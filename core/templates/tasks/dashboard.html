@@ -1,0 +1,311 @@
+<!-- core/templates/tasks/dashboard.html -->
+{% extends 'base/base.html' %}
+{% load i18n %}
+
+{% block title %}
+    {% if current_board %}{{ current_board.title }}{% else %}{% translate "General" %}{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-3">
+
+    <!-- CABECERA Y FILTRO DE TABLEROS -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <h2 class="h4 mb-0 fw-bold">
+            📌 {% if current_board %}{{ current_board.title }}{% else %}{% translate "General" %}{% endif %}
+        </h2>
+
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+            <!-- Pestañas de Tableros (Sin duplicados) -->
+            <div class="nav nav-pills gap-1 align-items-center">
+                <!-- Pestaña Principal: General -->
+                <a href="{% url 'dashboard' %}" 
+                   class="nav-link btn-sm py-1 px-3 {% if not current_board %}active bg-primary text-white{% else %}bg-light text-dark border{% endif %}">
+                    🌐 {% translate "General" %}
+                </a>
+
+                <!-- Tableros Personalizados -->
+                {% for board in boards %}
+                {% if not board.is_default %}
+                    <div class="d-inline-flex align-items-center rounded overflow-hidden shadow-sm me-1"
+                        style="
+                            {% if current_board.id == board.id %}
+                                background-color: {{ board.color|default:'#0d6efd' }} !important;
+                                color: white !important;
+                            {% else %}
+                                background-color: rgba(245, 245, 245, 0.9) !important;
+                                border-left: 4px solid {{ board.color|default:'#6c757d' }} !important;
+                                border-top: 1px solid #dee2e6 !important;
+                                border-right: 1px solid #dee2e6 !important;
+                                border-bottom: 1px solid #dee2e6 !important;
+                            {% endif %}
+                        ">
+                        <!-- Enlace principal del tablero -->
+                        <a href="{% url 'dashboard_board' board.id %}" 
+                        class="text-decoration-none py-1 ps-2 pe-1 small fw-bold {% if current_board.id == board.id %}text-white{% else %}text-dark{% endif %}">
+                            📁 {{ board.title }}
+                        </a>
+
+                        <!-- Botón lápiz clickeable con z-index explícito -->
+                        {% if current_board.id == board.id %}
+                            <button type="button" 
+                                    class="btn btn-sm p-0 pe-2 ps-1 border-0 shadow-none position-relative text-white" 
+                                    style="z-index: 2; cursor: pointer; opacity: 0.7; transition: opacity 0.2s ease, filter 0.2s ease;"
+                                    onmouseover="this.style.opacity='1'; this.style.filter='brightness(0.7)';"
+                                    onmouseout="this.style.opacity='0.7'; this.style.filter='brightness(1)';"
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#editBoardModal{{ board.id }}"
+                                    title="{% translate 'Editar tablero' %}">
+                                •••
+                            </button>
+                        {% endif %}
+                    </div>
+
+                    <!-- MODAL DE EDICIÓN (Ubicado fuera del contenedor de la pestaña) -->
+                    <div class="modal fade" id="editBoardModal{{ board.id }}" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content text-dark">
+                                <form method="POST" action="{% url 'edit_board' board.id %}">
+                                    {% csrf_token %}
+                                    <div class="modal-header">
+                                        <h5 class="modal-title fw-bold">⚙️ {% translate "Editar Tablero" %}: {{ board.title }}</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body text-start">
+                                        <div class="mb-3">
+                                            <label class="form-label small fw-bold">{% translate "Nombre del tablero" %}</label>
+                                            <input type="text" name="title" value="{{ board.title }}" class="form-control" required>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label small fw-bold">{% translate "Color del tablero" %}</label>
+                                            <select name="color" class="form-select">
+                                                <option value="#3B82F6" {% if board.color == "#3B82F6" %}selected{% endif %}>🔵 {% translate "Azul" %}</option>
+                                                <option value="#10B981" {% if board.color == "#10B981" %}selected{% endif %}>🟢 {% translate "Verde" %}</option>
+                                                <option value="#EF4444" {% if board.color == "#EF4444" %}selected{% endif %}>🔴 {% translate "Rojo" %}</option>
+                                                <option value="#F59E0B" {% if board.color == "#F59E0B" %}selected{% endif %}>🟠 {% translate "Naranja" %}</option>
+                                                <option value="#8B5CF6" {% if board.color == "#8B5CF6" %}selected{% endif %}>🟣 {% translate "Púrpura" %}</option>
+                                                <option value="#6B7280" {% if board.color == "#6B7280" %}selected{% endif %}>⚪ {% translate "Gris" %}</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label small">{% translate "Descripción" %}</label>
+                                            <textarea name="description" class="form-control" rows="3">{{ board.description|default:'' }}</textarea>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer justify-content-between">
+                                        <button type="submit" 
+                                                formaction="{% url 'delete_board' board.id %}" 
+                                                class="btn btn-outline-danger btn-sm"
+                                                onclick="return confirm('¿Seguro que quieres eliminar el tablero {{ board.title }}?');">
+                                            🗑️ {% translate "Eliminar Tablero" %}
+                                        </button>
+                                        
+                                        <div>
+                                            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">{% translate "Cancelar" %}</button>
+                                            <button type="submit" class="btn btn-primary btn-sm">{% translate "Guardar Cambios" %}</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+            </div>
+
+            <!-- Botón para crear un nuevo tablero -->
+            <button type="button" class="btn btn-success btn-sm shadow-sm ms-2" data-bs-toggle="modal" data-bs-target="#createBoardModal">
+                ➕ {% translate "Nuevo Tablero" %}
+            </button>
+        </div>
+    </div>
+
+    <!-- 1. FORMULARIO DE ALTA RÁPIDA -->
+    <div class="card mb-4 shadow-sm border-0">
+        <div class="card-body p-3">
+            <form method="POST" action="">
+                {% csrf_token %}
+                
+                <div class="row g-2 align-items-end">
+                    <div class="col-md-6">
+                        <label class="form-label small text-muted mb-1">{% translate "Título de la tarea" %}</label>
+                        {{ form.title }}
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small text-muted mb-1">{% translate "Urgencia (1-4)" %}</label>
+                        {{ form.urgency }}
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small text-muted mb-1">{% translate "Importancia (1-4)" %}</label>
+                        {{ form.importance }}
+                    </div>
+                    <div class="col-md-2 d-grid">
+                        <button type="submit" class="btn btn-primary">
+                            ➕ {% translate "Añadir" %}
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Desplegable Opciones Avanzadas -->
+                <div class="mt-2">
+                    <button class="btn btn-link btn-sm text-decoration-none p-0 text-muted" type="button" data-bs-toggle="collapse" data-bs-target="#advancedOptions">
+                        ⚙️ {% translate "Opciones avanzadas (Tablero, fecha límite, notas...)" %}
+                    </button>
+                    
+                    <div class="collapse mt-2" id="advancedOptions">
+                        <div class="row g-3 p-3 border rounded bg-white shadow-sm">
+                            <div class="col-md-4">
+                                <label class="form-label small">{% translate "Tablero" %}</label>
+                                {{ form.board }}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small">{% translate "Fecha límite" %}</label>
+                                {{ form.due_date }}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small">{% translate "Notas / Descripción" %}</label>
+                                {{ form.description }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 2. MATRIZ DE EISENHOWER (4 CUADRANTES CON CLASES SASS) -->
+    <div class="row g-3">
+        
+        <!-- CUADRANTE 1: DO FIRST (Urgente e Importante) -->
+        <div class="col-md-6">
+            <div class="quadrant quadrant-q1 h-100 shadow-sm">
+                <div class="quadrant-header d-flex justify-content-between align-items-center">
+                    <span>🔥 {% translate "Urgente - Importante (Hacer ahora)" %}</span>
+                    <span class="badge bg-white text-danger rounded-pill">{{ q1_tasks.count }}</span>
+                </div>
+                <div class="p-3">
+                    {% for task in q1_tasks %}
+                        {% include '_includes/_task_card.html' with task=task %}
+                    {% empty %}
+                        <p class="text-muted text-center py-4 small mb-0">{% translate "No hay tareas urgentes e importantes." %}</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- CUADRANTE 2: SCHEDULE (No Urgente pero Importante) -->
+        <div class="col-md-6">
+            <div class="quadrant quadrant-q2 h-100 shadow-sm">
+                <div class="quadrant-header d-flex justify-content-between align-items-center">
+                    <span>📅 {% translate "Importante - No Urgente (Planificar)" %}</span>
+                    <span class="badge bg-white text-primary rounded-pill">{{ q2_tasks.count }}</span>
+                </div>
+                <div class="p-3">
+                    {% for task in q2_tasks %}
+                        {% include '_includes/_task_card.html' with task=task %}
+                    {% empty %}
+                        <p class="text-muted text-center py-4 small mb-0">{% translate "No hay tareas de planificación pendientes." %}</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- CUADRANTE 3: DELEGATE (Urgente pero No Importante) -->
+        <div class="col-md-6">
+            <div class="quadrant quadrant-q3 h-100 shadow-sm">
+                <div class="quadrant-header d-flex justify-content-between align-items-center">
+                    <span>👥 {% translate "Urgente - No Importante (Delegar)" %}</span>
+                    <span class="badge bg-dark text-white rounded-pill">{{ q3_tasks.count }}</span>
+                </div>
+                <div class="p-3">
+                    {% for task in q3_tasks %}
+                        {% include '_includes/_task_card.html' with task=task %}
+                    {% empty %}
+                        <p class="text-muted text-center py-4 small mb-0">{% translate "No hay tareas por delegar." %}</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- CUADRANTE 4: ELIMINATE (Ni Urgente ni Importante) -->
+        <div class="col-md-6">
+            <div class="quadrant quadrant-q4 h-100 shadow-sm">
+                <div class="quadrant-header d-flex justify-content-between align-items-center">
+                    <span>🗑️ {% translate "No Urgente - No Importante (Eliminar / Posponer)" %}</span>
+                    <span class="badge bg-white text-secondary rounded-pill">{{ q4_tasks.count }}</span>
+                </div>
+                <div class="p-3">
+                    {% for task in q4_tasks %}
+                        {% include '_includes/_task_card.html' with task=task %}
+                    {% empty %}
+                        <p class="text-muted text-center py-4 small mb-0">{% translate "No hay tareas irrelevantes." %}</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 3. TAREAS COMPLETADAS (HISTORIAL SECUNDARIO) -->
+    {% if done_tasks %}
+    <div class="mt-5 mb-4">
+        <h5 class="h6 text-muted fw-bold mb-3">✅ {% translate "Últimas tareas completadas" %}</h5>
+        <div class="list-group shadow-sm border-0">
+            {% for task in done_tasks %}
+                <div class="list-group-item d-flex justify-content-between align-items-center text-muted py-2">
+                    <del class="small">{{ task.title }}</del>
+                    <small class="text-muted" style="font-size: 0.75rem;">{{ task.updated_at|date:"d/m/Y H:i" }}</small>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- MODAL DE CREACIÓN DE TABLERO -->
+    <div class="modal fade" id="createBoardModal" tabindex="-1" aria-labelledby="createBoardModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="POST" action="{% url 'create_board' %}">
+                    {% csrf_token %}
+                    <div class="modal-header">
+                        <h5 class="modal-title fw-bold" id="createBoardModalLabel">📋 {% translate "Crear nuevo tablero" %}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">{% translate "Nombre del tablero" %}</label>
+                            {{ board_form.title }}
+                        </div>
+
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">{% translate "Color del tablero" %}</label>
+                            <select name="color" class="form-select" required>
+                                <option value="#3B82F6" selected>🔵 {% translate "Azul" %}</option>
+                                <option value="#10B981">🟢 {% translate "Verde" %}</option>
+                                <option value="#EF4444">🔴 {% translate "Rojo" %}</option>
+                                <option value="#F59E0B">🟠 {% translate "Naranja" %}</option>
+                                <option value="#8B5CF6">🟣 {% translate "Púrpura" %}</option>
+                                <option value="#6B7280">⚪ {% translate "Gris" %}</option>
+                            </select>
+                        </div>
+
+
+                        <div class="mb-3">
+                            <label class="form-label small">{% translate "Descripción (opcional)" %}</label>
+                            {{ board_form.description }}
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">{% translate "Cancelar" %}</button>
+                        <button type="submit" class="btn btn-primary btn-sm">{% translate "Guardar Tablero" %}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
