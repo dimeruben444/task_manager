@@ -16,7 +16,7 @@
         </h2>
 
         <div class="d-flex align-items-center gap-2 flex-wrap">
-            <!-- Pestañas de Tableros (Sin duplicados) -->
+            <!-- Pestañas de Tableros -->
             <div class="nav nav-pills gap-1 align-items-center">
                 <!-- Pestaña Principal: General -->
                 <a href="{% url 'dashboard' %}" 
@@ -46,7 +46,7 @@
                             📁 {{ board.title }}
                         </a>
 
-                        <!-- Botón lápiz clickeable con z-index explícito -->
+                        <!-- Botón opciones del tablero -->
                         {% if current_board.id == board.id %}
                             <button type="button" 
                                     class="btn btn-sm p-0 pe-2 ps-1 border-0 shadow-none position-relative text-white" 
@@ -61,7 +61,7 @@
                         {% endif %}
                     </div>
 
-                    <!-- MODAL DE EDICIÓN (Ubicado fuera del contenedor de la pestaña) -->
+                    <!-- MODAL DE EDICIÓN DE TABLERO -->
                     <div class="modal fade" id="editBoardModal{{ board.id }}" tabindex="-1" aria-hidden="true">
                         <div class="modal-dialog">
                             <div class="modal-content text-dark">
@@ -122,28 +122,71 @@
         </div>
     </div>
 
-    <!-- 1. FORMULARIO DE ALTA RÁPIDA -->
+    <!-- 1. FORMULARIO DE ALTA RÁPIDA DE TAREA -->
     <div class="card mb-4 shadow-sm border-0">
         <div class="card-body p-3">
-            <form method="POST" action="">
+            <form id="quickTaskForm" method="POST" action="">
                 {% csrf_token %}
                 
-                <div class="row g-2 align-items-end">
-                    <div class="col-md-6">
-                        <label class="form-label small text-muted mb-1">{% translate "Título de la tarea" %}</label>
+                <div class="row g-3 align-items-end">
+                    <!-- Título -->
+                    <div class="col-md-5">
+                        <label class="form-label small text-muted mb-1 fw-bold">{% translate "Título de la tarea" %}</label>
                         {{ form.title }}
                     </div>
-                    <div class="col-md-2">
-                        <label class="form-label small text-muted mb-1">{% translate "Urgencia (1-4)" %}</label>
-                        {{ form.urgency }}
+
+                    <!-- Urgencia -->
+                    <div class="col-md-3 d-flex justify-content-center">
+                        <div class="rating-wrapper text-center" style="display: inline-block;">
+                            <div class="d-flex justify-content-between align-items-center mb-1 text-muted fw-bold small px-1">
+                                <span>-</span>
+                                <span>{% translate "Urgente" %}</span>
+                                <span>+</span>
+                            </div>
+                            <div class="star-rating">
+                                <input type="radio" id="urgency-4" name="urgency" value="4" {% if form.urgency.value == 4 %}checked{% endif %}>
+                                <label for="urgency-4" title="4 - Muy Urgente">★</label>
+
+                                <input type="radio" id="urgency-3" name="urgency" value="3" {% if form.urgency.value == 3 %}checked{% endif %}>
+                                <label for="urgency-3" title="3 - Urgente">★</label>
+
+                                <input type="radio" id="urgency-2" name="urgency" value="2" {% if form.urgency.value == 2 %}checked{% endif %}>
+                                <label for="urgency-2" title="2 - Moderado">★</label>
+
+                                <input type="radio" id="urgency-1" name="urgency" value="1" {% if form.urgency.value == 1 %}checked{% endif %}>
+                                <label for="urgency-1" title="1 - Baja Urgencia">★</label>
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-md-2">
-                        <label class="form-label small text-muted mb-1">{% translate "Importancia (1-4)" %}</label>
-                        {{ form.importance }}
+
+                    <!-- Importancia -->
+                    <div class="col-md-3 d-flex justify-content-center">
+                        <div class="rating-wrapper text-center" style="display: inline-block;">
+                            <div class="d-flex justify-content-between align-items-center mb-1 text-muted fw-bold small px-1">
+                                <span>-</span>
+                                <span>{% translate "Importante" %}</span>
+                                <span>+</span>
+                            </div>
+                            <div class="star-rating">
+                                <input type="radio" id="importance-4" name="importance" value="4" {% if form.importance.value == 4 %}checked{% endif %}>
+                                <label for="importance-4" title="4 - Muy Importante">★</label>
+
+                                <input type="radio" id="importance-3" name="importance" value="3" {% if form.importance.value == 3 %}checked{% endif %}>
+                                <label for="importance-3" title="3 - Importante">★</label>
+
+                                <input type="radio" id="importance-2" name="importance" value="2" {% if form.importance.value == 2 %}checked{% endif %}>
+                                <label for="importance-2" title="2 - Moderada">★</label>
+
+                                <input type="radio" id="importance-1" name="importance" value="1" {% if form.importance.value == 1 %}checked{% endif %}>
+                                <label for="importance-1" title="1 - Baja Importancia">★</label>
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-md-2 d-grid">
-                        <button type="submit" class="btn btn-primary">
-                            ➕ {% translate "Añadir" %}
+
+                    <!-- Botón Añadir -->
+                    <div class="col-md-1 d-grid">
+                        <button type="submit" class="btn btn-primary fw-bold">
+                            ➕
                         </button>
                     </div>
                 </div>
@@ -175,7 +218,7 @@
         </div>
     </div>
 
-    <!-- 2. MATRIZ DE EISENHOWER (4 CUADRANTES CON CLASES SASS) -->
+    <!-- 2. MATRIZ DE EISENHOWER (4 CUADRANTES) -->
     <div class="row g-3">
         
         <!-- CUADRANTE 1: DO FIRST (Urgente e Importante) -->
@@ -248,7 +291,7 @@
 
     </div>
 
-    <!-- 3. TAREAS COMPLETADAS (HISTORIAL SECUNDARIO) -->
+    <!-- 3. TAREAS COMPLETADAS -->
     {% if done_tasks %}
     <div class="mt-5 mb-4">
         <h5 class="h6 text-muted fw-bold mb-3">✅ {% translate "Últimas tareas completadas" %}</h5>
@@ -279,7 +322,6 @@
                             {{ board_form.title }}
                         </div>
 
-
                         <div class="mb-3">
                             <label class="form-label small fw-bold">{% translate "Color del tablero" %}</label>
                             <select name="color" class="form-select" required>
@@ -291,7 +333,6 @@
                                 <option value="#6B7280">⚪ {% translate "Gris" %}</option>
                             </select>
                         </div>
-
 
                         <div class="mb-3">
                             <label class="form-label small">{% translate "Descripción (opcional)" %}</label>
@@ -308,4 +349,52 @@
     </div>
 
 </div>
+
+<!-- SCRIPT DE VALIDACIÓN DE ESTRELLAS -->
+<script>
+document.addEventListener('submit', function (e) {
+    const form = e.target.closest('#quickTaskForm');
+    if (!form) return;
+
+    let isValid = true;
+
+    ['urgency', 'importance'].forEach(function (fieldName) {
+        const checked = form.querySelector(`input[name="${fieldName}"]:checked`);
+        const firstInput = form.querySelector(`input[name="${fieldName}"]`);
+        const container = firstInput ? firstInput.closest('.star-rating') : null;
+
+        if (!checked) {
+            isValid = false;
+            if (container) {
+                // Aplica el rojo con animación
+                container.classList.add('is-invalid');
+
+                // ⏱️ Remueve la clase de error tras 1 segundo (1000 ms)
+                setTimeout(function () {
+                    container.classList.remove('is-invalid');
+                }, 350);
+            }
+        } else {
+            if (container) {
+                container.classList.remove('is-invalid');
+            }
+        }
+    });
+
+    if (!isValid) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+});
+
+// Limpiar el rojo al hacer clic manualmente en una estrella
+document.addEventListener('change', function (e) {
+    if (e.target.matches('.star-rating input[type="radio"]')) {
+        const container = e.target.closest('.star-rating');
+        if (container) {
+            container.classList.remove('is-invalid');
+        }
+    }
+});
+</script>
 {% endblock %}

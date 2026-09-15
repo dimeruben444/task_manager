@@ -1,17 +1,17 @@
 <!-- core/templates/_includes/_task_card.html -->
 {% load i18n %}
 
-<div class="card mb-2 shadow-sm border-0 position-relative task-card">
+<div class="card mb-2 shadow-sm border-0 task-card">
     <div class="card-body p-3">
         <div class="d-flex justify-content-between align-items-start gap-2">
             
-            <!-- Checkbox de Completada / Check -->
+            <!-- Botón Check/Completada -->
             <form method="POST" action="{% url 'toggle_task' task.id %}" class="d-inline">
                 {% csrf_token %}
                 <button type="submit" 
                         class="btn btn-sm p-0 border-0 me-2 text-decoration-none" 
-                        title="{% if task.is_done %}{% translate 'Marcar como pendiente' %}{% else %}{% translate 'Marcar como completada' %}{% endif %}">
-                    {% if task.is_done %}
+                        title="{% if task.is_completed %}{% translate 'Marcar como pendiente' %}{% else %}{% translate 'Marcar como completada' %}{% endif %}">
+                    {% if task.is_completed %}
                         <span class="fs-5 text-success">✅</span>
                     {% else %}
                         <span class="fs-5 text-muted opacity-50 opacity-100-hover">⭕</span>
@@ -21,7 +21,7 @@
 
             <!-- Título y detalles de la tarea -->
             <div class="flex-grow-1">
-                <h6 class="card-title mb-1 fw-bold {% if task.is_done %}text-decoration-line-through text-muted{% endif %}">
+                <h6 class="card-title mb-1 fw-bold {% if task.is_completed %}text-decoration-line-through text-muted{% endif %}">
                     {{ task.title }}
                 </h6>
                 
@@ -46,78 +46,107 @@
                 </div>
             </div>
 
-            <!-- Botones de Acción: Editar y Eliminar -->
-            <div class="d-flex gap-1 align-items-center">
-                <!-- Botón Editar (Abre Modal) -->
-                <button type="button" 
-                        class="btn btn-sm btn-link text-muted p-0 border-0" 
-                        data-bs-toggle="modal" 
-                        data-bs-target="#editTaskModal{{ task.id }}"
-                        title="{% translate 'Editar tarea' %}">
-                    ✏️
-                </button>
+            <!-- Botón de opciones '•••' integrado para abrir el modal -->
+            <button type="button" 
+                    class="btn btn-sm p-0 px-1 border-0 shadow-none text-muted" 
+                    style="cursor: pointer; opacity: 0.7; transition: opacity 0.2s ease, filter 0.2s ease;"
+                    onmouseover="this.style.opacity='1'; this.style.filter='brightness(0.7)';"
+                    onmouseout="this.style.opacity='0.7'; this.style.filter='brightness(1)';"
+                    data-bs-toggle="modal" 
+                    data-bs-target="#editTaskModal{{ task.id }}"
+                    title="{% translate 'Editar tarea' %}">
+                •••
+            </button>
 
-                <!-- Botón Eliminar -->
-                <form method="POST" action="{% url 'delete_task' task.id %}" class="d-inline">
-                    {% csrf_token %}
-                    <button type="submit" 
-                            class="btn btn-sm btn-link text-danger p-0 border-0 ms-1" 
-                            onclick="return confirm('¿Seguro que quieres eliminar la tarea: {{ task.title }}?');"
-                            title="{% translate 'Eliminar tarea' %}">
-                        🗑️
-                    </button>
-                </form>
-            </div>
         </div>
     </div>
 </div>
 
-<!-- MODAL DE EDICIÓN DE TAREA -->
+<!-- MODAL DE EDICIÓN DE TAREA CON ESTRELLAS -->
 <div class="modal fade" id="editTaskModal{{ task.id }}" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content text-dark">
             <form method="POST" action="{% url 'edit_task' task.id %}">
                 {% csrf_token %}
                 <div class="modal-header">
-                    <h5 class="modal-title fw-bold">✏️ {% translate "Editar Tarea" %}</h5>
+                    <h5 class="modal-title fw-bold">⚙️ {% translate "Editar Tarea" %}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
+                
                 <div class="modal-body text-start">
                     <div class="mb-3">
-                        <label class="form-label small fw-bold">{% translate "Título" %}</label>
+                        <label class="form-label small fw-bold">{% translate "Título de la tarea" %}</label>
                         <input type="text" name="title" value="{{ task.title }}" class="form-control" required>
                     </div>
 
-                    <div class="row g-2 mb-3">
+                    <!-- Selector de Estrellas para Urgencia e Importancia -->
+                    <div class="row g-3 mb-3">
+                        <!-- Editar Urgencia -->
                         <div class="col-6">
-                            <label class="form-label small fw-bold">{% translate "Urgencia (1-4)" %}</label>
-                            <input type="number" name="urgency" min="1" max="4" value="{{ task.urgency }}" class="form-control" required>
+                            <label class="form-label small fw-bold d-block">{% translate "Urgencia" %}</label>
+                            <div class="star-rating">
+                                <input type="radio" id="edit-urgency-4-{{ task.id }}" name="urgency" value="4" {% if task.urgency == 4 %}checked{% endif %}>
+                                <label for="edit-urgency-4-{{ task.id }}" title="4 - Muy Urgente">★</label>
+
+                                <input type="radio" id="edit-urgency-3-{{ task.id }}" name="urgency" value="3" {% if task.urgency == 3 %}checked{% endif %}>
+                                <label for="edit-urgency-3-{{ task.id }}" title="3 - Urgente">★</label>
+
+                                <input type="radio" id="edit-urgency-2-{{ task.id }}" name="urgency" value="2" {% if task.urgency == 2 %}checked{% endif %}>
+                                <label for="edit-urgency-2-{{ task.id }}" title="2 - Moderado">★</label>
+
+                                <input type="radio" id="edit-urgency-1-{{ task.id }}" name="urgency" value="1" {% if task.urgency == 1 %}checked{% endif %}>
+                                <label for="edit-urgency-1-{{ task.id }}" title="1 - Baja Urgencia">★</label>
+                            </div>
                         </div>
+
+                        <!-- Editar Importancia -->
                         <div class="col-6">
-                            <label class="form-label small fw-bold">{% translate "Importancia (1-4)" %}</label>
-                            <input type="number" name="importance" min="1" max="4" value="{{ task.importance }}" class="form-control" required>
+                            <label class="form-label small fw-bold d-block">{% translate "Importancia" %}</label>
+                            <div class="star-rating">
+                                <input type="radio" id="edit-importance-4-{{ task.id }}" name="importance" value="4" {% if task.importance == 4 %}checked{% endif %}>
+                                <label for="edit-importance-4-{{ task.id }}" title="4 - Muy Importante">★</label>
+
+                                <input type="radio" id="edit-importance-3-{{ task.id }}" name="importance" value="3" {% if task.importance == 3 %}checked{% endif %}>
+                                <label for="edit-importance-3-{{ task.id }}" title="3 - Importante">★</label>
+
+                                <input type="radio" id="edit-importance-2-{{ task.id }}" name="importance" value="2" {% if task.importance == 2 %}checked{% endif %}>
+                                <label for="edit-importance-2-{{ task.id }}" title="2 - Moderada">★</label>
+
+                                <input type="radio" id="edit-importance-1-{{ task.id }}" name="importance" value="1" {% if task.importance == 1 %}checked{% endif %}>
+                                <label for="edit-importance-1-{{ task.id }}" title="1 - Baja Importancia">★</label>
+                            </div>
                         </div>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label small fw-bold">{% translate "Tablero" %}</label>
+                        <label class="form-label small fw-bold">{% translate "Tablero asignado" %}</label>
                         <select name="board" class="form-select">
                             {% for b in boards %}
                                 <option value="{{ b.id }}" {% if task.board.id == b.id %}selected{% endif %}>
-                                    {{ b.title }}
+                                    📁 {{ b.title }}
                                 </option>
                             {% endfor %}
                         </select>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label small">{% translate "Descripción" %}</label>
+                        <label class="form-label small">{% translate "Descripción / Notas" %}</label>
                         <textarea name="description" class="form-control" rows="3">{{ task.description|default:'' }}</textarea>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">{% translate "Cancelar" %}</button>
-                    <button type="submit" class="btn btn-primary btn-sm">{% translate "Guardar Cambios" %}</button>
+
+                <div class="modal-footer justify-content-between">
+                    <button type="submit" 
+                            formaction="{% url 'delete_task' task.id %}" 
+                            class="btn btn-outline-danger btn-sm"
+                            onclick="return confirm('¿Seguro que quieres eliminar la tarea: {{ task.title }}?');">
+                        🗑️ {% translate "Eliminar Tarea" %}
+                    </button>
+                    
+                    <div>
+                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">{% translate "Cancelar" %}</button>
+                        <button type="submit" class="btn btn-primary btn-sm">{% translate "Guardar Cambios" %}</button>
+                    </div>
                 </div>
             </form>
         </div>

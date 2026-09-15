@@ -39,10 +39,14 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'sass_processor',
+
     # Aplicacciones locales
     'users',
     'boards',
     'tasks',
+
+
 ]
 
 MIDDLEWARE = [
@@ -60,7 +64,7 @@ ROOT_URLCONF = 'core.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [ BASE_DIR / 'core' / 'templates' ],
+        'DIRS': [BASE_DIR / 'templates', BASE_DIR / 'core' / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -122,11 +126,22 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
+
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
 
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+
+# Ruta raíz de tus archivos estáticos
+STATICFILES_FINDERS = [
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'sass_processor.finders.CssFinder',  # 👈 Compilador automático de Sass
+]
+
+SASS_PROCESSOR_ROOT = BASE_DIR / 'static'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -136,3 +151,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # sirve para que no utilize el ususario predeteminado del sistema sino la clase User de mi app users
 AUTH_USER_MODEL = 'users.User'
+
+
+# Redirecciones de Autenticación
+LOGIN_URL = 'login'              # 👈 Redirige a /login/ en vez de /accounts/login/
+LOGIN_REDIRECT_URL = 'dashboard'  # Redirige tras iniciar sesión con éxito
+LOGOUT_REDIRECT_URL = 'login'     # Redirige tras cerrar sesión
+
+

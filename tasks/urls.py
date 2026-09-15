@@ -1,7 +1,7 @@
 # tasks/urls.py
 from django.urls import path
+from boards.views import dashboard_view
 from .views import (
-    dashboard_view, 
     ToggleTaskDoneView, 
     TaskUpdateView, 
     TaskDeleteView

@@ -1,0 +1,46 @@
+{% extends 'base/base.html' %}
+{% load i18n %}
+
+{% block title %}{% translate "Registro" %}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5 col-lg-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4">
+                    <h3 class="fw-bold text-center mb-4">📝 {% translate "Crear Cuenta" %}</h3>
+                    
+                    <form method="POST">
+                        {% csrf_token %}
+                        
+                        {% for field in form %}
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold">{{ field.label }}</label>
+                                {{ field }}
+                                {% if field.help_text %}
+                                    <div class="form-text text-muted small" style="font-size: 0.75rem;">{{ field.help_text }}</div>
+                                {% endif %}
+                                {% for error in field.errors %}
+                                    <div class="text-danger small mt-1">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endfor %}
+                        
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn btn-primary fw-bold">{% translate "Registrarse" %}</button>
+                        </div>
+                    </form>
+
+                    <div class="text-center mt-3">
+                        <small class="text-muted">
+                            {% translate "¿Ya tienes cuenta?" %} 
+                            <a href="{% url 'login' %}" class="text-decoration-none">{% translate "Inicia sesión aquí" %}</a>
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
