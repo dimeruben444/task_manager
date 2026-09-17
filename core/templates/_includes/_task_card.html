@@ -1,153 +1,312 @@
 <!-- core/templates/_includes/_task_card.html -->
 {% load i18n %}
 
-<div class="card mb-2 shadow-sm border-0 task-card">
-    <div class="card-body p-3">
+<!-- TARJETA EN EL TABLERO -->
+<div class="card mb-2 shadow-sm border-0 task-card hover-shadow" 
+     data-created-by="{% if task.created_by == request.user %}mine{% else %}shared{% endif %}"
+     style="cursor: pointer; transition: transform 0.15s ease, box-shadow 0.15s ease;">
+    
+    <div class="card-body p-2 pt-1" data-bs-toggle="modal" data-bs-target="#viewTaskModal{{ task.id }}">
         <div class="d-flex justify-content-between align-items-start gap-2">
             
-            <!-- Botón Check/Completada -->
-            <form method="POST" action="{% url 'toggle_task' task.id %}" class="d-inline">
-                {% csrf_token %}
-                <button type="submit" 
-                        class="btn btn-sm p-0 border-0 me-2 text-decoration-none" 
-                        title="{% if task.is_completed %}{% translate 'Marcar como pendiente' %}{% else %}{% translate 'Marcar como completada' %}{% endif %}">
-                    {% if task.is_completed %}
-                        <span class="fs-5 text-success">✅</span>
-                    {% else %}
-                        <span class="fs-5 text-muted opacity-50 opacity-100-hover">⭕</span>
-                    {% endif %}
-                </button>
-            </form>
-
-            <!-- Título y detalles de la tarea -->
             <div class="flex-grow-1">
-                <h6 class="card-title mb-1 fw-bold {% if task.is_completed %}text-decoration-line-through text-muted{% endif %}">
+                <!-- Badges de Tablero y Compartido -->
+                <div class="mb-1 d-flex align-items-center gap-1 flex-wrap">
+                    {% if task.board and not task.board.is_default %}
+                        {% if not current_board or current_board.id != task.board.id %}
+                            <span class="badge squared-pill text-white fw-normal" 
+                                  style="font-size: 0.65rem; background-color: {{ task.board.color|default:'#6c757d' }};">
+                                {{ task.board.title }}
+                            </span>
+                        {% endif %}
+                    {% endif %}
+                </div>
+
+                <!-- Título -->
+                <h6 class="card-title mb-1 ps-1 small fw-bold {% if task.is_completed %}text-decoration-line-through text-muted{% endif %}">
                     {{ task.title }}
                 </h6>
-                
-                {% if task.description %}
-                    <p class="card-text small text-muted mb-2">{{ task.description|truncatewords:15 }}</p>
-                {% endif %}
 
-                <!-- Badges de Fecha y Tablero -->
-                <div class="d-flex flex-wrap gap-1 align-items-center">
-                    {% if task.due_date %}
-                        <span class="badge bg-light text-dark border fw-normal" style="font-size: 0.7rem;">
-                            📅 {{ task.due_date|date:"d/m/Y" }}
-                        </span>
-                    {% endif %}
+                <!-- Pie de tarjeta: Fecha y Avatares -->
+                <div class="d-flex align-items-center justify-content-between mt-2 ps-2">
+                    <div class="d-flex align-items-center gap-0 text-muted small" style="font-size: 0.7rem;">
+                        {% if task.due_date %}
+                            <svg xmlns="http://www.w3.org/2000/svg" height="19px" viewBox="0 -960 960 960" width="19px" fill="#b8b8b8"><path d="m612-292 56-56-148-148v-184h-80v216l172 172ZM480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-400Zm0 320q133 0 226.5-93.5T800-480q0-133-93.5-226.5T480-800q-133 0-226.5 93.5T160-480q0 133 93.5 226.5T480-160Z"/></svg>{{ task.due_date|date:"M d" }}
+                        {% endif %}
+                    </div>
 
-                    {% if task.board and not current_board %}
-                        <span class="badge text-white fw-normal" 
-                              style="font-size: 0.7rem; background-color: {{ task.board.color|default:'#6c757d' }};">
-                            📁 {{ task.board.title }}
-                        </span>
-                    {% endif %}
+                    <!-- Avatares de asignados -->
+                    <div class="d-flex align-items-center gap-1">
+                        {% for user_assigned in task.assigned_to.all %}
+                            <span class="badge bg-dark text-white rounded-circle p-1 d-inline-flex align-items-center justify-content-center shadow-sm" 
+                                  style="width: 20px; height: 20px; font-size: 0.55rem;"
+                                  title="{{ user_assigned.get_full_name|default:user_assigned.username }}">
+                                {{ user_assigned.username|slice:":2"|upper }}
+                            </span>
+                        {% endfor %}
+                    </div>
                 </div>
             </div>
 
-            <!-- Botón de opciones '•••' integrado para abrir el modal -->
-            <button type="button" 
-                    class="btn btn-sm p-0 px-1 border-0 shadow-none text-muted" 
-                    style="cursor: pointer; opacity: 0.7; transition: opacity 0.2s ease, filter 0.2s ease;"
-                    onmouseover="this.style.opacity='1'; this.style.filter='brightness(0.7)';"
-                    onmouseout="this.style.opacity='0.7'; this.style.filter='brightness(1)';"
-                    data-bs-toggle="modal" 
-                    data-bs-target="#editTaskModal{{ task.id }}"
-                    title="{% translate 'Editar tarea' %}">
-                •••
-            </button>
+            <span class="text-muted small align-self-center opacity-50">...</span>
 
         </div>
     </div>
 </div>
 
-<!-- MODAL DE EDICIÓN DE TAREA CON ESTRELLAS -->
-<div class="modal fade" id="editTaskModal{{ task.id }}" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content text-dark">
+
+<!-- MODAL DETALLE / EDICIÓN ESTILO TRELLO -->
+<div class="modal fade" id="viewTaskModal{{ task.id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow text-dark">
+            
             <form method="POST" action="{% url 'edit_task' task.id %}">
                 {% csrf_token %}
-                <div class="modal-header">
-                    <h5 class="modal-title fw-bold">⚙️ {% translate "Editar Tarea" %}</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
                 
-                <div class="modal-body text-start">
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold">{% translate "Título de la tarea" %}</label>
-                        <input type="text" name="title" value="{{ task.title }}" class="form-control" required>
+                <!-- CABECERA: Título editable directo (Sin Label) -->
+                <div class="modal-header border-bottom-0 pb-1 align-items-start">
+                    <div class="w-100 me-3 ms-2">
+                        <input type="text" 
+                               name="title" 
+                               value="{{ task.title }}" 
+                               class="form-control form-control-lg border-0 fs-4 fw-bold p-1 shadow-none bg-transparent" 
+                               placeholder="{% translate 'Título de la tarea' %}" 
+                               required>
                     </div>
+                    <button type="button" class="btn-close mt-1" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
 
-                    <!-- Selector de Estrellas para Urgencia e Importancia -->
-                    <div class="row g-3 mb-3">
-                        <!-- Editar Urgencia -->
-                        <div class="col-6">
-                            <label class="form-label small fw-bold d-block">{% translate "Urgencia" %}</label>
-                            <div class="star-rating">
-                                <input type="radio" id="edit-urgency-4-{{ task.id }}" name="urgency" value="4" {% if task.urgency == 4 %}checked{% endif %}>
-                                <label for="edit-urgency-4-{{ task.id }}" title="4 - Muy Urgente">★</label>
+                <div class="modal-body p-4 pt-2">
+                    <div class="row g-4">
+                        
+                        <!-- COLUMNA IZQUIERDA -->
+                        <div class="col-md-7 d-flex flex-column justify-content-between">
+                            <div>
+                                <!-- ESTRELLAS CON SEPARACIÓN VISUAL (- Urgencia + | - Importancia +) -->
+                                <div class="p-3 bg-light rounded mb-3">
+                                    <div class="row g-0 align-items-center">
+                                        
+                                        <!-- Urgencia -->
+                                        <div class="col-6 pe-2 border-end text-center">
+                                            <div class="d-flex justify-content-between align-items-center text-muted fw-bold small px-1 mb-1">
+                                                <span>-</span>
+                                                <span>{% translate "Urgencia" %}</span>
+                                                <span>+</span>
+                                            </div>
+                                            <div class="star-rating d-inline-flex">
+                                                <input type="radio" id="detail-urgency-4-{{ task.id }}" name="urgency" value="4" {% if task.urgency == 4 %}checked{% endif %}>
+                                                <label for="detail-urgency-4-{{ task.id }}">★</label>
 
-                                <input type="radio" id="edit-urgency-3-{{ task.id }}" name="urgency" value="3" {% if task.urgency == 3 %}checked{% endif %}>
-                                <label for="edit-urgency-3-{{ task.id }}" title="3 - Urgente">★</label>
+                                                <input type="radio" id="detail-urgency-3-{{ task.id }}" name="urgency" value="3" {% if task.urgency == 3 %}checked{% endif %}>
+                                                <label for="detail-urgency-3-{{ task.id }}">★</label>
 
-                                <input type="radio" id="edit-urgency-2-{{ task.id }}" name="urgency" value="2" {% if task.urgency == 2 %}checked{% endif %}>
-                                <label for="edit-urgency-2-{{ task.id }}" title="2 - Moderado">★</label>
+                                                <input type="radio" id="detail-urgency-2-{{ task.id }}" name="urgency" value="2" {% if task.urgency == 2 %}checked{% endif %}>
+                                                <label for="detail-urgency-2-{{ task.id }}">★</label>
 
-                                <input type="radio" id="edit-urgency-1-{{ task.id }}" name="urgency" value="1" {% if task.urgency == 1 %}checked{% endif %}>
-                                <label for="edit-urgency-1-{{ task.id }}" title="1 - Baja Urgencia">★</label>
+                                                <input type="radio" id="detail-urgency-1-{{ task.id }}" name="urgency" value="1" {% if task.urgency == 1 %}checked{% endif %}>
+                                                <label for="detail-urgency-1-{{ task.id }}">★</label>
+                                            </div>
+                                        </div>
+
+                                        <!-- Importancia -->
+                                        <div class="col-6 ps-2 text-center">
+                                            <div class="d-flex justify-content-between align-items-center text-muted fw-bold small px-1 mb-1">
+                                                <span>-</span>
+                                                <span>{% translate "Importancia" %}</span>
+                                                <span>+</span>
+                                            </div>
+                                            <div class="star-rating d-inline-flex">
+                                                <input type="radio" id="detail-importance-4-{{ task.id }}" name="importance" value="4" {% if task.importance == 4 %}checked{% endif %}>
+                                                <label for="detail-importance-4-{{ task.id }}">★</label>
+
+                                                <input type="radio" id="detail-importance-3-{{ task.id }}" name="importance" value="3" {% if task.importance == 3 %}checked{% endif %}>
+                                                <label for="detail-importance-3-{{ task.id }}">★</label>
+
+                                                <input type="radio" id="detail-importance-2-{{ task.id }}" name="importance" value="2" {% if task.importance == 2 %}checked{% endif %}>
+                                                <label for="detail-importance-2-{{ task.id }}">★</label>
+
+                                                <input type="radio" id="detail-importance-1-{{ task.id }}" name="importance" value="1" {% if task.importance == 1 %}checked{% endif %}>
+                                                <label for="detail-importance-1-{{ task.id }}">★</label>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <!-- ACCIONES ESTILO TRELLO (POP-OVERS FLOTANTES) -->
+                                <div class="d-flex flex-column gap-2 mb-3">
+                                    
+                                    <!-- Pop-over Fecha y Hora -->
+                                    <div class="dropdown">
+                                        <button class="btn btn-outline-secondary btn-sm text-start w-100 d-flex justify-content-between align-items-center shadow-none" 
+                                                type="button" 
+                                                id="dropdownDate{{ task.id }}" 
+                                                data-bs-toggle="dropdown" 
+                                                data-bs-auto-close="outside" 
+                                                aria-expanded="false">
+                                            <span>⏰ {% translate "Fecha" %}</span>
+                                            <small class="text-muted">{% if task.due_date %}{{ task.due_date|date:"d/m/Y H:i" }}{% else %}+{% endif %}</small>
+                                        </button>
+                                        <div class="dropdown-menu p-3 shadow-lg border-0 rounded-3 mt-1" aria-labelledby="dropdownDate{{ task.id }}" style="width: 280px; z-index: 1055;">
+                                            <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+                                                <span class="fw-bold small">{% translate "Fechas" %}</span>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label small text-muted mb-1">{% translate "Vencimiento" %}</label>
+                                                <input type="datetime-local" 
+                                                       name="due_date" 
+                                                       value="{{ task.due_date|date:'Y-m-d\TH:i' }}" 
+                                                       class="form-control form-control-sm border">
+                                            </div>
+                                            <div class="d-flex flex-column gap-1">
+                                                <button type="button" class="btn btn-primary btn-sm w-100 fw-bold" onclick="bootstrap.Dropdown.getInstance(document.getElementById('dropdownDate{{ task.id }}')).hide();">
+                                                    {% translate "Aceptar" %}
+                                                </button>
+                                                <button type="button" class="btn btn-link btn-sm text-danger text-decoration-none w-100 p-0" 
+                                                        onclick="this.closest('.dropdown-menu').querySelector('input[type=datetime-local]').value='';">
+                                                    {% translate "Quitar fecha" %}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Pop-over Cambiar de Tablero -->
+                                    <div class="dropdown">
+                                        <button class="btn btn-outline-secondary btn-sm text-start w-100 d-flex justify-content-between align-items-center shadow-none" 
+                                                type="button" 
+                                                id="dropdownBoard{{ task.id }}" 
+                                                data-bs-toggle="dropdown" 
+                                                data-bs-auto-close="outside" 
+                                                aria-expanded="false">
+                                            <span>📁 {% translate "Mover de Tablero" %}</span>
+                                            <small class="text-muted">{{ task.board.title }}</small>
+                                        </button>
+                                        <div class="dropdown-menu p-3 shadow-lg border-0 rounded-3 mt-1 w-100" aria-labelledby="dropdownBoard{{ task.id }}" style="z-index: 1055;">
+                                            <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+                                                <span class="fw-bold small">{% translate "Seleccionar Tablero" %}</span>
+                                            </div>
+                                            <select name="board" class="form-select form-select-sm border mb-2">
+                                                {% for b in boards %}
+                                                    <option value="{{ b.id }}" {% if task.board.id == b.id %}selected{% endif %}>
+                                                        📁 {{ b.title }}
+                                                    </option>
+                                                {% endfor %}
+                                            </select>
+                                            <button type="button" class="btn btn-primary btn-sm w-100 fw-bold" onclick="bootstrap.Dropdown.getInstance(document.getElementById('dropdownBoard{{ task.id }}')).hide();">
+                                                {% translate "Aplicar" %}
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Descripción / Notas (Acordeón desplegable) -->
+                                    <button class="btn btn-outline-secondary btn-sm text-start w-100 d-flex justify-content-between align-items-center" 
+                                            type="button" 
+                                            data-bs-toggle="collapse" 
+                                            data-bs-target="#collapseDesc{{ task.id }}">
+                                        <span>📝 {% translate "Descripción / Notas" %}</span>
+                                        <small class="text-muted">{% if task.description %}✓{% else %}+{% endif %}</small>
+                                    </button>
+                                    <div class="collapse {% if task.description %}show{% endif %}" id="collapseDesc{{ task.id }}">
+                                        <div class="p-2 border rounded bg-white mt-1">
+                                            <textarea name="description" 
+                                                      class="form-control form-control-sm" 
+                                                      rows="3" 
+                                                      placeholder="{% translate 'Escribe una descripción más detallada...' %}">{{ task.description|default:'' }}</textarea>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <!-- BOTONERA INFERIOR -->
+                            <div class="pt-4 d-flex justify-content-between align-items-center">
+                                <button type="submit" 
+                                        formaction="{% url 'delete_task' task.id %}" 
+                                        class="btn btn-outline-danger btn-sm"
+                                        onclick="return confirm('¿Seguro que quieres eliminar la tarea: {{ task.title }}?');">
+                                    {% translate "Eliminar" %}
+                                </button>
+                                
+                                <div class="d-flex gap-2">
+                                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">{% translate "Cancelar" %}</button>
+                                    <button type="submit" class="btn btn-primary btn-sm fw-bold">{% translate "Guardar" %}</button>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- COLUMNA DERECHA (Auditoría y Asignación por Botones +) -->
+                        <div class="col-md-5 bg-light p-3 rounded d-flex flex-column justify-content-between">
+                            <div>
+                                <!-- Creador de la tarea y fecha -->
+                                <div class="d-flex align-items-start gap-2 mb-3">
+                                    <!-- Círculo de Iniciales (Avatar) -->
+                                    <div class="rounded-circle bg-danger text-white fw-bold d-flex align-items-center justify-content-center flex-shrink-0" 
+                                        style="width: 32px; height: 32px; font-size: 0.85rem;" 
+                                        title="{{ task.created_by.get_full_name|default:task.created_by.username }}">
+                                        {{ task.created_by.username|slice:":2"|upper }}
+                                    </div>
+
+                                    <!-- Texto de Actividad y Fecha -->
+                                    <div style="font-size: 0.85rem; line-height: 1.3;">
+                                        <div>
+                                            <strong class="text-dark">{{ task.created_by.get_full_name|default:task.created_by.username }}</strong> 
+                                            <span class="text-muted">{% translate "ha añadido esta tarjeta a" %}</span> 
+                                            <span class="text-muted fw-semibold">{{ task.board.title }}</span>
+                                        </div>
+                                        <small class="text-muted" style="font-size: 0.75rem;">
+                                            {{ task.created_at|date:"d M Y, H:i" }}
+                                        </small>
+                                    </div>
+                                </div>
+
+                                <!-- Muestra a quién está asignada sólo si difiere del creador -->
+                                {% with assigned_list=task.assigned_to.all %}
+                                    {% if assigned_list.count > 1 or assigned_list.first != task.created_by %}
+                                        <div class="mb-3 pt-2 border-top">
+                                            <small class="text-muted fw-bold d-block mb-1">🤝 {% translate "Asignada a" %}</small>
+                                            <div class="d-flex flex-wrap gap-1">
+                                                {% for user_assigned in assigned_list %}
+                                                    {% if user_assigned != task.created_by %}
+                                                        <span class="badge bg-info text-dark fw-normal px-2 py-1">
+                                                            👤 {{ user_assigned.get_full_name|default:user_assigned.username }}
+                                                        </span>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                {% endwith %}
+
+                                <!-- CAMBIAR ASIGNADOS CON BOTONES + (Sin Ctrl / Cmd) -->
+                                <div class="mt-3 pt-2 border-top">
+                                    <small class="text-muted fw-bold d-block mb-2">👥 {% translate "Cambiar asignados" %}</small>
+                                    <div class="d-flex flex-column gap-1">
+                                        {% for u in users %}
+                                            <div>
+                                                <input type="checkbox" 
+                                                       name="assigned_to" 
+                                                       value="{{ u.id }}" 
+                                                       id="assign-user-{{ task.id }}-{{ u.id }}" 
+                                                       class="btn-check" 
+                                                       {% if u in task.assigned_to.all %}checked{% endif %}>
+                                                
+                                                <label class="btn btn-outline-dark btn-sm w-100 text-start d-flex justify-content-between align-items-center py-1 px-2" 
+                                                       for="assign-user-{{ task.id }}-{{ u.id }}"
+                                                       style="font-size: 0.8rem;">
+                                                    <span>👤 {{ u.get_full_name|default:u.username }}</span>
+                                                    <span class="badge rounded-circle bg-light text-dark border">+</span>
+                                                </label>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Editar Importancia -->
-                        <div class="col-6">
-                            <label class="form-label small fw-bold d-block">{% translate "Importancia" %}</label>
-                            <div class="star-rating">
-                                <input type="radio" id="edit-importance-4-{{ task.id }}" name="importance" value="4" {% if task.importance == 4 %}checked{% endif %}>
-                                <label for="edit-importance-4-{{ task.id }}" title="4 - Muy Importante">★</label>
-
-                                <input type="radio" id="edit-importance-3-{{ task.id }}" name="importance" value="3" {% if task.importance == 3 %}checked{% endif %}>
-                                <label for="edit-importance-3-{{ task.id }}" title="3 - Importante">★</label>
-
-                                <input type="radio" id="edit-importance-2-{{ task.id }}" name="importance" value="2" {% if task.importance == 2 %}checked{% endif %}>
-                                <label for="edit-importance-2-{{ task.id }}" title="2 - Moderada">★</label>
-
-                                <input type="radio" id="edit-importance-1-{{ task.id }}" name="importance" value="1" {% if task.importance == 1 %}checked{% endif %}>
-                                <label for="edit-importance-1-{{ task.id }}" title="1 - Baja Importancia">★</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold">{% translate "Tablero asignado" %}</label>
-                        <select name="board" class="form-select">
-                            {% for b in boards %}
-                                <option value="{{ b.id }}" {% if task.board.id == b.id %}selected{% endif %}>
-                                    📁 {{ b.title }}
-                                </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label small">{% translate "Descripción / Notas" %}</label>
-                        <textarea name="description" class="form-control" rows="3">{{ task.description|default:'' }}</textarea>
                     </div>
                 </div>
 
-                <div class="modal-footer justify-content-between">
-                    <button type="submit" 
-                            formaction="{% url 'delete_task' task.id %}" 
-                            class="btn btn-outline-danger btn-sm"
-                            onclick="return confirm('¿Seguro que quieres eliminar la tarea: {{ task.title }}?');">
-                        🗑️ {% translate "Eliminar Tarea" %}
-                    </button>
-                    
-                    <div>
-                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">{% translate "Cancelar" %}</button>
-                        <button type="submit" class="btn btn-primary btn-sm">{% translate "Guardar Cambios" %}</button>
-                    </div>
-                </div>
             </form>
         </div>
     </div>

@@ -11,9 +11,26 @@
 
     <!-- CABECERA Y FILTRO DE TABLEROS -->
     <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
-        <h2 class="h4 mb-0 fw-bold">
-            📌 {% if current_board %}{{ current_board.title }}{% else %}{% translate "General" %}{% endif %}
-        </h2>
+        <div class="d-flex align-items-center gap-3">
+            <h2 class="h4 mb-0 fw-bold">
+                📌 {% if current_board %}{{ current_board.title }}{% else %}{% translate "General" %}{% endif %}
+            </h2>
+
+            <!-- SELECTOR CONDICIONAL: Solo en General y si existen tareas compartidas -->
+            {% if not current_board and has_shared_tasks %}
+                <div class="btn-group btn-group-sm shadow-sm" role="group" id="filterTaskGroup">
+                    <button type="button" class="btn btn-outline-primary active" data-filter="all">
+                        🌐 {% translate "Todas" %}
+                    </button>
+                    <button type="button" class="btn btn-outline-primary" data-filter="mine">
+                        👤 {% translate "Mis tareas" %}
+                    </button>
+                    <button type="button" class="btn btn-outline-primary" data-filter="shared">
+                        🤝 {% translate "Asignadas" %}
+                    </button>
+                </div>
+            {% endif %}
+        </div>
 
         <div class="d-flex align-items-center gap-2 flex-wrap">
             <!-- Pestañas de Tableros -->
@@ -24,7 +41,7 @@
                     🌐 {% translate "General" %}
                 </a>
 
-                <!-- Tableros Personalizados -->
+                <!-- Tableros Personalizados Propios -->
                 {% for board in boards %}
                 {% if not board.is_default %}
                     <div class="d-inline-flex align-items-center rounded overflow-hidden shadow-sm me-1"
@@ -46,7 +63,7 @@
                             📁 {{ board.title }}
                         </a>
 
-                        <!-- Botón opciones del tablero -->
+                        <!-- Botón opciones del tablero (Solo para el dueño) -->
                         {% if current_board.id == board.id %}
                             <button type="button" 
                                     class="btn btn-sm p-0 pe-2 ps-1 border-0 shadow-none position-relative text-white" 
@@ -112,7 +129,33 @@
                         </div>
                     </div>
                 {% endif %}
-            {% endfor %}
+                {% endfor %}
+
+                <!-- Tableros Compartidos Conmigo -->
+                {% if shared_boards %}
+                    <span class="text-muted small ms-2 me-1">|</span>
+                    {% for s_board in shared_boards %}
+                        <div class="d-inline-flex align-items-center rounded overflow-hidden shadow-sm me-1"
+                            style="
+                                {% if current_board.id == s_board.id %}
+                                    background-color: {{ s_board.color|default:'#0d6efd' }} !important;
+                                    color: white !important;
+                                {% else %}
+                                    background-color: rgba(235, 243, 255, 0.9) !important;
+                                    border-left: 4px solid {{ s_board.color|default:'#0d6efd' }} !important;
+                                    border-top: 1px solid #b6d4fe !important;
+                                    border-right: 1px solid #b6d4fe !important;
+                                    border-bottom: 1px solid #b6d4fe !important;
+                                {% endif %}
+                            ">
+                            <a href="{% url 'dashboard_board' s_board.id %}" 
+                               class="text-decoration-none py-1 px-2 small fw-bold {% if current_board.id == s_board.id %}text-white{% else %}text-primary{% endif %}"
+                               title="{% translate 'Tablero compartido por' %}: {{ s_board.owner.get_full_name|default:s_board.owner.username }}">
+                                👥 {{ s_board.title }} <small class="opacity-75">({{ s_board.owner.username }})</small>
+                            </a>
+                        </div>
+                    {% endfor %}
+                {% endif %}
             </div>
 
             <!-- Botón para crear un nuevo tablero -->
@@ -207,6 +250,10 @@
                                 <label class="form-label small">{% translate "Fecha límite" %}</label>
                                 {{ form.due_date }}
                             </div>
+                            <div class="col-md-3">
+                                <label class="form-label small">{% translate "Asignar a" %}</label>
+                                {{ form.assigned_to }}
+                            </div>
                             <div class="col-md-4">
                                 <label class="form-label small">{% translate "Notas / Descripción" %}</label>
                                 {{ form.description }}
@@ -221,14 +268,14 @@
     <!-- 2. MATRIZ DE EISENHOWER (4 CUADRANTES) -->
     <div class="row g-3">
         
-        <!-- CUADRANTE 1: DO FIRST (Urgente e Importante) -->
+        <!-- CUADRANTE 1: DO FIRST -->
         <div class="col-md-6">
             <div class="quadrant quadrant-q1 h-100 shadow-sm">
-                <div class="quadrant-header d-flex justify-content-between align-items-center">
-                    <span>🔥 {% translate "Urgente - Importante (Hacer ahora)" %}</span>
-                    <span class="badge bg-white text-danger rounded-pill">{{ q1_tasks.count }}</span>
+                <div class="quadrant-header position-relative text-center p-2 mb-2">
+                    <span class="fw-bold fs-6">🔥 {% translate "Urgente - Importante (Hacer ahora)" %}</span>
+                    <span class="badge bg-white text-danger rounded-pill position-absolute end-0 top-50 translate-middle-y me-2">{{ q1_tasks.count }}</span>
                 </div>
-                <div class="p-3">
+                <div class="p-3 pt-0">
                     {% for task in q1_tasks %}
                         {% include '_includes/_task_card.html' with task=task %}
                     {% empty %}
@@ -238,14 +285,14 @@
             </div>
         </div>
 
-        <!-- CUADRANTE 2: SCHEDULE (No Urgente pero Importante) -->
+        <!-- CUADRANTE 2: SCHEDULE -->
         <div class="col-md-6">
             <div class="quadrant quadrant-q2 h-100 shadow-sm">
-                <div class="quadrant-header d-flex justify-content-between align-items-center">
-                    <span>📅 {% translate "Importante - No Urgente (Planificar)" %}</span>
-                    <span class="badge bg-white text-primary rounded-pill">{{ q2_tasks.count }}</span>
+                <div class="quadrant-header position-relative text-center p-2 mb-2">
+                    <span class="fw-bold fs-6">📅 {% translate "Importante - No Urgente (Planificar)" %}</span>
+                    <span class="badge bg-white text-primary rounded-pill position-absolute end-0 top-50 translate-middle-y me-2">{{ q2_tasks.count }}</span>
                 </div>
-                <div class="p-3">
+                <div class="p-3 pt-0">
                     {% for task in q2_tasks %}
                         {% include '_includes/_task_card.html' with task=task %}
                     {% empty %}
@@ -255,14 +302,14 @@
             </div>
         </div>
 
-        <!-- CUADRANTE 3: DELEGATE (Urgente pero No Importante) -->
+        <!-- CUADRANTE 3: DELEGATE -->
         <div class="col-md-6">
             <div class="quadrant quadrant-q3 h-100 shadow-sm">
-                <div class="quadrant-header d-flex justify-content-between align-items-center">
-                    <span>👥 {% translate "Urgente - No Importante (Delegar)" %}</span>
-                    <span class="badge bg-dark text-white rounded-pill">{{ q3_tasks.count }}</span>
+                <div class="quadrant-header position-relative text-center p-2 mb-2">
+                    <span class="fw-bold fs-6">👥 {% translate "Urgente - No Importante (Delegar)" %}</span>
+                    <span class="badge bg-dark text-white rounded-pill position-absolute end-0 top-50 translate-middle-y me-2">{{ q3_tasks.count }}</span>
                 </div>
-                <div class="p-3">
+                <div class="p-3 pt-0">
                     {% for task in q3_tasks %}
                         {% include '_includes/_task_card.html' with task=task %}
                     {% empty %}
@@ -272,14 +319,14 @@
             </div>
         </div>
 
-        <!-- CUADRANTE 4: ELIMINATE (Ni Urgente ni Importante) -->
+        <!-- CUADRANTE 4: ELIMINATE -->
         <div class="col-md-6">
             <div class="quadrant quadrant-q4 h-100 shadow-sm">
-                <div class="quadrant-header d-flex justify-content-between align-items-center">
-                    <span>🗑️ {% translate "No Urgente - No Importante (Eliminar / Posponer)" %}</span>
-                    <span class="badge bg-white text-secondary rounded-pill">{{ q4_tasks.count }}</span>
+                <div class="quadrant-header position-relative text-center p-2 mb-2">
+                    <span class="fw-bold fs-6">🗑️ {% translate "No Urgente - No Importante (Eliminar / Posponer)" %}</span>
+                    <span class="badge bg-white text-secondary rounded-pill position-absolute end-0 top-50 translate-middle-y me-2">{{ q4_tasks.count }}</span>
                 </div>
-                <div class="p-3">
+                <div class="p-3 pt-0">
                     {% for task in q4_tasks %}
                         {% include '_includes/_task_card.html' with task=task %}
                     {% empty %}
@@ -294,7 +341,7 @@
     <!-- 3. TAREAS COMPLETADAS -->
     {% if done_tasks %}
     <div class="mt-5 mb-4">
-        <h5 class="h6 text-muted fw-bold mb-3">✅ {% translate "Últimas tareas completadas" %}</h5>
+        <h5 class="h6 text-muted fw-bold mb-3">✅ {% translate "Completadas" %}</h5>
         <div class="list-group shadow-sm border-0">
             {% for task in done_tasks %}
                 <div class="list-group-item d-flex justify-content-between align-items-center text-muted py-2">
@@ -352,6 +399,7 @@
 
 <!-- SCRIPT DE VALIDACIÓN DE ESTRELLAS -->
 <script>
+// 1. VALIDACIÓN DE FORMULARIO RÁPIDO (ESTRELLAS)
 document.addEventListener('submit', function (e) {
     const form = e.target.closest('#quickTaskForm');
     if (!form) return;
@@ -366,10 +414,7 @@ document.addEventListener('submit', function (e) {
         if (!checked) {
             isValid = false;
             if (container) {
-                // Aplica el rojo con animación
                 container.classList.add('is-invalid');
-
-                // ⏱️ Remueve la clase de error tras 1 segundo (1000 ms)
                 setTimeout(function () {
                     container.classList.remove('is-invalid');
                 }, 350);
@@ -387,7 +432,7 @@ document.addEventListener('submit', function (e) {
     }
 });
 
-// Limpiar el rojo al hacer clic manualmente en una estrella
+// Limpieza de feedback de error al hacer clic en estrellas
 document.addEventListener('change', function (e) {
     if (e.target.matches('.star-rating input[type="radio"]')) {
         const container = e.target.closest('.star-rating');
@@ -395,6 +440,37 @@ document.addEventListener('change', function (e) {
             container.classList.remove('is-invalid');
         }
     }
+});
+
+// 2. FILTRADO DINÁMICO DE TARJETAS (TODAS / MIS TAREAS / ASIGNADAS)
+document.addEventListener('DOMContentLoaded', function () {
+    const filterButtons = document.querySelectorAll('#filterTaskGroup button');
+    if (!filterButtons.length) return;
+
+    filterButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            // Cambiar clase activa visualmente en el grupo de botones
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+
+            const filter = this.getAttribute('data-filter');
+            const taskCards = document.querySelectorAll('.task-card');
+
+            taskCards.forEach(card => {
+                const type = card.getAttribute('data-created-by');
+
+                if (filter === 'all') {
+                    card.style.display = 'block';
+                } else if (filter === 'mine' && type === 'mine') {
+                    card.style.display = 'block';
+                } else if (filter === 'shared' && type === 'shared') {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+    });
 });
 </script>
 {% endblock %}

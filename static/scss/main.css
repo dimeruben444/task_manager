@@ -1,0 +1,83 @@
+@charset "UTF-8";
+.rating-wrapper {
+  width: -moz-fit-content;
+  width: fit-content;
+}
+
+.star-rating {
+  display: inline-flex;
+  flex-direction: row-reverse;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+}
+.star-rating input[type=radio] {
+  display: none;
+}
+.star-rating label {
+  font-size: 1.6rem;
+  color: #d1d5db;
+  cursor: pointer;
+  transition: color 0.15s ease-in-out, transform 0.1s ease;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+}
+.star-rating label:hover, .star-rating label:hover ~ label {
+  color: #000000 !important;
+}
+.star-rating input[type=radio]:checked ~ label {
+  color: #000000;
+}
+.star-rating label:hover {
+  transform: scale(1.15);
+}
+.star-rating.is-invalid label {
+  color: #dc2626 !important;
+  animation: shake 0.3s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-3px);
+  }
+  75% {
+    transform: translateX(3px);
+  }
+}
+/* Respaldo CSS directo para error de validación */
+.star-rating.is-invalid label {
+  color: #dc2626 !important;
+  animation: shakeStars 0.3s ease-in-out;
+}
+
+@keyframes shakeStars {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-4px);
+  }
+  75% {
+    transform: translateX(4px);
+  }
+}
+.quadrant {
+  background-color: #f1f5f9;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.task-card {
+  background-color: #ffffff !important;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.task-card:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+}/*# sourceMappingURL=main.css.map */
