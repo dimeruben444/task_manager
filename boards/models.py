@@ -40,4 +40,4 @@ class Board(models.Model):
 
     def __str__(self):
         tipo = _('General') if self.is_default else _('Personalizado')
-        return f"{self.title} ({tipo})"
+        return f"{self.title} "

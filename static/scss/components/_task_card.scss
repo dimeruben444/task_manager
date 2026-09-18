@@ -1,5 +1,30 @@
-// static/scss/components/_task_card.scss
+// ==========================================
+// COMPONENTE: TARJETA DE TAREA & RATING
+// ==========================================
 
+.task-card {
+  cursor: pointer;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+
+  .task-board-badge,
+  .task-shared-badge {
+    font-size: 0.65rem;
+  }
+
+  .task-due-date {
+    font-size: 0.7rem;
+  }
+
+  .user-avatar-badge {
+    width: 20px;
+    height: 20px;
+    font-size: 0.55rem;
+  }
+}
+
+// RATING DE ESTRELLAS INTERACTIVO
 .star-rating-custom {
   display: inline-flex;
   flex-direction: row-reverse;
@@ -22,7 +47,7 @@
     transition: color 0.15s ease;
   }
 
-  // Hover y selección de izquierda a derecha
+  // Ilumina la estrella seleccionada y todas las anteriores (de izquierda a derecha)
   input[type="radio"]:checked ~ label,
   label:hover,
   label:hover ~ label {

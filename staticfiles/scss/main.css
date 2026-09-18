@@ -61,6 +61,19 @@
   .task-card:hover {
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important; }
 
+.task-card {
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease; }
+  .task-card .task-board-badge,
+  .task-card .task-shared-badge {
+    font-size: 0.65rem; }
+  .task-card .task-due-date {
+    font-size: 0.7rem; }
+  .task-card .user-avatar-badge {
+    width: 20px;
+    height: 20px;
+    font-size: 0.55rem; }
+
 .star-rating-custom {
   display: inline-flex;
   flex-direction: row-reverse;

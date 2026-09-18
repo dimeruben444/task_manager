@@ -16,6 +16,18 @@ class Task(models.Model):
         ('DONE', _('Completada')),
     ]
 
+    REMINDER_CHOICES = [
+        ('at_time', _('A la hora del vencimiento')),
+        ('5_min', _('5 minutos antes')),
+        ('15_min', _('15 minutos antes')),
+        ('1_hour', _('1 hora antes')),
+        ('2_hours', _('2 horas antes')),
+        ('1_day', _('1 día antes')),
+        ('2_days', _('2 días antes')),
+        ('1_week', _('1 semana antes')),
+        ('2_weeks', _('2 semanas antes')),
+    ]
+
     # Campos principales
     title = models.CharField(
         _('Título de la tarea'),
@@ -36,7 +48,7 @@ class Task(models.Model):
         ]
     )
 
-    # Campos opcionales
+    # Campos opcionales y recordatorio
     description = models.TextField(
         _('Descripción / Notas'),
         blank=True,
@@ -45,6 +57,16 @@ class Task(models.Model):
         _('Fecha límite'),
         blank=True,
         null=True,
+    )
+    reminder_enabled = models.BooleanField(
+        _('Activar recordatorio'),
+        default=False,
+    )
+    reminder_offset = models.CharField(
+        _('Antelación del recordatorio'),
+        max_length=20,
+        choices=REMINDER_CHOICES,
+        default='1_day',
     )
 
     # Relaciones de Usuario (Creador y Múltiples Asignados)
@@ -110,7 +132,7 @@ class Task(models.Model):
 
     def check_auto_urgency(self):
         if self.due_date and not self.is_completed:
-            time_left = self.due_date - timezone.now().date()
+            time_left = self.due_date - timezone.now()
             if time_left <= timedelta(days=2) and self.urgency <= 2:
                 self.urgency = 4
 

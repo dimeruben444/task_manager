@@ -10,7 +10,17 @@ User = get_user_model()
 class TaskForm(forms.ModelForm):
     class Meta:
         model = Task
-        fields = ['title', 'urgency', 'importance', 'board', 'assigned_to', 'due_date', 'description']
+        fields = [
+            'title', 
+            'urgency', 
+            'importance', 
+            'board', 
+            'assigned_to', 
+            'due_date', 
+            'reminder_enabled', 
+            'reminder_offset', 
+            'description'
+        ]
 
         widgets = {
             'title': forms.TextInput(attrs={
@@ -40,10 +50,19 @@ class TaskForm(forms.ModelForm):
                 'rows': 3,
                 'placeholder': _('Notas ...'),
             }),
-            'due_date': forms.DateInput(attrs={
-                'class': 'form-control',
-                'type': 'date',
-                'placeholder': _('Fecha límite'),
+            'due_date': forms.DateTimeInput(
+                attrs={
+                    'class': 'form-control form-control-sm',
+                    'type': 'datetime-local',
+                    'placeholder': _('Fecha límite'),
+                },
+                format='%Y-%m-%dT%H:%M',
+            ),
+            'reminder_enabled': forms.CheckboxInput(attrs={
+                'class': 'form-check-input',
+            }),
+            'reminder_offset': forms.Select(attrs={
+                'class': 'form-select form-select-sm',
             }),
         }
 
@@ -56,9 +75,15 @@ class TaskForm(forms.ModelForm):
         # Campos opcionales en el formulario
         self.fields['board'].required = False
         self.fields['assigned_to'].required = False
+        self.fields['reminder_enabled'].required = False
+        self.fields['reminder_offset'].required = False
 
         # Cargar la lista completa de usuarios para asignación múltiple
         self.fields['assigned_to'].queryset = User.objects.all()
+
+        # Limpiar el nombre del tablero para que no muestre (General) / (Personalizado)
+        if 'board' in self.fields:
+            self.fields['board'].label_from_instance = lambda obj: f"📁 {obj.title}"
 
         if user:
             # Filtrar tableros pertenecientes al usuario activo
