@@ -1,4 +1,3 @@
-<!-- core/templates/base/base.html -->
 {% load static %}
 {% load sass_tags %}
 {% load i18n %}
@@ -9,35 +8,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}{% translate "Gestor de Tareas Eisenhower" %}{% endblock %}</title>
 
-    <!-- Bootstrap 5 CSS (Estructura, formularios y utilidades base) -->
+    <!-- Bootstrap 5 CSS e Iconos -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
 
-    <!-- CSS personalizado compilado automáticamente desde SASS -->
-    <!-- <link rel="stylesheet" href="{% sass_src 'scss/main.scss' %}">-->
+    <!-- CSS personalizado -->
     <link rel="stylesheet" href="{% static 'css/main.css' %}?v=1.1">
 
     {% block extra_css %}{% endblock %}
 </head>
 <body class="bg-light">
 
-    <!-- BARRA DE NAVEGACIÓN SUPERIOR -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm mb-3">
+    <!-- BARRA DE NAVEGACIÓN SUPERIOR (SOLO LOGO Y USUARIO) -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
         <div class="container-fluid px-4">
             <a class="navbar-brand fw-bold" href="{% url 'dashboard' %}">
                 🎯 {% translate "Eisenhower Task Manager" %}
             </a>
             
-            <!-- MENÚ DE PERFIL Y AUTENTICACIÓN -->
             <div class="d-flex align-items-center ms-auto">
                 {% if user.is_authenticated %}
-                    <!-- Desplegable del usuario autenticado -->
                     <div class="dropdown">
                         <button class="btn btn-outline-light btn-sm dropdown-toggle d-flex align-items-center gap-2 shadow-sm border-0" 
                                 type="button" 
                                 id="userMenuButton" 
                                 data-bs-toggle="dropdown" 
                                 aria-expanded="false">
-                            <!-- Inicial del usuario en avatar circular -->
                             <span class="rounded-circle bg-primary text-white d-inline-flex justify-content-center align-items-center fw-bold" 
                                   style="width: 26px; height: 26px; font-size: 0.8rem;">
                                 {{ user.username|slice:":1"|upper }}
@@ -48,8 +44,7 @@
                         <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2" aria-labelledby="userMenuButton">
                             <li>
                                 <span class="dropdown-item-text text-muted small">
-                                    👤 <strong class="text-dark">{{ user.username }}</strong><br>
-                                    
+                                    👤 <strong class="text-dark">{{ user.username }}</strong>
                                 </span>
                             </li>
                             <li><hr class="dropdown-divider"></li>
@@ -64,7 +59,6 @@
                         </ul>
                     </div>
                 {% else %}
-                    <!-- Botones para usuarios no autenticados -->
                     <div class="d-flex gap-2">
                         <a href="{% url 'login' %}" class="btn btn-outline-light btn-sm">
                             🔑 {% translate "Iniciar sesión" %}
@@ -78,14 +72,115 @@
         </div>
     </nav>
 
-    <!-- CONTENIDO PRINCIPAL -->
-    <main>
-        {% block content %}
-        {% endblock %}
-    </main>
+    <!-- ESTRUCTURA DE 2 COLUMNAS: TABLEROS MINIMALISTA + CONTENIDO -->
+    <div class="app-dashboard-layout d-flex" style="min-height: calc(100vh - 56px);">
+        
+        <!-- 1. COLUMNA IZQUIERDA: LISTA DE TABLEROS MINIMALISTA -->
+        <aside class="sidebar-boards p-3 bg-white border-end d-flex flex-column" style="width: 220px; flex-shrink: 0;">
+            <div class="d-flex justify-content-between align-items-center mb-3 px-1">
+                <span class="text-muted fw-bold small text-uppercase">{% translate "Tableros" %}</span>
+            </div>
+            
+            <div class="boards-stack flex-grow-1 overflow-auto">
+                <!-- ENLACE GENERAL -->
+                <a href="{% url 'dashboard' %}" 
+                   class="board-chip d-block text-decoration-none mb-1 p-2 rounded small {% if not current_board %}bg-light fw-bold text-dark{% else %}text-secondary{% endif %}">
+                    🌐 {% translate "General" %}
+                </a>
 
-    <!-- Bootstrap 5 JS Bundle (Requerido para el colapsable de opciones avanzadas y modales) -->
+                <!-- TABLEROS PROPIOS -->
+                {% for b in boards %}
+                    {% if not b.is_default %}
+                        <div class="board-item d-flex align-items-center justify-content-between mb-1 p-2 rounded {% if current_board.id == b.id %}bg-light fw-bold{% endif %}"
+                             style="--board-color: {{ b.color|default:'#6c757d' }};">
+                            
+                            <a href="{% url 'dashboard_board' b.id %}" 
+                               class="text-decoration-none text-truncate flex-grow-1 d-flex align-items-center gap-2 small" style="color: #333;">
+                                <span class="color-dot d-inline-block rounded-circle flex-shrink-0" style="width: 8px; height: 8px; background-color: var(--board-color);"></span>
+                                <span class="board-title text-truncate">{{ b.title }}</span>
+                            </a>
+
+                            <button type="button" 
+                                    class="btn btn-sm p-0 border-0 shadow-none text-muted opacity-50 hover-opacity-100 ms-1" 
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#editBoardModalSidebar{{ b.id }}"
+                                    title="{% translate 'Editar tablero' %}"
+                                    style="font-size: 0.75rem;">
+                                •••
+                            </button>
+                        </div>
+
+                        <!-- MODAL DE EDICIÓN DE TABLERO -->
+                        <div class="modal fade" id="editBoardModalSidebar{{ b.id }}" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content text-dark">
+                                    <form method="POST" action="{% url 'edit_board' b.id %}">
+                                        {% csrf_token %}
+                                        <div class="modal-header">
+                                            <h5 class="modal-title fw-bold">⚙ {% translate "Editar Tablero" %}: {{ b.title }}</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body text-start">
+                                            <div class="mb-3">
+                                                <label class="form-label small fw-bold">{% translate "Nombre del tablero" %}</label>
+                                                <input type="text" name="title" value="{{ b.title }}" class="form-control" required>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label class="form-label small fw-bold">{% translate "Color del tablero" %}</label>
+                                                <select name="color" class="form-select">
+                                                    <option value="#3B82F6" {% if b.color == "#3B82F6" %}selected{% endif %}>🔵 {% translate "Azul" %}</option>
+                                                    <option value="#10B981" {% if b.color == "#10B981" %}selected{% endif %}>🟢 {% translate "Verde" %}</option>
+                                                    <option value="#EF4444" {% if b.color == "#EF4444" %}selected{% endif %}>🔴 {% translate "Rojo" %}</option>
+                                                    <option value="#F59E0B" {% if b.color == "#F59E0B" %}selected{% endif %}>🟠 {% translate "Naranja" %}</option>
+                                                    <option value="#8B5CF6" {% if b.color == "#8B5CF6" %}selected{% endif %}>🟣 {% translate "Púrpura" %}</option>
+                                                    <option value="#6B7280" {% if b.color == "#6B7280" %}selected{% endif %}>⚪ {% translate "Gris" %}</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label class="form-label small">{% translate "Descripción" %}</label>
+                                                <textarea name="description" class="form-control" rows="3">{{ b.description|default:'' }}</textarea>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer justify-content-between">
+                                            <button type="submit" 
+                                                    formaction="{% url 'delete_board' b.id %}" 
+                                                    class="btn btn-outline-danger btn-sm"
+                                                    onclick="return confirm('¿Seguro que quieres eliminar el tablero {{ b.title }}?');">
+                                                🗑️ {% translate "Eliminar Tablero" %}
+                                            </button>
+                                            
+                                            <div>
+                                                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">{% translate "Cancelar" %}</button>
+                                                <button type="submit" class="btn btn-primary btn-sm">{% translate "Guardar Cambios" %}</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+
+                <!-- BOTÓN NUEVO TABLERO -->
+                <button class="btn btn-outline-secondary btn-sm mt-2 w-100" data-bs-toggle="modal" data-bs-target="#createBoardModal">
+                    + {% translate "Nuevo Tablero" %}
+                </button>
+            </div>
+        </aside>
+
+        <!-- 2. ÁREA PRINCIPAL -->
+        <main class="flex-grow-1 p-3 overflow-auto" style="background-color: #f4f5f7;">
+            {% block content %}
+            {% endblock %}
+        </main>
+
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'js/tasks.js' %}"></script>
     
     {% block extra_js %}{% endblock %}
 </body>

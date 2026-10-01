@@ -1,56 +1,264 @@
 // ==========================================
-// COMPONENTE: TARJETA DE TAREA & RATING
+// ANIMACIONES KEYFRAMES
+// ==========================================
+
+@keyframes checkPop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.3); }
+  70% { transform: scale(0.9); }
+  100% { transform: scale(1); }
+}
+
+@keyframes cardShake {
+  0% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+  100% { transform: translateX(0); }
+}
+
+// ==========================================
+// COMPONENTE: TARJETA DE TAREA
 // ==========================================
 
 .task-card {
+  position: relative;
+  background-color: #ffffff;
+  border-radius: 8px;
   cursor: pointer;
-  transition:
-    transform 0.15s ease,
-    box-shadow 0.15s ease;
+  overflow: hidden;
+  padding: 0.5rem 0.75rem;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.3s ease, filter 0.3s ease;
 
-  .task-board-badge,
-  .task-shared-badge {
-    font-size: 0.65rem;
+  .task-card-header {
+    min-height: 24px;
   }
 
-  .task-due-date {
-    font-size: 0.7rem;
+  // CHECKBOX: Flotante a la izquierda, centrado verticalmente
+  .task-checkbox-wrapper {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%) scale(0.6);
+    width: 17px;
+    height: 17px;
+    z-index: 2;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s cubic-bezier(0.5, 0, 0.75, 0), 
+                transform 0.45s cubic-bezier(0.5, 0, 0.75, 0), 
+                visibility 0.4s cubic-bezier(0.5, 0, 0.75, 0);
   }
 
-  .user-avatar-badge {
-    width: 20px;
-    height: 20px;
-    font-size: 0.55rem;
+  // TÍTULO: Se desplaza suavemente al hacer hover para dejar espacio al checkbox
+  .task-title-wrapper {
+    width: 100%;
+    padding-right: 1.5rem;
+    transform: translateX(0);
+    transition: transform 0.45s cubic-bezier(0.5, 0, 0.75, 0);
+  }
+
+  .task-title {
+    color: #212529;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+    padding-right: 0.25rem;
+    transition: color 0.3s ease, text-decoration-color 0.3s ease;
+  }
+
+  // ZONA DERECHA RESERVADA: Metadatos/Avatares
+  .task-card-meta {
+    min-width: 28px;
+  }
+
+  // HOVER EN CUADRANTE
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+
+    .task-checkbox-wrapper {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(-50%) scale(1);
+    }
+
+    .task-title-wrapper {
+      transform: translateX(25px);
+    }
+  }
+
+  // ESTADO COMPLETADA (EN CUADRANTE O EN SIDEBAR)
+  &.is-completed {
+    opacity: 0.65;
+    filter: grayscale(15%);
+
+    .task-checkbox-wrapper {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(-50%) scale(1);
+    }
+
+    .task-title-wrapper {
+      transform: translateX(25px);
+    }
+
+    .task-title {
+      text-decoration: line-through;
+      text-decoration-thickness: 2px;
+      color: #6c757d !important;
+    }
+  }
+
+  &.animate-shake {
+    animation: cardShake 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
   }
 }
 
-// RATING DE ESTRELLAS INTERACTIVO
-.star-rating-custom {
-  display: inline-flex;
-  flex-direction: row-reverse;
-  justify-content: flex-end;
+// ==========================================
+// ESTILOS ESPECÍFICOS PARA TARJETAS COMPLETADAS (SIDEBAR)
+// ==========================================
 
-  input[type="radio"] {
+.completed-task-item {
+  border-radius: 8px;
+  background-color: #ffffff;
+  transition: background-color 0.2s ease, opacity 0.2s ease;
+
+  &:hover {
+    background-color: #f1f3f5;
+  }
+
+  .task-completion-check {
+    width: 16px;
+    height: 16px;
+    accent-color: #198754;
+  }
+}
+
+// ==========================================
+// CHECKBOX ANIMADO CIRCULAR (17px)
+// ==========================================
+
+.task-checkbox-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 17px;
+  height: 17px;
+  cursor: pointer;
+
+  input[type="checkbox"] {
     position: absolute;
     opacity: 0;
-    width: 0;
-    height: 0;
-    pointer-events: none;
-  }
-
-  label {
-    font-size: 1.4rem;
-    color: #ccc;
     cursor: pointer;
-    padding: 0 2px;
-    line-height: 1;
-    transition: color 0.15s ease;
+    height: 0;
+    width: 0;
   }
 
-  // Ilumina la estrella seleccionada y todas las anteriores (de izquierda a derecha)
-  input[type="radio"]:checked ~ label,
-  label:hover,
-  label:hover ~ label {
-    color: #ffc107;
+  .checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 17px;
+    width: 17px;
+    background-color: #fff;
+    border: 2px solid #adb5bd;
+    border-radius: 50%;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+
+    &::after {
+      content: "";
+      position: absolute;
+      display: none;
+      left: 5px;
+      top: 2px;
+      width: 4px;
+      height: 8px;
+      border: solid white;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
   }
+
+  &:hover input ~ .checkmark {
+    border-color: #198754;
+  }
+
+  input:checked ~ .checkmark {
+    background-color: #198754;
+    border-color: #198754;
+    animation: checkPop 0.35s ease-in-out forwards;
+
+    &::after {
+      display: block;
+    }
+  }
+}
+
+// ==========================================
+// ALTA RÁPIDA IN-LINE (TRELLO STYLE)
+// ==========================================
+
+.add-task-inline-wrapper {
+  .btn-add-inline {
+    background-color: transparent;
+    transition: background-color 0.2s ease, color 0.2s ease;
+
+    &:hover {
+      background-color: rgba(9, 30, 66, 0.08);
+      color: #172b4d !important;
+    }
+  }
+
+  .inline-task-form {
+    .card {
+      background-color: #ffffff;
+      border-radius: 8px;
+    }
+
+    .task-inline-input:focus {
+      outline: none;
+      box-shadow: none;
+    }
+
+    .btn-close-inline {
+      background: transparent;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+
+      &:hover {
+        background-color: rgba(9, 30, 66, 0.08);
+        color: #091e42 !important;
+      }
+    }
+  }
+}
+
+
+/* ==========================================================================
+   Estilos de Datepicker y Pop-overs para Task Cards (Flatpickr / Trello style)
+   ========================================================================== */
+
+/* Contenedor del desplegable de fechas */
+.dropdown-menu-dates {
+    width: 335px;
+    min-width: 335px;
+    z-index: 1055;
+
+    @media (max-width: 400px) {
+        width: 100%;
+        min-width: auto;
+    }
+}
+
+/* Limpieza de sombras y bordes del calendario Flatpickr Inline */
+.flatpickr-clean-container {
+    .flatpickr-calendar {
+        box-shadow: none !important;
+        border: none !important;
+        background: transparent !important;
+    }
 }

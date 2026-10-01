@@ -61,39 +61,85 @@
   .task-card:hover {
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important; }
 
+@keyframes checkPop {
+  0% {
+    transform: scale(1); }
+  50% {
+    transform: scale(1.35); }
+  70% {
+    transform: scale(0.9); }
+  100% {
+    transform: scale(1.1); } }
+
+@keyframes cardShake {
+  0% {
+    transform: translateX(0); }
+  20% {
+    transform: translateX(-6px); }
+  40% {
+    transform: translateX(6px); }
+  60% {
+    transform: translateX(-4px); }
+  80% {
+    transform: translateX(4px); }
+  100% {
+    transform: translateX(0); } }
+
 .task-card {
   cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease; }
-  .task-card .task-board-badge,
-  .task-card .task-shared-badge {
-    font-size: 0.65rem; }
-  .task-card .task-due-date {
-    font-size: 0.7rem; }
-  .task-card .user-avatar-badge {
-    width: 20px;
-    height: 20px;
-    font-size: 0.55rem; }
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.3s ease, filter 0.3s ease; }
+  .task-card .task-title {
+    transition: color 0.3s ease, text-decoration-color 0.3s ease; }
+  .task-card.is-completed {
+    opacity: 0.55;
+    filter: grayscale(20%); }
+    .task-card.is-completed .task-title {
+      text-decoration: line-through;
+      text-decoration-thickness: 2px;
+      color: #6c757d !important; }
+  .task-card.animate-shake {
+    animation: cardShake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both; }
 
-.star-rating-custom {
-  display: inline-flex;
-  flex-direction: row-reverse;
-  justify-content: flex-end; }
-  .star-rating-custom input[type="radio"] {
+.task-checkbox-container {
+  display: inline-block;
+  position: relative;
+  width: 20px;
+  height: 20px;
+  cursor: pointer; }
+  .task-checkbox-container input[type="checkbox"] {
     position: absolute;
     opacity: 0;
-    width: 0;
-    height: 0;
-    pointer-events: none; }
-  .star-rating-custom label {
-    font-size: 1.4rem;
-    color: #ccc;
     cursor: pointer;
-    padding: 0 2px;
-    line-height: 1;
-    transition: color 0.15s ease; }
-  .star-rating-custom input[type="radio"]:checked ~ label,
-  .star-rating-custom label:hover,
-  .star-rating-custom label:hover ~ label {
-    color: #ffc107; }
+    height: 0;
+    width: 0; }
+  .task-checkbox-container .checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 20px;
+    width: 20px;
+    background-color: #fff;
+    border: 2px solid #adb5bd;
+    border-radius: 50%;
+    transition: border-color 0.2s ease, background-color 0.2s ease; }
+    .task-checkbox-container .checkmark::after {
+      content: "";
+      position: absolute;
+      display: none;
+      left: 6px;
+      top: 2px;
+      width: 5px;
+      height: 10px;
+      border: solid white;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg); }
+  .task-checkbox-container:hover input ~ .checkmark {
+    border-color: #198754; }
+  .task-checkbox-container input:checked ~ .checkmark {
+    background-color: #198754;
+    border-color: #198754;
+    animation: checkPop 0.35s ease-in-out forwards; }
+    .task-checkbox-container input:checked ~ .checkmark::after {
+      display: block; }
 
 /*# sourceMappingURL=main.css.map */

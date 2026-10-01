@@ -7,16 +7,15 @@
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid py-3">
+<div class="container-fluid p-0">
 
-    <!-- CABECERA Y FILTRO DE TABLEROS -->
-    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <!-- CABECERA Y FILTRO DE TABLEROS (ANCHO COMPLETO) -->
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
         <div class="d-flex align-items-center gap-3">
             <h2 class="h4 mb-0 fw-bold">
                 📌 {% if current_board %}{{ current_board.title }}{% else %}{% translate "General" %}{% endif %}
             </h2>
 
-            <!-- SELECTOR CONDICIONAL: Solo en General y si existen tareas compartidas -->
             {% if not current_board and has_shared_tasks %}
                 <div class="btn-group btn-group-sm shadow-sm" role="group" id="filterTaskGroup">
                     <button type="button" class="btn btn-outline-primary active" data-filter="all">
@@ -31,154 +30,20 @@
                 </div>
             {% endif %}
         </div>
-
-        <div class="d-flex align-items-center gap-2 flex-wrap">
-            <!-- Pestañas de Tableros -->
-            <div class="nav nav-pills gap-1 align-items-center">
-                <!-- Pestaña Principal: General -->
-                <a href="{% url 'dashboard' %}" 
-                   class="nav-link btn-sm py-1 px-3 {% if not current_board %}active bg-primary text-white{% else %}bg-light text-dark border{% endif %}">
-                    🌐 {% translate "General" %}
-                </a>
-
-                <!-- Tableros Personalizados Propios -->
-                {% for board in boards %}
-                {% if not board.is_default %}
-                    <div class="d-inline-flex align-items-center rounded overflow-hidden shadow-sm me-1"
-                        style="
-                            {% if current_board.id == board.id %}
-                                background-color: {{ board.color|default:'#0d6efd' }} !important;
-                                color: white !important;
-                            {% else %}
-                                background-color: rgba(245, 245, 245, 0.9) !important;
-                                border-left: 4px solid {{ board.color|default:'#6c757d' }} !important;
-                                border-top: 1px solid #dee2e6 !important;
-                                border-right: 1px solid #dee2e6 !important;
-                                border-bottom: 1px solid #dee2e6 !important;
-                            {% endif %}
-                        ">
-                        <!-- Enlace principal del tablero -->
-                        <a href="{% url 'dashboard_board' board.id %}" 
-                        class="text-decoration-none py-1 ps-2 pe-1 small fw-bold {% if current_board.id == board.id %}text-white{% else %}text-dark{% endif %}">
-                            📁 {{ board.title }}
-                        </a>
-
-                        <!-- Botón opciones del tablero (Solo para el dueño) -->
-                        {% if current_board.id == board.id %}
-                            <button type="button" 
-                                    class="btn btn-sm p-0 pe-2 ps-1 border-0 shadow-none position-relative text-white" 
-                                    style="z-index: 2; cursor: pointer; opacity: 0.7; transition: opacity 0.2s ease, filter 0.2s ease;"
-                                    onmouseover="this.style.opacity='1'; this.style.filter='brightness(0.7)';"
-                                    onmouseout="this.style.opacity='0.7'; this.style.filter='brightness(1)';"
-                                    data-bs-toggle="modal" 
-                                    data-bs-target="#editBoardModal{{ board.id }}"
-                                    title="{% translate 'Editar tablero' %}">
-                                •••
-                            </button>
-                        {% endif %}
-                    </div>
-
-                    <!-- MODAL DE EDICIÓN DE TABLERO -->
-                    <div class="modal fade" id="editBoardModal{{ board.id }}" tabindex="-1" aria-hidden="true">
-                        <div class="modal-dialog">
-                            <div class="modal-content text-dark">
-                                <form method="POST" action="{% url 'edit_board' board.id %}">
-                                    {% csrf_token %}
-                                    <div class="modal-header">
-                                        <h5 class="modal-title fw-bold">⚙️ {% translate "Editar Tablero" %}: {{ board.title }}</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body text-start">
-                                        <div class="mb-3">
-                                            <label class="form-label small fw-bold">{% translate "Nombre del tablero" %}</label>
-                                            <input type="text" name="title" value="{{ board.title }}" class="form-control" required>
-                                        </div>
-
-                                        <div class="mb-3">
-                                            <label class="form-label small fw-bold">{% translate "Color del tablero" %}</label>
-                                            <select name="color" class="form-select">
-                                                <option value="#3B82F6" {% if board.color == "#3B82F6" %}selected{% endif %}>🔵 {% translate "Azul" %}</option>
-                                                <option value="#10B981" {% if board.color == "#10B981" %}selected{% endif %}>🟢 {% translate "Verde" %}</option>
-                                                <option value="#EF4444" {% if board.color == "#EF4444" %}selected{% endif %}>🔴 {% translate "Rojo" %}</option>
-                                                <option value="#F59E0B" {% if board.color == "#F59E0B" %}selected{% endif %}>🟠 {% translate "Naranja" %}</option>
-                                                <option value="#8B5CF6" {% if board.color == "#8B5CF6" %}selected{% endif %}>🟣 {% translate "Púrpura" %}</option>
-                                                <option value="#6B7280" {% if board.color == "#6B7280" %}selected{% endif %}>⚪ {% translate "Gris" %}</option>
-                                            </select>
-                                        </div>
-
-                                        <div class="mb-3">
-                                            <label class="form-label small">{% translate "Descripción" %}</label>
-                                            <textarea name="description" class="form-control" rows="3">{{ board.description|default:'' }}</textarea>
-                                        </div>
-                                    </div>
-                                    <div class="modal-footer justify-content-between">
-                                        <button type="submit" 
-                                                formaction="{% url 'delete_board' board.id %}" 
-                                                class="btn btn-outline-danger btn-sm"
-                                                onclick="return confirm('¿Seguro que quieres eliminar el tablero {{ board.title }}?');">
-                                            🗑️ {% translate "Eliminar Tablero" %}
-                                        </button>
-                                        
-                                        <div>
-                                            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">{% translate "Cancelar" %}</button>
-                                            <button type="submit" class="btn btn-primary btn-sm">{% translate "Guardar Cambios" %}</button>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                {% endif %}
-                {% endfor %}
-
-                <!-- Tableros Compartidos Conmigo -->
-                {% if shared_boards %}
-                    <span class="text-muted small ms-2 me-1">|</span>
-                    {% for s_board in shared_boards %}
-                        <div class="d-inline-flex align-items-center rounded overflow-hidden shadow-sm me-1"
-                            style="
-                                {% if current_board.id == s_board.id %}
-                                    background-color: {{ s_board.color|default:'#0d6efd' }} !important;
-                                    color: white !important;
-                                {% else %}
-                                    background-color: rgba(235, 243, 255, 0.9) !important;
-                                    border-left: 4px solid {{ s_board.color|default:'#0d6efd' }} !important;
-                                    border-top: 1px solid #b6d4fe !important;
-                                    border-right: 1px solid #b6d4fe !important;
-                                    border-bottom: 1px solid #b6d4fe !important;
-                                {% endif %}
-                            ">
-                            <a href="{% url 'dashboard_board' s_board.id %}" 
-                               class="text-decoration-none py-1 px-2 small fw-bold {% if current_board.id == s_board.id %}text-white{% else %}text-primary{% endif %}"
-                               title="{% translate 'Tablero compartido por' %}: {{ s_board.owner.get_full_name|default:s_board.owner.username }}">
-                                👥 {{ s_board.title }} <small class="opacity-75">({{ s_board.owner.username }})</small>
-                            </a>
-                        </div>
-                    {% endfor %}
-                {% endif %}
-            </div>
-
-            <!-- Botón para crear un nuevo tablero -->
-            <button type="button" class="btn btn-success btn-sm shadow-sm ms-2" data-bs-toggle="modal" data-bs-target="#createBoardModal">
-                ➕ {% translate "Nuevo Tablero" %}
-            </button>
-        </div>
     </div>
 
-    <!-- 1. FORMULARIO DE ALTA RÁPIDA DE TAREA -->
-    <div class="card mb-4 shadow-sm border-0">
+    <!-- FORMULARIO DE ALTA RÁPIDA (ANCHO COMPLETO) -->
+    <div class="card mb-3 shadow-sm border-0">
         <div class="card-body p-3">
             <form id="quickTaskForm" method="POST" action="">
                 {% csrf_token %}
                 
                 <div class="row g-3 align-items-end">
-                    <!-- Título -->
                     <div class="col-md-5">
                         <label class="form-label small text-muted mb-1 fw-bold">{% translate "Título de la tarea" %}</label>
                         {{ form.title }}
                     </div>
 
-                    <!-- Urgencia -->
                     <div class="col-md-3 d-flex justify-content-center">
                         <div class="rating-wrapper text-center" style="display: inline-block;">
                             <div class="d-flex justify-content-between align-items-center mb-1 text-muted fw-bold small px-1">
@@ -202,7 +67,6 @@
                         </div>
                     </div>
 
-                    <!-- Importancia -->
                     <div class="col-md-3 d-flex justify-content-center">
                         <div class="rating-wrapper text-center" style="display: inline-block;">
                             <div class="d-flex justify-content-between align-items-center mb-1 text-muted fw-bold small px-1">
@@ -226,7 +90,6 @@
                         </div>
                     </div>
 
-                    <!-- Botón Añadir -->
                     <div class="col-md-1 d-grid">
                         <button type="submit" class="btn btn-primary fw-bold">
                             ➕
@@ -234,7 +97,6 @@
                     </div>
                 </div>
 
-                <!-- Desplegable Opciones Avanzadas -->
                 <div class="mt-2">
                     <button class="btn btn-link btn-sm text-decoration-none p-0 text-muted" type="button" data-bs-toggle="collapse" data-bs-target="#advancedOptions">
                         ⚙️ {% translate "Opciones avanzadas (Tablero, fecha límite, notas...)" %}
@@ -265,72 +127,239 @@
         </div>
     </div>
 
-    <!-- 2. MATRIZ DE EISENHOWER (4 CUADRANTES) -->
+    <!-- GRID PRINCIPAL: MATRIZ (8 COLS) + COMPLETADAS (4 COLS) -->
     <div class="row g-3">
         
-        <!-- CUADRANTE 1: DO FIRST -->
-        <div class="col-md-6">
-            <div class="quadrant quadrant-q1 h-100 shadow-sm">
-                <div class="quadrant-header position-relative text-center p-2 mb-2">
-                    <span class="fw-bold fs-6">🔥 {% translate "Urgente - Importante (Hacer ahora)" %}</span>
-                    <span class="badge bg-white text-danger rounded-pill position-absolute end-0 top-50 translate-middle-y me-2">{{ q1_tasks.count }}</span>
+        <!-- SECCIÓN IZQUIERDA: MATRIZ DE EISENHOWER -->
+        <div class="col-lg-8">
+            <div class="row g-3">
+                <!-- CUADRANTE 1: DO FIRST -->
+                <div class="col-md-6">
+                    <div class="quadrant quadrant-q1 h-100 shadow-sm d-flex flex-column bg-white rounded-3 p-2">
+                        <div class="quadrant-header position-relative text-center p-2 mb-2">
+                            <span class="fw-bold fs-6">🔥 {% translate "Urgente - Importante (Hacer ahora)" %}</span>
+                            <span class="badge bg-danger rounded-pill position-absolute end-0 top-50 translate-middle-y me-2">{{ q1_tasks.count }}</span>
+                        </div>
+                        
+                        <!-- CONTENEDOR EXCLUSIVO PARA TARJETAS -->
+                        <div class="p-2 pt-0 flex-grow-1 d-flex flex-column quadrant-container" data-quadrant="Q1" style="min-height: 80px;">
+                            {% for task in q1_tasks %}
+                                {% include '_includes/_task_card.html' with task=task %}
+                            {% empty %}
+                                <p class="text-muted text-center py-4 small mb-0 empty-msg">{% translate "No hay tareas urgentes e importantes." %}</p>
+                            {% endfor %}
+                        </div>
+
+                        <!-- BOTÓN DE AÑADIR TAREA (FUERA DEL ÁREA DE ARRASTRE) -->
+                        <div class="add-task-inline-wrapper mt-auto pt-2 px-2">
+                            <button type="button" class="btn btn-add-inline text-muted w-100 text-start d-flex align-items-center gap-2 py-2 px-2 border-0 rounded-2" onclick="showInlineForm(this)">
+                                <i class="bi bi-plus-lg"></i>
+                                <span class="fw-medium" style="font-size: 0.88rem;"> {% translate "Añadir una tarea" %}</span>
+                            </button>
+                            <form method="POST" action="{% url 'quick_create_task' %}" class="inline-task-form d-none mt-1">
+                                {% csrf_token %}
+                                <input type="hidden" name="urgency" value="4">
+                                <input type="hidden" name="importance" value="4">
+                                {% if current_board %}<input type="hidden" name="board" value="{{ current_board.id }}">{% endif %}
+                                <div class="card p-2 border-0 shadow-sm mb-2">
+                                    <textarea name="title" class="form-control border-0 p-1 shadow-none task-inline-input" rows="2" placeholder="{% translate 'Introduce un título para esta tarjeta...' %}" required style="resize: none; font-size: 0.88rem;"></textarea>
+                                </div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <button type="submit" class="btn btn-primary btn-sm px-3 fw-semibold">{% translate "Añadir tarjeta" %}</button>
+                                    <button type="button" class="btn btn-close-inline btn-sm text-muted" onclick="hideInlineForm(this)">✕</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
-                <div class="p-3 pt-0">
-                    {% for task in q1_tasks %}
-                        {% include '_includes/_task_card.html' with task=task %}
-                    {% empty %}
-                        <p class="text-muted text-center py-4 small mb-0">{% translate "No hay tareas urgentes e importantes." %}</p>
-                    {% endfor %}
+
+                <!-- CUADRANTE 2: SCHEDULE -->
+                <div class="col-md-6">
+                    <div class="quadrant quadrant-q2 h-100 shadow-sm d-flex flex-column bg-white rounded-3 p-2">
+                        <div class="quadrant-header position-relative text-center p-2 mb-2">
+                            <span class="fw-bold fs-6">📅 {% translate "Importante - No Urgente (Planificar)" %}</span>
+                            <span class="badge bg-primary rounded-pill position-absolute end-0 top-50 translate-middle-y me-2">{{ q2_tasks.count }}</span>
+                        </div>
+                        
+                        <!-- CONTENEDOR EXCLUSIVO PARA TARJETAS -->
+                        <div class="p-2 pt-0 flex-grow-1 d-flex flex-column quadrant-container" data-quadrant="Q2" style="min-height: 80px;">
+                            {% for task in q2_tasks %}
+                                {% include '_includes/_task_card.html' with task=task %}
+                            {% empty %}
+                                <p class="text-muted text-center py-4 small mb-0 empty-msg">{% translate "No hay tareas de planificación pendientes." %}</p>
+                            {% endfor %}
+                        </div>
+
+                        <!-- BOTÓN DE AÑADIR TAREA (FUERA DEL ÁREA DE ARRASTRE) -->
+                        <div class="add-task-inline-wrapper mt-auto pt-2 px-2">
+                            <button type="button" class="btn btn-add-inline text-muted w-100 text-start d-flex align-items-center gap-2 py-2 px-2 border-0 rounded-2" onclick="showInlineForm(this)">
+                                <i class="bi bi-plus-lg"></i>
+                                <span class="fw-medium" style="font-size: 0.88rem;"> {% translate "Añadir una tarea" %}</span>
+                            </button>
+                            <form method="POST" action="{% url 'quick_create_task' %}" class="inline-task-form d-none mt-1">
+                                {% csrf_token %}
+                                <input type="hidden" name="urgency" value="1">
+                                <input type="hidden" name="importance" value="4">
+                                {% if current_board %}<input type="hidden" name="board" value="{{ current_board.id }}">{% endif %}
+                                <div class="card p-2 border-0 shadow-sm mb-2">
+                                    <textarea name="title" class="form-control border-0 p-1 shadow-none task-inline-input" rows="2" placeholder="{% translate 'Introduce un título para esta tarjeta...' %}" required style="resize: none; font-size: 0.88rem;"></textarea>
+                                </div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <button type="submit" class="btn btn-primary btn-sm px-3 fw-semibold">{% translate "Añadir tarjeta" %}</button>
+                                    <button type="button" class="btn btn-close-inline btn-sm text-muted" onclick="hideInlineForm(this)">✕</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CUADRANTE 3: DELEGATE -->
+                <div class="col-md-6">
+                    <div class="quadrant quadrant-q3 h-100 shadow-sm d-flex flex-column bg-white rounded-3 p-2">
+                        <div class="quadrant-header position-relative text-center p-2 mb-2">
+                            <span class="fw-bold fs-6">👥 {% translate "Urgente - No Importante (Delegar)" %}</span>
+                            <span class="badge bg-dark rounded-pill position-absolute end-0 top-50 translate-middle-y me-2">{{ q3_tasks.count }}</span>
+                        </div>
+                        
+                        <!-- CONTENEDOR EXCLUSIVO PARA TARJETAS -->
+                        <div class="p-2 pt-0 flex-grow-1 d-flex flex-column quadrant-container" data-quadrant="Q3" style="min-height: 80px;">
+                            {% for task in q3_tasks %}
+                                {% include '_includes/_task_card.html' with task=task %}
+                            {% empty %}
+                                <p class="text-muted text-center py-4 small mb-0 empty-msg">{% translate "No hay tareas por delegar." %}</p>
+                            {% endfor %}
+                        </div>
+
+                        <!-- BOTÓN DE AÑADIR TAREA (FUERA DEL ÁREA DE ARRASTRE) -->
+                        <div class="add-task-inline-wrapper mt-auto pt-2 px-2">
+                            <button type="button" class="btn btn-add-inline text-muted w-100 text-start d-flex align-items-center gap-2 py-2 px-2 border-0 rounded-2" onclick="showInlineForm(this)">
+                                <i class="bi bi-plus-lg"></i>
+                                <span class="fw-medium" style="font-size: 0.88rem;"> {% translate "Añadir una tarea" %}</span>
+                            </button>
+                            <form method="POST" action="{% url 'quick_create_task' %}" class="inline-task-form d-none mt-1">
+                                {% csrf_token %}
+                                <input type="hidden" name="urgency" value="4">
+                                <input type="hidden" name="importance" value="1">
+                                {% if current_board %}<input type="hidden" name="board" value="{{ current_board.id }}">{% endif %}
+                                <div class="card p-2 border-0 shadow-sm mb-2">
+                                    <textarea name="title" class="form-control border-0 p-1 shadow-none task-inline-input" rows="2" placeholder="{% translate 'Introduce un título para esta tarjeta...' %}" required style="resize: none; font-size: 0.88rem;"></textarea>
+                                </div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <button type="submit" class="btn btn-primary btn-sm px-3 fw-semibold">{% translate "Añadir tarjeta" %}</button>
+                                    <button type="button" class="btn btn-close-inline btn-sm text-muted" onclick="hideInlineForm(this)">✕</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CUADRANTE 4: ELIMINATE -->
+                <div class="col-md-6">
+                    <div class="quadrant quadrant-q4 h-100 shadow-sm d-flex flex-column bg-white rounded-3 p-2">
+                        <div class="quadrant-header position-relative text-center p-2 mb-2">
+                            <span class="fw-bold fs-6">🗑️ {% translate "No Urgente - No Importante (Eliminar)" %}</span>
+                            <span class="badge bg-secondary rounded-pill position-absolute end-0 top-50 translate-middle-y me-2">{{ q4_tasks.count }}</span>
+                        </div>
+                        
+                        <!-- CONTENEDOR EXCLUSIVO PARA TARJETAS -->
+                        <div class="p-2 pt-0 flex-grow-1 d-flex flex-column quadrant-container" data-quadrant="Q4" style="min-height: 80px;">
+                            {% for task in q4_tasks %}
+                                {% include '_includes/_task_card.html' with task=task %}
+                            {% empty %}
+                                <p class="text-muted text-center py-4 small mb-0 empty-msg">{% translate "No hay tareas irrelevantes." %}</p>
+                            {% endfor %}
+                        </div>
+
+                        <!-- BOTÓN DE AÑADIR TAREA (FUERA DEL ÁREA DE ARRASTRE) -->
+                        <div class="add-task-inline-wrapper mt-auto pt-2 px-2">
+                            <button type="button" class="btn btn-add-inline text-muted w-100 text-start d-flex align-items-center gap-2 py-2 px-2 border-0 rounded-2" onclick="showInlineForm(this)">
+                                <i class="bi bi-plus-lg"></i>
+                                <span class="fw-medium" style="font-size: 0.88rem;"> {% translate "Añadir una tarea" %}</span>
+                            </button>
+                            <form method="POST" action="{% url 'quick_create_task' %}" class="inline-task-form d-none mt-1">
+                                {% csrf_token %}
+                                <input type="hidden" name="urgency" value="1">
+                                <input type="hidden" name="importance" value="1">
+                                {% if current_board %}<input type="hidden" name="board" value="{{ current_board.id }}">{% endif %}
+                                <div class="card p-2 border-0 shadow-sm mb-2">
+                                    <textarea name="title" class="form-control border-0 p-1 shadow-none task-inline-input" rows="2" placeholder="{% translate 'Introduce un título para esta tarjeta...' %}" required style="resize: none; font-size: 0.88rem;"></textarea>
+                                </div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <button type="submit" class="btn btn-primary btn-sm px-3 fw-semibold">{% translate "Añadir tarjeta" %}</button>
+                                    <button type="button" class="btn btn-close-inline btn-sm text-muted" onclick="hideInlineForm(this)">✕</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- CUADRANTE 2: SCHEDULE -->
-        <div class="col-md-6">
-            <div class="quadrant quadrant-q2 h-100 shadow-sm">
-                <div class="quadrant-header position-relative text-center p-2 mb-2">
-                    <span class="fw-bold fs-6">📅 {% translate "Importante - No Urgente (Planificar)" %}</span>
-                    <span class="badge bg-white text-primary rounded-pill position-absolute end-0 top-50 translate-middle-y me-2">{{ q2_tasks.count }}</span>
-                </div>
-                <div class="p-3 pt-0">
-                    {% for task in q2_tasks %}
-                        {% include '_includes/_task_card.html' with task=task %}
-                    {% empty %}
-                        <p class="text-muted text-center py-4 small mb-0">{% translate "No hay tareas de planificación pendientes." %}</p>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
+        <!-- SECCIÓN DERECHA: SIDEBAR DE COMPLETADAS -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm h-100 d-flex flex-column bg-white rounded-3">
+                <div class="card-header bg-transparent border-0 p-3 pb-2 d-flex align-items-center justify-content-between flex-wrap gap-2">
+                    <div class="d-flex align-items-center gap-2">
+                        <h6 class="fw-bold mb-0 text-secondary">
+                            <i class="bi bi-check2-square me-1"></i> {% translate "Completadas" %}
+                        </h6>
+                        <span class="badge bg-secondary rounded-pill" id="completed-count">
+                            {{ completed_tasks.count }}
+                        </span>
+                    </div>
 
-        <!-- CUADRANTE 3: DELEGATE -->
-        <div class="col-md-6">
-            <div class="quadrant quadrant-q3 h-100 shadow-sm">
-                <div class="quadrant-header position-relative text-center p-2 mb-2">
-                    <span class="fw-bold fs-6">👥 {% translate "Urgente - No Importante (Delegar)" %}</span>
-                    <span class="badge bg-dark text-white rounded-pill position-absolute end-0 top-50 translate-middle-y me-2">{{ q3_tasks.count }}</span>
-                </div>
-                <div class="p-3 pt-0">
-                    {% for task in q3_tasks %}
-                        {% include '_includes/_task_card.html' with task=task %}
-                    {% empty %}
-                        <p class="text-muted text-center py-4 small mb-0">{% translate "No hay tareas por delegar." %}</p>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <select id="completed-filter-select" class="form-select form-select-sm border-0 shadow-none bg-light py-1 px-2 text-muted" style="font-size: 0.8rem; width: auto; cursor: pointer;">
+                            <option value="all" selected>{% translate "Todas" %}</option>
+                            <option value="today">{% translate "Hoy" %}</option>
+                            <option value="week">{% translate "Esta semana" %}</option>
+                        </select>
 
-        <!-- CUADRANTE 4: ELIMINATE -->
-        <div class="col-md-6">
-            <div class="quadrant quadrant-q4 h-100 shadow-sm">
-                <div class="quadrant-header position-relative text-center p-2 mb-2">
-                    <span class="fw-bold fs-6">🗑️ {% translate "No Urgente - No Importante (Eliminar / Posponer)" %}</span>
-                    <span class="badge bg-white text-secondary rounded-pill position-absolute end-0 top-50 translate-middle-y me-2">{{ q4_tasks.count }}</span>
+                        <button type="button" class="btn btn-outline-danger btn-sm py-0 px-2 rounded-2" data-bs-toggle="modal" data-bs-target="#clearCompletedModal" title="{% translate 'Vaciar completadas' %}" style="font-size: 0.8rem;">
+                            <i class="bi bi-trash3"></i> {% translate "Limpiar" %}
+                        </button>
+                    </div>
                 </div>
-                <div class="p-3 pt-0">
-                    {% for task in q4_tasks %}
-                        {% include '_includes/_task_card.html' with task=task %}
+
+                <hr class="m-0 text-muted opacity-25">
+
+                <div class="card-body p-2 flex-grow-1 overflow-auto quadrant-container" id="completed-tasks-container" data-quadrant="DONE" style="max-height: calc(100vh - 280px); min-height: 400px;">
+                    {% for task in completed_tasks %}
+                        <div class="completed-task-item task-card card border-0 shadow-sm mb-2 p-2 d-flex flex-row align-items-center justify-content-between gap-2 bg-light" 
+                             data-task-id="{{ task.id }}"
+                             data-urgency="{{ task.urgency }}"
+                             data-importance="{{ task.importance }}"
+                             data-updated-at="{{ task.updated_at|date:'Y-m-d' }}">
+                            
+                            <div class="d-flex align-items-center gap-2 flex-grow-1 min-w-0" style="overflow: hidden;">
+                                <div class="task-checkbox-wrapper-sidebar flex-shrink-0" style="width: 17px; height: 17px;">
+                                    <label class="task-checkbox-container m-0" onclick="event.stopPropagation();">
+                                        <input type="checkbox" 
+                                               class="task-completion-check" 
+                                               data-task-id="{{ task.id }}" 
+                                               checked>
+                                        <span class="checkmark"></span>
+                                    </label>
+                                </div>
+                                
+                                <span class="task-title text-muted text-decoration-line-through text-truncate fw-medium" 
+                                      style="font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: default;" 
+                                      title="{{ task.title }}">
+                                    {{ task.title }}
+                                </span>
+                            </div>
+
+                            <form method="POST" action="{% url 'delete_task' task.id %}" class="d-inline m-0 flex-shrink-0" onsubmit="return confirm('¿Eliminar esta tarea definitivamente?');">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-link text-danger p-0 border-0 opacity-50 hover-opacity-100" title="{% translate 'Eliminar' %}">
+                                    <i class="bi bi-x-lg" style="font-size: 0.85rem;"></i>
+                                </button>
+                            </form>
+                        </div>
                     {% empty %}
-                        <p class="text-muted text-center py-4 small mb-0">{% translate "No hay tareas irrelevantes." %}</p>
+                        <p class="text-muted text-center py-4 small mb-0 empty-msg" id="empty-trash-msg">
+                            {% translate "No hay tareas completadas." %}
+                        </p>
                     {% endfor %}
                 </div>
             </div>
@@ -338,22 +367,7 @@
 
     </div>
 
-    <!-- 3. TAREAS COMPLETADAS -->
-    {% if done_tasks %}
-    <div class="mt-5 mb-4">
-        <h5 class="h6 text-muted fw-bold mb-3">✅ {% translate "Completadas" %}</h5>
-        <div class="list-group shadow-sm border-0">
-            {% for task in done_tasks %}
-                <div class="list-group-item d-flex justify-content-between align-items-center text-muted py-2">
-                    <del class="small">{{ task.title }}</del>
-                    <small class="text-muted" style="font-size: 0.75rem;">{{ task.updated_at|date:"d/m/Y H:i" }}</small>
-                </div>
-            {% endfor %}
-        </div>
-    </div>
-    {% endif %}
-
-    <!-- MODAL DE CREACIÓN DE TABLERO -->
+    <!-- MODALES DE CREACIÓN DE TABLERO Y LIMPIEZA MASIVA -->
     <div class="modal fade" id="createBoardModal" tabindex="-1" aria-labelledby="createBoardModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -395,82 +409,272 @@
         </div>
     </div>
 
+    <div class="modal fade" id="clearCompletedModal" tabindex="-1" aria-labelledby="clearCompletedModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header border-0 pb-0">
+                    <h6 class="modal-title fw-bold text-danger" id="clearCompletedModalLabel">{% translate "Vaciar tareas completadas" %}</h6>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body py-3 text-secondary" style="font-size: 0.9rem;">
+                    {% translate "¿Estás seguro de que deseas eliminar permanentemente las tareas completadas visibles según el filtro seleccionado?" %}
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-light btn-sm fw-semibold" data-bs-dismiss="modal">{% translate "Cancelar" %}</button>
+                    <form method="POST" action="{% url 'clear_completed_tasks' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="time_filter" id="modal-time-filter-input" value="all">
+                        <button type="submit" class="btn btn-danger btn-sm fw-semibold">{% translate "Eliminar definitivamente" %}</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 
-<!-- SCRIPT DE VALIDACIÓN DE ESTRELLAS -->
+<!-- Carga de SortableJS -->
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+
 <script>
-// 1. VALIDACIÓN DE FORMULARIO RÁPIDO (ESTRELLAS)
-document.addEventListener('submit', function (e) {
-    const form = e.target.closest('#quickTaskForm');
-    if (!form) return;
+function showInlineForm(button) {
+    const wrapper = button.closest('.add-task-inline-wrapper');
+    const form = wrapper.querySelector('.inline-task-form');
+    const textarea = form.querySelector('textarea');
 
-    let isValid = true;
+    button.classList.add('d-none');
+    form.classList.remove('d-none');
+    textarea.focus();
 
-    ['urgency', 'importance'].forEach(function (fieldName) {
-        const checked = form.querySelector(`input[name="${fieldName}"]:checked`);
-        const firstInput = form.querySelector(`input[name="${fieldName}"]`);
-        const container = firstInput ? firstInput.closest('.star-rating') : null;
-
-        if (!checked) {
-            isValid = false;
-            if (container) {
-                container.classList.add('is-invalid');
-                setTimeout(function () {
-                    container.classList.remove('is-invalid');
-                }, 350);
-            }
-        } else {
-            if (container) {
-                container.classList.remove('is-invalid');
+    textarea.onkeydown = function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            if (this.value.trim() !== '') {
+                form.submit();
             }
         }
-    });
+    };
+}
 
-    if (!isValid) {
-        e.preventDefault();
-        e.stopPropagation();
-    }
-});
+function hideInlineForm(button) {
+    const wrapper = button.closest('.add-task-inline-wrapper');
+    const form = wrapper.querySelector('.inline-task-form');
+    const toggleBtn = wrapper.querySelector('.btn-add-inline');
+    const textarea = form.querySelector('textarea');
 
-// Limpieza de feedback de error al hacer clic en estrellas
-document.addEventListener('change', function (e) {
-    if (e.target.matches('.star-rating input[type="radio"]')) {
-        const container = e.target.closest('.star-rating');
-        if (container) {
-            container.classList.remove('is-invalid');
+    textarea.value = '';
+    form.classList.add('d-none');
+    toggleBtn.classList.remove('d-none');
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
         }
     }
-});
+    return cookieValue;
+}
 
-// 2. FILTRADO DINÁMICO DE TARJETAS (TODAS / MIS TAREAS / ASIGNADAS)
 document.addEventListener('DOMContentLoaded', function () {
-    const filterButtons = document.querySelectorAll('#filterTaskGroup button');
-    if (!filterButtons.length) return;
+    let isProcessing = false;
 
-    filterButtons.forEach(button => {
-        button.addEventListener('click', function () {
-            // Cambiar clase activa visualmente en el grupo de botones
-            filterButtons.forEach(btn => btn.classList.remove('active'));
-            this.classList.add('active');
+    // Inicialización de SortableJS
+    const quadrantContainers = document.querySelectorAll('.quadrant-container');
 
-            const filter = this.getAttribute('data-filter');
-            const taskCards = document.querySelectorAll('.task-card');
+    quadrantContainers.forEach(container => {
+        new Sortable(container, {
+            group: 'eisenhower-matrix',
+            draggable: '.task-card',
+            filter: '.empty-msg',
+            animation: 150,
+            ghostClass: 'opacity-50',
 
-            taskCards.forEach(card => {
-                const type = card.getAttribute('data-created-by');
-
-                if (filter === 'all') {
-                    card.style.display = 'block';
-                } else if (filter === 'mine' && type === 'mine') {
-                    card.style.display = 'block';
-                } else if (filter === 'shared' && type === 'shared') {
-                    card.style.display = 'block';
-                } else {
-                    card.style.display = 'none';
+            onAdd: function (evt) {
+                // Oculta el mensaje "No hay tareas..." del cuadrante de destino
+                const emptyMsg = evt.to.querySelector('.empty-msg');
+                if (emptyMsg) {
+                    emptyMsg.style.display = 'none';
                 }
-            });
+            },
+
+            onRemove: function (evt) {
+                // Si el cuadrante de origen se queda vacío, vuelve a mostrar el mensaje
+                const remainingCards = evt.from.querySelectorAll('.task-card');
+                if (remainingCards.length === 0) {
+                    const emptyMsg = evt.from.querySelector('.empty-msg');
+                    if (emptyMsg) {
+                        emptyMsg.style.display = 'block';
+                    }
+                }
+            },
+
+            onEnd: async function (evt) {
+                if (isProcessing) return;
+
+                const itemEl = evt.item;
+                const targetContainer = evt.to;
+                const sourceContainer = evt.from;
+
+                if (targetContainer === sourceContainer) return;
+
+                const taskId = itemEl.getAttribute('data-task-id');
+                const targetQuadrant = targetContainer.getAttribute('data-quadrant');
+
+                if (!taskId || !targetQuadrant) return;
+
+                isProcessing = true;
+
+                try {
+                    const response = await fetch('/tasks/move/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCookie('csrftoken'),
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: JSON.stringify({
+                            task_id: taskId,
+                            target_quadrant: targetQuadrant
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.status === 'success') {
+                        window.location.reload();
+                    } else {
+                        sourceContainer.appendChild(itemEl);
+                        isProcessing = false;
+                    }
+                } catch (err) {
+                    console.error('Error al mover la tarea:', err);
+                    sourceContainer.appendChild(itemEl);
+                    isProcessing = false;
+                }
+            }
         });
     });
+
+    // Filtros de tableros
+    const filterButtons = document.querySelectorAll('#filterTaskGroup button');
+    if (filterButtons.length) {
+        filterButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                filterButtons.forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+
+                const filter = this.getAttribute('data-filter');
+                const taskCards = document.querySelectorAll('.task-card');
+
+                taskCards.forEach(card => {
+                    const type = card.getAttribute('data-created-by');
+
+                    if (filter === 'all' || (filter === 'mine' && type === 'mine') || (filter === 'shared' && type === 'shared')) {
+                        card.style.display = '';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        });
+    }
+
+    // Filtros del panel de completadas
+    const filterSelect = document.getElementById('completed-filter-select');
+    const modalFilterInput = document.getElementById('modal-time-filter-input');
+    const completedContainer = document.getElementById('completed-tasks-container');
+
+    if (filterSelect && completedContainer) {
+        filterSelect.addEventListener('change', function () {
+            const selectedFilter = this.value;
+            
+            if (modalFilterInput) {
+                modalFilterInput.value = selectedFilter;
+            }
+
+            const items = completedContainer.querySelectorAll('.completed-task-item');
+            const todayStr = new Date().toISOString().split('T')[0];
+            const sevenDaysAgo = new Date();
+            sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+            let visibleCount = 0;
+
+            items.forEach(item => {
+                const itemDateStr = item.getAttribute('data-updated-at');
+                const itemDate = new Date(itemDateStr);
+
+                if (selectedFilter === 'today') {
+                    if (itemDateStr === todayStr) {
+                        item.classList.remove('d-none');
+                        visibleCount++;
+                    } else {
+                        item.classList.add('d-none');
+                    }
+                } else if (selectedFilter === 'week') {
+                    if (itemDate >= sevenDaysAgo) {
+                        item.classList.remove('d-none');
+                        visibleCount++;
+                    } else {
+                        item.classList.add('d-none');
+                    }
+                } else {
+                    item.classList.remove('d-none');
+                    visibleCount++;
+                }
+            });
+
+            const countBadge = document.getElementById('completed-count');
+            if (countBadge) {
+                countBadge.textContent = visibleCount;
+            }
+        });
+    }
+});
+
+// Checkbox manual de estado
+document.addEventListener('change', function (e) {
+    if (e.target.matches('.task-completion-check')) {
+        const checkbox = e.target;
+
+        const taskId = checkbox.dataset.taskId;
+        const isCompleted = checkbox.checked;
+
+        if (!taskId) return;
+
+        const csrftoken = getCookie('csrftoken');
+
+        fetch(`/task/${taskId}/toggle/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrftoken,
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({ 'is_completed': isCompleted })
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Error en el servidor');
+            return response.json();
+        })
+        .then(data => {
+            if (data.status === 'success' || data.is_completed !== undefined) {
+                window.location.reload();
+            } else {
+                checkbox.checked = !isCompleted;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            checkbox.checked = !isCompleted;
+        });
+    }
 });
 </script>
 {% endblock %}

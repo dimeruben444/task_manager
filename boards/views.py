@@ -31,7 +31,6 @@ def dashboard_view(request, board_id=None):
     current_board = None
 
     if board_id:
-        # Se aplica .distinct() antes de pasarlo a get_object_or_404
         board_queryset = Board.objects.filter(
             Q(id=board_id) & (Q(owner=request.user) | Q(tasks__assigned_to=request.user))
         ).distinct()
@@ -72,7 +71,14 @@ def dashboard_view(request, board_id=None):
     else: 
         form = TaskForm(user=request.user, current_board=current_board)
 
+    # Filtrar tareas activas e inactivas
     active_tasks = base_tasks.filter(is_completed=False)
+    completed_tasks = base_tasks.filter(is_completed=True).order_by('-updated_at')[:15]
+
+    # === LÍNEAS DE DEPURACIÓN TEMPORALES ===
+    for t in base_tasks.filter(is_completed=False):
+        print(f"DEBUG Tarea: '{t.title}' | Urgencia: {t.urgency} | Importancia: {t.importance}")
+    # =======================================
     
     context = {
         'form': form,
@@ -83,14 +89,15 @@ def dashboard_view(request, board_id=None):
         'current_board': current_board,
         'default_board': default_board,
         'has_shared_tasks': has_shared_tasks,
-        'q1_tasks': active_tasks.filter(quadrant='Q1'),
-        'q2_tasks': active_tasks.filter(quadrant='Q2'),
-        'q3_tasks': active_tasks.filter(quadrant='Q3'),
-        'q4_tasks': active_tasks.filter(quadrant='Q4'),
-        'done_tasks': base_tasks.filter(is_completed=True)[:10],
+        'q1_tasks': active_tasks.filter(urgency__gte=3, importance__gte=3), # Urgente e Importante
+        'q2_tasks': active_tasks.filter(urgency__lt=3, importance__gte=3),  # Importante, No Urgente
+        'q3_tasks': active_tasks.filter(urgency__gte=3, importance__lt=3),  # Urgente, No Importante
+        'q4_tasks': active_tasks.filter(urgency__lt=3, importance__lt=3),  # No Urgente, No Importante
+        'completed_tasks': completed_tasks,
     }
 
     return render(request, 'tasks/dashboard.html', context)
+
 
 class BoardCreateView(LoginRequiredMixin, CreateView):
     model = Board

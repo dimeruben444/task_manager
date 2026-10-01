@@ -145,15 +145,13 @@ class Task(models.Model):
             if default_board:
                 self.board = default_board
 
-        # Asignar cuadrante según urgencia/importancia si la tarea no está completada
-        if not self.is_completed and self.quadrant != 'DONE':
-            self.quadrant = self.calculate_quadrant()
-
-        # Sincronizar estado DONE
-        if self.quadrant == 'DONE':
-            self.is_completed = True
-        elif self.is_completed and self.quadrant != 'DONE':
+        # Sincronización correcta de is_completed y quadrant
+        if self.is_completed:
             self.quadrant = 'DONE'
+        else:
+            # Si estaba completada (o en DONE) y la desmarcamos, recalculamos su cuadrante real
+            if self.quadrant == 'DONE' or not self.quadrant:
+                self.quadrant = self.calculate_quadrant()
 
         super().save(*args, **kwargs)
 

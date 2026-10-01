@@ -1,59 +1,82 @@
-<!-- core/templates/_includes/_task_card.html -->
 {% load i18n %}
 
 <!-- TARJETA EN EL TABLERO -->
-<div class="card mb-2 shadow-sm border-0 task-card hover-shadow" 
+<div class="card mb-2 p-0 shadow-sm border-0 task-card {% if task.is_completed %}is-completed{% endif %}" 
+     id="task-card-{{ task.id }}"
+     data-task-id="{{ task.id }}"
+     data-urgency="{{ task.urgency }}"
+     data-importance="{{ task.importance }}"
      data-created-by="{% if task.created_by == request.user %}mine{% else %}shared{% endif %}"
-     style="cursor: pointer; transition: transform 0.15s ease, box-shadow 0.15s ease;">
+     style="cursor: pointer;">
     
-    <div class="card-body p-2 pt-1" data-bs-toggle="modal" data-bs-target="#viewTaskModal{{ task.id }}">
-        <div class="d-flex justify-content-between align-items-start gap-2">
+    <div class="card-body py-2 px-3 d-flex flex-column justify-content-center">
+        
+        <!-- FILA SUPERIOR: CHECKBOX + TÍTULO -->
+        <div class="task-card-header d-flex align-items-center position-relative w-100">
             
-            <div class="flex-grow-1">
-                <!-- Badges de Tablero y Compartido -->
-                <div class="mb-1 d-flex align-items-center gap-1 flex-wrap">
-                    {% if task.board and not task.board.is_default %}
-                        {% if not current_board or current_board.id != task.board.id %}
-                            <span class="badge squared-pill text-white fw-normal" 
-                                  style="font-size: 0.65rem; background-color: {{ task.board.color|default:'#6c757d' }};">
-                                {{ task.board.title }}
-                            </span>
-                        {% endif %}
-                    {% endif %}
-                </div>
-
-                <!-- Título -->
-                <h6 class="card-title mb-1 ps-1 small fw-bold {% if task.is_completed %}text-decoration-line-through text-muted{% endif %}">
-                    {{ task.title }}
-                </h6>
-
-                <!-- Pie de tarjeta: Fecha y Avatares -->
-                <div class="d-flex align-items-center justify-content-between mt-2 ps-2">
-                    <div class="d-flex align-items-center gap-0 text-muted small" style="font-size: 0.7rem;">
-                        {% if task.due_date %}
-                            <svg xmlns="http://www.w3.org/2000/svg" height="19px" viewBox="0 -960 960 960" width="19px" fill="#b8b8b8"><path d="m612-292 56-56-148-148v-184h-80v216l172 172ZM480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-400Zm0 320q133 0 226.5-93.5T800-480q0-133-93.5-226.5T480-800q-133 0-226.5 93.5T160-480q0 133 93.5 226.5T480-160Z"/></svg>{{ task.due_date|date:"M d H:i" }}
-                        {% endif %}
-                    </div>
-
-                    <!-- Avatares de asignados -->
-                    <div class="d-flex align-items-center gap-1">
-                        {% for user_assigned in task.assigned_to.all %}
-                            <span class="badge bg-dark text-white rounded-circle p-1 d-inline-flex align-items-center justify-content-center shadow-sm" 
-                                  style="width: 20px; height: 20px; font-size: 0.55rem;"
-                                  title="{{ user_assigned.get_full_name|default:user_assigned.username }}">
-                                {{ user_assigned.username|slice:":2"|upper }}
-                            </span>
-                        {% endfor %}
-                    </div>
-                </div>
+            <!-- Checkbox flotante/interactivo -->
+            <div class="task-checkbox-wrapper flex-shrink-0">
+                <label class="task-checkbox-container m-0" onclick="event.stopPropagation();">
+                    <input type="checkbox" 
+                        class="task-completion-check" 
+                        data-task-id="{{ task.id }}"
+                        {% if task.is_completed %}checked{% endif %}>
+                    <span class="checkmark"></span>
+                </label>
             </div>
 
-            <span class="text-muted small align-self-center opacity-50">...</span>
+            <!-- Título de la tarjeta -->
+            <div class="task-title-wrapper w-100" data-bs-toggle="modal" data-bs-target="#viewTaskModal{{ task.id }}">
+                <h6 class="card-title task-title mb-0 fw-semibold text-dark {% if task.is_completed %}completed-text{% endif %}" 
+                    style="font-size: 0.88rem; line-height: 1.35; margin: 0;">
+                    {{ task.title }}
+                </h6>
+            </div>
 
         </div>
+
+        {% with first_assignee=task.assigned_to.first total_assignees=task.assigned_to.count %}
+            {% if task.due_date or task.description or task.assigned_to.exists and total_assignees > 1 or task.assigned_to.exists and first_assignee != task.created_by %}
+                
+                <div class="d-flex align-items-center justify-content-between mt-1 pt-1 text-muted" 
+                     style="font-size: 0.72rem;" 
+                     data-bs-toggle="modal" 
+                     data-bs-target="#viewTaskModal{{ task.id }}">
+                    
+                    <div class="d-flex align-items-center gap-2">
+                        {% if task.due_date %}
+                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle d-inline-flex align-items-center gap-1 px-1.5 py-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" height="12px" viewBox="0 -960 960 960" width="12px" fill="currentColor"><path d="m612-292 56-56-148-148v-184h-80v216l172 172ZM480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-400Zm0 320q133 0 226.5-93.5T800-480q0-133-93.5-226.5T480-800q-133 0-226.5 93.5T160-480q0 133 93.5 226.5T480-160Z"/></svg>
+                                {{ task.due_date|date:"d M" }}
+                            </span>
+                        {% endif %}
+
+                        {% if task.description %}
+                            <span title="{% translate 'Tiene descripción' %}">
+                                <svg xmlns="http://www.w3.org/2000/svg" height="14px" viewBox="0 -960 960 960" width="14px" fill="#888"><path d="M320-240h320v-80H320v80Zm0-160h320v-80H320v80ZM240-80q-33 0-56.5-23.5T160-160v-640q0-33 23.5-56.5T240-880h320l240 240v480q0 33-23.5 56.5T720-80H240Zm280-520v-200H240v640h480v-440H520ZM240-800v200-200 640-640Z"/></svg>
+                            </span>
+                        {% endif %}
+                    </div>
+
+                    <div class="ms-auto d-flex align-items-center gap-1">
+                        {% if task.assigned_to.exists %}
+                            {% if total_assignees > 1 or first_assignee != task.created_by %}
+                                <span class="badge bg-danger text-white rounded-circle d-inline-flex align-items-center justify-content-center shadow-sm p-0" 
+                                      style="width: 20px; height: 20px; font-size: 0.6rem; font-weight: bold;"
+                                      title="{% translate 'Asignado a:' %} {{ first_assignee.username }}">
+                                    {{ first_assignee.username|slice:":2"|upper }}
+                                </span>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+
+                </div>
+
+            {% endif %}
+        {% endwith %}
+
     </div>
 </div>
-
 
 <!-- MODAL DETALLE / EDICIÓN ESTILO TRELLO -->
 <div class="modal fade" id="viewTaskModal{{ task.id }}" tabindex="-1" aria-hidden="true">
@@ -63,7 +86,6 @@
             <form method="POST" action="{% url 'edit_task' task.id %}">
                 {% csrf_token %}
                 
-                <!-- CABECERA: Título editable directo -->
                 <div class="modal-header border-bottom-0 pb-1 align-items-start">
                     <div class="w-100 me-3 ms-2">
                         <input type="text" 
@@ -79,15 +101,11 @@
                 <div class="modal-body p-4 pt-2">
                     <div class="row g-4">
                         
-                        <!-- COLUMNA IZQUIERDA -->
                         <div class="col-md-7 d-flex flex-column justify-content-between">
                             <div>
-                                <!-- ESTRELLAS CON SEPARACIÓN VISUAL (- Urgencia + | - Importancia +) -->
                                 <div class="p-3 bg-light rounded mb-3">
                                     <div class="row g-0 align-items-center">
-                                        
-                                        <!-- Urgencia -->
-                                        <div class="col-6 pe-4 border-end text-center ">
+                                        <div class="col-6 pe-4 border-end text-center">
                                             <div class="d-flex justify-content-between align-items-center text-muted fw-bold small px-1 mb-1 ps-4 pe-4">
                                                 <span>-</span>
                                                 <span>{% translate "Urgencia" %}</span>
@@ -108,7 +126,6 @@
                                             </div>
                                         </div>
 
-                                        <!-- Importancia -->
                                         <div class="col-6 ps-4 text-center">
                                             <div class="d-flex justify-content-between align-items-center text-muted fw-bold small px-1 mb-1 ps-4 pe-4">
                                                 <span>-</span>
@@ -129,14 +146,12 @@
                                                 <label for="detail-importance-1-{{ task.id }}">★</label>
                                             </div>
                                         </div>
-
                                     </div>
                                 </div>
 
-                                <!-- ACCIONES ESTILO TRELLO (POP-OVERS FLOTANTES) -->
                                 <div class="d-flex flex-column gap-2 mb-3">
                                     
-                                    <!-- Pop-over Fecha y Hora con Recordatorio -->
+                                    <!-- Pop-over Fecha y Hora -->
                                     <div class="dropdown">
                                         <button class="btn btn-outline-secondary btn-sm text-start w-100 d-flex justify-content-between align-items-center shadow-none" 
                                                 type="button" 
@@ -145,38 +160,43 @@
                                                 data-bs-auto-close="outside" 
                                                 aria-expanded="false">
                                             <span><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#b8b8b8"><path d="m612-292 56-56-148-148v-184h-80v216l172 172ZM480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-400Zm0 320q133 0 226.5-93.5T800-480q0-133-93.5-226.5T480-800q-133 0-226.5 93.5T160-480q0 133 93.5 226.5T480-160Z"/></svg> {% translate "Fechas" %}</span>
-                                            <small class="text-muted">{% if task.due_date %}{{ task.due_date|date:"d/m/Y H:i" }}{% else %}+{% endif %}</small>
+                                            <small class="text-muted" id="dateBadgeDisplay{{ task.id }}">{% if task.due_date %}{{ task.due_date|date:"d/m/Y H:i" }}{% else %}+{% endif %}</small>
                                         </button>
                                         
-                                        <div class="dropdown-menu p-3 shadow-lg border-0 rounded-3 mt-1" aria-labelledby="dropdownDate{{ task.id }}" style="width: 300px; z-index: 1055;">
+                                        <!-- DESPLEGABLE CON CLASE CSS DE TASK_CARD.SCSS -->
+                                        <div class="dropdown-menu dropdown-menu-dates p-3 shadow-lg border-0 rounded-3 mt-1" aria-labelledby="dropdownDate{{ task.id }}">
                                             <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
-                                                <span class="fw-bold small">{% translate "Fechas" %}</span>
+                                                <span class="fw-bold small text-dark">{% translate "Fechas" %}</span>
+                                                <button type="button" class="btn-close btn-sm" onclick="bootstrap.Dropdown.getInstance(document.getElementById('dropdownDate{{ task.id }}')).hide();"></button>
                                             </div>
 
-                                            <!-- Input Vencimiento -->
-                                            <div class="mb-3">
+                                            <!-- CALENDARIO INLINE FLATPICKR -->
+                                            <div id="inlineCalendar{{ task.id }}" class="mb-2 d-flex justify-content-center flatpickr-clean-container"></div>
+
+                                            <!-- CAMPOS EDITABLES A MANO -->
+                                            <div class="mb-2">
                                                 <label class="form-label small text-muted mb-1 fw-bold">{% translate "Fecha de vencimiento" %}</label>
-                                                <input type="datetime-local" 
-                                                       name="due_date" 
-                                                       value="{{ task.due_date|date:'Y-m-d\TH:i' }}" 
-                                                       class="form-control form-control-sm border">
+                                                <div class="row g-2">
+                                                    <div class="col-7">
+                                                        <input type="text" id="displayDate{{ task.id }}" class="form-control form-control-sm text-center fw-medium" placeholder="AAAA-MM-DD" value="{% if task.due_date %}{{ task.due_date|date:'Y-m-d' }}{% endif %}">
+                                                    </div>
+                                                    <div class="col-5">
+                                                        <input type="time" id="displayTime{{ task.id }}" class="form-control form-control-sm text-center fw-medium" value="{% if task.due_date %}{{ task.due_date|date:'H:i' }}{% else %}12:00{% endif %}">
+                                                    </div>
+                                                </div>
                                             </div>
 
-                                            <!-- Checkbox Recordatorio -->
+                                            <!-- INPUT OCULTO QUE RECIBE DJANGO -->
+                                            <input type="hidden" name="due_date" id="hiddenDueDate{{ task.id }}" value="{{ task.due_date|date:'Y-m-d H:i' }}">
+
                                             <div class="mb-2 form-check">
-                                                <input type="checkbox" 
-                                                       class="form-check-input" 
-                                                       name="reminder_enabled" 
-                                                       id="reminder_enabled_{{ task.id }}" 
-                                                       {% if task.reminder_enabled %}checked{% endif %}>
+                                                <input type="checkbox" class="form-check-input" name="reminder_enabled" id="reminder_enabled_{{ task.id }}" {% if task.reminder_enabled %}checked{% endif %}>
                                                 <label class="form-check-label small fw-bold text-dark" for="reminder_enabled_{{ task.id }}">
                                                     {% translate "Crear recordatorio" %}
                                                 </label>
                                             </div>
 
-                                            <!-- Desplegable Antelación (Choices) -->
                                             <div class="mb-3">
-                                                <label class="form-label small text-muted mb-1">{% translate "Crear recordatorio" %}</label>
                                                 <select name="reminder_offset" class="form-select form-select-sm border">
                                                     <option value="at_time" {% if task.reminder_offset == 'at_time' %}selected{% endif %}>{% translate "A la hora del vencimiento" %}</option>
                                                     <option value="5_min" {% if task.reminder_offset == '5_min' %}selected{% endif %}>{% translate "5 minutos antes" %}</option>
@@ -188,18 +208,13 @@
                                                     <option value="1_week" {% if task.reminder_offset == '1_week' %}selected{% endif %}>{% translate "1 semana antes" %}</option>
                                                     <option value="2_weeks" {% if task.reminder_offset == '2_weeks' %}selected{% endif %}>{% translate "2 semanas antes" %}</option>
                                                 </select>
-                                                <small class="text-muted d-block mt-1" style="font-size: 0.7rem;">
-                                                    {% translate "Se enviarán recordatorios a todos los miembros y seguidores de esta tarjeta." %}
-                                                </small>
                                             </div>
 
-                                            <!-- Botones -->
                                             <div class="d-flex flex-column gap-1">
-                                                <button type="button" class="btn btn-primary btn-sm w-100 fw-bold" onclick="bootstrap.Dropdown.getInstance(document.getElementById('dropdownDate{{ task.id }}')).hide();">
+                                                <button type="button" class="btn btn-primary btn-sm w-100 fw-bold" onclick="saveTaskDate('{{ task.id }}')">
                                                     {% translate "Guardar" %}
                                                 </button>
-                                                <button type="button" class="btn btn-link btn-sm text-danger text-decoration-none w-100 p-0" 
-                                                        onclick="let menu = this.closest('.dropdown-menu'); menu.querySelector('input[type=datetime-local]').value=''; menu.querySelector('input[type=checkbox]').checked=false;">
+                                                <button type="button" class="btn btn-link btn-sm text-danger text-decoration-none w-100 p-0" onclick="clearTaskDate('{{ task.id }}')">
                                                     {% translate "Quitar" %}
                                                 </button>
                                             </div>
@@ -244,10 +259,7 @@
                                     </button>
                                     <div class="collapse {% if task.description %}show{% endif %}" id="collapseDesc{{ task.id }}">
                                         <div class="p-2 border rounded bg-white mt-1">
-                                            <textarea name="description" 
-                                                      class="form-control form-control-sm" 
-                                                      rows="3" 
-                                                      placeholder="{% translate 'Escribe una descripción más detallada...' %}">{{ task.description|default:'' }}</textarea>
+                                            <textarea name="description" class="form-control form-control-sm" rows="3" placeholder="{% translate 'Escribe una descripción más detallada...' %}">{{ task.description|default:'' }}</textarea>
                                         </div>
                                     </div>
 
@@ -274,7 +286,6 @@
                         <!-- COLUMNA DERECHA -->
                         <div class="col-md-5 bg-light p-3 rounded d-flex flex-column justify-content-between">
                             <div>
-                                <!-- Creador de la tarea y fecha estilo Trello -->
                                 <div class="d-flex align-items-start gap-2 mb-3">
                                     <div class="rounded-circle bg-danger text-white fw-bold d-flex align-items-center justify-content-center flex-shrink-0" 
                                         style="width: 32px; height: 32px; font-size: 0.85rem;" 
@@ -294,7 +305,6 @@
                                     </div>
                                 </div>
 
-                                <!-- SECCIÓN ASIGNADA A (CON BOTÓN + Y DESPLEGABLE) -->
                                 <div class="mb-3 pt-2 border-top">
                                     <small class="text-muted fw-bold d-block mb-2">
                                         <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="#b8b8b8" class="me-1 align-text-bottom"><path d="M365-580Zm-5 540-40-40v-240H120v-80l80-80v-280h-40v-80h285q-18 17-32.5 37T387-760H280v314l-46 46h263q24 14 49.5 23.5T600-363v43H400v240l-40 40Zm322.5-617.5Q700-675 700-700t-17.5-42.5Q665-760 640-760t-42.5 17.5Q580-725 580-700t17.5 42.5Q615-640 640-640t42.5-17.5Zm14 123Q722-549 739-573q-22-13-47-20t-52-7q-27 0-52 7t-47 20q17 24 42.5 38.5T640-520q31 0 56.5-14.5Zm-198 36Q440-557 440-640t58.5-141.5Q557-840 640-840t141.5 58.5Q840-723 840-640t-58.5 141.5Q723-440 640-440t-141.5-58.5Z"/></svg>
@@ -302,7 +312,6 @@
                                     </small>
 
                                     <div class="d-flex flex-wrap gap-2 align-items-center">
-                                        <!-- Avatares asignados actualmente -->
                                         {% for user_assigned in task.assigned_to.all %}
                                             <div class="d-flex align-items-center gap-2 bg-white pe-2 rounded-pill border shadow-sm">
                                                 <div class="rounded-circle bg-info text-dark fw-bold d-flex align-items-center justify-content-center flex-shrink-0" 
@@ -316,7 +325,6 @@
                                             </div>
                                         {% endfor %}
 
-                                        <!-- BOTÓN POP-OVER (+) ESTILO TRELLO -->
                                         <div class="dropdown">
                                             <button class="btn btn-light btn-sm rounded-circle border shadow-sm d-flex align-items-center justify-content-center p-0" 
                                                     type="button" 
@@ -328,7 +336,6 @@
                                                 +
                                             </button>
 
-                                            <!-- Desplegable flotante de miembros -->
                                             <div class="dropdown-menu p-3 shadow-lg border-0 rounded-3 mt-1" 
                                                  aria-labelledby="dropdownAssignees{{ task.id }}" 
                                                  style="width: 260px; z-index: 1055;">
@@ -359,7 +366,6 @@
                                                                     <span class="text-dark">{{ u.get_full_name|default:u.username }}</span>
                                                                 </div>
 
-                                                                <!-- Icono dinámico con visualización CSS + / - -->
                                                                 <span class="badge rounded-circle border toggle-icon text-dark bg-white" style="width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center;"></span>
                                                             </label>
                                                         </div>
@@ -380,3 +386,99 @@
         </div>
     </div>
 </div>
+
+<!-- LIBRERÍAS Y SCRIPT JS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
+
+<script>
+(function() {
+    const taskId = "{{ task.id }}";
+    const modalEl = document.getElementById(`viewTaskModal${taskId}`);
+
+    if (modalEl) {
+        modalEl.addEventListener('shown.bs.modal', function () {
+            const calendarContainer = document.getElementById(`inlineCalendar${taskId}`);
+            const hiddenInput = document.getElementById(`hiddenDueDate${taskId}`);
+            const displayDate = document.getElementById(`displayDate${taskId}`);
+            const displayTime = document.getElementById(`displayTime${taskId}`);
+
+            if (calendarContainer && !calendarContainer._flatpickr) {
+                const initialVal = hiddenInput.value ? hiddenInput.value.split(' ')[0] : 'today';
+
+                const fp = flatpickr(calendarContainer, {
+                    inline: true,
+                    locale: 'es',
+                    defaultDate: initialVal,
+                    dateFormat: 'Y-m-d',
+                    onChange: function(selectedDates) {
+                        if (selectedDates.length > 0) {
+                            const dateStr = fp.formatDate(selectedDates[0], 'Y-m-d');
+                            displayDate.value = dateStr;
+                            syncHiddenDueDate(taskId, fp);
+                        }
+                    }
+                });
+
+                displayDate.addEventListener('input', function() {
+                    if (this.value) {
+                        fp.setDate(this.value, false);
+                    }
+                    syncHiddenDueDate(taskId, fp);
+                });
+
+                displayTime.addEventListener('change', function() {
+                    syncHiddenDueDate(taskId, fp);
+                });
+            }
+        });
+    }
+})();
+
+function syncHiddenDueDate(taskId, fpInstance) {
+    const displayDateVal = document.getElementById(`displayDate${taskId}`).value;
+    const displayTimeVal = document.getElementById(`displayTime${taskId}`).value || '12:00';
+    const hiddenInput = document.getElementById(`hiddenDueDate${taskId}`);
+
+    if (displayDateVal) {
+        hiddenInput.value = `${displayDateVal} ${displayTimeVal}`;
+    } else {
+        hiddenInput.value = '';
+    }
+}
+
+function saveTaskDate(taskId) {
+    const hiddenInput = document.getElementById(`hiddenDueDate${taskId}`);
+    const badgeDisplay = document.getElementById(`dateBadgeDisplay${taskId}`);
+
+    if (hiddenInput.value) {
+        badgeDisplay.textContent = hiddenInput.value;
+    } else {
+        badgeDisplay.textContent = '+';
+    }
+
+    const dropdownBtn = document.getElementById(`dropdownDate${taskId}`);
+    if (dropdownBtn) {
+        const instance = bootstrap.Dropdown.getInstance(dropdownBtn);
+        if (instance) instance.hide();
+    }
+}
+
+function clearTaskDate(taskId) {
+    document.getElementById(`displayDate${taskId}`).value = '';
+    document.getElementById(`hiddenDueDate${taskId}`).value = '';
+    document.getElementById(`dateBadgeDisplay${taskId}`).textContent = '+';
+
+    const calendarContainer = document.getElementById(`inlineCalendar${taskId}`);
+    if (calendarContainer && calendarContainer._flatpickr) {
+        calendarContainer._flatpickr.clear();
+    }
+
+    const dropdownBtn = document.getElementById(`dropdownDate${taskId}`);
+    if (dropdownBtn) {
+        const instance = bootstrap.Dropdown.getInstance(dropdownBtn);
+        if (instance) instance.hide();
+    }
+}
+</script>
