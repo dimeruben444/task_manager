@@ -51,15 +51,13 @@ class ToggleTaskDoneView(LoginRequiredMixin, View):
             'task_id': task.id
         })
 
-
-# 2. Editar Tarea
+# 2 editar tarea 
 class TaskUpdateView(LoginRequiredMixin, UpdateView):
     model = Task
     form_class = TaskForm
     pk_url_kwarg = 'pk'
 
     def get_queryset(self):
-        # Permite editar si fuiste el creador, si estás asignado o si eres el dueño del tablero
         return Task.objects.filter(
             Q(created_by=self.request.user) |
             Q(assigned_to=self.request.user) |
@@ -68,15 +66,24 @@ class TaskUpdateView(LoginRequiredMixin, UpdateView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        # Le pasamos el usuario autenticado a TaskForm
         kwargs['user'] = self.request.user
         if hasattr(self.object, 'board') and self.object.board:
             kwargs['current_board'] = self.object.board
         return kwargs
 
+    def form_valid(self, form):
+        task = form.save(commit=False)
+        
+        # Si el recordatorio está marcado, aseguramos que reminder_sent vuelva a False
+        if form.cleaned_data.get('reminder_enabled'):
+            task.reminder_sent = False
+        
+        task.save()
+        form.save_m2m()  # Guarda los usuarios asignados (Many-to-Many)
+        return super().form_valid(form)
+
     def get_success_url(self):
         return self.request.META.get('HTTP_REFERER', reverse_lazy('dashboard'))
-
 
 # 3. Eliminar Tarea
 class TaskDeleteView(LoginRequiredMixin, DeleteView):

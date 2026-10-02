@@ -115,7 +115,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Madrid'
 
 USE_I18N = True
 
@@ -159,3 +159,19 @@ LOGIN_REDIRECT_URL = 'dashboard'  # Redirige tras iniciar sesión con éxito
 LOGOUT_REDIRECT_URL = 'login'     # Redirige tras cerrar sesión
 
 
+
+
+
+
+
+# En entorno de desarrollo (para ver los correos en la consola del terminal):
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# En producción / servidor real:
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = 'tu_correo@gmail.com'
+# EMAIL_HOST_PASSWORD = 'tu_password_de_aplicacion'
+# DEFAULT_FROM_EMAIL = 'Eisenhower Task Manager <tu_correo@gmail.com>'

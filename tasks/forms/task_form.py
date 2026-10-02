@@ -72,7 +72,16 @@ class TaskForm(forms.ModelForm):
         
         super().__init__(*args, **kwargs)
 
+        # Formatos de fecha aceptados (incluyendo espacio o T entre fecha y hora)
+        self.fields['due_date'].input_formats = [
+            '%Y-%m-%d %H:%M',
+            '%Y-%m-%dT%H:%M',
+            '%Y-%m-%d %H:%M:%S',
+            '%Y-%m-%d',
+        ]
+
         # Campos opcionales en el formulario
+        self.fields['due_date'].required = False
         self.fields['board'].required = False
         self.fields['assigned_to'].required = False
         self.fields['reminder_enabled'].required = False

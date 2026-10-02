@@ -310,6 +310,11 @@
   background: transparent !important;
 }
 
+/* Posicionamiento superior del modal de detalle de tarea */
+.modal-dialog.modal-top-aligned {
+  margin-top: 3rem !important; /* Ajusta la distancia desde arriba según tu gusto */
+}
+
 .app-dashboard-layout {
   display: grid;
   grid-template-columns: 200px 1fr 260px;
