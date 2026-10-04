@@ -20,6 +20,8 @@ class Command(BaseCommand):
             '5min': timedelta(minutes=5),
             '15_min': timedelta(minutes=15),
             '15min': timedelta(minutes=15),
+            '30_min': timedelta(minutes=30),
+            '30min': timedelta(minutes=30),
             '1_hour': timedelta(hours=1),
             '1hour': timedelta(hours=1),
             '2_hours': timedelta(hours=2),
@@ -48,7 +50,7 @@ class Command(BaseCommand):
             offset = offsets.get(str(task.reminder_offset).strip(), timedelta(minutes=0))
             reminder_trigger_time = task.due_date - offset
 
-            # Comprobar si ya es hora de notificar (comparación en UTC)
+            # Comprobar si ya es hora de notificar (comparación consciente de timezone UTC)
             if now >= reminder_trigger_time:
                 recipients = set()
 
@@ -102,6 +104,7 @@ Mensaje enviado automáticamente desde tu Gestor de Tareas Eisenhower.
                         fail_silently=False,
                     )
 
+                    # Actualización explícita evitando disparar save() completo si no es necesario
                     task.email_notification_sent = True
                     task.save(update_fields=['email_notification_sent'])
                     sent_count += 1

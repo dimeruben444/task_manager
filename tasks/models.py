@@ -130,11 +130,16 @@ class Task(models.Model):
         else:
             return 'Q4'
 
+    # tasks/models.py
+
     def check_auto_urgency(self):
-        if self.due_date and not self.is_completed:
-            time_left = self.due_date - timezone.now()
-            if time_left <= timedelta(days=2) and self.urgency <= 2:
-                self.urgency = 4
+        # Si no hay fecha, está completada o no tiene urgencia definida, salimos directamente
+        if not self.due_date or self.is_completed or self.urgency is None:
+            return
+
+        time_left = self.due_date - timezone.now()
+        if time_left <= timedelta(days=2) and self.urgency <= 2:
+            self.urgency = 4
 
     def save(self, *args, **kwargs):
         self.check_auto_urgency()
