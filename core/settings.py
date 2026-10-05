@@ -167,10 +167,17 @@ LOGOUT_REDIRECT_URL = 'login'     # Redirige tras cerrar sesión
 
 
 
+import os
+from pathlib import Path
+from dotenv import load_dotenv
 
+load_dotenv(os.path.join(BASE_DIR, '.env'))
 
 # En entorno de desarrollo (para ver los correos en la consola del terminal):
 #EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+SECRET_KEY = os.getenv('SECRET_KEY')
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
 # En producción / servidor real:
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -178,8 +185,8 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
-EMAIL_HOST_USER = 'dimeruben444@gmail.com'
-EMAIL_HOST_PASSWORD = 'cqfi riyb rial ayon'
-DEFAULT_FROM_EMAIL = 'Eisenhower Task Manager <dimeruben444@gmail.com'
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = f"Eisenhower Task Manager <{EMAIL_HOST_USER}>"
 
 
