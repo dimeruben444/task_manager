@@ -177,3 +177,53 @@
     text-shadow: 0 0 6px rgba(220, 53, 69, 0.6) !important;
   }
 }
+
+
+/* Estilo de la tarjeta cuando se marca como completada */
+.task-card.task-completing {
+  transition: all 0.3s ease;
+  opacity: 0.6;
+
+  .task-title {
+    text-decoration: line-through !important;
+    color: #6c757d !important;
+  }
+}
+
+/* dashboard.scss */
+
+/* Esfera luminosa que realiza el vuelo parabólico */
+.flying-particle {
+  position: fixed !important;
+  z-index: 999999 !important;
+  width: 26px;
+  height: 26px;
+  background: radial-gradient(circle, #ffffff 10%, #10B981 70%, #059669 100%);
+  border-radius: 50%;
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.9), 
+              0 0 30px rgba(16, 185, 129, 0.6),
+              0 0 45px rgba(16, 185, 129, 0.3);
+  pointer-events: none !important;
+  will-change: transform, opacity;
+}
+
+/* Animación de la parábola (sube un arco suave y cae al destino) */
+@keyframes parabolicFly {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  40% {
+    /* En el punto medio eleva la posición en Y para crear el arco de la parábola */
+    transform: translate(calc(var(--target-x) * 0.45), calc(var(--target-y) * 0.2 - 60px)) scale(0.85);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(var(--target-x), var(--target-y)) scale(0.25);
+    opacity: 0.2;
+  }
+}
+
+.flying-particle.fly-arc {
+  animation: parabolicFly 0.85s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+}

@@ -141,34 +141,34 @@
                             <span class="badge bg-danger rounded-pill position-absolute end-0 top-50 translate-middle-y me-2">{{ q1_tasks.count }}</span>
                         </div>
                         
-                        <!-- CONTENEDOR EXCLUSIVO PARA TARJETAS -->
+                        <!-- CONTENEDOR DE TARJETAS + BOTÓN PEGAO A LA ÚLTIMA TAREA -->
                         <div class="p-2 pt-0 flex-grow-1 d-flex flex-column quadrant-container" data-quadrant="Q1" style="min-height: 80px;">
                             {% for task in q1_tasks %}
                                 {% include '_includes/_task_card.html' with task=task %}
                             {% empty %}
                                 <p class="text-muted text-center py-4 small mb-0 empty-msg">{% translate "No hay tareas urgentes e importantes." %}</p>
                             {% endfor %}
-                        </div>
 
-                        <!-- BOTÓN DE AÑADIR TAREA (FUERA DEL ÁREA DE ARRASTRE) -->
-                        <div class="add-task-inline-wrapper mt-auto pt-2 px-2">
-                            <button type="button" class="btn btn-add-inline text-muted w-100 text-start d-flex align-items-center gap-2 py-2 px-2 border-0 rounded-2" onclick="showInlineForm(this)">
-                                <i class="bi bi-plus-lg"></i>
-                                <span class="fw-medium" style="font-size: 0.88rem;"> {% translate "Añadir una tarea" %}</span>
-                            </button>
-                            <form method="POST" action="{% url 'quick_create_task' %}" class="inline-task-form d-none mt-1">
-                                {% csrf_token %}
-                                <input type="hidden" name="urgency" value="4">
-                                <input type="hidden" name="importance" value="4">
-                                {% if current_board %}<input type="hidden" name="board" value="{{ current_board.id }}">{% endif %}
-                                <div class="card p-2 border-0 shadow-sm mb-2">
-                                    <textarea name="title" class="form-control border-0 p-1 shadow-none task-inline-input" rows="2" placeholder="{% translate 'Introduce un título para esta tarjeta...' %}" required style="resize: none; font-size: 0.88rem;"></textarea>
-                                </div>
-                                <div class="d-flex align-items-center gap-2">
-                                    <button type="submit" class="btn btn-primary btn-sm px-3 fw-semibold">{% translate "Añadir tarjeta" %}</button>
-                                    <button type="button" class="btn btn-close-inline btn-sm text-muted" onclick="hideInlineForm(this)">✕</button>
-                                </div>
-                            </form>
+                            <!-- BOTÓN Y FORMULARIO INLINE -->
+                            <div class="add-task-inline-wrapper mt-2">
+                                <button type="button" class="btn btn-add-inline text-muted w-100 text-start d-flex align-items-center gap-2 py-2 px-2 border-0 rounded-2" onclick="showInlineForm(this)">
+                                    <i class="bi bi-plus-lg"></i>
+                                    <span class="fw-medium" style="font-size: 0.88rem;"> {% translate "Añadir una tarea" %}</span>
+                                </button>
+                                <form method="POST" action="{% url 'quick_create_task' %}" class="inline-task-form d-none mt-1">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="urgency" value="4">
+                                    <input type="hidden" name="importance" value="4">
+                                    {% if current_board %}<input type="hidden" name="board" value="{{ current_board.id }}">{% endif %}
+                                    <div class="card p-2 border-0 shadow-sm mb-2">
+                                        <textarea name="title" class="form-control border-0 p-1 shadow-none task-inline-input" rows="2" placeholder="{% translate 'Introduce un título para esta tarjeta...' %}" required style="resize: none; font-size: 0.88rem;"></textarea>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <button type="submit" class="btn btn-primary btn-sm px-3 fw-semibold">{% translate "Añadir tarea" %}</button>
+                                        <button type="button" class="btn btn-close-inline btn-sm text-muted" onclick="hideInlineForm(this)">✕</button>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -181,34 +181,34 @@
                             <span class="badge bg-primary rounded-pill position-absolute end-0 top-50 translate-middle-y me-2">{{ q2_tasks.count }}</span>
                         </div>
                         
-                        <!-- CONTENEDOR EXCLUSIVO PARA TARJETAS -->
+                        <!-- CONTENEDOR DE TARJETAS + BOTÓN PEGAO A LA ÚLTIMA TAREA -->
                         <div class="p-2 pt-0 flex-grow-1 d-flex flex-column quadrant-container" data-quadrant="Q2" style="min-height: 80px;">
                             {% for task in q2_tasks %}
                                 {% include '_includes/_task_card.html' with task=task %}
                             {% empty %}
                                 <p class="text-muted text-center py-4 small mb-0 empty-msg">{% translate "No hay tareas de planificación pendientes." %}</p>
                             {% endfor %}
-                        </div>
 
-                        <!-- BOTÓN DE AÑADIR TAREA (FUERA DEL ÁREA DE ARRASTRE) -->
-                        <div class="add-task-inline-wrapper mt-auto pt-2 px-2">
-                            <button type="button" class="btn btn-add-inline text-muted w-100 text-start d-flex align-items-center gap-2 py-2 px-2 border-0 rounded-2" onclick="showInlineForm(this)">
-                                <i class="bi bi-plus-lg"></i>
-                                <span class="fw-medium" style="font-size: 0.88rem;"> {% translate "Añadir una tarea" %}</span>
-                            </button>
-                            <form method="POST" action="{% url 'quick_create_task' %}" class="inline-task-form d-none mt-1">
-                                {% csrf_token %}
-                                <input type="hidden" name="urgency" value="1">
-                                <input type="hidden" name="importance" value="4">
-                                {% if current_board %}<input type="hidden" name="board" value="{{ current_board.id }}">{% endif %}
-                                <div class="card p-2 border-0 shadow-sm mb-2">
-                                    <textarea name="title" class="form-control border-0 p-1 shadow-none task-inline-input" rows="2" placeholder="{% translate 'Introduce un título para esta tarjeta...' %}" required style="resize: none; font-size: 0.88rem;"></textarea>
-                                </div>
-                                <div class="d-flex align-items-center gap-2">
-                                    <button type="submit" class="btn btn-primary btn-sm px-3 fw-semibold">{% translate "Añadir tarjeta" %}</button>
-                                    <button type="button" class="btn btn-close-inline btn-sm text-muted" onclick="hideInlineForm(this)">✕</button>
-                                </div>
-                            </form>
+                            <!-- BOTÓN Y FORMULARIO INLINE -->
+                            <div class="add-task-inline-wrapper mt-2">
+                                <button type="button" class="btn btn-add-inline text-muted w-100 text-start d-flex align-items-center gap-2 py-2 px-2 border-0 rounded-2" onclick="showInlineForm(this)">
+                                    <i class="bi bi-plus-lg"></i>
+                                    <span class="fw-medium" style="font-size: 0.88rem;"> {% translate "Añadir una tarea" %}</span>
+                                </button>
+                                <form method="POST" action="{% url 'quick_create_task' %}" class="inline-task-form d-none mt-1">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="urgency" value="1">
+                                    <input type="hidden" name="importance" value="4">
+                                    {% if current_board %}<input type="hidden" name="board" value="{{ current_board.id }}">{% endif %}
+                                    <div class="card p-2 border-0 shadow-sm mb-2">
+                                        <textarea name="title" class="form-control border-0 p-1 shadow-none task-inline-input" rows="2" placeholder="{% translate 'Introduce un título para esta tarjeta...' %}" required style="resize: none; font-size: 0.88rem;"></textarea>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <button type="submit" class="btn btn-primary btn-sm px-3 fw-semibold">{% translate "Añadir tarea" %}</button>
+                                        <button type="button" class="btn btn-close-inline btn-sm text-muted" onclick="hideInlineForm(this)">✕</button>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -221,34 +221,34 @@
                             <span class="badge bg-dark rounded-pill position-absolute end-0 top-50 translate-middle-y me-2">{{ q3_tasks.count }}</span>
                         </div>
                         
-                        <!-- CONTENEDOR EXCLUSIVO PARA TARJETAS -->
+                        <!-- CONTENEDOR DE TARJETAS + BOTÓN PEGAO A LA ÚLTIMA TAREA -->
                         <div class="p-2 pt-0 flex-grow-1 d-flex flex-column quadrant-container" data-quadrant="Q3" style="min-height: 80px;">
                             {% for task in q3_tasks %}
                                 {% include '_includes/_task_card.html' with task=task %}
                             {% empty %}
                                 <p class="text-muted text-center py-4 small mb-0 empty-msg">{% translate "No hay tareas por delegar." %}</p>
                             {% endfor %}
-                        </div>
 
-                        <!-- BOTÓN DE AÑADIR TAREA (FUERA DEL ÁREA DE ARRASTRE) -->
-                        <div class="add-task-inline-wrapper mt-auto pt-2 px-2">
-                            <button type="button" class="btn btn-add-inline text-muted w-100 text-start d-flex align-items-center gap-2 py-2 px-2 border-0 rounded-2" onclick="showInlineForm(this)">
-                                <i class="bi bi-plus-lg"></i>
-                                <span class="fw-medium" style="font-size: 0.88rem;"> {% translate "Añadir una tarea" %}</span>
-                            </button>
-                            <form method="POST" action="{% url 'quick_create_task' %}" class="inline-task-form d-none mt-1">
-                                {% csrf_token %}
-                                <input type="hidden" name="urgency" value="4">
-                                <input type="hidden" name="importance" value="1">
-                                {% if current_board %}<input type="hidden" name="board" value="{{ current_board.id }}">{% endif %}
-                                <div class="card p-2 border-0 shadow-sm mb-2">
-                                    <textarea name="title" class="form-control border-0 p-1 shadow-none task-inline-input" rows="2" placeholder="{% translate 'Introduce un título para esta tarjeta...' %}" required style="resize: none; font-size: 0.88rem;"></textarea>
-                                </div>
-                                <div class="d-flex align-items-center gap-2">
-                                    <button type="submit" class="btn btn-primary btn-sm px-3 fw-semibold">{% translate "Añadir tarjeta" %}</button>
-                                    <button type="button" class="btn btn-close-inline btn-sm text-muted" onclick="hideInlineForm(this)">✕</button>
-                                </div>
-                            </form>
+                            <!-- BOTÓN Y FORMULARIO INLINE -->
+                            <div class="add-task-inline-wrapper mt-2">
+                                <button type="button" class="btn btn-add-inline text-muted w-100 text-start d-flex align-items-center gap-2 py-2 px-2 border-0 rounded-2" onclick="showInlineForm(this)">
+                                    <i class="bi bi-plus-lg"></i>
+                                    <span class="fw-medium" style="font-size: 0.88rem;"> {% translate "Añadir una tarea" %}</span>
+                                </button>
+                                <form method="POST" action="{% url 'quick_create_task' %}" class="inline-task-form d-none mt-1">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="urgency" value="4">
+                                    <input type="hidden" name="importance" value="1">
+                                    {% if current_board %}<input type="hidden" name="board" value="{{ current_board.id }}">{% endif %}
+                                    <div class="card p-2 border-0 shadow-sm mb-2">
+                                        <textarea name="title" class="form-control border-0 p-1 shadow-none task-inline-input" rows="2" placeholder="{% translate 'Introduce un título para esta tarjeta...' %}" required style="resize: none; font-size: 0.88rem;"></textarea>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <button type="submit" class="btn btn-primary btn-sm px-3 fw-semibold">{% translate "Añadir tarea" %}</button>
+                                        <button type="button" class="btn btn-close-inline btn-sm text-muted" onclick="hideInlineForm(this)">✕</button>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -261,34 +261,34 @@
                             <span class="badge bg-secondary rounded-pill position-absolute end-0 top-50 translate-middle-y me-2">{{ q4_tasks.count }}</span>
                         </div>
                         
-                        <!-- CONTENEDOR EXCLUSIVO PARA TARJETAS -->
+                        <!-- CONTENEDOR DE TARJETAS + BOTÓN PEGAO A LA ÚLTIMA TAREA -->
                         <div class="p-2 pt-0 flex-grow-1 d-flex flex-column quadrant-container" data-quadrant="Q4" style="min-height: 80px;">
                             {% for task in q4_tasks %}
                                 {% include '_includes/_task_card.html' with task=task %}
                             {% empty %}
                                 <p class="text-muted text-center py-4 small mb-0 empty-msg">{% translate "No hay tareas irrelevantes." %}</p>
                             {% endfor %}
-                        </div>
 
-                        <!-- BOTÓN DE AÑADIR TAREA (FUERA DEL ÁREA DE ARRASTRE) -->
-                        <div class="add-task-inline-wrapper mt-auto pt-2 px-2">
-                            <button type="button" class="btn btn-add-inline text-muted w-100 text-start d-flex align-items-center gap-2 py-2 px-2 border-0 rounded-2" onclick="showInlineForm(this)">
-                                <i class="bi bi-plus-lg"></i>
-                                <span class="fw-medium" style="font-size: 0.88rem;"> {% translate "Añadir una tarea" %}</span>
-                            </button>
-                            <form method="POST" action="{% url 'quick_create_task' %}" class="inline-task-form d-none mt-1">
-                                {% csrf_token %}
-                                <input type="hidden" name="urgency" value="1">
-                                <input type="hidden" name="importance" value="1">
-                                {% if current_board %}<input type="hidden" name="board" value="{{ current_board.id }}">{% endif %}
-                                <div class="card p-2 border-0 shadow-sm mb-2">
-                                    <textarea name="title" class="form-control border-0 p-1 shadow-none task-inline-input" rows="2" placeholder="{% translate 'Introduce un título para esta tarjeta...' %}" required style="resize: none; font-size: 0.88rem;"></textarea>
-                                </div>
-                                <div class="d-flex align-items-center gap-2">
-                                    <button type="submit" class="btn btn-primary btn-sm px-3 fw-semibold">{% translate "Añadir tarjeta" %}</button>
-                                    <button type="button" class="btn btn-close-inline btn-sm text-muted" onclick="hideInlineForm(this)">✕</button>
-                                </div>
-                            </form>
+                            <!-- BOTÓN Y FORMULARIO INLINE -->
+                            <div class="add-task-inline-wrapper mt-2">
+                                <button type="button" class="btn btn-add-inline text-muted w-100 text-start d-flex align-items-center gap-2 py-2 px-2 border-0 rounded-2" onclick="showInlineForm(this)">
+                                    <i class="bi bi-plus-lg"></i>
+                                    <span class="fw-medium" style="font-size: 0.88rem;"> {% translate "Añadir una tarea" %}</span>
+                                </button>
+                                <form method="POST" action="{% url 'quick_create_task' %}" class="inline-task-form d-none mt-1">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="urgency" value="1">
+                                    <input type="hidden" name="importance" value="1">
+                                    {% if current_board %}<input type="hidden" name="board" value="{{ current_board.id }}">{% endif %}
+                                    <div class="card p-2 border-0 shadow-sm mb-2">
+                                        <textarea name="title" class="form-control border-0 p-1 shadow-none task-inline-input" rows="2" placeholder="{% translate 'Introduce un título para esta tarjeta...' %}" required style="resize: none; font-size: 0.88rem;"></textarea>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <button type="submit" class="btn btn-primary btn-sm px-3 fw-semibold">{% translate "Añadir tarea" %}</button>
+                                        <button type="button" class="btn btn-close-inline btn-sm text-muted" onclick="hideInlineForm(this)">✕</button>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -433,23 +433,36 @@
 
 </div>
 
-<!-- Carga de SortableJS -->
+
+<!-- Carga de SortableJS y Canvas Confetti -->
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
 <script>
+// 2. FUNCIÓN DE MOSTRAR FORMULARIO E INTERCEPTAR EL ENTER
 function showInlineForm(button) {
     const wrapper = button.closest('.add-task-inline-wrapper');
+    const quadrantContainer = button.closest('.quadrant-container');
     const form = wrapper.querySelector('.inline-task-form');
     const textarea = form.querySelector('textarea');
+
+    if (quadrantContainer) {
+        const emptyMsg = quadrantContainer.querySelector('.empty-msg');
+        if (emptyMsg) {
+            emptyMsg.classList.add('d-none');
+        }
+    }
 
     button.classList.add('d-none');
     form.classList.remove('d-none');
     textarea.focus();
 
+    // Guardar scroll si el usuario envía la tarea pulsando Enter
     textarea.onkeydown = function(e) {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
             if (this.value.trim() !== '') {
+                localStorage.setItem('dashboard_scroll_pos', window.scrollY); // <--- Guarda el scroll aquí
                 form.submit();
             }
         }
@@ -458,6 +471,7 @@ function showInlineForm(button) {
 
 function hideInlineForm(button) {
     const wrapper = button.closest('.add-task-inline-wrapper');
+    const quadrantContainer = button.closest('.quadrant-container');
     const form = wrapper.querySelector('.inline-task-form');
     const toggleBtn = wrapper.querySelector('.btn-add-inline');
     const textarea = form.querySelector('textarea');
@@ -465,6 +479,14 @@ function hideInlineForm(button) {
     textarea.value = '';
     form.classList.add('d-none');
     toggleBtn.classList.remove('d-none');
+
+    if (quadrantContainer) {
+        const hasTaskCards = quadrantContainer.querySelectorAll('.task-card').length > 0;
+        const emptyMsg = quadrantContainer.querySelector('.empty-msg');
+        if (!hasTaskCards && emptyMsg) {
+            emptyMsg.classList.remove('d-none');
+        }
+    }
 }
 
 function getCookie(name) {
@@ -482,6 +504,184 @@ function getCookie(name) {
     return cookieValue;
 }
 
+function sendToggleRequest(taskId, isCompleted, checkbox) {
+    const csrftoken = getCookie('csrftoken');
+
+    fetch(`/task/${taskId}/toggle/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrftoken,
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({ 'is_completed': isCompleted })
+    })
+    .then(response => {
+        if (!response.ok) throw new Error('Error en el servidor');
+        return response.json();
+    })
+    .then(data => {
+        if (data.status === 'success' || data.is_completed !== undefined) {
+            const card = checkbox.closest('.task-card, .completed-task-item');
+
+            // ==========================================
+            // CASO 1: MARCAR COMO COMPLETADA
+            // ==========================================
+            if (isCompleted && card) {
+                const targetContainer = document.getElementById('completed-tasks-container');
+                if (!targetContainer) return;
+
+                // Ocultar mensaje "No hay tareas completadas"
+                const emptyMsg = targetContainer.querySelector('#empty-trash-msg, .empty-msg');
+                if (emptyMsg) emptyMsg.classList.add('d-none');
+
+                // Extraer título limpio
+                const titleText = card.querySelector('.task-title')?.textContent.trim() 
+                               || card.querySelector('h6')?.textContent.trim() 
+                               || card.textContent.trim();
+
+                const urgency = card.dataset.urgency || "4";
+                const importance = card.dataset.importance || "4";
+
+                // Crear elemento formateado para la lista de completadas
+                const completedItem = document.createElement('div');
+                completedItem.className = 'completed-task-item task-card card border-0 shadow-sm mb-2 p-2 d-flex flex-row align-items-center justify-content-between gap-2 bg-light';
+                completedItem.setAttribute('data-task-id', taskId);
+                completedItem.setAttribute('data-urgency', urgency);
+                completedItem.setAttribute('data-importance', importance);
+
+                completedItem.innerHTML = `
+                    <div class="d-flex align-items-center gap-2 flex-grow-1 min-w-0" style="overflow: hidden;">
+                        <div class="task-checkbox-wrapper-sidebar flex-shrink-0" style="width: 17px; height: 17px;">
+                            <label class="task-checkbox-container m-0" onclick="event.stopPropagation();">
+                                <input type="checkbox" class="task-completion-check" data-task-id="${taskId}" checked>
+                                <span class="checkmark"></span>
+                            </label>
+                        </div>
+                        
+                        <span class="task-title text-muted text-decoration-line-through text-truncate fw-medium" 
+                              style="font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: default;" 
+                              title="${titleText}">
+                            ${titleText}
+                        </span>
+                    </div>
+
+                    <form method="POST" action="/task/${taskId}/delete/" class="d-inline m-0 flex-shrink-0" onsubmit="return confirm('¿Eliminar esta tarea definitivamente?');">
+                        <input type="hidden" name="csrfmiddlewaretoken" value="${csrftoken}">
+                        <button type="submit" class="btn btn-link text-danger p-0 border-0 opacity-50 hover-opacity-100" title="Eliminar">
+                            <i class="bi bi-x-lg" style="font-size: 0.85rem;"></i>
+                        </button>
+                    </form>
+                `;
+
+                targetContainer.prepend(completedItem);
+
+                // Eliminar tarjeta original y actualizar cuadrante
+                const quadrantContainer = card.closest('.quadrant-container');
+                card.remove();
+
+                if (quadrantContainer) {
+                    const remainingCards = quadrantContainer.querySelectorAll('.task-card');
+                    if (remainingCards.length === 0) {
+                        const quadrantEmptyMsg = quadrantContainer.querySelector('.empty-msg');
+                        if (quadrantEmptyMsg) quadrantEmptyMsg.classList.remove('d-none');
+                    }
+                }
+
+                // Incrementar contador (+1)
+                const countBadge = document.getElementById('completed-count');
+                if (countBadge) {
+                    let currentCount = parseInt(countBadge.textContent, 10) || 0;
+                    countBadge.textContent = currentCount + 1;
+                }
+            } 
+            // ==========================================
+            // CASO 2: DESCOMPLETAR TAREA (RECONSTRUIR Y MOVER AL CUADRANTE)
+            // ==========================================
+            else if (!isCompleted && card) {
+                // Determinar el cuadrante de destino
+                let targetQuadrantCode = data.quadrant; 
+                
+                if (!targetQuadrantCode) {
+                    const urgency = parseInt(card.dataset.urgency || "4", 10);
+                    const importance = parseInt(card.dataset.importance || "4", 10);
+                    
+                    if (urgency >= 3 && importance >= 3) targetQuadrantCode = 'Q1';
+                    else if (urgency <= 2 && importance >= 3) targetQuadrantCode = 'Q2';
+                    else if (urgency >= 3 && importance <= 2) targetQuadrantCode = 'Q3';
+                    else targetQuadrantCode = 'Q4';
+                }
+
+                const targetQuadrantContainer = document.querySelector(`.quadrant-container[data-quadrant="${targetQuadrantCode}"]`);
+
+                if (targetQuadrantContainer) {
+                    // Ocultar mensaje "No hay tareas" del cuadrante si estaba activo
+                    const emptyMsg = targetQuadrantContainer.querySelector('.empty-msg');
+                    if (emptyMsg) emptyMsg.classList.add('d-none');
+
+                    const titleText = card.querySelector('.task-title')?.textContent.trim() 
+                                   || card.querySelector('span')?.textContent.trim() 
+                                   || card.textContent.trim();
+
+                    // Reconstruir la tarjeta con la estructura exacta de _task_card.html
+                    const restoredCard = document.createElement('div');
+                    restoredCard.className = 'card mb-2 p-0 shadow-sm border-0 task-card';
+                    restoredCard.id = `task-card-${taskId}`;
+                    restoredCard.setAttribute('data-task-id', taskId);
+                    restoredCard.setAttribute('data-urgency', card.dataset.urgency || "4");
+                    restoredCard.setAttribute('data-importance', card.dataset.importance || "4");
+                    restoredCard.style.cursor = 'pointer';
+
+                    restoredCard.innerHTML = `
+                        <div class="card-body py-2 px-3 d-flex flex-column justify-content-center">
+                            <div class="task-card-header d-flex align-items-center position-relative w-100">
+                                <div class="task-checkbox-wrapper flex-shrink-0">
+                                    <label class="task-checkbox-container m-0" onclick="event.stopPropagation();">
+                                        <input type="checkbox" class="task-completion-check" data-task-id="${taskId}">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                </div>
+                                <div class="task-title-wrapper w-100" data-bs-toggle="modal" data-bs-target="#viewTaskModal${taskId}">
+                                    <h6 class="card-title task-title mb-0 fw-semibold text-dark" style="font-size: 0.88rem; line-height: 1.35; margin: 0;">
+                                        ${titleText}
+                                    </h6>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    // Insertar la tarjeta restaurada encima del botón de añadir
+                    const inlineWrapper = targetQuadrantContainer.querySelector('.add-task-inline-wrapper');
+                    if (inlineWrapper) {
+                        targetQuadrantContainer.insertBefore(restoredCard, inlineWrapper);
+                    } else {
+                        targetQuadrantContainer.appendChild(restoredCard);
+                    }
+
+                    // Quitar de la barra lateral
+                    card.remove();
+                } else {
+                    window.location.reload();
+                    return;
+                }
+
+                // Decrementar contador (-1)
+                const countBadge = document.getElementById('completed-count');
+                if (countBadge) {
+                    let currentCount = parseInt(countBadge.textContent, 10) || 0;
+                    countBadge.textContent = Math.max(0, currentCount - 1);
+                }
+            }
+        } else {
+            checkbox.checked = !isCompleted;
+        }
+    })
+    .catch(error => {
+        console.error('Error al actualizar la tarea:', error);
+        checkbox.checked = !isCompleted;
+    });
+}
+
 document.addEventListener('DOMContentLoaded', function () {
     let isProcessing = false;
 
@@ -492,7 +692,7 @@ document.addEventListener('DOMContentLoaded', function () {
         new Sortable(container, {
             group: 'eisenhower-matrix',
             draggable: '.task-card',
-            filter: '.empty-msg',
+            filter: '.empty-msg, .add-task-inline-wrapper',
             animation: 150,
             ghostClass: 'opacity-50',
 
@@ -667,7 +867,33 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
-// Checkbox manual de estado
+
+// Clic en cualquier área vacía del cuadrante para abrir el formulario
+document.querySelectorAll('.quadrant').forEach(quadrant => {
+    quadrant.addEventListener('click', function (e) {
+        // Si se hace clic en una tarjeta de tarea, botón, formulario, textarea, checkbox o modal, ignoramos
+        if (e.target.closest('.task-card') || 
+            e.target.closest('button') || 
+            e.target.closest('form') || 
+            e.target.closest('input') || 
+            e.target.closest('textarea') || 
+            e.target.closest('.modal')) {
+            return;
+        }
+
+        // Buscamos el botón de añadir tarea dentro de este cuadrante específico
+        const addBtn = this.querySelector('.btn-add-inline');
+        const form = this.querySelector('.inline-task-form');
+
+        // Si el formulario inline está oculto, lo mostramos llamando a tu función
+        if (addBtn && form && form.classList.contains('d-none')) {
+            showInlineForm(addBtn);
+        }
+    });
+});
+
+
+// Checkbox manual de estado: Confeti -> Pausa -> Vuelo con Parábola
 document.addEventListener('change', function (e) {
     if (e.target.matches('.task-completion-check')) {
         const checkbox = e.target;
@@ -676,33 +902,86 @@ document.addEventListener('change', function (e) {
 
         if (!taskId) return;
 
-        const csrftoken = getCookie('csrftoken');
+        if (isCompleted) {
+            const card = checkbox.closest('.task-card');
+            const targetContainer = document.getElementById('completed-tasks-container');
 
-        fetch(`/task/${taskId}/toggle/`, {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': csrftoken,
-                'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            body: JSON.stringify({ 'is_completed': isCompleted })
-        })
-        .then(response => {
-            if (!response.ok) throw new Error('Error en el servidor');
-            return response.json();
-        })
-        .then(data => {
-            if (data.status === 'success' || data.is_completed !== undefined) {
-                window.location.reload();
-            } else {
-                checkbox.checked = !isCompleted;
+            if (card && targetContainer) {
+                // 1. TACHADO DE LA TARJETA
+                card.classList.add('task-completing');
+
+                const rect = checkbox.getBoundingClientRect();
+                const startX = rect.left + rect.width / 2;
+                const startY = rect.top + rect.height / 2;
+
+                // 2. DISPARO DE CONFETI
+                confetti({
+                    particleCount: 30,
+                    spread: 55,
+                    origin: { 
+                        x: startX / window.innerWidth, 
+                        y: startY / window.innerHeight 
+                    },
+                    colors: ['#10B981', '#3B82F6', '#F59E0B'],
+                    disableForReducedMotion: true
+                });
+
+                // 3. ESPERAR 400ms A QUE EL CONFETI SE DISIPE Y LANZAR LA PARÁBOLA
+                setTimeout(() => {
+                    const particle = document.createElement('div');
+                    particle.classList.add('flying-particle');
+                    
+                    // Centrar la bolita (26px) sobre la casilla
+                    particle.style.top = (startY - 13) + 'px';
+                    particle.style.left = (startX - 13) + 'px';
+
+                    // Calcular coordenadas de destino
+                    const targetRect = targetContainer.getBoundingClientRect();
+                    const targetX = (targetRect.left + 40) - startX;
+                    const targetY = (targetRect.top + 50) - startY;
+
+                    // Pasar los deltas CSS mediante Custom Properties (Variables CSS)
+                    particle.style.setProperty('--target-x', `${targetX}px`);
+                    particle.style.setProperty('--target-y', `${targetY}px`);
+
+                    document.body.appendChild(particle);
+
+                    // Activar la clase de la animación parabólica
+                    requestAnimationFrame(() => {
+                        particle.classList.add('fly-arc');
+                    });
+
+                    // 4. GUARDAR EN BACKEND TRAS EL VUELO (850ms)
+                    setTimeout(() => {
+                        particle.remove();
+                        sendToggleRequest(taskId, isCompleted, checkbox);
+                    }, 800);
+
+                }, 370);
+
+                return;
             }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            checkbox.checked = !isCompleted;
-        });
+        }
+
+        sendToggleRequest(taskId, isCompleted, checkbox);
     }
+});
+
+// 1. RESTAURAR SCROLL AL CARGAR LA PÁGINA
+document.addEventListener('DOMContentLoaded', function () {
+    const savedScrollPos = localStorage.getItem('dashboard_scroll_pos');
+    if (savedScrollPos !== null) {
+        window.scrollTo({
+            top: parseInt(savedScrollPos, 10),
+            behavior: 'instant'
+        });
+        localStorage.removeItem('dashboard_scroll_pos');
+    }
+
+    // Intercepta todos los envíos de formulario estándar
+    document.addEventListener('submit', function () {
+        localStorage.setItem('dashboard_scroll_pos', window.scrollY);
+    });
 });
 </script>
 {% endblock %}

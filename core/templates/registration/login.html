@@ -11,11 +11,33 @@
                 <div class="card-body p-4">
                     <h3 class="fw-bold text-center mb-4">🔑 {% translate "Iniciar Sesión" %}</h3>
                     
+                    <!-- ALERTA DE ERROR VISUAL SI FALLA LA AUTENTICACIÓN -->
+                    {% if form.errors or form.non_field_errors %}
+                        <div class="alert alert-danger alert-dismissible fade show small mb-3" role="alert">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="bi bi-exclamation-triangle-fill flex-shrink-0"></i>
+                                <div>
+                                    {% translate "Usuario o contraseña incorrectos. Por favor, inténtalo de nuevo." %}
+                                </div>
+                            </div>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endif %}
+
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show small mb-3" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
                     <form method="POST">
                         {% csrf_token %}
                         <div class="mb-3">
                             <label class="form-label small fw-bold">{% translate "Usuario" %}</label>
-                            <input type="text" name="username" class="form-control" required autofocus>
+                            <input type="text" name="username" class="form-control" value="{{ request.POST.username|default:'' }}" required autofocus>
                         </div>
                         <div class="mb-3">
                             <label class="form-label small fw-bold">{% translate "Contraseña" %}</label>

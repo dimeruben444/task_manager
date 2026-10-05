@@ -86,18 +86,38 @@
             <form method="POST" action="{% url 'edit_task' task.id %}">
                 {% csrf_token %}
                 
-                <div class="modal-header border-bottom-0 pb-1 align-items-start">
-                    <div class="w-100 me-3 ms-2">
-                        <input type="text" 
-                               name="title" 
-                               value="{{ task.title }}" 
-                               class="form-control form-control-lg border-0 fs-4 fw-bold p-1 shadow-none bg-transparent" 
-                               placeholder="{% translate 'Título de la tarea' %}" 
-                               required>
+                <!-- FILA 1: BARRA SUPERIOR (DESPLEGABLE A KWADRADO + BOTÓN CERRAR) -->
+                <div class="modal-header border-bottom-0 pb-1 pt-3 px-3 d-flex justify-content-between align-items-center">
+                    <!-- Selector de Cuadrante estilo caja cuadrada -->
+                    <div class="dropdown">
+                        <select name="quadrant_select" 
+                                class="form-select form-select-sm border bg-white text-dark fw-medium shadow-none cursor-pointer rounded px-3 py-2" 
+                                style="font-size: 0.85rem; width: auto;"
+                                onchange="updateQuadrantValues(this, '{{ task.id }}')">
+                            <option value="Q1" {% if task.urgency >= 3 and task.importance >= 3 %}selected{% endif %}>🔥 {% translate "Urgente e Importante (Hacer ahora)" %}</option>
+                            <option value="Q2" {% if task.urgency <= 2 and task.importance >= 3 %}selected{% endif %}>📅 {% translate "Importante - No Urgente (Planificar)" %}</option>
+                            <option value="Q3" {% if task.urgency >= 3 and task.importance <= 2 %}selected{% endif %}>👥 {% translate "Urgente - No Importante (Delegar)" %}</option>
+                            <option value="Q4" {% if task.urgency <= 2 and task.importance <= 2 %}selected{% endif %}>🗑️ {% translate "No Urgente - No Importante (Eliminar)" %}</option>
+                        </select>
                     </div>
-                    <button type="button" class="btn-close mt-1" data-bs-dismiss="modal" aria-label="Close"></button>
+
+                    <!-- Botón de cerrar (X) -->
+                    <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
+                
+                <!-- FILA 2: TÍTULO MULTILÍNEA COMPLETO SIN RECORTES -->
+                <div class="px-3 pb-2 pt-1">
+                    <textarea name="title" 
+                            class="form-control form-control-lg border-0 fs-4 fw-bold p-1 shadow-none bg-transparent task-title-textarea" 
+                            placeholder="{% translate 'Título de la tarea' %}" 
+                            required 
+                            rows="1"
+                            style="resize: none; width: 100%; height: auto; overflow: hidden; line-height: 1.35; word-break: break-word; overflow-wrap: anywhere; field-sizing: content; box-sizing: content-box;"
+                            oninput="this.style.height = 'auto'; this.style.height = (this.scrollHeight) + 'px';">{{ task.title }}</textarea>
+                </div>
+
+                <!-- CUERPO DEL MODAL -->
                 <div class="modal-body p-4 pt-2">
                     <div class="row g-4">
                         
@@ -398,7 +418,18 @@
     const modalEl = document.getElementById(`viewTaskModal${taskId}`);
 
     if (modalEl) {
+        // Usamos 'show.bs.modal' en lugar de 'shown.bs.modal' para calcular ANTES de la animación
+        modalEl.addEventListener('show.bs.modal', function () {
+            const titleTextarea = modalEl.querySelector('.task-title-textarea');
+            if (titleTextarea) {
+                // Ajuste instantáneo de altura antes de renderizar la ventana
+                titleTextarea.style.height = 'auto';
+                titleTextarea.style.height = (titleTextarea.scrollHeight + 4) + 'px';
+            }
+        });
+
         modalEl.addEventListener('shown.bs.modal', function () {
+            // Dejamos aquí solo la inicialización de Flatpickr cuando el modal ya es visible
             const calendarContainer = document.getElementById(`inlineCalendar${taskId}`);
             const hiddenInput = document.getElementById(`hiddenDueDate${taskId}`);
             const displayDate = document.getElementById(`displayDate${taskId}`);
@@ -481,4 +512,23 @@ function clearTaskDate(taskId) {
         if (instance) instance.hide();
     }
 }
+
+
+function updateQuadrantValues(selectEl, taskId) {
+    const val = selectEl.value;
+    let urgency = 4, importance = 4;
+
+    if (val === 'Q1') { urgency = 4; importance = 4; }
+    else if (val === 'Q2') { urgency = 1; importance = 4; }
+    else if (val === 'Q3') { urgency = 4; importance = 1; }
+    else if (val === 'Q4') { urgency = 1; importance = 1; }
+
+    const urgencyRadio = document.getElementById(`detail-urgency-${urgency}-${taskId}`);
+    const importanceRadio = document.getElementById(`detail-importance-${importance}-${taskId}`);
+
+    if (urgencyRadio) urgencyRadio.checked = true;
+    if (importanceRadio) importanceRadio.checked = true;
+}
+
+
 </script>

@@ -36,7 +36,7 @@ class Board(models.Model):
     class Meta:
         verbose_name = _('Tablero')
         verbose_name_plural = _('Tableros')
-        ordering = ['-created_at']
+        ordering = ['created_at']
 
     def __str__(self):
         tipo = _('General') if self.is_default else _('Personalizado')

@@ -72,8 +72,12 @@ def dashboard_view(request, board_id=None):
         form = TaskForm(user=request.user, current_board=current_board)
 
     # Filtrar tareas activas e inactivas
-    active_tasks = base_tasks.filter(is_completed=False)
+    active_tasks = base_tasks.filter(is_completed=False).order_by('created_at')
     completed_tasks = base_tasks.filter(is_completed=True).order_by('-updated_at')[:15]
+
+    
+
+    
 
     # === LÍNEAS DE DEPURACIÓN TEMPORALES ===
     for t in base_tasks.filter(is_completed=False):
