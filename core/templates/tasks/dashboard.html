@@ -98,31 +98,200 @@
                 </div>
 
                 <div class="mt-2">
-                    <button class="btn btn-link btn-sm text-decoration-none p-0 text-muted" type="button" data-bs-toggle="collapse" data-bs-target="#advancedOptions">
-                        ⚙️ {% translate "Opciones avanzadas (Tablero, fecha límite, notas...)" %}
+                    <button class="btn btn-link btn-sm text-decoration-none p-0 text-muted shadow-none d-inline-flex align-items-center gap-1" 
+                            type="button" 
+                            data-bs-toggle="collapse" 
+                            data-bs-target="#advancedOptions" 
+                            aria-expanded="false">
+                        <span>⚙️</span>
+                        <span>{% translate "Opciones avanzadas (Tablero, fecha límite, notas...)" %}</span>
                     </button>
                     
-                    <div class="collapse mt-2" id="advancedOptions">
-                        <div class="row g-3 p-3 border rounded bg-white shadow-sm">
-                            <div class="col-md-4">
-                                <label class="form-label small">{% translate "Tablero" %}</label>
-                                {{ form.board }}
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label small">{% translate "Fecha límite" %}</label>
-                                {{ form.due_date }}
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label small">{% translate "Asignar a" %}</label>
-                                {{ form.assigned_to }}
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label small">{% translate "Notas / Descripción" %}</label>
-                                {{ form.description }}
+                    <div class="collapse mt-3" id="advancedOptions">
+                        <div class="p-3 border rounded-3 bg-light shadow-sm">
+                            <div class="row g-3 align-items-center">
+                                
+                                <!-- 1. POP-OVER TABLERO -->
+                                <div class="col-md-3">
+                                    <div class="dropdown">
+                                        <button class="btn btn-outline-secondary btn-sm text-start w-100 d-flex justify-content-between align-items-center bg-white shadow-none py-2 px-3 border" 
+                                                type="button" 
+                                                id="quickDropdownBoard" 
+                                                data-bs-toggle="dropdown" 
+                                                data-bs-auto-close="outside" 
+                                                aria-expanded="false">
+                                            <span class="d-flex align-items-center gap-2 text-dark">
+                                                <svg xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 -960 960 960" width="18px" fill="#888"><path d="M160-120q-33 0-56.5-23.5T80-200v-560q0-33 23.5-56.5T160-840h560q33 0 56.5 23.5T800-760v80h80v80h-80v80h80v80h-80v80h80v80h-80v80q0 33-23.5 56.5T720-120H160Zm0-80h560v-560H160v560Zm80-80h200v-160H240v160Zm240-280h160v-120H480v120Zm-240 80h200v-200H240v200Zm240 200h160v-240H480v240ZM160-760v560-560Z"/></svg>
+                                                <span class="fw-medium">{% translate "Tablero" %}</span>
+                                            </span>
+                                            <small class="text-muted" id="quickBoardSelectedName">{% if current_board %}{{ current_board.title }}{% else %}{% translate "General" %}{% endif %}</small>
+                                        </button>
+                                        
+                                        <div class="dropdown-menu p-3 shadow-lg border-0 rounded-3 mt-1 w-100" aria-labelledby="quickDropdownBoard" style="z-index: 1055;">
+                                            <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+                                                <span class="fw-bold small text-dark">{% translate "Seleccionar Tablero" %}</span>
+                                            </div>
+                                            <select name="board" id="quickBoardSelect" class="form-select form-select-sm border mb-2" onchange="updateQuickBoardName(this)">
+                                                {% for b in boards %}
+                                                    <option value="{{ b.id }}" {% if current_board and current_board.id == b.id %}selected{% endif %}>
+                                                        {{ b.title }}
+                                                    </option>
+                                                {% endfor %}
+                                            </select>
+                                            <button type="button" class="btn btn-primary btn-sm w-100 fw-bold" onclick="bootstrap.Dropdown.getInstance(document.getElementById('quickDropdownBoard')).hide();">
+                                                {% translate "Aplicar" %}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 2. POP-OVER FECHAS Y VENCIMIENTO (IDÉNTICO AL MODAL DETALLE) -->
+                                <div class="col-md-3">
+                                    <div class="dropdown">
+                                        <button class="btn btn-outline-secondary btn-sm text-start w-100 d-flex justify-content-between align-items-center bg-white shadow-none py-2 px-3 border" 
+                                                type="button" 
+                                                id="quickDropdownDate" 
+                                                data-bs-toggle="dropdown" 
+                                                data-bs-auto-close="outside" 
+                                                aria-expanded="false">
+                                            <span class="d-flex align-items-center gap-2 text-dark">
+                                                <svg xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 -960 960 960" width="18px" fill="#888"><path d="m612-292 56-56-148-148v-184h-80v216l172 172ZM480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-400Zm0 320q133 0 226.5-93.5T800-480q0-133-93.5-226.5T480-800q-133 0-226.5 93.5T160-480q0 133 93.5 226.5T480-160Z"/></svg>
+                                                <span class="fw-medium">{% translate "Fechas" %}</span>
+                                            </span>
+                                            <small class="text-muted" id="quickDateBadgeDisplay">+</small>
+                                        </button>
+                                        
+                                        <div class="dropdown-menu dropdown-menu-dates p-3 shadow-lg border-0 rounded-3 mt-1" aria-labelledby="quickDropdownDate" style="width: 310px; z-index: 1055;">
+                                            <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+                                                <span class="fw-bold small text-dark">{% translate "Fechas" %}</span>
+                                                <button type="button" class="btn-close btn-sm" onclick="bootstrap.Dropdown.getInstance(document.getElementById('quickDropdownDate')).hide();"></button>
+                                            </div>
+
+                                            <!-- Calendario Inline Flatpickr -->
+                                            <div id="quickInlineCalendar" class="mb-2 d-flex justify-content-center flatpickr-clean-container"></div>
+
+                                            <div class="mb-2">
+                                                <label class="form-label small text-muted mb-1 fw-bold">{% translate "Fecha de vencimiento" %}</label>
+                                                <div class="row g-2">
+                                                    <div class="col-7">
+                                                        <input type="text" id="quickDisplayDate" class="form-control form-control-sm text-center fw-medium" placeholder="AAAA-MM-DD">
+                                                    </div>
+                                                    <div class="col-5">
+                                                        <input type="time" id="quickDisplayTime" class="form-control form-control-sm text-center fw-medium" value="12:00">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Campo oculto para enviar fecha y hora completas a Django -->
+                                            <input type="hidden" name="due_date" id="quickHiddenDueDate">
+
+                                            <!-- Checkbox Crear Recordatorio -->
+                                            <div class="mb-2 form-check">
+                                                <input type="checkbox" class="form-check-input" name="reminder_enabled" id="quick_reminder_enabled">
+                                                <label class="form-check-label small fw-bold text-dark" for="quick_reminder_enabled">
+                                                    {% translate "Crear recordatorio" %}
+                                                </label>
+                                            </div>
+
+                                            <!-- Desplegable Offset del Recordatorio -->
+                                            <div class="mb-3">
+                                                <select name="reminder_offset" class="form-select form-select-sm border">
+                                                    <option value="at_time">{% translate "A la hora del vencimiento" %}</option>
+                                                    <option value="5_min">{% translate "5 minutos antes" %}</option>
+                                                    <option value="15_min">{% translate "15 minutos antes" %}</option>
+                                                    <option value="1_hour">{% translate "1 hora antes" %}</option>
+                                                    <option value="2_hours">{% translate "2 horas antes" %}</option>
+                                                    <option value="1_day" selected>{% translate "1 día antes" %}</option>
+                                                    <option value="2_days">{% translate "2 días antes" %}</option>
+                                                    <option value="1_week">{% translate "1 semana antes" %}</option>
+                                                    <option value="2_weeks">{% translate "2 semanas antes" %}</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="d-flex flex-column gap-1">
+                                                <button type="button" class="btn btn-primary btn-sm w-100 fw-bold" onclick="saveQuickDate()">
+                                                    {% translate "Guardar" %}
+                                                </button>
+                                                <button type="button" class="btn btn-link btn-sm text-danger text-decoration-none w-100 p-0" onclick="clearQuickDate()">
+                                                    {% translate "Quitar" %}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 3. POP-OVER ASIGNAR A (MIEMBROS CON AVATARES) -->
+                                <div class="col-md-3">
+                                    <div class="dropdown">
+                                        <button class="btn btn-outline-secondary btn-sm text-start w-100 d-flex justify-content-between align-items-center bg-white shadow-none py-2 px-3 border" 
+                                                type="button" 
+                                                id="quickDropdownAssignees" 
+                                                data-bs-toggle="dropdown" 
+                                                data-bs-auto-close="outside" 
+                                                aria-expanded="false">
+                                            <span class="d-flex align-items-center gap-2 text-dark">
+                                                <svg xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 -960 960 960" width="18px" fill="#888"><path d="M365-580Zm-5 540-40-40v-240H120v-80l80-80v-280h-40v-80h285q-18 17-32.5 37T387-760H280v314l-46 46h263q24 14 49.5 23.5T600-363v43H400v240l-40 40Zm322.5-617.5Q700-675 700-700t-17.5-42.5Q665-760 640-760t-42.5 17.5Q580-725 580-700t17.5 42.5Q615-640 640-640t42.5-17.5Zm14 123Q722-549 739-573q-22-13-47-20t-52-7q-27 0-52 7t-47 20q17 24 42.5 38.5T640-520q31 0 56.5-14.5Zm-198 36Q440-557 440-640t58.5-141.5Q557-840 640-840t141.5 58.5Q840-723 840-640t-58.5 141.5Q723-440 640-440t-141.5-58.5Z"/></svg>
+                                                <span class="fw-medium">{% translate "Asignada a" %}</span>
+                                            </span>
+                                            <small class="text-muted" id="quickAssigneesCount">+</small>
+                                        </button>
+
+                                        <div class="dropdown-menu p-3 shadow-lg border-0 rounded-3 mt-1" aria-labelledby="quickDropdownAssignees" style="width: 260px; z-index: 1055;">
+                                            <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+                                                <span class="fw-bold small text-dark">{% translate "Miembros" %}</span>
+                                            </div>
+
+                                            <div class="d-flex flex-column gap-1">
+                                                {% for u in users %}
+                                                    <div>
+                                                        <input type="checkbox" name="assigned_to" value="{{ u.id }}" id="quick-assign-user-{{ u.id }}" class="btn-check assign-check-toggle" onchange="updateQuickAssigneesCount()">
+                                                        
+                                                        <label class="btn btn-outline-dark btn-sm w-100 text-start d-flex justify-content-between align-items-center py-1 px-2 border-0 bg-light-hover" 
+                                                            for="quick-assign-user-{{ u.id }}" style="font-size: 0.8rem; cursor: pointer;">
+                                                            
+                                                            <div class="d-flex align-items-center gap-2">
+                                                                <span class="badge rounded-circle bg-info text-dark border p-0 d-inline-flex align-items-center justify-content-center" 
+                                                                    style="width: 22px; height: 22px; font-size: 0.65rem;">
+                                                                    {{ u.username|slice:":2"|upper }}
+                                                                </span>
+                                                                <span class="text-dark">{{ u.get_full_name|default:u.username }}</span>
+                                                            </div>
+
+                                                            <span class="badge rounded-circle border toggle-icon text-dark bg-white" style="width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center;"></span>
+                                                        </label>
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 4. NOTAS / DESCRIPCIÓN -->
+                                <div class="col-md-3">
+                                    <button class="btn btn-outline-secondary btn-sm text-start w-100 d-flex justify-content-between align-items-center bg-white shadow-none py-2 px-3 border" 
+                                            type="button" 
+                                            data-bs-toggle="collapse" 
+                                            data-bs-target="#quickCollapseDesc">
+                                        <span class="d-flex align-items-center gap-2 text-dark">
+                                            <svg xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 -960 960 960" width="18px" fill="#888"><path d="M320-240h320v-80H320v80Zm0-160h320v-80H320v80ZM240-80q-33 0-56.5-23.5T160-160v-640q0-33 23.5-56.5T240-880h320l240 240v480q0 33-23.5 56.5T720-80H240Zm280-520v-200H240v640h480v-440H520ZM240-800v200-200 640-640Z"/></svg>
+                                            <span class="fw-medium">{% translate "Descripción" %}</span>
+                                        </span>
+                                        <small class="text-muted" id="quickDescIcon">+</small>
+                                    </button>
+                                </div>
+
+                                <div class="col-12 collapse mt-2" id="quickCollapseDesc">
+                                    <div class="p-2 border rounded bg-white">
+                                        <textarea name="description" class="form-control form-control-sm border-0 shadow-none" rows="2" placeholder="{% translate 'Escribe notas o una descripción más detallada...' %}" oninput="document.getElementById('quickDescIcon').textContent = this.value.trim() ? '✓' : '+';"></textarea>
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
                     </div>
                 </div>
+
+
             </form>
         </div>
     </div>
@@ -437,6 +606,10 @@
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
+<!-- Carga de SortableJS y Canvas Confetti -->
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
 <script>
 // 1. REGISTRO GLOBAL DE SELECCIÓN DE CUADRANTE
 window.selectedQuadrantForTask = window.selectedQuadrantForTask || {};
@@ -504,7 +677,7 @@ function saveTaskModal(taskId) {
         return;
     }
 
-    // 1. Obtener el cuadrante de destino seleccionado
+    // A. Obtener el cuadrante de destino seleccionado
     let targetQuadrant = window.selectedQuadrantForTask ? window.selectedQuadrantForTask[taskId] : null;
     if (!targetQuadrant) {
         const urgencyVal = form.querySelector('input[name="urgency"]:checked')?.value || '4';
@@ -519,18 +692,17 @@ function saveTaskModal(taskId) {
         else targetQuadrant = 'Q4';
     }
 
-    // 2. Actualizar título en el tablero
+    // B. Actualizar título en el tablero
     const titleInput = form.querySelector('textarea[name="title"]');
     const cardTitleEl = document.querySelector(`#task-card-${taskId} .task-title`);
     if (titleInput && cardTitleEl) {
         cardTitleEl.textContent = titleInput.value;
     }
 
-    // 3. Ocultar el modal de Bootstrap
+    // C. Ocultar el modal de Bootstrap
     if (modalEl) {
         const modalInstance = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
         
-        // Ocultamos el modal y disparamos la animación FLIP justo al iniciar el cierre
         modalInstance.hide();
 
         setTimeout(() => {
@@ -540,7 +712,7 @@ function saveTaskModal(taskId) {
         animateTaskToQuadrant(taskId, targetQuadrant);
     }
 
-    // 4. Enviar datos a Django por Fetch AJAX
+    // D. Enviar datos a Django por Fetch AJAX
     const formData = new FormData(form);
     fetch(form.action, {
         method: 'POST',
@@ -557,7 +729,103 @@ function saveTaskModal(taskId) {
     .catch(err => console.error('Error guardando tarea:', err));
 }
 
-// 4. FUNCIONES DE FORMULARIOS INLINE Y BÚSQUEDA / UTILS
+// 4. FUNCIONES PARA LAS OPCIONES AVANZADAS RÁPIDAS
+function updateQuickBoardName(selectEl) {
+    const selectedText = selectEl.options[selectEl.selectedIndex].text;
+    const badge = document.getElementById('quickBoardSelectedName');
+    if (badge) badge.textContent = selectedText.trim();
+}
+
+function updateQuickAssigneesCount() {
+    const checked = document.querySelectorAll('#advancedOptions input[name="assigned_to"]:checked');
+    const badge = document.getElementById('quickAssigneesCount');
+    if (badge) {
+        badge.textContent = checked.length > 0 ? `${checked.length}` : '+';
+    }
+}
+
+function saveQuickDate() {
+    const displayDate = document.getElementById('quickDisplayDate').value;
+    const displayTime = document.getElementById('quickDisplayTime').value || '12:00';
+    const hiddenInput = document.getElementById('quickHiddenDueDate');
+    const badgeDisplay = document.getElementById('quickDateBadgeDisplay');
+
+    if (displayDate) {
+        hiddenInput.value = `${displayDate} ${displayTime}`;
+        badgeDisplay.textContent = `${displayDate} ${displayTime}`;
+    } else {
+        hiddenInput.value = '';
+        badgeDisplay.textContent = '+';
+    }
+
+    const dropdownBtn = document.getElementById('quickDropdownDate');
+    if (dropdownBtn) {
+        const instance = bootstrap.Dropdown.getInstance(dropdownBtn);
+        if (instance) instance.hide();
+    }
+}
+
+function clearQuickDate() {
+    document.getElementById('quickDisplayDate').value = '';
+    document.getElementById('quickHiddenDueDate').value = '';
+    document.getElementById('quickDateBadgeDisplay').textContent = '+';
+    
+    const reminderCheck = document.getElementById('quick_reminder_enabled');
+    if (reminderCheck) reminderCheck.checked = false;
+
+    const calendarContainer = document.getElementById('quickInlineCalendar');
+    if (calendarContainer && calendarContainer._flatpickr) {
+        calendarContainer._flatpickr.clear();
+    }
+
+    const dropdownBtn = document.getElementById('quickDropdownDate');
+    if (dropdownBtn) {
+        const instance = bootstrap.Dropdown.getInstance(dropdownBtn);
+        if (instance) instance.hide();
+    }
+}
+
+// Inicialización del calendario Flatpickr en el Pop-over de Alta Rápida
+document.addEventListener('DOMContentLoaded', function() {
+    const quickDateBtn = document.getElementById('quickDropdownDate');
+    if (quickDateBtn) {
+        quickDateBtn.addEventListener('shown.bs.dropdown', function () {
+            const calendarContainer = document.getElementById('quickInlineCalendar');
+            const hiddenInput = document.getElementById('quickHiddenDueDate');
+            const displayDate = document.getElementById('quickDisplayDate');
+            const displayTime = document.getElementById('quickDisplayTime');
+
+            if (calendarContainer && !calendarContainer._flatpickr) {
+                const fp = flatpickr(calendarContainer, {
+                    inline: true,
+                    locale: 'es',
+                    defaultDate: 'today',
+                    dateFormat: 'Y-m-d',
+                    onChange: function(selectedDates) {
+                        if (selectedDates.length > 0) {
+                            const dateStr = fp.formatDate(selectedDates[0], 'Y-m-d');
+                            displayDate.value = dateStr;
+                            hiddenInput.value = `${dateStr} ${displayTime.value || '12:00'}`;
+                        }
+                    }
+                });
+
+                displayDate.addEventListener('input', function() {
+                    if (this.value) fp.setDate(this.value, false);
+                    hiddenInput.value = this.value ? `${this.value} ${displayTime.value || '12:00'}` : '';
+                });
+
+                displayTime.addEventListener('change', function() {
+                    if (displayDate.value) {
+                        hiddenInput.value = `${displayDate.value} ${this.value || '12:00'}`;
+                    }
+                });
+            }
+        });
+    }
+});
+
+// 5. FUNCIONES DE FORMULARIOS INLINE Y BÚSQUEDA / UTILS
 function showInlineForm(button) {
     const wrapper = button.closest('.add-task-inline-wrapper');
     const quadrantContainer = button.closest('.quadrant-container');
@@ -784,6 +1052,44 @@ function sendToggleRequest(taskId, isCompleted, checkbox) {
 
 document.addEventListener('DOMContentLoaded', function () {
     let isProcessing = false;
+
+    // Inicialización del calendario Flatpickr al desplegar el pop-over de Fechas Rápidas
+    const quickDateBtn = document.getElementById('quickDropdownDate');
+    if (quickDateBtn) {
+        quickDateBtn.addEventListener('shown.bs.dropdown', function () {
+            const calendarContainer = document.getElementById('quickInlineCalendar');
+            const hiddenInput = document.getElementById('quickHiddenDueDate');
+            const displayDate = document.getElementById('quickDisplayDate');
+            const displayTime = document.getElementById('quickDisplayTime');
+
+            if (calendarContainer && !calendarContainer._flatpickr) {
+                const fp = flatpickr(calendarContainer, {
+                    inline: true,
+                    locale: 'es',
+                    defaultDate: 'today',
+                    dateFormat: 'Y-m-d',
+                    onChange: function(selectedDates) {
+                        if (selectedDates.length > 0) {
+                            const dateStr = fp.formatDate(selectedDates[0], 'Y-m-d');
+                            displayDate.value = dateStr;
+                            hiddenInput.value = `${dateStr} ${displayTime.value || '12:00'}`;
+                        }
+                    }
+                });
+
+                displayDate.addEventListener('input', function() {
+                    if (this.value) fp.setDate(this.value, false);
+                    hiddenInput.value = this.value ? `${this.value} ${displayTime.value || '12:00'}` : '';
+                });
+
+                displayTime.addEventListener('change', function() {
+                    if (displayDate.value) {
+                        hiddenInput.value = `${displayDate.value} ${this.value || '12:00'}`;
+                    }
+                });
+            }
+        });
+    }
 
     // Inicialización de SortableJS
     const quadrantContainers = document.querySelectorAll('.quadrant-container');
