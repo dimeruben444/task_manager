@@ -227,3 +227,18 @@
 .flying-particle.fly-arc {
   animation: parabolicFly 0.85s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
 }
+
+
+.task-card {
+    transition: transform 0.45s cubic-bezier(0.2, 0, 0, 1);
+    will-change: transform;
+}
+
+.task-card-moving {
+    z-index: 1050 !important;
+    position: relative;
+    pointer-events: none;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2) !important;
+}
+
+

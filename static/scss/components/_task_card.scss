@@ -270,4 +270,17 @@
     }
 }
 
+/* Animación suave de desplazamiento entre cuadrantes */
+.task-card {
+    transition: transform 0.45s cubic-bezier(0.2, 0, 0, 1), opacity 0.3s ease;
+    will-change: transform, opacity;
+}
+
+/* Clase temporal durante el desplazamiento/movimiento */
+.task-card-moving {
+    z-index: 1000;
+    pointer-events: none;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15) !important;
+}
+
 

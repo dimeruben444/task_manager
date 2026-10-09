@@ -351,7 +351,7 @@
 
                             <form method="POST" action="{% url 'delete_task' task.id %}" class="d-inline m-0 flex-shrink-0" onsubmit="return confirm('¿Eliminar esta tarea definitivamente?');">
                                 {% csrf_token %}
-                                <button type="submit" class="btn btn-link text-danger p-0 border-0 opacity-50 hover-opacity-100" title="{% translate 'Eliminar' %}">
+                                <button type="submit" class="btn btn-link text-danger p-0 border-0 opacity-50 hover-opacity-100" title="Eliminar">
                                     <i class="bi bi-x-lg" style="font-size: 0.85rem;"></i>
                                 </button>
                             </form>
@@ -433,13 +433,131 @@
 
 </div>
 
-
 <!-- Carga de SortableJS y Canvas Confetti -->
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
 <script>
-// 2. FUNCIÓN DE MOSTRAR FORMULARIO E INTERCEPTAR EL ENTER
+// 1. REGISTRO GLOBAL DE SELECCIÓN DE CUADRANTE
+window.selectedQuadrantForTask = window.selectedQuadrantForTask || {};
+
+// 2. ANIMACIÓN FLIP CON TIMEOUT DE SEGURIDAD PARA EL MODAL
+function animateTaskToQuadrant(taskId, targetQuadrantCode) {
+    const card = document.getElementById(`task-card-${taskId}`);
+    const targetContainer = document.querySelector(`.quadrant-container[data-quadrant="${targetQuadrantCode}"]`);
+
+    if (!card || !targetContainer) return;
+
+    const currentContainer = card.closest('.quadrant-container');
+    if (currentContainer === targetContainer) return;
+
+    // A. Posición Inicial (FIRST)
+    const firstRect = card.getBoundingClientRect();
+
+    // B. Mover en el DOM (LAST)
+    const inlineWrapper = targetContainer.querySelector('.add-task-inline-wrapper');
+    if (inlineWrapper) {
+        targetContainer.insertBefore(card, inlineWrapper);
+    } else {
+        targetContainer.appendChild(card);
+    }
+
+    const emptyMsg = targetContainer.querySelector('.empty-msg');
+    if (emptyMsg) emptyMsg.classList.add('d-none');
+
+    card.setAttribute('data-urgency', targetQuadrantCode === 'Q1' || targetQuadrantCode === 'Q3' ? '4' : '1');
+    card.setAttribute('data-importance', targetQuadrantCode === 'Q1' || targetQuadrantCode === 'Q2' ? '4' : '1');
+
+    // C. Posición Final
+    const lastRect = card.getBoundingClientRect();
+
+    // D. Invertir posición (INVERT)
+    const deltaX = firstRect.left - lastRect.left;
+    const deltaY = firstRect.top - lastRect.top;
+
+    card.style.transition = 'none';
+    card.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+    card.classList.add('task-card-moving');
+
+    // E. Reproducir (PLAY)
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            card.style.transition = 'transform 0.45s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.3s ease';
+            card.style.transform = 'translate(0, 0)';
+
+            setTimeout(() => {
+                card.style.transition = '';
+                card.style.transform = '';
+                card.classList.remove('task-card-moving');
+            }, 450);
+        });
+    });
+}
+
+// 3. FUNCIÓN EXPLICITA DE GUARDADO AL PULSAR EL BOTÓN
+function saveTaskModal(taskId) {
+    const form = document.getElementById(`editTaskForm${taskId}`);
+    const modalEl = document.getElementById(`viewTaskModal${taskId}`);
+
+    if (!form) {
+        console.error(`No se encontró el formulario editTaskForm${taskId}`);
+        return;
+    }
+
+    // 1. Obtener el cuadrante de destino seleccionado
+    let targetQuadrant = window.selectedQuadrantForTask ? window.selectedQuadrantForTask[taskId] : null;
+    if (!targetQuadrant) {
+        const urgencyVal = form.querySelector('input[name="urgency"]:checked')?.value || '4';
+        const importanceVal = form.querySelector('input[name="importance"]:checked')?.value || '4';
+
+        const u = parseInt(urgencyVal, 10);
+        const i = parseInt(importanceVal, 10);
+
+        if (u >= 3 && i >= 3) targetQuadrant = 'Q1';
+        else if (u <= 2 && i >= 3) targetQuadrant = 'Q2';
+        else if (u >= 3 && i <= 2) targetQuadrant = 'Q3';
+        else targetQuadrant = 'Q4';
+    }
+
+    // 2. Actualizar título en el tablero
+    const titleInput = form.querySelector('textarea[name="title"]');
+    const cardTitleEl = document.querySelector(`#task-card-${taskId} .task-title`);
+    if (titleInput && cardTitleEl) {
+        cardTitleEl.textContent = titleInput.value;
+    }
+
+    // 3. Ocultar el modal de Bootstrap
+    if (modalEl) {
+        const modalInstance = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+        
+        // Ocultamos el modal y disparamos la animación FLIP justo al iniciar el cierre
+        modalInstance.hide();
+
+        setTimeout(() => {
+            animateTaskToQuadrant(taskId, targetQuadrant);
+        }, 100);
+    } else {
+        animateTaskToQuadrant(taskId, targetQuadrant);
+    }
+
+    // 4. Enviar datos a Django por Fetch AJAX
+    const formData = new FormData(form);
+    fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(() => {
+        if (window.selectedQuadrantForTask) {
+            delete window.selectedQuadrantForTask[taskId];
+        }
+    })
+    .catch(err => console.error('Error guardando tarea:', err));
+}
+
+// 4. FUNCIONES DE FORMULARIOS INLINE Y BÚSQUEDA / UTILS
 function showInlineForm(button) {
     const wrapper = button.closest('.add-task-inline-wrapper');
     const quadrantContainer = button.closest('.quadrant-container');
@@ -457,12 +575,11 @@ function showInlineForm(button) {
     form.classList.remove('d-none');
     textarea.focus();
 
-    // Guardar scroll si el usuario envía la tarea pulsando Enter
     textarea.onkeydown = function(e) {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
             if (this.value.trim() !== '') {
-                localStorage.setItem('dashboard_scroll_pos', window.scrollY); // <--- Guarda el scroll aquí
+                localStorage.setItem('dashboard_scroll_pos', window.scrollY);
                 form.submit();
             }
         }
@@ -524,18 +641,13 @@ function sendToggleRequest(taskId, isCompleted, checkbox) {
         if (data.status === 'success' || data.is_completed !== undefined) {
             const card = checkbox.closest('.task-card, .completed-task-item');
 
-            // ==========================================
-            // CASO 1: MARCAR COMO COMPLETADA
-            // ==========================================
             if (isCompleted && card) {
                 const targetContainer = document.getElementById('completed-tasks-container');
                 if (!targetContainer) return;
 
-                // Ocultar mensaje "No hay tareas completadas"
                 const emptyMsg = targetContainer.querySelector('#empty-trash-msg, .empty-msg');
                 if (emptyMsg) emptyMsg.classList.add('d-none');
 
-                // Extraer título limpio
                 const titleText = card.querySelector('.task-title')?.textContent.trim() 
                                || card.querySelector('h6')?.textContent.trim() 
                                || card.textContent.trim();
@@ -543,7 +655,6 @@ function sendToggleRequest(taskId, isCompleted, checkbox) {
                 const urgency = card.dataset.urgency || "4";
                 const importance = card.dataset.importance || "4";
 
-                // Crear elemento formateado para la lista de completadas
                 const completedItem = document.createElement('div');
                 completedItem.className = 'completed-task-item task-card card border-0 shadow-sm mb-2 p-2 d-flex flex-row align-items-center justify-content-between gap-2 bg-light';
                 completedItem.setAttribute('data-task-id', taskId);
@@ -576,7 +687,6 @@ function sendToggleRequest(taskId, isCompleted, checkbox) {
 
                 targetContainer.prepend(completedItem);
 
-                // Eliminar tarjeta original y actualizar cuadrante
                 const quadrantContainer = card.closest('.quadrant-container');
                 card.remove();
 
@@ -588,18 +698,13 @@ function sendToggleRequest(taskId, isCompleted, checkbox) {
                     }
                 }
 
-                // Incrementar contador (+1)
                 const countBadge = document.getElementById('completed-count');
                 if (countBadge) {
                     let currentCount = parseInt(countBadge.textContent, 10) || 0;
                     countBadge.textContent = currentCount + 1;
                 }
             } 
-            // ==========================================
-            // CASO 2: DESCOMPLETAR TAREA (RECONSTRUIR Y MOVER AL CUADRANTE)
-            // ==========================================
             else if (!isCompleted && card) {
-                // Determinar el cuadrante de destino
                 let targetQuadrantCode = data.quadrant; 
                 
                 if (!targetQuadrantCode) {
@@ -615,7 +720,6 @@ function sendToggleRequest(taskId, isCompleted, checkbox) {
                 const targetQuadrantContainer = document.querySelector(`.quadrant-container[data-quadrant="${targetQuadrantCode}"]`);
 
                 if (targetQuadrantContainer) {
-                    // Ocultar mensaje "No hay tareas" del cuadrante si estaba activo
                     const emptyMsg = targetQuadrantContainer.querySelector('.empty-msg');
                     if (emptyMsg) emptyMsg.classList.add('d-none');
 
@@ -623,7 +727,6 @@ function sendToggleRequest(taskId, isCompleted, checkbox) {
                                    || card.querySelector('span')?.textContent.trim() 
                                    || card.textContent.trim();
 
-                    // Reconstruir la tarjeta con la estructura exacta de _task_card.html
                     const restoredCard = document.createElement('div');
                     restoredCard.className = 'card mb-2 p-0 shadow-sm border-0 task-card';
                     restoredCard.id = `task-card-${taskId}`;
@@ -650,7 +753,6 @@ function sendToggleRequest(taskId, isCompleted, checkbox) {
                         </div>
                     `;
 
-                    // Insertar la tarjeta restaurada encima del botón de añadir
                     const inlineWrapper = targetQuadrantContainer.querySelector('.add-task-inline-wrapper');
                     if (inlineWrapper) {
                         targetQuadrantContainer.insertBefore(restoredCard, inlineWrapper);
@@ -658,14 +760,12 @@ function sendToggleRequest(taskId, isCompleted, checkbox) {
                         targetQuadrantContainer.appendChild(restoredCard);
                     }
 
-                    // Quitar de la barra lateral
                     card.remove();
                 } else {
                     window.location.reload();
                     return;
                 }
 
-                // Decrementar contador (-1)
                 const countBadge = document.getElementById('completed-count');
                 if (countBadge) {
                     let currentCount = parseInt(countBadge.textContent, 10) || 0;
@@ -867,11 +967,9 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
-
 // Clic en cualquier área vacía del cuadrante para abrir el formulario
 document.querySelectorAll('.quadrant').forEach(quadrant => {
     quadrant.addEventListener('click', function (e) {
-        // Si se hace clic en una tarjeta de tarea, botón, formulario, textarea, checkbox o modal, ignoramos
         if (e.target.closest('.task-card') || 
             e.target.closest('button') || 
             e.target.closest('form') || 
@@ -881,19 +979,16 @@ document.querySelectorAll('.quadrant').forEach(quadrant => {
             return;
         }
 
-        // Buscamos el botón de añadir tarea dentro de este cuadrante específico
         const addBtn = this.querySelector('.btn-add-inline');
         const form = this.querySelector('.inline-task-form');
 
-        // Si el formulario inline está oculto, lo mostramos llamando a tu función
         if (addBtn && form && form.classList.contains('d-none')) {
             showInlineForm(addBtn);
         }
     });
 });
 
-
-// Checkbox manual de estado: Confeti -> Pausa -> Vuelo con Parábola
+// Checkbox manual de estado
 document.addEventListener('change', function (e) {
     if (e.target.matches('.task-completion-check')) {
         const checkbox = e.target;
@@ -907,14 +1002,12 @@ document.addEventListener('change', function (e) {
             const targetContainer = document.getElementById('completed-tasks-container');
 
             if (card && targetContainer) {
-                // 1. TACHADO DE LA TARJETA
                 card.classList.add('task-completing');
 
                 const rect = checkbox.getBoundingClientRect();
                 const startX = rect.left + rect.width / 2;
                 const startY = rect.top + rect.height / 2;
 
-                // 2. DISPARO DE CONFETI
                 confetti({
                     particleCount: 30,
                     spread: 55,
@@ -926,32 +1019,26 @@ document.addEventListener('change', function (e) {
                     disableForReducedMotion: true
                 });
 
-                // 3. ESPERAR 400ms A QUE EL CONFETI SE DISIPE Y LANZAR LA PARÁBOLA
                 setTimeout(() => {
                     const particle = document.createElement('div');
                     particle.classList.add('flying-particle');
                     
-                    // Centrar la bolita (26px) sobre la casilla
                     particle.style.top = (startY - 13) + 'px';
                     particle.style.left = (startX - 13) + 'px';
 
-                    // Calcular coordenadas de destino
                     const targetRect = targetContainer.getBoundingClientRect();
                     const targetX = (targetRect.left + 40) - startX;
                     const targetY = (targetRect.top + 50) - startY;
 
-                    // Pasar los deltas CSS mediante Custom Properties (Variables CSS)
                     particle.style.setProperty('--target-x', `${targetX}px`);
                     particle.style.setProperty('--target-y', `${targetY}px`);
 
                     document.body.appendChild(particle);
 
-                    // Activar la clase de la animación parabólica
                     requestAnimationFrame(() => {
                         particle.classList.add('fly-arc');
                     });
 
-                    // 4. GUARDAR EN BACKEND TRAS EL VUELO (850ms)
                     setTimeout(() => {
                         particle.remove();
                         sendToggleRequest(taskId, isCompleted, checkbox);
@@ -967,7 +1054,7 @@ document.addEventListener('change', function (e) {
     }
 });
 
-// 1. RESTAURAR SCROLL AL CARGAR LA PÁGINA
+// RESTAURAR SCROLL AL CARGAR LA PÁGINA
 document.addEventListener('DOMContentLoaded', function () {
     const savedScrollPos = localStorage.getItem('dashboard_scroll_pos');
     if (savedScrollPos !== null) {
@@ -978,7 +1065,6 @@ document.addEventListener('DOMContentLoaded', function () {
         localStorage.removeItem('dashboard_scroll_pos');
     }
 
-    // Intercepta todos los envíos de formulario estándar
     document.addEventListener('submit', function () {
         localStorage.setItem('dashboard_scroll_pos', window.scrollY);
     });

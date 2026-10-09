@@ -83,38 +83,76 @@
     <div class="modal-dialog modal-lg modal-top-aligned">
         <div class="modal-content border-0 shadow text-dark">
             
-            <form method="POST" action="{% url 'edit_task' task.id %}">
+            <form method="POST" action="{% url 'edit_task' task.id %}" id="editTaskForm{{ task.id }}">
                 {% csrf_token %}
                 
-                <!-- FILA 1: BARRA SUPERIOR (DESPLEGABLE A KWADRADO + BOTÓN CERRAR) -->
+                <!-- FILA 1: BARRA SUPERIOR (DESPLEGABLE MATRIZ + BOTÓN CERRAR) -->
                 <div class="modal-header border-bottom-0 pb-1 pt-3 px-3 d-flex justify-content-between align-items-center">
-                    <!-- Selector de Cuadrante estilo caja cuadrada -->
                     <div class="dropdown">
-                        <select name="quadrant_select" 
-                                class="form-select form-select-sm border bg-white text-dark fw-medium shadow-none cursor-pointer rounded px-3 py-2" 
-                                style="font-size: 0.85rem; width: auto;"
-                                onchange="updateQuadrantValues(this, '{{ task.id }}')">
-                            <option value="Q1" {% if task.urgency >= 3 and task.importance >= 3 %}selected{% endif %}>🔥 {% translate "Urgente e Importante (Hacer ahora)" %}</option>
-                            <option value="Q2" {% if task.urgency <= 2 and task.importance >= 3 %}selected{% endif %}>📅 {% translate "Importante - No Urgente (Planificar)" %}</option>
-                            <option value="Q3" {% if task.urgency >= 3 and task.importance <= 2 %}selected{% endif %}>👥 {% translate "Urgente - No Importante (Delegar)" %}</option>
-                            <option value="Q4" {% if task.urgency <= 2 and task.importance <= 2 %}selected{% endif %}>🗑️ {% translate "No Urgente - No Importante (Eliminar)" %}</option>
-                        </select>
+                        <button class="btn btn-outline-secondary btn-sm dropdown-toggle text-start d-flex align-items-center gap-2 shadow-none" 
+                                type="button" 
+                                id="quadrantDropdown{{ task.id }}" 
+                                data-bs-toggle="dropdown" 
+                                aria-expanded="false" 
+                                style="font-size: 0.85rem;">
+                            
+                            <span id="quadrantDropdownSelected{{ task.id }}" class="d-flex align-items-center gap-2 text-dark fw-medium">
+                                {% if task.urgency >= 3 and task.importance >= 3 %}
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="1" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="9" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/></svg>
+                                    {% translate "Urgente e Importante (Hacer ahora)" %}
+                                {% elif task.urgency <= 2 and task.importance >= 3 %}
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="9" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="1" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="9" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/></svg>
+                                    {% translate "Importante - No Urgente (Planificar)" %}
+                                {% elif task.urgency >= 3 and task.importance <= 2 %}
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="9" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="1" y="9" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/></svg>
+                                    {% translate "Urgente - No Importante (Delegar)" %}
+                                {% else %}
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="9" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="1" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="9" y="9" width="6" height="6" rx="1" fill="currentColor"/></svg>
+                                    {% translate "No Urgente - No Importante (Eliminar)" %}
+                                {% endif %}
+                            </span>
+                        </button>
+
+                        <ul class="dropdown-menu shadow border-0 mt-1" aria-labelledby="quadrantDropdown{{ task.id }}">
+                            <li>
+                                <button type="button" class="dropdown-item d-flex align-items-center gap-2 small py-2" onclick="selectQuadrant('Q1', '{{ task.id }}', '{% translate "Urgente e Importante (Hacer ahora)" %}')">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="1" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="9" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/></svg>
+                                    <span>{% translate "Urgente e Importante (Hacer ahora)" %}</span>
+                                </button>
+                            </li>
+                            <li>
+                                <button type="button" class="dropdown-item d-flex align-items-center gap-2 small py-2" onclick="selectQuadrant('Q2', '{{ task.id }}', '{% translate "Importante - No Urgente (Planificar)" %}')">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="9" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="1" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="9" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/></svg>
+                                    <span>{% translate "Importante - No Urgente (Planificar)" %}</span>
+                                </button>
+                            </li>
+                            <li>
+                                <button type="button" class="dropdown-item d-flex align-items-center gap-2 small py-2" onclick="selectQuadrant('Q3', '{{ task.id }}', '{% translate "Urgente - No Importante (Delegar)" %}')">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="9" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="1" y="9" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/></svg>
+                                    <span>{% translate "Urgente - No Importante (Delegar)" %}</span>
+                                </button>
+                            </li>
+                            <li>
+                                <button type="button" class="dropdown-item d-flex align-items-center gap-2 small py-2" onclick="selectQuadrant('Q4', '{{ task.id }}', '{% translate "No Urgente - No Importante (Eliminar)" %}')">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="9" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="1" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="9" y="9" width="6" height="6" rx="1" fill="currentColor"/></svg>
+                                    <span>{% translate "No Urgente - No Importante (Eliminar)" %}</span>
+                                </button>
+                            </li>
+                        </ul>
                     </div>
 
                     <!-- Botón de cerrar (X) -->
                     <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
-                
-                <!-- FILA 2: TÍTULO MULTILÍNEA COMPLETO SIN RECORTES -->
+                <!-- FILA 2: TÍTULO MULTILÍNEA CON AJUSTE INSTANTÁNEO -->
                 <div class="px-3 pb-2 pt-1">
                     <textarea name="title" 
-                            class="form-control form-control-lg border-0 fs-4 fw-bold p-1 shadow-none bg-transparent task-title-textarea" 
-                            placeholder="{% translate 'Título de la tarea' %}" 
-                            required 
-                            rows="1"
-                            style="resize: none; width: 100%; height: auto; overflow: hidden; line-height: 1.35; word-break: break-word; overflow-wrap: anywhere; field-sizing: content; box-sizing: content-box;"
-                            oninput="this.style.height = 'auto'; this.style.height = (this.scrollHeight) + 'px';">{{ task.title }}</textarea>
+                              class="form-control form-control-lg border-0 fs-4 fw-bold p-1 shadow-none bg-transparent task-title-textarea" 
+                              placeholder="{% translate 'Título de la tarea' %}" 
+                              required 
+                              style="resize: none; width: 100%; overflow: hidden; line-height: 1.35; word-break: break-word; overflow-wrap: anywhere; field-sizing: content;"
+                              oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';">{{ task.title }}</textarea>
                 </div>
 
                 <!-- CUERPO DEL MODAL -->
@@ -183,7 +221,6 @@
                                             <small class="text-muted" id="dateBadgeDisplay{{ task.id }}">{% if task.due_date %}{{ task.due_date|date:"d/m/Y H:i" }}{% else %}+{% endif %}</small>
                                         </button>
                                         
-                                        <!-- DESPLEGABLE CON CLASE CSS DE TASK_CARD.SCSS -->
                                         <div class="dropdown-menu dropdown-menu-dates p-3 shadow-lg border-0 rounded-3 mt-1" aria-labelledby="dropdownDate{{ task.id }}">
                                             <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
                                                 <span class="fw-bold small text-dark">{% translate "Fechas" %}</span>
@@ -193,7 +230,7 @@
                                             <!-- CALENDARIO INLINE FLATPICKR -->
                                             <div id="inlineCalendar{{ task.id }}" class="mb-2 d-flex justify-content-center flatpickr-clean-container"></div>
 
-                                            <!-- CAMPOS EDITABLES A MANO -->
+                                            <!-- CAMPOS EDITABLES -->
                                             <div class="mb-2">
                                                 <label class="form-label small text-muted mb-1 fw-bold">{% translate "Fecha de vencimiento" %}</label>
                                                 <div class="row g-2">
@@ -206,7 +243,6 @@
                                                 </div>
                                             </div>
 
-                                            <!-- INPUT OCULTO QUE RECIBE DJANGO -->
                                             <input type="hidden" name="due_date" id="hiddenDueDate{{ task.id }}" value="{{ task.due_date|date:'Y-m-d H:i' }}">
 
                                             <div class="mb-2 form-check">
@@ -297,7 +333,9 @@
                                 
                                 <div class="d-flex gap-2">
                                     <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">{% translate "Cancelar" %}</button>
-                                    <button type="submit" class="btn btn-primary btn-sm fw-bold">{% translate "Guardar" %}</button>
+                                    <button type="button" class="btn btn-primary btn-sm fw-bold" onclick="saveTaskModal('{{ task.id }}')">
+                                        {% translate "Guardar" %}
+                                    </button>
                                 </div>
                             </div>
 
@@ -413,23 +451,65 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
 
 <script>
+// FUNCIÓN GLOBAL DE SELECCIÓN DE CUADRANTE
+function selectQuadrant(quadrantCode, taskId, labelText) {
+    let urgency = 4, importance = 4;
+    let svgIcon = '';
+
+    if (quadrantCode === 'Q1') {
+        urgency = 4; importance = 4;
+        svgIcon = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="1" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="9" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/></svg>`;
+    } else if (quadrantCode === 'Q2') {
+        urgency = 1; importance = 4;
+        svgIcon = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="9" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="1" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="9" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/></svg>`;
+    } else if (quadrantCode === 'Q3') {
+        urgency = 4; importance = 1;
+        svgIcon = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="9" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="1" y="9" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/></svg>`;
+    } else if (quadrantCode === 'Q4') {
+        urgency = 1; importance = 1;
+        svgIcon = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="9" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="1" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="9" y="9" width="6" height="6" rx="1" fill="currentColor"/></svg>`;
+    }
+
+    window.selectedQuadrantForTask = window.selectedQuadrantForTask || {};
+    window.selectedQuadrantForTask[taskId] = quadrantCode;
+
+    const displayContainer = document.getElementById(`quadrantDropdownSelected${taskId}`);
+    if (displayContainer) {
+        displayContainer.innerHTML = `${svgIcon} <span>${labelText}</span>`;
+    }
+
+    const urgencyRadio = document.getElementById(`detail-urgency-${urgency}-${taskId}`);
+    const importanceRadio = document.getElementById(`detail-importance-${importance}-${taskId}`);
+
+    if (urgencyRadio) urgencyRadio.checked = true;
+    if (importanceRadio) importanceRadio.checked = true;
+}
+
 (function() {
     const taskId = "{{ task.id }}";
     const modalEl = document.getElementById(`viewTaskModal${taskId}`);
 
     if (modalEl) {
-        // Usamos 'show.bs.modal' en lugar de 'shown.bs.modal' para calcular ANTES de la animación
+        // PRE-CÁLCULO INVISIBLE PARA ELIMINAR EL SALTO VISUAL DEL TÍTULO
         modalEl.addEventListener('show.bs.modal', function () {
             const titleTextarea = modalEl.querySelector('.task-title-textarea');
-            if (titleTextarea) {
-                // Ajuste instantáneo de altura antes de renderizar la ventana
-                titleTextarea.style.height = 'auto';
-                titleTextarea.style.height = (titleTextarea.scrollHeight + 4) + 'px';
-            }
+            if (!titleTextarea) return;
+
+            const prevDisplay = modalEl.style.display;
+            const prevVisibility = modalEl.style.visibility;
+
+            modalEl.style.visibility = 'hidden';
+            modalEl.style.display = 'block';
+
+            titleTextarea.style.height = 'auto';
+            titleTextarea.style.height = titleTextarea.scrollHeight + 'px';
+
+            modalEl.style.display = prevDisplay;
+            modalEl.style.visibility = prevVisibility;
         });
 
+        // INICIALIZACIÓN DE COMPONENTES TRAS APERTURA COMPLETA
         modalEl.addEventListener('shown.bs.modal', function () {
-            // Dejamos aquí solo la inicialización de Flatpickr cuando el modal ya es visible
             const calendarContainer = document.getElementById(`inlineCalendar${taskId}`);
             const hiddenInput = document.getElementById(`hiddenDueDate${taskId}`);
             const displayDate = document.getElementById(`displayDate${taskId}`);
@@ -512,23 +592,4 @@ function clearTaskDate(taskId) {
         if (instance) instance.hide();
     }
 }
-
-
-function updateQuadrantValues(selectEl, taskId) {
-    const val = selectEl.value;
-    let urgency = 4, importance = 4;
-
-    if (val === 'Q1') { urgency = 4; importance = 4; }
-    else if (val === 'Q2') { urgency = 1; importance = 4; }
-    else if (val === 'Q3') { urgency = 4; importance = 1; }
-    else if (val === 'Q4') { urgency = 1; importance = 1; }
-
-    const urgencyRadio = document.getElementById(`detail-urgency-${urgency}-${taskId}`);
-    const importanceRadio = document.getElementById(`detail-importance-${importance}-${taskId}`);
-
-    if (urgencyRadio) urgencyRadio.checked = true;
-    if (importanceRadio) importanceRadio.checked = true;
-}
-
-
 </script>
