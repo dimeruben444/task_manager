@@ -1,8 +1,7 @@
+# users/views.py (o la ubicación de tus vistas)
 from django.shortcuts import render, redirect
 from django.contrib.auth import login
 from .forms import CustomUserCreationForm
-
-# Create your views here.
 
 def register_view(request):
     if request.method == 'POST':
@@ -13,8 +12,5 @@ def register_view(request):
             return redirect('dashboard')
     else:
         form = CustomUserCreationForm()
-        
-    for field in form.fields.values():
-        field.widget.attrs.update({'class': 'form-control'})
 
     return render(request, 'registration/register.html', {'form': form})
