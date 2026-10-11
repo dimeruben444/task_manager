@@ -2,6 +2,7 @@
 {% extends 'base/base.html' %}
 {% load i18n %}
 
+
 {% block title %}
     {% if current_board %}{{ current_board.title }}{% else %}{% translate "General" %}{% endif %}
 {% endblock %}
