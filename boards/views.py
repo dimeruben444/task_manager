@@ -15,14 +15,16 @@ from .models import Board
 User = get_user_model()
 
 
+# boards/views.py
+
 @login_required
 def dashboard_view(request, board_id=None):
 
-    # 1. Tableros propios del usuario (ordenando el predeterminado primero)
+    # 1. Tableros propios del usuario
     user_boards = Board.objects.filter(owner=request.user).order_by('-is_default', 'id')
     default_board = user_boards.filter(is_default=True).first()
 
-    # 2. Tableros compartidos (SOLO personalizados, se excluyen los tableros 'General' de otros)
+    # 2. Tableros compartidos
     shared_boards = Board.objects.filter(
         tasks__assigned_to=request.user,
         is_default=False
@@ -39,12 +41,12 @@ def dashboard_view(request, board_id=None):
 
         base_tasks = Task.objects.filter(
             Q(board=current_board) & (Q(board__owner=request.user) | Q(assigned_to=request.user))
-        ).distinct()
+        )
     else:
         # En la raíz (/), muestra tareas de tableros propios O asignadas al usuario
         base_tasks = Task.objects.filter(
             Q(board__owner=request.user) | Q(assigned_to=request.user)
-        ).distinct()
+        )
 
     has_shared_tasks = base_tasks.filter(~Q(created_by=request.user)).exists()
 
@@ -62,8 +64,6 @@ def dashboard_view(request, board_id=None):
             assigned_users = form.cleaned_data.get('assigned_to')
             if assigned_users:
                 task.assigned_to.set(assigned_users)
-            else:
-                task.assigned_to.add(request.user)
 
             return redirect('dashboard_board', board_id=board_id) if board_id else redirect('dashboard')
         else:
@@ -71,19 +71,14 @@ def dashboard_view(request, board_id=None):
     else: 
         form = TaskForm(user=request.user, current_board=current_board)
 
-    # Filtrar tareas activas e inactivas
-    active_tasks = base_tasks.filter(is_completed=False).order_by('created_at')
-    completed_tasks = base_tasks.filter(is_completed=True).order_by('-updated_at')[:15]
+    # === EXTRACCIÓN DE IDs ÚNICOS (ELIMINA DUPLICADOS DE JOIN M2M) ===
+    active_task_ids = list(base_tasks.filter(is_completed=False).values_list('id', flat=True).distinct())
+    completed_task_ids = list(base_tasks.filter(is_completed=True).values_list('id', flat=True).distinct())
 
-    
+    active_tasks = Task.objects.filter(id__in=active_task_ids).order_by('created_at')
+    completed_tasks = Task.objects.filter(id__in=completed_task_ids).order_by('-updated_at')[:15]
+    # =================================================================
 
-    
-
-    # === LÍNEAS DE DEPURACIÓN TEMPORALES ===
-    for t in base_tasks.filter(is_completed=False):
-        print(f"DEBUG Tarea: '{t.title}' | Urgencia: {t.urgency} | Importancia: {t.importance}")
-    # =======================================
-    
     context = {
         'form': form,
         'board_form': BoardForm(),
@@ -93,10 +88,12 @@ def dashboard_view(request, board_id=None):
         'current_board': current_board,
         'default_board': default_board,
         'has_shared_tasks': has_shared_tasks,
-        'q1_tasks': active_tasks.filter(urgency__gte=3, importance__gte=3), # Urgente e Importante
-        'q2_tasks': active_tasks.filter(urgency__lt=3, importance__gte=3),  # Importante, No Urgente
-        'q3_tasks': active_tasks.filter(urgency__gte=3, importance__lt=3),  # Urgente, No Importante
-        'q4_tasks': active_tasks.filter(urgency__lt=3, importance__lt=3),  # No Urgente, No Importante
+        
+        # Filtros clasificados
+        'q1_tasks': list(active_tasks.filter(urgency__gte=3, importance__gte=3)),
+        'q2_tasks': list(active_tasks.filter(urgency__lt=3, importance__gte=3)),
+        'q3_tasks': list(active_tasks.filter(urgency__gte=3, importance__lt=3)),
+        'q4_tasks': list(active_tasks.filter(urgency__lt=3, importance__lt=3)),
         'completed_tasks': completed_tasks,
     }
 

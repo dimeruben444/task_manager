@@ -103,6 +103,8 @@ class TaskDeleteView(LoginRequiredMixin, DeleteView):
 
 
 # 4. Crear tarea rápida desde el cuadrante 
+# tasks/views.py
+
 @login_required
 @require_POST
 def quick_create_task(request):
@@ -114,10 +116,8 @@ def quick_create_task(request):
     if title:
         board = None
         if board_id:
-            # Filtramos el tablero por owner (dueño)
             board = Board.objects.filter(id=board_id, owner=request.user).first()
 
-        # Creamos la tarea asignando created_by en lugar de user
         task = Task.objects.create(
             created_by=request.user,
             title=title,
@@ -126,10 +126,7 @@ def quick_create_task(request):
             board=board
         )
 
-        task.assigned_to.add(request.user)
-
     return redirect(request.META.get('HTTP_REFERER', 'dashboard'))
-
 
 # 5. Mover tarea mediante Drag & Drop (SortableJS)
 @login_required

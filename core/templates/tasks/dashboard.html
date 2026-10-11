@@ -1,7 +1,7 @@
 <!-- core/templates/tasks/dashboard.html -->
 {% extends 'base/base.html' %}
 {% load i18n %}
-
+{% load static %}
 
 {% block title %}
     {% if current_board %}{{ current_board.title }}{% else %}{% translate "General" %}{% endif %}
@@ -146,7 +146,7 @@
                                     </div>
                                 </div>
 
-                                <!-- 2. POP-OVER FECHAS Y VENCIMIENTO (IDÉNTICO AL MODAL DETALLE) -->
+                                <!-- 2. POP-OVER FECHAS Y VENCIMIENTO -->
                                 <div class="col-md-3">
                                     <div class="dropdown">
                                         <button class="btn btn-outline-secondary btn-sm text-start w-100 d-flex justify-content-between align-items-center bg-white shadow-none py-2 px-3 border" 
@@ -168,7 +168,6 @@
                                                 <button type="button" class="btn-close btn-sm" onclick="bootstrap.Dropdown.getInstance(document.getElementById('quickDropdownDate')).hide();"></button>
                                             </div>
 
-                                            <!-- Calendario Inline Flatpickr -->
                                             <div id="quickInlineCalendar" class="mb-2 d-flex justify-content-center flatpickr-clean-container"></div>
 
                                             <div class="mb-2">
@@ -183,10 +182,8 @@
                                                 </div>
                                             </div>
 
-                                            <!-- Campo oculto para enviar fecha y hora completas a Django -->
                                             <input type="hidden" name="due_date" id="quickHiddenDueDate">
 
-                                            <!-- Checkbox Crear Recordatorio -->
                                             <div class="mb-2 form-check">
                                                 <input type="checkbox" class="form-check-input" name="reminder_enabled" id="quick_reminder_enabled">
                                                 <label class="form-check-label small fw-bold text-dark" for="quick_reminder_enabled">
@@ -194,7 +191,6 @@
                                                 </label>
                                             </div>
 
-                                            <!-- Desplegable Offset del Recordatorio -->
                                             <div class="mb-3">
                                                 <select name="reminder_offset" class="form-select form-select-sm border">
                                                     <option value="at_time">{% translate "A la hora del vencimiento" %}</option>
@@ -221,7 +217,7 @@
                                     </div>
                                 </div>
 
-                                <!-- 3. POP-OVER ASIGNAR A (MIEMBROS CON AVATARES) -->
+                                <!-- 3. POP-OVER ASIGNAR A -->
                                 <div class="col-md-3">
                                     <div class="dropdown">
                                         <button class="btn btn-outline-secondary btn-sm text-start w-100 d-flex justify-content-between align-items-center bg-white shadow-none py-2 px-3 border" 
@@ -292,7 +288,6 @@
                     </div>
                 </div>
 
-
             </form>
         </div>
     </div>
@@ -311,7 +306,6 @@
                             <span class="badge bg-danger rounded-pill position-absolute end-0 top-50 translate-middle-y me-2">{{ q1_tasks.count }}</span>
                         </div>
                         
-                        <!-- CONTENEDOR DE TARJETAS + BOTÓN PEGAO A LA ÚLTIMA TAREA -->
                         <div class="p-2 pt-0 flex-grow-1 d-flex flex-column quadrant-container" data-quadrant="Q1" style="min-height: 80px;">
                             {% for task in q1_tasks %}
                                 {% include '_includes/_task_card.html' with task=task %}
@@ -319,7 +313,6 @@
                                 <p class="text-muted text-center py-4 small mb-0 empty-msg">{% translate "No hay tareas urgentes e importantes." %}</p>
                             {% endfor %}
 
-                            <!-- BOTÓN Y FORMULARIO INLINE -->
                             <div class="add-task-inline-wrapper mt-2">
                                 <button type="button" class="btn btn-add-inline text-muted w-100 text-start d-flex align-items-center gap-2 py-2 px-2 border-0 rounded-2" onclick="showInlineForm(this)">
                                     <i class="bi bi-plus-lg"></i>
@@ -351,7 +344,6 @@
                             <span class="badge bg-primary rounded-pill position-absolute end-0 top-50 translate-middle-y me-2">{{ q2_tasks.count }}</span>
                         </div>
                         
-                        <!-- CONTENEDOR DE TARJETAS + BOTÓN PEGAO A LA ÚLTIMA TAREA -->
                         <div class="p-2 pt-0 flex-grow-1 d-flex flex-column quadrant-container" data-quadrant="Q2" style="min-height: 80px;">
                             {% for task in q2_tasks %}
                                 {% include '_includes/_task_card.html' with task=task %}
@@ -359,7 +351,6 @@
                                 <p class="text-muted text-center py-4 small mb-0 empty-msg">{% translate "No hay tareas de planificación pendientes." %}</p>
                             {% endfor %}
 
-                            <!-- BOTÓN Y FORMULARIO INLINE -->
                             <div class="add-task-inline-wrapper mt-2">
                                 <button type="button" class="btn btn-add-inline text-muted w-100 text-start d-flex align-items-center gap-2 py-2 px-2 border-0 rounded-2" onclick="showInlineForm(this)">
                                     <i class="bi bi-plus-lg"></i>
@@ -391,7 +382,6 @@
                             <span class="badge bg-dark rounded-pill position-absolute end-0 top-50 translate-middle-y me-2">{{ q3_tasks.count }}</span>
                         </div>
                         
-                        <!-- CONTENEDOR DE TARJETAS + BOTÓN PEGAO A LA ÚLTIMA TAREA -->
                         <div class="p-2 pt-0 flex-grow-1 d-flex flex-column quadrant-container" data-quadrant="Q3" style="min-height: 80px;">
                             {% for task in q3_tasks %}
                                 {% include '_includes/_task_card.html' with task=task %}
@@ -399,7 +389,6 @@
                                 <p class="text-muted text-center py-4 small mb-0 empty-msg">{% translate "No hay tareas por delegar." %}</p>
                             {% endfor %}
 
-                            <!-- BOTÓN Y FORMULARIO INLINE -->
                             <div class="add-task-inline-wrapper mt-2">
                                 <button type="button" class="btn btn-add-inline text-muted w-100 text-start d-flex align-items-center gap-2 py-2 px-2 border-0 rounded-2" onclick="showInlineForm(this)">
                                     <i class="bi bi-plus-lg"></i>
@@ -431,7 +420,6 @@
                             <span class="badge bg-secondary rounded-pill position-absolute end-0 top-50 translate-middle-y me-2">{{ q4_tasks.count }}</span>
                         </div>
                         
-                        <!-- CONTENEDOR DE TARJETAS + BOTÓN PEGAO A LA ÚLTIMA TAREA -->
                         <div class="p-2 pt-0 flex-grow-1 d-flex flex-column quadrant-container" data-quadrant="Q4" style="min-height: 80px;">
                             {% for task in q4_tasks %}
                                 {% include '_includes/_task_card.html' with task=task %}
@@ -439,7 +427,6 @@
                                 <p class="text-muted text-center py-4 small mb-0 empty-msg">{% translate "No hay tareas irrelevantes." %}</p>
                             {% endfor %}
 
-                            <!-- BOTÓN Y FORMULARIO INLINE -->
                             <div class="add-task-inline-wrapper mt-2">
                                 <button type="button" class="btn btn-add-inline text-muted w-100 text-start d-flex align-items-center gap-2 py-2 px-2 border-0 rounded-2" onclick="showInlineForm(this)">
                                     <i class="bi bi-plus-lg"></i>
@@ -603,778 +590,17 @@
 
 </div>
 
-<!-- Carga de SortableJS y Canvas Confetti -->
+<!-- Carga de Librerías y CDNs -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
+
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
-<!-- Carga de SortableJS y Canvas Confetti -->
-<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-
-<script>
-// 1. REGISTRO GLOBAL DE SELECCIÓN DE CUADRANTE
-window.selectedQuadrantForTask = window.selectedQuadrantForTask || {};
-
-// 2. ANIMACIÓN FLIP CON TIMEOUT DE SEGURIDAD PARA EL MODAL
-function animateTaskToQuadrant(taskId, targetQuadrantCode) {
-    const card = document.getElementById(`task-card-${taskId}`);
-    const targetContainer = document.querySelector(`.quadrant-container[data-quadrant="${targetQuadrantCode}"]`);
-
-    if (!card || !targetContainer) return;
-
-    const currentContainer = card.closest('.quadrant-container');
-    if (currentContainer === targetContainer) return;
-
-    // A. Posición Inicial (FIRST)
-    const firstRect = card.getBoundingClientRect();
-
-    // B. Mover en el DOM (LAST)
-    const inlineWrapper = targetContainer.querySelector('.add-task-inline-wrapper');
-    if (inlineWrapper) {
-        targetContainer.insertBefore(card, inlineWrapper);
-    } else {
-        targetContainer.appendChild(card);
-    }
-
-    const emptyMsg = targetContainer.querySelector('.empty-msg');
-    if (emptyMsg) emptyMsg.classList.add('d-none');
-
-    card.setAttribute('data-urgency', targetQuadrantCode === 'Q1' || targetQuadrantCode === 'Q3' ? '4' : '1');
-    card.setAttribute('data-importance', targetQuadrantCode === 'Q1' || targetQuadrantCode === 'Q2' ? '4' : '1');
-
-    // C. Posición Final
-    const lastRect = card.getBoundingClientRect();
-
-    // D. Invertir posición (INVERT)
-    const deltaX = firstRect.left - lastRect.left;
-    const deltaY = firstRect.top - lastRect.top;
-
-    card.style.transition = 'none';
-    card.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
-    card.classList.add('task-card-moving');
-
-    // E. Reproducir (PLAY)
-    requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-            card.style.transition = 'transform 0.45s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.3s ease';
-            card.style.transform = 'translate(0, 0)';
-
-            setTimeout(() => {
-                card.style.transition = '';
-                card.style.transform = '';
-                card.classList.remove('task-card-moving');
-            }, 450);
-        });
-    });
-}
-
-// 3. FUNCIÓN EXPLICITA DE GUARDADO AL PULSAR EL BOTÓN
-function saveTaskModal(taskId) {
-    const form = document.getElementById(`editTaskForm${taskId}`);
-    const modalEl = document.getElementById(`viewTaskModal${taskId}`);
-
-    if (!form) {
-        console.error(`No se encontró el formulario editTaskForm${taskId}`);
-        return;
-    }
-
-    // A. Obtener el cuadrante de destino seleccionado
-    let targetQuadrant = window.selectedQuadrantForTask ? window.selectedQuadrantForTask[taskId] : null;
-    if (!targetQuadrant) {
-        const urgencyVal = form.querySelector('input[name="urgency"]:checked')?.value || '4';
-        const importanceVal = form.querySelector('input[name="importance"]:checked')?.value || '4';
-
-        const u = parseInt(urgencyVal, 10);
-        const i = parseInt(importanceVal, 10);
-
-        if (u >= 3 && i >= 3) targetQuadrant = 'Q1';
-        else if (u <= 2 && i >= 3) targetQuadrant = 'Q2';
-        else if (u >= 3 && i <= 2) targetQuadrant = 'Q3';
-        else targetQuadrant = 'Q4';
-    }
-
-    // B. Actualizar título en el tablero
-    const titleInput = form.querySelector('textarea[name="title"]');
-    const cardTitleEl = document.querySelector(`#task-card-${taskId} .task-title`);
-    if (titleInput && cardTitleEl) {
-        cardTitleEl.textContent = titleInput.value;
-    }
-
-    // C. Ocultar el modal de Bootstrap
-    if (modalEl) {
-        const modalInstance = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
-        
-        modalInstance.hide();
-
-        setTimeout(() => {
-            animateTaskToQuadrant(taskId, targetQuadrant);
-        }, 100);
-    } else {
-        animateTaskToQuadrant(taskId, targetQuadrant);
-    }
-
-    // D. Enviar datos a Django por Fetch AJAX
-    const formData = new FormData(form);
-    fetch(form.action, {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        }
-    })
-    .then(() => {
-        if (window.selectedQuadrantForTask) {
-            delete window.selectedQuadrantForTask[taskId];
-        }
-    })
-    .catch(err => console.error('Error guardando tarea:', err));
-}
-
-// 4. FUNCIONES PARA LAS OPCIONES AVANZADAS RÁPIDAS
-function updateQuickBoardName(selectEl) {
-    const selectedText = selectEl.options[selectEl.selectedIndex].text;
-    const badge = document.getElementById('quickBoardSelectedName');
-    if (badge) badge.textContent = selectedText.trim();
-}
-
-function updateQuickAssigneesCount() {
-    const checked = document.querySelectorAll('#advancedOptions input[name="assigned_to"]:checked');
-    const badge = document.getElementById('quickAssigneesCount');
-    if (badge) {
-        badge.textContent = checked.length > 0 ? `${checked.length}` : '+';
-    }
-}
-
-function saveQuickDate() {
-    const displayDate = document.getElementById('quickDisplayDate').value;
-    const displayTime = document.getElementById('quickDisplayTime').value || '12:00';
-    const hiddenInput = document.getElementById('quickHiddenDueDate');
-    const badgeDisplay = document.getElementById('quickDateBadgeDisplay');
-
-    if (displayDate) {
-        hiddenInput.value = `${displayDate} ${displayTime}`;
-        badgeDisplay.textContent = `${displayDate} ${displayTime}`;
-    } else {
-        hiddenInput.value = '';
-        badgeDisplay.textContent = '+';
-    }
-
-    const dropdownBtn = document.getElementById('quickDropdownDate');
-    if (dropdownBtn) {
-        const instance = bootstrap.Dropdown.getInstance(dropdownBtn);
-        if (instance) instance.hide();
-    }
-}
-
-function clearQuickDate() {
-    document.getElementById('quickDisplayDate').value = '';
-    document.getElementById('quickHiddenDueDate').value = '';
-    document.getElementById('quickDateBadgeDisplay').textContent = '+';
-    
-    const reminderCheck = document.getElementById('quick_reminder_enabled');
-    if (reminderCheck) reminderCheck.checked = false;
-
-    const calendarContainer = document.getElementById('quickInlineCalendar');
-    if (calendarContainer && calendarContainer._flatpickr) {
-        calendarContainer._flatpickr.clear();
-    }
-
-    const dropdownBtn = document.getElementById('quickDropdownDate');
-    if (dropdownBtn) {
-        const instance = bootstrap.Dropdown.getInstance(dropdownBtn);
-        if (instance) instance.hide();
-    }
-}
-
-// Inicialización del calendario Flatpickr en el Pop-over de Alta Rápida
-document.addEventListener('DOMContentLoaded', function() {
-    const quickDateBtn = document.getElementById('quickDropdownDate');
-    if (quickDateBtn) {
-        quickDateBtn.addEventListener('shown.bs.dropdown', function () {
-            const calendarContainer = document.getElementById('quickInlineCalendar');
-            const hiddenInput = document.getElementById('quickHiddenDueDate');
-            const displayDate = document.getElementById('quickDisplayDate');
-            const displayTime = document.getElementById('quickDisplayTime');
-
-            if (calendarContainer && !calendarContainer._flatpickr) {
-                const fp = flatpickr(calendarContainer, {
-                    inline: true,
-                    locale: 'es',
-                    defaultDate: 'today',
-                    dateFormat: 'Y-m-d',
-                    onChange: function(selectedDates) {
-                        if (selectedDates.length > 0) {
-                            const dateStr = fp.formatDate(selectedDates[0], 'Y-m-d');
-                            displayDate.value = dateStr;
-                            hiddenInput.value = `${dateStr} ${displayTime.value || '12:00'}`;
-                        }
-                    }
-                });
-
-                displayDate.addEventListener('input', function() {
-                    if (this.value) fp.setDate(this.value, false);
-                    hiddenInput.value = this.value ? `${this.value} ${displayTime.value || '12:00'}` : '';
-                });
-
-                displayTime.addEventListener('change', function() {
-                    if (displayDate.value) {
-                        hiddenInput.value = `${displayDate.value} ${this.value || '12:00'}`;
-                    }
-                });
-            }
-        });
-    }
-});
-
-// 5. FUNCIONES DE FORMULARIOS INLINE Y BÚSQUEDA / UTILS
-function showInlineForm(button) {
-    const wrapper = button.closest('.add-task-inline-wrapper');
-    const quadrantContainer = button.closest('.quadrant-container');
-    const form = wrapper.querySelector('.inline-task-form');
-    const textarea = form.querySelector('textarea');
-
-    if (quadrantContainer) {
-        const emptyMsg = quadrantContainer.querySelector('.empty-msg');
-        if (emptyMsg) {
-            emptyMsg.classList.add('d-none');
-        }
-    }
-
-    button.classList.add('d-none');
-    form.classList.remove('d-none');
-    textarea.focus();
-
-    textarea.onkeydown = function(e) {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            if (this.value.trim() !== '') {
-                localStorage.setItem('dashboard_scroll_pos', window.scrollY);
-                form.submit();
-            }
-        }
-    };
-}
-
-function hideInlineForm(button) {
-    const wrapper = button.closest('.add-task-inline-wrapper');
-    const quadrantContainer = button.closest('.quadrant-container');
-    const form = wrapper.querySelector('.inline-task-form');
-    const toggleBtn = wrapper.querySelector('.btn-add-inline');
-    const textarea = form.querySelector('textarea');
-
-    textarea.value = '';
-    form.classList.add('d-none');
-    toggleBtn.classList.remove('d-none');
-
-    if (quadrantContainer) {
-        const hasTaskCards = quadrantContainer.querySelectorAll('.task-card').length > 0;
-        const emptyMsg = quadrantContainer.querySelector('.empty-msg');
-        if (!hasTaskCards && emptyMsg) {
-            emptyMsg.classList.remove('d-none');
-        }
-    }
-}
-
-function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-}
-
-function sendToggleRequest(taskId, isCompleted, checkbox) {
-    const csrftoken = getCookie('csrftoken');
-
-    fetch(`/task/${taskId}/toggle/`, {
-        method: 'POST',
-        headers: {
-            'X-CSRFToken': csrftoken,
-            'Content-Type': 'application/json',
-            'X-Requested-With': 'XMLHttpRequest'
-        },
-        body: JSON.stringify({ 'is_completed': isCompleted })
-    })
-    .then(response => {
-        if (!response.ok) throw new Error('Error en el servidor');
-        return response.json();
-    })
-    .then(data => {
-        if (data.status === 'success' || data.is_completed !== undefined) {
-            const card = checkbox.closest('.task-card, .completed-task-item');
-
-            if (isCompleted && card) {
-                const targetContainer = document.getElementById('completed-tasks-container');
-                if (!targetContainer) return;
-
-                const emptyMsg = targetContainer.querySelector('#empty-trash-msg, .empty-msg');
-                if (emptyMsg) emptyMsg.classList.add('d-none');
-
-                const titleText = card.querySelector('.task-title')?.textContent.trim() 
-                               || card.querySelector('h6')?.textContent.trim() 
-                               || card.textContent.trim();
-
-                const urgency = card.dataset.urgency || "4";
-                const importance = card.dataset.importance || "4";
-
-                const completedItem = document.createElement('div');
-                completedItem.className = 'completed-task-item task-card card border-0 shadow-sm mb-2 p-2 d-flex flex-row align-items-center justify-content-between gap-2 bg-light';
-                completedItem.setAttribute('data-task-id', taskId);
-                completedItem.setAttribute('data-urgency', urgency);
-                completedItem.setAttribute('data-importance', importance);
-
-                completedItem.innerHTML = `
-                    <div class="d-flex align-items-center gap-2 flex-grow-1 min-w-0" style="overflow: hidden;">
-                        <div class="task-checkbox-wrapper-sidebar flex-shrink-0" style="width: 17px; height: 17px;">
-                            <label class="task-checkbox-container m-0" onclick="event.stopPropagation();">
-                                <input type="checkbox" class="task-completion-check" data-task-id="${taskId}" checked>
-                                <span class="checkmark"></span>
-                            </label>
-                        </div>
-                        
-                        <span class="task-title text-muted text-decoration-line-through text-truncate fw-medium" 
-                              style="font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: default;" 
-                              title="${titleText}">
-                            ${titleText}
-                        </span>
-                    </div>
-
-                    <form method="POST" action="/task/${taskId}/delete/" class="d-inline m-0 flex-shrink-0" onsubmit="return confirm('¿Eliminar esta tarea definitivamente?');">
-                        <input type="hidden" name="csrfmiddlewaretoken" value="${csrftoken}">
-                        <button type="submit" class="btn btn-link text-danger p-0 border-0 opacity-50 hover-opacity-100" title="Eliminar">
-                            <i class="bi bi-x-lg" style="font-size: 0.85rem;"></i>
-                        </button>
-                    </form>
-                `;
-
-                targetContainer.prepend(completedItem);
-
-                const quadrantContainer = card.closest('.quadrant-container');
-                card.remove();
-
-                if (quadrantContainer) {
-                    const remainingCards = quadrantContainer.querySelectorAll('.task-card');
-                    if (remainingCards.length === 0) {
-                        const quadrantEmptyMsg = quadrantContainer.querySelector('.empty-msg');
-                        if (quadrantEmptyMsg) quadrantEmptyMsg.classList.remove('d-none');
-                    }
-                }
-
-                const countBadge = document.getElementById('completed-count');
-                if (countBadge) {
-                    let currentCount = parseInt(countBadge.textContent, 10) || 0;
-                    countBadge.textContent = currentCount + 1;
-                }
-            } 
-            else if (!isCompleted && card) {
-                let targetQuadrantCode = data.quadrant; 
-                
-                if (!targetQuadrantCode) {
-                    const urgency = parseInt(card.dataset.urgency || "4", 10);
-                    const importance = parseInt(card.dataset.importance || "4", 10);
-                    
-                    if (urgency >= 3 && importance >= 3) targetQuadrantCode = 'Q1';
-                    else if (urgency <= 2 && importance >= 3) targetQuadrantCode = 'Q2';
-                    else if (urgency >= 3 && importance <= 2) targetQuadrantCode = 'Q3';
-                    else targetQuadrantCode = 'Q4';
-                }
-
-                const targetQuadrantContainer = document.querySelector(`.quadrant-container[data-quadrant="${targetQuadrantCode}"]`);
-
-                if (targetQuadrantContainer) {
-                    const emptyMsg = targetQuadrantContainer.querySelector('.empty-msg');
-                    if (emptyMsg) emptyMsg.classList.add('d-none');
-
-                    const titleText = card.querySelector('.task-title')?.textContent.trim() 
-                                   || card.querySelector('span')?.textContent.trim() 
-                                   || card.textContent.trim();
-
-                    const restoredCard = document.createElement('div');
-                    restoredCard.className = 'card mb-2 p-0 shadow-sm border-0 task-card';
-                    restoredCard.id = `task-card-${taskId}`;
-                    restoredCard.setAttribute('data-task-id', taskId);
-                    restoredCard.setAttribute('data-urgency', card.dataset.urgency || "4");
-                    restoredCard.setAttribute('data-importance', card.dataset.importance || "4");
-                    restoredCard.style.cursor = 'pointer';
-
-                    restoredCard.innerHTML = `
-                        <div class="card-body py-2 px-3 d-flex flex-column justify-content-center">
-                            <div class="task-card-header d-flex align-items-center position-relative w-100">
-                                <div class="task-checkbox-wrapper flex-shrink-0">
-                                    <label class="task-checkbox-container m-0" onclick="event.stopPropagation();">
-                                        <input type="checkbox" class="task-completion-check" data-task-id="${taskId}">
-                                        <span class="checkmark"></span>
-                                    </label>
-                                </div>
-                                <div class="task-title-wrapper w-100" data-bs-toggle="modal" data-bs-target="#viewTaskModal${taskId}">
-                                    <h6 class="card-title task-title mb-0 fw-semibold text-dark" style="font-size: 0.88rem; line-height: 1.35; margin: 0;">
-                                        ${titleText}
-                                    </h6>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-
-                    const inlineWrapper = targetQuadrantContainer.querySelector('.add-task-inline-wrapper');
-                    if (inlineWrapper) {
-                        targetQuadrantContainer.insertBefore(restoredCard, inlineWrapper);
-                    } else {
-                        targetQuadrantContainer.appendChild(restoredCard);
-                    }
-
-                    card.remove();
-                } else {
-                    window.location.reload();
-                    return;
-                }
-
-                const countBadge = document.getElementById('completed-count');
-                if (countBadge) {
-                    let currentCount = parseInt(countBadge.textContent, 10) || 0;
-                    countBadge.textContent = Math.max(0, currentCount - 1);
-                }
-            }
-        } else {
-            checkbox.checked = !isCompleted;
-        }
-    })
-    .catch(error => {
-        console.error('Error al actualizar la tarea:', error);
-        checkbox.checked = !isCompleted;
-    });
-}
-
-document.addEventListener('DOMContentLoaded', function () {
-    let isProcessing = false;
-
-    // Inicialización del calendario Flatpickr al desplegar el pop-over de Fechas Rápidas
-    const quickDateBtn = document.getElementById('quickDropdownDate');
-    if (quickDateBtn) {
-        quickDateBtn.addEventListener('shown.bs.dropdown', function () {
-            const calendarContainer = document.getElementById('quickInlineCalendar');
-            const hiddenInput = document.getElementById('quickHiddenDueDate');
-            const displayDate = document.getElementById('quickDisplayDate');
-            const displayTime = document.getElementById('quickDisplayTime');
-
-            if (calendarContainer && !calendarContainer._flatpickr) {
-                const fp = flatpickr(calendarContainer, {
-                    inline: true,
-                    locale: 'es',
-                    defaultDate: 'today',
-                    dateFormat: 'Y-m-d',
-                    onChange: function(selectedDates) {
-                        if (selectedDates.length > 0) {
-                            const dateStr = fp.formatDate(selectedDates[0], 'Y-m-d');
-                            displayDate.value = dateStr;
-                            hiddenInput.value = `${dateStr} ${displayTime.value || '12:00'}`;
-                        }
-                    }
-                });
-
-                displayDate.addEventListener('input', function() {
-                    if (this.value) fp.setDate(this.value, false);
-                    hiddenInput.value = this.value ? `${this.value} ${displayTime.value || '12:00'}` : '';
-                });
-
-                displayTime.addEventListener('change', function() {
-                    if (displayDate.value) {
-                        hiddenInput.value = `${displayDate.value} ${this.value || '12:00'}`;
-                    }
-                });
-            }
-        });
-    }
-
-    // Inicialización de SortableJS
-    const quadrantContainers = document.querySelectorAll('.quadrant-container');
-
-    quadrantContainers.forEach(container => {
-        new Sortable(container, {
-            group: 'eisenhower-matrix',
-            draggable: '.task-card',
-            filter: '.empty-msg, .add-task-inline-wrapper',
-            animation: 150,
-            ghostClass: 'opacity-50',
-
-            onAdd: function (evt) {
-                const emptyMsg = evt.to.querySelector('.empty-msg');
-                if (emptyMsg) emptyMsg.style.display = 'none';
-            },
-
-            onRemove: function (evt) {
-                const remainingCards = evt.from.querySelectorAll('.task-card');
-                if (remainingCards.length === 0) {
-                    const emptyMsg = evt.from.querySelector('.empty-msg');
-                    if (emptyMsg) emptyMsg.style.display = 'block';
-                }
-            },
-
-            onEnd: async function (evt) {
-                if (isProcessing) return;
-
-                const itemEl = evt.item;
-                const targetContainer = evt.to;
-                const sourceContainer = evt.from;
-
-                if (targetContainer === sourceContainer) return;
-
-                const taskId = itemEl.getAttribute('data-task-id');
-                const targetQuadrant = targetContainer.getAttribute('data-quadrant');
-
-                if (!taskId || !targetQuadrant) return;
-
-                isProcessing = true;
-
-                try {
-                    const response = await fetch('/tasks/move/', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRFToken': getCookie('csrftoken'),
-                            'X-Requested-With': 'XMLHttpRequest'
-                        },
-                        body: JSON.stringify({
-                            task_id: taskId,
-                            target_quadrant: targetQuadrant
-                        })
-                    });
-
-                    const data = await response.json();
-
-                    if (data.status === 'success') {
-                        window.location.reload();
-                    } else {
-                        sourceContainer.appendChild(itemEl);
-                        isProcessing = false;
-                    }
-                } catch (err) {
-                    console.error('Error al mover la tarea:', err);
-                    sourceContainer.appendChild(itemEl);
-                    isProcessing = false;
-                }
-            }
-        });
-    });
-
-    // Filtros de tableros
-    const filterButtons = document.querySelectorAll('#filterTaskGroup button');
-    if (filterButtons.length) {
-        filterButtons.forEach(button => {
-            button.addEventListener('click', function () {
-                filterButtons.forEach(btn => btn.classList.remove('active'));
-                this.classList.add('active');
-
-                const filter = this.getAttribute('data-filter');
-                const taskCards = document.querySelectorAll('.task-card');
-
-                taskCards.forEach(card => {
-                    const type = card.getAttribute('data-created-by');
-                    if (filter === 'all' || (filter === 'mine' && type === 'mine') || (filter === 'shared' && type === 'shared')) {
-                        card.style.display = '';
-                    } else {
-                        card.style.display = 'none';
-                    }
-                });
-            });
-        });
-    }
-
-    // Filtros del panel de completadas
-    const filterSelect = document.getElementById('completed-filter-select');
-    const modalFilterInput = document.getElementById('modal-time-filter-input');
-    const completedContainer = document.getElementById('completed-tasks-container');
-
-    if (filterSelect && completedContainer) {
-        filterSelect.addEventListener('change', function () {
-            const selectedFilter = this.value;
-            if (modalFilterInput) modalFilterInput.value = selectedFilter;
-
-            const items = completedContainer.querySelectorAll('.completed-task-item');
-            const todayStr = new Date().toISOString().split('T')[0];
-            const sevenDaysAgo = new Date();
-            sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-
-            let visibleCount = 0;
-
-            items.forEach(item => {
-                const itemDateStr = item.getAttribute('data-updated-at');
-                const itemDate = new Date(itemDateStr);
-
-                if (selectedFilter === 'today') {
-                    if (itemDateStr === todayStr) {
-                        item.classList.remove('d-none');
-                        visibleCount++;
-                    } else {
-                        item.classList.add('d-none');
-                    }
-                } else if (selectedFilter === 'week') {
-                    if (itemDate >= sevenDaysAgo) {
-                        item.classList.remove('d-none');
-                        visibleCount++;
-                    } else {
-                        item.classList.add('d-none');
-                    }
-                } else {
-                    item.classList.remove('d-none');
-                    visibleCount++;
-                }
-            });
-
-            const countBadge = document.getElementById('completed-count');
-            if (countBadge) countBadge.textContent = visibleCount;
-        });
-    }
-
-    // Validaciones del formulario rápido (Estrellas)
-    const quickForm = document.getElementById('quickTaskForm');
-
-    if (quickForm) {
-        quickForm.addEventListener('submit', function (e) {
-            const urgencyChecked = quickForm.querySelector('input[name="urgency"]:checked');
-            const importanceChecked = quickForm.querySelector('input[name="importance"]:checked');
-
-            let hasError = false;
-
-            document.querySelectorAll('.rating-wrapper').forEach(w => w.classList.remove('shake-error'));
-
-            if (!urgencyChecked) {
-                hasError = true;
-                const urgencyInput = quickForm.querySelector('input[name="urgency"]');
-                if (urgencyInput) {
-                    const wrapper = urgencyInput.closest('.rating-wrapper');
-                    if (wrapper) wrapper.classList.add('shake-error');
-                }
-            }
-
-            if (!importanceChecked) {
-                hasError = true;
-                const importanceInput = quickForm.querySelector('input[name="importance"]');
-                if (importanceInput) {
-                    const wrapper = importanceInput.closest('.rating-wrapper');
-                    if (wrapper) wrapper.classList.add('shake-error');
-                }
-            }
-
-            if (hasError) {
-                e.preventDefault();
-                e.stopPropagation();
-
-                setTimeout(() => {
-                    document.querySelectorAll('.rating-wrapper').forEach(w => w.classList.remove('shake-error'));
-                }, 400);
-            }
-        });
-    }
-});
-
-// Clic en cualquier área vacía del cuadrante para abrir el formulario
-document.querySelectorAll('.quadrant').forEach(quadrant => {
-    quadrant.addEventListener('click', function (e) {
-        if (e.target.closest('.task-card') || 
-            e.target.closest('button') || 
-            e.target.closest('form') || 
-            e.target.closest('input') || 
-            e.target.closest('textarea') || 
-            e.target.closest('.modal')) {
-            return;
-        }
-
-        const addBtn = this.querySelector('.btn-add-inline');
-        const form = this.querySelector('.inline-task-form');
-
-        if (addBtn && form && form.classList.contains('d-none')) {
-            showInlineForm(addBtn);
-        }
-    });
-});
-
-// Checkbox manual de estado
-document.addEventListener('change', function (e) {
-    if (e.target.matches('.task-completion-check')) {
-        const checkbox = e.target;
-        const taskId = checkbox.dataset.taskId;
-        const isCompleted = checkbox.checked;
-
-        if (!taskId) return;
-
-        if (isCompleted) {
-            const card = checkbox.closest('.task-card');
-            const targetContainer = document.getElementById('completed-tasks-container');
-
-            if (card && targetContainer) {
-                card.classList.add('task-completing');
-
-                const rect = checkbox.getBoundingClientRect();
-                const startX = rect.left + rect.width / 2;
-                const startY = rect.top + rect.height / 2;
-
-                confetti({
-                    particleCount: 30,
-                    spread: 55,
-                    origin: { 
-                        x: startX / window.innerWidth, 
-                        y: startY / window.innerHeight 
-                    },
-                    colors: ['#10B981', '#3B82F6', '#F59E0B'],
-                    disableForReducedMotion: true
-                });
-
-                setTimeout(() => {
-                    const particle = document.createElement('div');
-                    particle.classList.add('flying-particle');
-                    
-                    particle.style.top = (startY - 13) + 'px';
-                    particle.style.left = (startX - 13) + 'px';
-
-                    const targetRect = targetContainer.getBoundingClientRect();
-                    const targetX = (targetRect.left + 40) - startX;
-                    const targetY = (targetRect.top + 50) - startY;
-
-                    particle.style.setProperty('--target-x', `${targetX}px`);
-                    particle.style.setProperty('--target-y', `${targetY}px`);
-
-                    document.body.appendChild(particle);
-
-                    requestAnimationFrame(() => {
-                        particle.classList.add('fly-arc');
-                    });
-
-                    setTimeout(() => {
-                        particle.remove();
-                        sendToggleRequest(taskId, isCompleted, checkbox);
-                    }, 800);
-
-                }, 370);
-
-                return;
-            }
-        }
-
-        sendToggleRequest(taskId, isCompleted, checkbox);
-    }
-});
-
-// RESTAURAR SCROLL AL CARGAR LA PÁGINA
-document.addEventListener('DOMContentLoaded', function () {
-    const savedScrollPos = localStorage.getItem('dashboard_scroll_pos');
-    if (savedScrollPos !== null) {
-        window.scrollTo({
-            top: parseInt(savedScrollPos, 10),
-            behavior: 'instant'
-        });
-        localStorage.removeItem('dashboard_scroll_pos');
-    }
-
-    document.addEventListener('submit', function () {
-        localStorage.setItem('dashboard_scroll_pos', window.scrollY);
-    });
-});
-</script>
+<!-- Carga Única de Scripts JS Modularizados -->
+<script src="{% static 'js/task-animation.js' %}"></script>
+<script src="{% static 'js/task-modal.js' %}"></script>
+<script src="{% static 'js/task-quick-options.js' %}"></script>
+<script src="{% static 'js/dashboard.js' %}"></script>
 {% endblock %}
