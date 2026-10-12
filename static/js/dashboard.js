@@ -391,3 +391,149 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
+
+
+// BUSCADOR CON DESPLEGABLE EMERGENTE (ESTILO TRELLO)
+
+
+function handleTaskSearchInput(query) {
+    const cleanQuery = query.toLowerCase().trim();
+    const dropdown = document.getElementById('searchDropdownResults');
+    const clearBtn = document.getElementById('clearSearchBtn');
+
+    if (!dropdown) return;
+
+    if (clearBtn) {
+        if (cleanQuery !== '') {
+            clearBtn.classList.remove('d-none');
+        } else {
+            clearBtn.classList.add('d-none');
+        }
+    }
+
+    if (cleanQuery === '') {
+        dropdown.classList.add('d-none');
+        dropdown.innerHTML = '';
+        return;
+    }
+
+    const allCards = document.querySelectorAll('.task-card, .completed-task-item');
+    const matches = [];
+
+    allCards.forEach(card => {
+        let taskId = card.dataset.taskId || card.getAttribute('data-task-id');
+        if (!taskId && card.id && card.id.startsWith('task-card-')) {
+            taskId = card.id.replace('task-card-', '');
+        }
+
+        const titleEl = card.querySelector('.task-title') || card.querySelector('h6') || card.querySelector('span');
+        const titleText = titleEl ? titleEl.textContent.trim() : card.textContent.trim();
+
+        if (titleText.toLowerCase().includes(cleanQuery) && taskId) {
+            const isCompleted = card.classList.contains('completed-task-item') || card.closest('#completed-tasks-container') !== null;
+            
+            let locationLabel = "Completada";
+            let badgeBg = "bg-secondary";
+
+            if (!isCompleted) {
+                const container = card.closest('.quadrant-container');
+                const quadCode = container ? container.getAttribute('data-quadrant') : '';
+                if (quadCode === 'Q1') { locationLabel = "Urgente e Importante"; badgeBg = "bg-danger"; }
+                else if (quadCode === 'Q2') { locationLabel = "Planificar"; badgeBg = "bg-primary"; }
+                else if (quadCode === 'Q3') { locationLabel = "Delegar"; badgeBg = "bg-warning text-dark"; }
+                else if (quadCode === 'Q4') { locationLabel = "Eliminar"; badgeBg = "bg-info text-dark"; }
+                else { locationLabel = "Matriz"; badgeBg = "bg-secondary"; }
+            }
+
+            matches.push({
+                id: taskId,
+                title: titleText,
+                isCompleted: isCompleted,
+                location: locationLabel,
+                badgeBg: badgeBg
+            });
+        }
+    });
+
+    if (matches.length > 0) {
+        let html = `<div class="px-2 py-1 text-uppercase text-white-50 fw-bold border-bottom border-secondary mb-1" style="font-size: 0.68rem; letter-spacing: 0.5px;">TARJETAS ENCONTRADAS (${matches.length})</div>`;
+        
+        matches.forEach(item => {
+            html += `
+                            <button type="button" 
+                                    class="dropdown-item text-white rounded-2 p-2 mb-1 d-flex align-items-center justify-content-between gap-2 border-0 search-result-item"
+                                    style="cursor: pointer; text-align: left; width: 100%;"
+                                    onclick="openSearchResultModal('${item.id}')">
+                                <div class="d-flex align-items-center gap-2 min-w-0 search-item-title-wrapper">
+                                    <span class="fs-6 flex-shrink-0">${item.isCompleted ? '☑️' : '📋'}</span>
+                                    <span class="fw-medium task-title-text ${item.isCompleted ? 'is-completed' : ''}" title="${escapeHtml(item.title)}">
+                                        ${escapeHtml(item.title)}
+                                    </span>
+                                </div>
+                                <span class="badge ${item.badgeBg} flex-shrink-0">
+                                    ${item.location}
+                                </span>
+                            </button>
+            `;
+        });
+
+        dropdown.innerHTML = html;
+        dropdown.classList.remove('d-none');
+    } else {
+        dropdown.innerHTML = `
+            <div class="p-3 text-center text-white-50 small">
+                No se encontraron tareas con "${escapeHtml(cleanQuery)}"
+            </div>
+        `;
+        dropdown.classList.remove('d-none');
+    }
+}
+
+
+function openSearchResultModal(taskId) {
+    const dropdown = document.getElementById('searchDropdownResults');
+    if (dropdown) dropdown.classList.add('d-none');
+
+    // Buscar el modal por ID
+    const modalEl = document.getElementById(`viewTaskModal${taskId}`);
+    if (modalEl) {
+        const modalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
+        modalInstance.show();
+    } else {
+        // Fallback: si no hay modal (por ejemplo en completadas), se busca el elemento en el tablero
+        const targetCard = document.querySelector(`[data-task-id="${taskId}"]`);
+        if (targetCard) {
+            targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            targetCard.classList.add('bg-warning-subtle');
+            setTimeout(() => targetCard.classList.remove('bg-warning-subtle'), 2000);
+        }
+    }
+}
+
+function clearGlobalSearch() {
+    const searchInput = document.getElementById('globalTaskSearchInput');
+    const dropdown = document.getElementById('searchDropdownResults');
+    
+    if (searchInput) {
+        searchInput.value = '';
+        searchInput.focus();
+    }
+    if (dropdown) {
+        dropdown.classList.add('d-none');
+        dropdown.innerHTML = '';
+    }
+    const clearBtn = document.getElementById('clearSearchBtn');
+    if (clearBtn) clearBtn.classList.add('d-none');
+}
+
+function escapeHtml(str) {
+    return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+}
+
+document.addEventListener('click', function (e) {
+    const searchWrapper = e.target.closest('#globalTaskSearchWrapper');
+    const dropdown = document.getElementById('searchDropdownResults');
+    if (!searchWrapper && dropdown) {
+        dropdown.classList.add('d-none');
+    }
+});

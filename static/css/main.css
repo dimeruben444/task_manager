@@ -543,4 +543,79 @@
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2) !important;
 }
 
+#searchDropdownResults .dropdown-item:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+#globalTaskSearchWrapper {
+  position: relative !important;
+}
+
+#searchDropdownResults {
+  display: block; /* Se controla el mostrado con .d-none de Bootstrap */
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5) !important;
+}
+
+#searchDropdownResults .dropdown-item:hover {
+  background-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+#globalTaskSearchWrapper {
+  position: relative !important;
+}
+#globalTaskSearchWrapper #searchDropdownResults {
+  background-color: #1e242b !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5) !important;
+  overflow-x: hidden !important;
+  z-index: 2005 !important;
+}
+#globalTaskSearchWrapper #searchDropdownResults::-webkit-scrollbar {
+  width: 6px;
+}
+#globalTaskSearchWrapper #searchDropdownResults::-webkit-scrollbar-track {
+  background: #1e242b;
+}
+#globalTaskSearchWrapper #searchDropdownResults::-webkit-scrollbar-thumb {
+  background: #4a5568;
+  border-radius: 4px;
+}
+#globalTaskSearchWrapper #searchDropdownResults::-webkit-scrollbar-thumb:hover {
+  background: #718096;
+}
+#globalTaskSearchWrapper #searchDropdownResults .search-result-item {
+  background-color: rgba(255, 255, 255, 0.05);
+  transition: background-color 0.15s ease-in-out, transform 0.1s ease-in-out;
+}
+#globalTaskSearchWrapper #searchDropdownResults .search-result-item:hover {
+  background-color: rgba(255, 255, 255, 0.18) !important;
+  transform: translateX(2px);
+}
+#globalTaskSearchWrapper #searchDropdownResults .search-result-item:active {
+  background-color: rgba(255, 255, 255, 0.25) !important;
+}
+#globalTaskSearchWrapper #searchDropdownResults .search-result-item .search-item-title-wrapper {
+  min-width: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
+}
+#globalTaskSearchWrapper #searchDropdownResults .search-result-item .task-title-text {
+  font-size: 0.88rem;
+  color: #ffffff;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  display: block;
+}
+#globalTaskSearchWrapper #searchDropdownResults .search-result-item .task-title-text.is-completed {
+  color: rgba(255, 255, 255, 0.6) !important;
+  text-decoration: line-through;
+}
+#globalTaskSearchWrapper #searchDropdownResults .search-result-item .badge {
+  font-size: 0.68rem;
+  font-weight: 500;
+  padding: 0.35em 0.65em;
+  flex-shrink: 0 !important;
+}
+
 /*# sourceMappingURL=main.css.map */

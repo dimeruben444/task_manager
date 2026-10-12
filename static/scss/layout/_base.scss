@@ -1,0 +1,72 @@
+
+// ESTILOS PARA EL BUSCADOR GLOBAL (TRELLO DROPDOWN)
+
+
+#globalTaskSearchWrapper {
+    position: relative !important;
+
+    #searchDropdownResults {
+        background-color: #1e242b !important;
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5) !important;
+        overflow-x: hidden !important;
+        z-index: 2005 !important;
+
+        &::-webkit-scrollbar {
+            width: 6px;
+        }
+        &::-webkit-scrollbar-track {
+            background: #1e242b;
+        }
+        &::-webkit-scrollbar-thumb {
+            background: #4a5568;
+            border-radius: 4px;
+
+            &:hover {
+                background: #718096;
+            }
+        }
+
+        .search-result-item {
+            background-color: rgba(255, 255, 255, 0.05);
+            transition: background-color 0.15s ease-in-out, transform 0.1s ease-in-out;
+
+            &:hover {
+                background-color: rgba(255, 255, 255, 0.18) !important;
+                transform: translateX(2px);
+            }
+
+            &:active {
+                background-color: rgba(255, 255, 255, 0.25) !important;
+            }
+
+            // CONTENEDOR DEL TEXTO (Previene que empuje al badge)
+            .search-item-title-wrapper {
+                min-width: 0; // Imprescindible para flexbox truncado
+                flex: 1 1 auto;
+                overflow: hidden;
+            }
+
+            .task-title-text {
+                font-size: 0.88rem;
+                color: #ffffff;
+                white-space: nowrap !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+                display: block;
+
+                &.is-completed {
+                    color: rgba(255, 255, 255, 0.6) !important;
+                    text-decoration: line-through;
+                }
+            }
+
+            .badge {
+                font-size: 0.68rem;
+                font-weight: 500;
+                padding: 0.35em 0.65em;
+                flex-shrink: 0 !important; // Evita que el badge se aplaste o deforme
+            }
+        }
+    }
+}

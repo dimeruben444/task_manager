@@ -251,3 +251,20 @@
 }
 
 
+#searchDropdownResults .dropdown-item:hover {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+
+#globalTaskSearchWrapper {
+    position: relative !important;
+}
+
+#searchDropdownResults {
+    display: block; /* Se controla el mostrado con .d-none de Bootstrap */
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5) !important;
+}
+
+#searchDropdownResults .dropdown-item:hover {
+    background-color: rgba(255, 255, 255, 0.15) !important;
+}

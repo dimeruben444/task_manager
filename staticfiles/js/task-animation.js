@@ -1,124 +1,5 @@
 // static/js/task-animation.js
 
-// 1. REGISTRO GLOBAL DE SELECCIÓN DE CUADRANTE
-window.selectedQuadrantForTask = window.selectedQuadrantForTask || {};
-
-// 2. ANIMACIÓN FLIP CON TIMEOUT DE SEGURIDAD PARA EL MODAL
-function animateTaskToQuadrant(taskId, targetQuadrantCode) {
-    const card = document.getElementById(`task-card-${taskId}`);
-    const targetContainer = document.querySelector(`.quadrant-container[data-quadrant="${targetQuadrantCode}"]`);
-
-    if (!card || !targetContainer) return;
-
-    const currentContainer = card.closest('.quadrant-container');
-    if (currentContainer === targetContainer) return;
-
-    // A. Posición Inicial (FIRST)
-    const firstRect = card.getBoundingClientRect();
-
-    // B. Mover en el DOM (LAST)
-    const inlineWrapper = targetContainer.querySelector('.add-task-inline-wrapper');
-    if (inlineWrapper) {
-        targetContainer.insertBefore(card, inlineWrapper);
-    } else {
-        targetContainer.appendChild(card);
-    }
-
-    const emptyMsg = targetContainer.querySelector('.empty-msg');
-    if (emptyMsg) emptyMsg.classList.add('d-none');
-
-    card.setAttribute('data-urgency', targetQuadrantCode === 'Q1' || targetQuadrantCode === 'Q3' ? '4' : '1');
-    card.setAttribute('data-importance', targetQuadrantCode === 'Q1' || targetQuadrantCode === 'Q2' ? '4' : '1');
-
-    // C. Posición Final
-    const lastRect = card.getBoundingClientRect();
-
-    // D. Invertir posición (INVERT)
-    const deltaX = firstRect.left - lastRect.left;
-    const deltaY = firstRect.top - lastRect.top;
-
-    card.style.transition = 'none';
-    card.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
-    card.classList.add('task-card-moving');
-
-    // E. Reproducir (PLAY)
-    requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-            card.style.transition = 'transform 0.45s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.3s ease';
-            card.style.transform = 'translate(0, 0)';
-
-            setTimeout(() => {
-                card.style.transition = '';
-                card.style.transform = '';
-                card.classList.remove('task-card-moving');
-            }, 450);
-        });
-    });
-}
-
-// 3. GUARDADO DESDE EL MODAL DE DETALLE
-function saveTaskModal(taskId) {
-    const form = document.getElementById(`editTaskForm${taskId}`);
-    const modalEl = document.getElementById(`viewTaskModal${taskId}`);
-
-    if (!form) {
-        console.error(`No se encontró el formulario editTaskForm${taskId}`);
-        return;
-    }
-
-    // A. Obtener el cuadrante de destino seleccionado
-    let targetQuadrant = window.selectedQuadrantForTask ? window.selectedQuadrantForTask[taskId] : null;
-    if (!targetQuadrant) {
-        const urgencyVal = form.querySelector('input[name="urgency"]:checked')?.value || '4';
-        const importanceVal = form.querySelector('input[name="importance"]:checked')?.value || '4';
-
-        const u = parseInt(urgencyVal, 10);
-        const i = parseInt(importanceVal, 10);
-
-        if (u >= 3 && i >= 3) targetQuadrant = 'Q1';
-        else if (u <= 2 && i >= 3) targetQuadrant = 'Q2';
-        else if (u >= 3 && i <= 2) targetQuadrant = 'Q3';
-        else targetQuadrant = 'Q4';
-    }
-
-    // B. Actualizar título en el tablero
-    const titleInput = form.querySelector('textarea[name="title"]');
-    const cardTitleEl = document.querySelector(`#task-card-${taskId} .task-title`);
-    if (titleInput && cardTitleEl) {
-        cardTitleEl.textContent = titleInput.value;
-    }
-
-    // C. Ocultar el modal de Bootstrap
-    if (modalEl) {
-        const modalInstance = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
-        
-        modalInstance.hide();
-
-        setTimeout(() => {
-            animateTaskToQuadrant(taskId, targetQuadrant);
-        }, 100);
-    } else {
-        animateTaskToQuadrant(taskId, targetQuadrant);
-    }
-
-    // D. Enviar datos a Django por Fetch AJAX
-    const formData = new FormData(form);
-    fetch(form.action, {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        }
-    })
-    .then(() => {
-        if (window.selectedQuadrantForTask) {
-            delete window.selectedQuadrantForTask[taskId];
-        }
-    })
-    .catch(err => console.error('Error guardando tarea:', err));
-}
-
-// 4. MANEJO DE LA ANIMACIÓN DE LA ESFERA AL MARCAR TAREA COMPLETADA
 document.addEventListener('change', function (e) {
     if (e.target && e.target.classList.contains('task-completion-check')) {
         const checkbox = e.target;
@@ -131,43 +12,52 @@ document.addEventListener('change', function (e) {
             const card = checkbox.closest('.task-card');
             const targetContainer = document.getElementById('completed-tasks-container');
 
-            if (card && targetContainer) {
+            if (card) {
                 card.classList.add('task-completing');
 
-                // 1. Coordenadas exactas en viewport
+                // 1. ORIGEN EXACTO (Centro de la casilla pulsada)
                 const rect = checkbox.getBoundingClientRect();
                 const startX = rect.left + rect.width / 2;
                 const startY = rect.top + rect.height / 2;
 
-                const targetRect = targetContainer.getBoundingClientRect();
-                const endX = targetRect.left + 50;
-                const endY = targetRect.top + 100;
+                // 2. DESTINO ROBUSTO (Si falla el contenedor, apunta al lateral derecho)
+                let endX, endY;
+                if (targetContainer) {
+                    const targetRect = targetContainer.getBoundingClientRect();
+                    endX = targetRect.left + 60;
+                    endY = targetRect.top + 100;
+                } else {
+                    endX = window.innerWidth - 220;
+                    endY = 180;
+                }
 
-                // 2. Vértice del ángulo
-                const peakY = Math.max(80, Math.min(startY - 140, window.innerHeight * 0.15));
-                const peakX = startX + ((endX - startX) * 0.18);
+                // 3. VÉRTICE DEL ÁNGULO (Cálculo estricto en V)
+                // Altura fija de subida de 150px (mínimo a 80px del borde superior de la pantalla)
+                const peakY = Math.max(80, startY - 150);
+                // El vértice avanza un 20% hacia la derecha durante el ascenso
+                const peakX = startX + ((endX - startX) * 0.20);
 
-                // 3. Confetti en el origen
+                // 4. CONFETTI LOCAL
                 if (typeof confetti === 'function') {
                     confetti({
-                        particleCount: 22,
-                        spread: 50,
+                        particleCount: 20,
+                        spread: 45,
                         origin: { x: startX / window.innerWidth, y: startY / window.innerHeight },
                         colors: ['#10B981', '#3B82F6', '#F59E0B'],
                         disableForReducedMotion: true
                     });
                 }
 
-                // 4. Crear esfera en el DOM
+                // 5. CREACIÓN Y ESTILOS DE LA PARTÍCULA
                 const particle = document.createElement('div');
                 particle.className = 'flying-particle';
                 particle.style.position = 'fixed';
                 particle.style.zIndex = '999999';
-                particle.style.width = '28px';
-                particle.style.height = '28px';
+                particle.style.width = '26px';
+                particle.style.height = '26px';
                 particle.style.borderRadius = '50%';
                 particle.style.background = 'radial-gradient(circle, #ffffff 15%, #10B981 70%, #059669 100%)';
-                particle.style.boxShadow = '0 0 18px rgba(16, 185, 129, 0.95), 0 0 35px rgba(16, 185, 129, 0.7)';
+                particle.style.boxShadow = '0 0 18px rgba(16, 185, 129, 0.95), 0 0 30px rgba(16, 185, 129, 0.7)';
                 particle.style.pointerEvents = 'none';
                 particle.style.left = `${startX}px`;
                 particle.style.top = `${startY}px`;
@@ -176,10 +66,10 @@ document.addEventListener('change', function (e) {
 
                 document.body.appendChild(particle);
 
-                // 5. Duraciones de tramos
-                const tSubida = 420;
-                const tPausa = 90;
-                const tCaida = 600;
+                // 6. CONTROL DEL VUELO VECTORIAL (TRAMO 1 -> VÉRTICE -> TRAMO 2)
+                const tSubida = 380;   // Subida rápida y empinada
+                const tPausa = 80;     // Pausa estática para marcar el quiebre del ángulo
+                const tCaida = 550;    // Caida diagonal en línea recta a completadas
                 const tTotal = tSubida + tPausa + tCaida;
 
                 const startTime = performance.now();
@@ -190,28 +80,28 @@ document.addEventListener('change', function (e) {
 
                     let currentX, currentY, currentScale, currentOpacity = 1;
 
-                    // Tramo A: Recta de subida empinada
+                    // RECTA 1: Subida hasta el vértice
                     if (elapsed < tSubida) {
                         const segmentProgress = elapsed / tSubida;
                         currentX = startX + (peakX - startX) * segmentProgress;
                         currentY = startY + (peakY - startY) * segmentProgress;
-                        currentScale = 1 + (1.35 - 1) * segmentProgress;
+                        currentScale = 1 + (1.3 - 1) * segmentProgress;
                     } 
-                    // Tramo B: Quiebre y micro-pausa en el vértice
+                    // PAUSA: Parada estática en el pico para fijar la esquina
                     else if (elapsed < tSubida + tPausa) {
                         currentX = peakX;
                         currentY = peakY;
-                        currentScale = 1.35;
+                        currentScale = 1.3;
                     } 
-                    // Tramo C: Desplazamiento a la derecha y llegada
+                    // RECTA 2: Bajada hacia la derecha hasta la columna de completadas
                     else {
                         const segmentProgress = (elapsed - (tSubida + tPausa)) / tCaida;
                         currentX = peakX + (endX - peakX) * segmentProgress;
                         currentY = peakY + (endY - peakY) * segmentProgress;
-                        currentScale = 1.35 + (0.4 - 1.35) * segmentProgress;
+                        currentScale = 1.3 + (0.4 - 1.3) * segmentProgress;
 
-                        if (segmentProgress > 0.88) {
-                            currentOpacity = 1 - (segmentProgress - 0.88) * 8.3;
+                        if (segmentProgress > 0.85) {
+                            currentOpacity = 1 - (segmentProgress - 0.85) * 6.6;
                         }
                     }
 

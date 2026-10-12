@@ -89,6 +89,8 @@ function getCookie(name) {
 
 // static/js/dashboard.js
 
+// static/js/dashboard.js
+
 function sendToggleRequest(taskId, isCompleted, checkbox) {
     const csrftoken = getCookie('csrftoken');
 
@@ -109,18 +111,26 @@ function sendToggleRequest(taskId, isCompleted, checkbox) {
         if (data.status === 'success' || data.is_completed !== undefined) {
             const card = checkbox.closest('.task-card, .completed-task-item');
 
+            // 1. SI MARCAMOS COMO COMPLETADA
             if (isCompleted && card) {
                 const targetContainer = document.getElementById('completed-tasks-container');
                 if (targetContainer) {
                     const emptyMsg = targetContainer.querySelector('#empty-trash-msg, .empty-msg');
                     if (emptyMsg) emptyMsg.classList.add('d-none');
 
-                    const titleText = card.querySelector('.task-title')?.textContent.trim() || card.textContent.trim();
+                    const titleText = card.querySelector('.task-title')?.textContent.trim() 
+                                   || card.querySelector('h6')?.textContent.trim() 
+                                   || card.textContent.trim();
 
-                    // Insertar en la columna de completadas
+                    const urgency = card.dataset.urgency || "4";
+                    const importance = card.dataset.importance || "4";
+
+                    // Crear elemento en completadas
                     const completedItem = document.createElement('div');
                     completedItem.className = 'completed-task-item task-card card border-0 shadow-sm mb-2 p-2 d-flex flex-row align-items-center justify-content-between gap-2 bg-light';
                     completedItem.setAttribute('data-task-id', taskId);
+                    completedItem.setAttribute('data-urgency', urgency);
+                    completedItem.setAttribute('data-importance', importance);
 
                     completedItem.innerHTML = `
                         <div class="d-flex align-items-center gap-2 flex-grow-1 min-w-0" style="overflow: hidden;">
@@ -130,21 +140,106 @@ function sendToggleRequest(taskId, isCompleted, checkbox) {
                                     <span class="checkmark"></span>
                                 </label>
                             </div>
-                            <span class="task-title text-muted text-decoration-line-through text-truncate fw-medium" style="font-size: 0.85rem;" title="${titleText}">
+                            
+                            <span class="task-title text-muted text-decoration-line-through text-truncate fw-medium" 
+                                  style="font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: default;" 
+                                  title="${titleText}">
                                 ${titleText}
                             </span>
                         </div>
+
+                        <form method="POST" action="/task/${taskId}/delete/" class="d-inline m-0 flex-shrink-0" onsubmit="return confirm('¿Eliminar esta tarea definitivamente?');">
+                            <input type="hidden" name="csrfmiddlewaretoken" value="${csrftoken}">
+                            <button type="submit" class="btn btn-link text-danger p-0 border-0 opacity-50 hover-opacity-100" title="Eliminar">
+                                <i class="bi bi-x-lg" style="font-size: 0.85rem;"></i>
+                            </button>
+                        </form>
                     `;
 
                     targetContainer.prepend(completedItem);
                     card.remove();
 
-                    // Actualizar contador
+                    // Incrementar contador
                     const countBadge = document.getElementById('completed-count');
                     if (countBadge) {
                         let currentCount = parseInt(countBadge.textContent, 10) || 0;
                         countBadge.textContent = currentCount + 1;
                     }
+                }
+            } 
+            // 2. SI DESMARCAMOS (DESCOMPLETAR)
+            else if (!isCompleted && card) {
+                // Determinar el cuadrante de destino según la respuesta o metadatos de la tarjeta
+                let targetQuadrantCode = data.quadrant; 
+                
+                if (!targetQuadrantCode) {
+                    const urgency = parseInt(card.dataset.urgency || "4", 10);
+                    const importance = parseInt(card.dataset.importance || "4", 10);
+                    
+                    if (urgency >= 3 && importance >= 3) targetQuadrantCode = 'Q1';
+                    else if (urgency <= 2 && importance >= 3) targetQuadrantCode = 'Q2';
+                    else if (urgency >= 3 && importance <= 2) targetQuadrantCode = 'Q3';
+                    else targetQuadrantCode = 'Q4';
+                }
+
+                const targetQuadrantContainer = document.querySelector(`.quadrant-container[data-quadrant="${targetQuadrantCode}"]`);
+
+                if (targetQuadrantContainer) {
+                    // Ocultar mensaje de "No hay tareas"
+                    const emptyMsg = targetQuadrantContainer.querySelector('.empty-msg');
+                    if (emptyMsg) emptyMsg.classList.add('d-none');
+
+                    const titleText = card.querySelector('.task-title')?.textContent.trim() 
+                                   || card.querySelector('span')?.textContent.trim() 
+                                   || card.textContent.trim();
+
+                    // Recrear la tarjeta en la matriz
+                    const restoredCard = document.createElement('div');
+                    restoredCard.className = 'card mb-2 p-0 shadow-sm border-0 task-card';
+                    restoredCard.id = `task-card-${taskId}`;
+                    restoredCard.setAttribute('data-task-id', taskId);
+                    restoredCard.setAttribute('data-urgency', card.dataset.urgency || "4");
+                    restoredCard.setAttribute('data-importance', card.dataset.importance || "4");
+                    restoredCard.style.cursor = 'pointer';
+
+                    restoredCard.innerHTML = `
+                        <div class="card-body py-2 px-3 d-flex flex-column justify-content-center">
+                            <div class="task-card-header d-flex align-items-center position-relative w-100">
+                                <div class="task-checkbox-wrapper flex-shrink-0">
+                                    <label class="task-checkbox-container m-0" onclick="event.stopPropagation();">
+                                        <input type="checkbox" class="task-completion-check" data-task-id="${taskId}">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                </div>
+                                <div class="task-title-wrapper w-100" data-bs-toggle="modal" data-bs-target="#viewTaskModal${taskId}">
+                                    <h6 class="card-title task-title mb-0 fw-semibold text-dark" style="font-size: 0.88rem; line-height: 1.35; margin: 0;">
+                                        ${titleText}
+                                    </h6>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    // Insertar antes del botón de añadir tarea
+                    const inlineWrapper = targetQuadrantContainer.querySelector('.add-task-inline-wrapper');
+                    if (inlineWrapper) {
+                        targetQuadrantContainer.insertBefore(restoredCard, inlineWrapper);
+                    } else {
+                        targetQuadrantContainer.appendChild(restoredCard);
+                    }
+
+                    card.remove();
+                } else {
+                    // Si por algún motivo no encuentra el cuadrante, recargar como fallback
+                    window.location.reload();
+                    return;
+                }
+
+                // Decrementar contador de completadas
+                const countBadge = document.getElementById('completed-count');
+                if (countBadge) {
+                    let currentCount = parseInt(countBadge.textContent, 10) || 0;
+                    countBadge.textContent = Math.max(0, currentCount - 1);
                 }
             }
         } else {
@@ -156,7 +251,6 @@ function sendToggleRequest(taskId, isCompleted, checkbox) {
         checkbox.checked = !isCompleted;
     });
 }
-
 
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -297,3 +391,172 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
+
+
+// FUNCIONALIDAD DE BÚSQUEDA EN TIEMPO REAL
+function filterTasksBySearch(query) {
+    const cleanQuery = query.toLowerCase().trim();
+    const clearBtn = document.getElementById('clearSearchBtn');
+    
+    if (clearBtn) {
+        if (cleanQuery !== '') {
+            clearBtn.classList.remove('d-none');
+        } else {
+            clearBtn.classList.add('d-none');
+        }
+    }
+
+    // Selecciona todas las tarjetas activas en los cuadrantes y en la barra de completadas
+    const allTaskCards = document.querySelectorAll('.task-card, .completed-task-item');
+
+    allTaskCards.forEach(card => {
+        const titleEl = card.querySelector('.task-title') || card.querySelector('h6');
+        const titleText = titleEl ? titleEl.textContent.toLowerCase() : '';
+
+        if (cleanQuery === '' || titleText.includes(cleanQuery)) {
+            card.style.display = '';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+
+function clearGlobalSearch() {
+    const searchInput = document.getElementById('globalTaskSearchInput');
+    if (searchInput) {
+        searchInput.value = '';
+        filterTasksBySearch('');
+        searchInput.focus();
+    }
+}
+
+// BUSCADOR CON DESPLEGABLE EMERGENTE 
+
+function handleTaskSearchInput(query) {
+    const cleanQuery = query.toLowerCase().trim();
+    const dropdown = document.getElementById('searchDropdownResults');
+    const clearBtn = document.getElementById('clearSearchBtn');
+
+    if (!dropdown) return;
+
+    if (clearBtn) {
+        if (cleanQuery !== '') {
+            clearBtn.classList.remove('d-none');
+        } else {
+            clearBtn.classList.add('d-none');
+        }
+    }
+
+    if (cleanQuery === '') {
+        dropdown.classList.add('d-none');
+        dropdown.innerHTML = '';
+        return;
+    }
+
+    // Buscar en todas las tarjetas (activas y completadas)
+    const allCards = document.querySelectorAll('.task-card, .completed-task-item');
+    const matches = [];
+
+    allCards.forEach(card => {
+        const taskId = card.getAttribute('data-task-id');
+        const titleEl = card.querySelector('.task-title') || card.querySelector('h6');
+        const titleText = titleEl ? titleEl.textContent.trim() : '';
+
+        if (titleText.toLowerCase().includes(cleanQuery) && taskId) {
+            const isCompleted = card.classList.contains('completed-task-item') || card.classList.contains('is-completed');
+            
+            // Obtener el nombre del cuadrante o estado
+            let locationLabel = "Completada";
+            if (!isCompleted) {
+                const container = card.closest('.quadrant-container');
+                const quadCode = container ? container.getAttribute('data-quadrant') : '';
+                if (quadCode === 'Q1') locationLabel = "Urgente e Importante";
+                else if (quadCode === 'Q2') locationLabel = "Planificar";
+                else if (quadCode === 'Q3') locationLabel = "Delegar";
+                else if (quadCode === 'Q4') locationLabel = "Eliminar";
+            }
+
+            matches.push({
+                id: taskId,
+                title: titleText,
+                isCompleted: isCompleted,
+                location: locationLabel
+            });
+        }
+    });
+
+    // Renderizar resultados en el dropdown
+    if (matches.length > 0) {
+        let html = `<div class="px-2 py-1 text-uppercase text-muted fw-bold" style="font-size: 0.68rem; letter-spacing: 0.5px;">TARJETAS (${matches.length})</div>`;
+        
+        matches.forEach(item => {
+            html += `
+                <button type="button" 
+                        class="dropdown-item text-white rounded-2 p-2 d-flex align-items-center gap-2 border-0 bg-transparent hover-bg-dark-subtle"
+                        style="cursor: pointer; text-align: left;"
+                        onclick="openSearchResultModal('${item.id}')">
+                    <span class="fs-6">${item.isCompleted ? '☑️' : '📋'}</span>
+                    <div class="d-flex flex-column min-w-0 flex-grow-1">
+                        <span class="fw-semibold text-truncate ${item.isCompleted ? 'text-decoration-line-through text-muted' : ''}" style="font-size: 0.85rem;">
+                            ${escapeHtml(item.title)}
+                        </span>
+                        <small class="text-muted" style="font-size: 0.72rem;">
+                            ${item.location}
+                        </small>
+                    </div>
+                </button>
+            `;
+        });
+
+        dropdown.innerHTML = html;
+        dropdown.classList.remove('d-none');
+    } else {
+        dropdown.innerHTML = `
+            <div class="p-3 text-center text-muted small">
+                No se encontraron tareas con "${escapeHtml(cleanQuery)}"
+            </div>
+        `;
+        dropdown.classList.remove('d-none');
+    }
+}
+
+// Abrir el modal de detalle directamente desde el resultado del buscador
+function openSearchResultModal(taskId) {
+    const dropdown = document.getElementById('searchDropdownResults');
+    if (dropdown) dropdown.classList.add('d-none');
+
+    const modalEl = document.getElementById(`viewTaskModal${taskId}`);
+    if (modalEl) {
+        const modalInstance = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+        modalInstance.show();
+    }
+}
+
+function clearGlobalSearch() {
+    const searchInput = document.getElementById('globalTaskSearchInput');
+    const dropdown = document.getElementById('searchDropdownResults');
+    if (searchInput) {
+        searchInput.value = '';
+        searchInput.focus();
+    }
+    if (dropdown) {
+        dropdown.classList.add('d-none');
+        dropdown.innerHTML = '';
+    }
+    const clearBtn = document.getElementById('clearSearchBtn');
+    if (clearBtn) clearBtn.classList.add('d-none');
+}
+
+// Auxiliar para evitar inyecciones XSS
+function escapeHtml(str) {
+    return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+}
+
+// Ocultar desplegable si el usuario hace clic fuera de él
+document.addEventListener('click', function (e) {
+    const searchWrapper = e.target.closest('.position-relative');
+    const dropdown = document.getElementById('searchDropdownResults');
+    if (!searchWrapper && dropdown) {
+        dropdown.classList.add('d-none');
+    }
+});

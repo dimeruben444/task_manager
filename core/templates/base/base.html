@@ -21,15 +21,42 @@
 
     <!-- BARRA DE NAVEGACIÓN SUPERIOR -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm py-2">
-        <div class="container-fluid px-4">
-            <a class="navbar-brand fw-bold" href="{% url 'dashboard' %}">
+        <div class="container-fluid px-4 d-flex justify-content-between align-items-center">
+            
+            <!-- LOGO / BRAND (IZQUIERDA) -->
+            <a class="navbar-brand fw-bold me-0" href="{% url 'dashboard' %}">
                 🎯 {% translate "Eisenhower Task Manager" %}
             </a>
             
-            <div class="d-flex align-items-center ms-auto">
+            <!-- BUSCADOR GLOBAL CON DESPLEGABLE ESTILO TRELLO -->
+            <div id="globalTaskSearchWrapper" class="position-relative d-none d-md-block mx-3" style="width: 100%; max-width: 480px; z-index: 2000;">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-secondary border-secondary text-white-50 pe-1">🔍</span>
+                    <input type="text" 
+                        id="globalTaskSearchInput" 
+                        class="form-control bg-secondary text-white border-secondary shadow-none ps-2" 
+                        placeholder="Buscar tareas..." 
+                        autocomplete="off"
+                        oninput="handleTaskSearchInput(this.value)"
+                        onfocus="handleTaskSearchInput(this.value)">
+                    <button class="btn btn-outline-secondary border-secondary text-white-50 d-none" 
+                            type="button" 
+                            id="clearSearchBtn" 
+                            onclick="clearGlobalSearch()">✕</button>
+                </div>
+
+                <!-- Menú desplegable flotante -->
+                <div id="searchDropdownResults" 
+                    class="dropdown-menu shadow-lg border-0 rounded-3 p-2 mt-1 w-100 bg-dark text-white d-none position-absolute" 
+                    style="max-height: 380px; overflow-y: auto; z-index: 2005; top: 100%; left: 0;">
+                </div>
+            </div>
+
+            <!-- MENÚ DE USUARIO (DERECHA) -->
+            <div class="d-flex align-items-center ms-0">
                 {% if user.is_authenticated %}
                     <div class="dropdown">
-                       
+                    
                         <!-- BOTÓN SUPERIOR EN LA BARRA -->
                         <button class="btn btn-outline-light btn-sm dropdown-toggle d-flex align-items-center gap-2 shadow-sm border-0 py-1 px-2.5 navbar-user-btn" 
                                 type="button" 
@@ -54,8 +81,8 @@
                         
                         <!-- MENÚ DESPLEGABLE ESTILO FOTO 2 -->
                         <div class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-3 p-3 mt-2" 
-                             aria-labelledby="userMenuButton" 
-                             style="min-width: 260px;">
+                            aria-labelledby="userMenuButton" 
+                            style="min-width: 260px;">
                             
                             <!-- ETIQUETA CUENTA -->
                             <div class="text-uppercase text-muted fw-bold mb-2" style="font-size: 0.7rem; letter-spacing: 0.5px;">
@@ -66,7 +93,7 @@
                             <div class="d-flex align-items-center gap-3 py-1 mb-1">
                                 <!-- BOLA DE INICIALES DENTRO DEL DESPLEGABLE -->
                                 <span class="rounded-circle bg-primary text-white fw-bold d-inline-flex justify-content-center align-items-center flex-shrink-0" 
-                                      style="width: 42px; height: 42px; font-size: 1rem;">
+                                    style="width: 42px; height: 42px; font-size: 1rem;">
                                     {% if user.first_name and user.last_name %}
                                         {{ user.first_name|slice:":1"|upper }}{{ user.last_name|slice:":1"|upper }}
                                     {% else %}

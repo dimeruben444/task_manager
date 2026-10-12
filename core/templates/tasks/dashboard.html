@@ -483,25 +483,28 @@
                 <div class="card-body p-2 flex-grow-1 overflow-auto quadrant-container" id="completed-tasks-container" data-quadrant="DONE" style="max-height: calc(100vh - 280px); min-height: 400px;">
                     {% for task in completed_tasks %}
                         <div class="completed-task-item task-card card border-0 shadow-sm mb-2 p-2 d-flex flex-row align-items-center justify-content-between gap-2 bg-light" 
-                             data-task-id="{{ task.id }}"
-                             data-urgency="{{ task.urgency }}"
-                             data-importance="{{ task.importance }}"
-                             data-updated-at="{{ task.updated_at|date:'Y-m-d' }}">
+                            data-task-id="{{ task.id }}"
+                            data-urgency="{{ task.urgency }}"
+                            data-importance="{{ task.importance }}"
+                            data-updated-at="{{ task.updated_at|date:'Y-m-d' }}">
                             
                             <div class="d-flex align-items-center gap-2 flex-grow-1 min-w-0" style="overflow: hidden;">
                                 <div class="task-checkbox-wrapper-sidebar flex-shrink-0" style="width: 17px; height: 17px;">
                                     <label class="task-checkbox-container m-0" onclick="event.stopPropagation();">
                                         <input type="checkbox" 
-                                               class="task-completion-check" 
-                                               data-task-id="{{ task.id }}" 
-                                               checked>
+                                            class="task-completion-check" 
+                                            data-task-id="{{ task.id }}" 
+                                            checked>
                                         <span class="checkmark"></span>
                                     </label>
                                 </div>
                                 
+                                <!-- TÍTULO CON DETONADOR DE MODAL (ABRE DETALLE) -->
                                 <span class="task-title text-muted text-decoration-line-through text-truncate fw-medium" 
-                                      style="font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: default;" 
-                                      title="{{ task.title }}">
+                                    style="font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer;" 
+                                    title="{{ task.title }}"
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#viewTaskModal{{ task.id }}">
                                     {{ task.title }}
                                 </span>
                             </div>
