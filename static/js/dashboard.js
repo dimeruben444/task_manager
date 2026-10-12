@@ -87,6 +87,10 @@ function getCookie(name) {
     return cookieValue;
 }
 
+// static/js/dashboard.js
+
+// static/js/dashboard.js
+
 function sendToggleRequest(taskId, isCompleted, checkbox) {
     const csrftoken = getCookie('csrftoken');
 
@@ -105,8 +109,139 @@ function sendToggleRequest(taskId, isCompleted, checkbox) {
     })
     .then(data => {
         if (data.status === 'success' || data.is_completed !== undefined) {
-            // Recargar la vista o actualizar el estado de forma limpia
-            window.location.reload();
+            const card = checkbox.closest('.task-card, .completed-task-item');
+
+            // 1. SI MARCAMOS COMO COMPLETADA
+            if (isCompleted && card) {
+                const targetContainer = document.getElementById('completed-tasks-container');
+                if (targetContainer) {
+                    const emptyMsg = targetContainer.querySelector('#empty-trash-msg, .empty-msg');
+                    if (emptyMsg) emptyMsg.classList.add('d-none');
+
+                    const titleText = card.querySelector('.task-title')?.textContent.trim() 
+                                   || card.querySelector('h6')?.textContent.trim() 
+                                   || card.textContent.trim();
+
+                    const urgency = card.dataset.urgency || "4";
+                    const importance = card.dataset.importance || "4";
+
+                    // Crear elemento en completadas
+                    const completedItem = document.createElement('div');
+                    completedItem.className = 'completed-task-item task-card card border-0 shadow-sm mb-2 p-2 d-flex flex-row align-items-center justify-content-between gap-2 bg-light';
+                    completedItem.setAttribute('data-task-id', taskId);
+                    completedItem.setAttribute('data-urgency', urgency);
+                    completedItem.setAttribute('data-importance', importance);
+
+                    completedItem.innerHTML = `
+                        <div class="d-flex align-items-center gap-2 flex-grow-1 min-w-0" style="overflow: hidden;">
+                            <div class="task-checkbox-wrapper-sidebar flex-shrink-0" style="width: 17px; height: 17px;">
+                                <label class="task-checkbox-container m-0" onclick="event.stopPropagation();">
+                                    <input type="checkbox" class="task-completion-check" data-task-id="${taskId}" checked>
+                                    <span class="checkmark"></span>
+                                </label>
+                            </div>
+                            
+                            <span class="task-title text-muted text-decoration-line-through text-truncate fw-medium" 
+                                  style="font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: default;" 
+                                  title="${titleText}">
+                                ${titleText}
+                            </span>
+                        </div>
+
+                        <form method="POST" action="/task/${taskId}/delete/" class="d-inline m-0 flex-shrink-0" onsubmit="return confirm('¿Eliminar esta tarea definitivamente?');">
+                            <input type="hidden" name="csrfmiddlewaretoken" value="${csrftoken}">
+                            <button type="submit" class="btn btn-link text-danger p-0 border-0 opacity-50 hover-opacity-100" title="Eliminar">
+                                <i class="bi bi-x-lg" style="font-size: 0.85rem;"></i>
+                            </button>
+                        </form>
+                    `;
+
+                    targetContainer.prepend(completedItem);
+                    card.remove();
+
+                    // Incrementar contador
+                    const countBadge = document.getElementById('completed-count');
+                    if (countBadge) {
+                        let currentCount = parseInt(countBadge.textContent, 10) || 0;
+                        countBadge.textContent = currentCount + 1;
+                    }
+                }
+            } 
+            // 2. SI DESMARCAMOS (DESCOMPLETAR)
+            else if (!isCompleted && card) {
+                // Determinar el cuadrante de destino según la respuesta o metadatos de la tarjeta
+                let targetQuadrantCode = data.quadrant; 
+                
+                if (!targetQuadrantCode) {
+                    const urgency = parseInt(card.dataset.urgency || "4", 10);
+                    const importance = parseInt(card.dataset.importance || "4", 10);
+                    
+                    if (urgency >= 3 && importance >= 3) targetQuadrantCode = 'Q1';
+                    else if (urgency <= 2 && importance >= 3) targetQuadrantCode = 'Q2';
+                    else if (urgency >= 3 && importance <= 2) targetQuadrantCode = 'Q3';
+                    else targetQuadrantCode = 'Q4';
+                }
+
+                const targetQuadrantContainer = document.querySelector(`.quadrant-container[data-quadrant="${targetQuadrantCode}"]`);
+
+                if (targetQuadrantContainer) {
+                    // Ocultar mensaje de "No hay tareas"
+                    const emptyMsg = targetQuadrantContainer.querySelector('.empty-msg');
+                    if (emptyMsg) emptyMsg.classList.add('d-none');
+
+                    const titleText = card.querySelector('.task-title')?.textContent.trim() 
+                                   || card.querySelector('span')?.textContent.trim() 
+                                   || card.textContent.trim();
+
+                    // Recrear la tarjeta en la matriz
+                    const restoredCard = document.createElement('div');
+                    restoredCard.className = 'card mb-2 p-0 shadow-sm border-0 task-card';
+                    restoredCard.id = `task-card-${taskId}`;
+                    restoredCard.setAttribute('data-task-id', taskId);
+                    restoredCard.setAttribute('data-urgency', card.dataset.urgency || "4");
+                    restoredCard.setAttribute('data-importance', card.dataset.importance || "4");
+                    restoredCard.style.cursor = 'pointer';
+
+                    restoredCard.innerHTML = `
+                        <div class="card-body py-2 px-3 d-flex flex-column justify-content-center">
+                            <div class="task-card-header d-flex align-items-center position-relative w-100">
+                                <div class="task-checkbox-wrapper flex-shrink-0">
+                                    <label class="task-checkbox-container m-0" onclick="event.stopPropagation();">
+                                        <input type="checkbox" class="task-completion-check" data-task-id="${taskId}">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                </div>
+                                <div class="task-title-wrapper w-100" data-bs-toggle="modal" data-bs-target="#viewTaskModal${taskId}">
+                                    <h6 class="card-title task-title mb-0 fw-semibold text-dark" style="font-size: 0.88rem; line-height: 1.35; margin: 0;">
+                                        ${titleText}
+                                    </h6>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    // Insertar antes del botón de añadir tarea
+                    const inlineWrapper = targetQuadrantContainer.querySelector('.add-task-inline-wrapper');
+                    if (inlineWrapper) {
+                        targetQuadrantContainer.insertBefore(restoredCard, inlineWrapper);
+                    } else {
+                        targetQuadrantContainer.appendChild(restoredCard);
+                    }
+
+                    card.remove();
+                } else {
+                    // Si por algún motivo no encuentra el cuadrante, recargar como fallback
+                    window.location.reload();
+                    return;
+                }
+
+                // Decrementar contador de completadas
+                const countBadge = document.getElementById('completed-count');
+                if (countBadge) {
+                    let currentCount = parseInt(countBadge.textContent, 10) || 0;
+                    countBadge.textContent = Math.max(0, currentCount - 1);
+                }
+            }
         } else {
             checkbox.checked = !isCompleted;
         }
@@ -116,6 +251,7 @@ function sendToggleRequest(taskId, isCompleted, checkbox) {
         checkbox.checked = !isCompleted;
     });
 }
+
 
 document.addEventListener('DOMContentLoaded', function () {
     let isProcessingMove = false;
@@ -255,39 +391,3 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
-// D. MANEJO DE EVENTOS DE CLICK Y CHECKBOX DE COMPLETADO
-document.addEventListener('change', function (e) {
-    if (e.target.matches('.task-completion-check')) {
-        const checkbox = e.target;
-        const taskId = checkbox.dataset.taskId;
-        const isCompleted = checkbox.checked;
-
-        if (!taskId) return;
-
-        if (isCompleted) {
-            const card = checkbox.closest('.task-card');
-            if (card) {
-                card.classList.add('task-completing');
-                const rect = checkbox.getBoundingClientRect();
-                const startX = rect.left + rect.width / 2;
-                const startY = rect.top + rect.height / 2;
-
-                if (typeof confetti !== 'undefined') {
-                    confetti({
-                        particleCount: 30,
-                        spread: 55,
-                        origin: { x: startX / window.innerWidth, y: startY / window.innerHeight },
-                        colors: ['#10B981', '#3B82F6', '#F59E0B'],
-                        disableForReducedMotion: true
-                    });
-                }
-
-                setTimeout(() => {
-                    sendToggleRequest(taskId, isCompleted, checkbox);
-                }, 350);
-                return;
-            }
-        }
-        sendToggleRequest(taskId, isCompleted, checkbox);
-    }
-});

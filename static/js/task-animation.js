@@ -1,119 +1,132 @@
 // static/js/task-animation.js
 
-// 1. REGISTRO GLOBAL DE SELECCIÓN DE CUADRANTE
-window.selectedQuadrantForTask = window.selectedQuadrantForTask || {};
+document.addEventListener('change', function (e) {
+    if (e.target && e.target.classList.contains('task-completion-check')) {
+        const checkbox = e.target;
+        const taskId = checkbox.dataset.taskId;
+        const isCompleted = checkbox.checked;
 
-// 2. ANIMACIÓN FLIP CON TIMEOUT DE SEGURIDAD PARA EL MODAL
-function animateTaskToQuadrant(taskId, targetQuadrantCode) {
-    const card = document.getElementById(`task-card-${taskId}`);
-    const targetContainer = document.querySelector(`.quadrant-container[data-quadrant="${targetQuadrantCode}"]`);
+        if (!taskId) return;
 
-    if (!card || !targetContainer) return;
+        if (isCompleted) {
+            const card = checkbox.closest('.task-card');
+            const targetContainer = document.getElementById('completed-tasks-container');
 
-    const currentContainer = card.closest('.quadrant-container');
-    if (currentContainer === targetContainer) return;
+            if (card) {
+                card.classList.add('task-completing');
 
-    // A. Posición Inicial (FIRST)
-    const firstRect = card.getBoundingClientRect();
+                // 1. ORIGEN EXACTO (Centro de la casilla pulsada)
+                const rect = checkbox.getBoundingClientRect();
+                const startX = rect.left + rect.width / 2;
+                const startY = rect.top + rect.height / 2;
 
-    // B. Mover en el DOM (LAST)
-    const inlineWrapper = targetContainer.querySelector('.add-task-inline-wrapper');
-    if (inlineWrapper) {
-        targetContainer.insertBefore(card, inlineWrapper);
-    } else {
-        targetContainer.appendChild(card);
-    }
+                // 2. DESTINO ROBUSTO (Si falla el contenedor, apunta al lateral derecho)
+                let endX, endY;
+                if (targetContainer) {
+                    const targetRect = targetContainer.getBoundingClientRect();
+                    endX = targetRect.left + 60;
+                    endY = targetRect.top + 100;
+                } else {
+                    endX = window.innerWidth - 220;
+                    endY = 180;
+                }
 
-    const emptyMsg = targetContainer.querySelector('.empty-msg');
-    if (emptyMsg) emptyMsg.classList.add('d-none');
+                // 3. VÉRTICE DEL ÁNGULO (Cálculo estricto en V)
+                // Altura fija de subida de 150px (mínimo a 80px del borde superior de la pantalla)
+                const peakY = Math.max(80, startY - 150);
+                // El vértice avanza un 20% hacia la derecha durante el ascenso
+                const peakX = startX + ((endX - startX) * 0.20);
 
-    card.setAttribute('data-urgency', targetQuadrantCode === 'Q1' || targetQuadrantCode === 'Q3' ? '4' : '1');
-    card.setAttribute('data-importance', targetQuadrantCode === 'Q1' || targetQuadrantCode === 'Q2' ? '4' : '1');
+                // 4. CONFETTI LOCAL
+                if (typeof confetti === 'function') {
+                    confetti({
+                        particleCount: 20,
+                        spread: 45,
+                        origin: { x: startX / window.innerWidth, y: startY / window.innerHeight },
+                        colors: ['#10B981', '#3B82F6', '#F59E0B'],
+                        disableForReducedMotion: true
+                    });
+                }
 
-    // C. Posición Final
-    const lastRect = card.getBoundingClientRect();
+                // 5. CREACIÓN Y ESTILOS DE LA PARTÍCULA
+                const particle = document.createElement('div');
+                particle.className = 'flying-particle';
+                particle.style.position = 'fixed';
+                particle.style.zIndex = '999999';
+                particle.style.width = '26px';
+                particle.style.height = '26px';
+                particle.style.borderRadius = '50%';
+                particle.style.background = 'radial-gradient(circle, #ffffff 15%, #10B981 70%, #059669 100%)';
+                particle.style.boxShadow = '0 0 18px rgba(16, 185, 129, 0.95), 0 0 30px rgba(16, 185, 129, 0.7)';
+                particle.style.pointerEvents = 'none';
+                particle.style.left = `${startX}px`;
+                particle.style.top = `${startY}px`;
+                particle.style.opacity = '1';
+                particle.style.transform = 'translate(-50%, -50%) scale(1)';
 
-    // D. Invertir posición (INVERT)
-    const deltaX = firstRect.left - lastRect.left;
-    const deltaY = firstRect.top - lastRect.top;
+                document.body.appendChild(particle);
 
-    card.style.transition = 'none';
-    card.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
-    card.classList.add('task-card-moving');
+                // 6. CONTROL DEL VUELO VECTORIAL (TRAMO 1 -> VÉRTICE -> TRAMO 2)
+                const tSubida = 380;   // Subida rápida y empinada
+                const tPausa = 80;     // Pausa estática para marcar el quiebre del ángulo
+                const tCaida = 550;    // Caida diagonal en línea recta a completadas
+                const tTotal = tSubida + tPausa + tCaida;
 
-    // E. Reproducir (PLAY)
-    requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-            card.style.transition = 'transform 0.45s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.3s ease';
-            card.style.transform = 'translate(0, 0)';
+                const startTime = performance.now();
 
-            setTimeout(() => {
-                card.style.transition = '';
-                card.style.transform = '';
-                card.classList.remove('task-card-moving');
-            }, 450);
-        });
-    });
-}
+                function renderFlight(currentTime) {
+                    const elapsed = currentTime - startTime;
+                    const progress = Math.min(elapsed / tTotal, 1);
 
-// 3. GUARDADO DESDE EL MODAL DE DETALLE
-function saveTaskModal(taskId) {
-    const form = document.getElementById(`editTaskForm${taskId}`);
-    const modalEl = document.getElementById(`viewTaskModal${taskId}`);
+                    let currentX, currentY, currentScale, currentOpacity = 1;
 
-    if (!form) {
-        console.error(`No se encontró el formulario editTaskForm${taskId}`);
-        return;
-    }
+                    // RECTA 1: Subida hasta el vértice
+                    if (elapsed < tSubida) {
+                        const segmentProgress = elapsed / tSubida;
+                        currentX = startX + (peakX - startX) * segmentProgress;
+                        currentY = startY + (peakY - startY) * segmentProgress;
+                        currentScale = 1 + (1.3 - 1) * segmentProgress;
+                    } 
+                    // PAUSA: Parada estática en el pico para fijar la esquina
+                    else if (elapsed < tSubida + tPausa) {
+                        currentX = peakX;
+                        currentY = peakY;
+                        currentScale = 1.3;
+                    } 
+                    // RECTA 2: Bajada hacia la derecha hasta la columna de completadas
+                    else {
+                        const segmentProgress = (elapsed - (tSubida + tPausa)) / tCaida;
+                        currentX = peakX + (endX - peakX) * segmentProgress;
+                        currentY = peakY + (endY - peakY) * segmentProgress;
+                        currentScale = 1.3 + (0.4 - 1.3) * segmentProgress;
 
-    // A. Obtener el cuadrante de destino seleccionado
-    let targetQuadrant = window.selectedQuadrantForTask ? window.selectedQuadrantForTask[taskId] : null;
-    if (!targetQuadrant) {
-        const urgencyVal = form.querySelector('input[name="urgency"]:checked')?.value || '4';
-        const importanceVal = form.querySelector('input[name="importance"]:checked')?.value || '4';
+                        if (segmentProgress > 0.85) {
+                            currentOpacity = 1 - (segmentProgress - 0.85) * 6.6;
+                        }
+                    }
 
-        const u = parseInt(urgencyVal, 10);
-        const i = parseInt(importanceVal, 10);
+                    particle.style.left = `${currentX}px`;
+                    particle.style.top = `${currentY}px`;
+                    particle.style.transform = `translate(-50%, -50%) scale(${currentScale})`;
+                    particle.style.opacity = currentOpacity;
 
-        if (u >= 3 && i >= 3) targetQuadrant = 'Q1';
-        else if (u <= 2 && i >= 3) targetQuadrant = 'Q2';
-        else if (u >= 3 && i <= 2) targetQuadrant = 'Q3';
-        else targetQuadrant = 'Q4';
-    }
+                    if (progress < 1) {
+                        requestAnimationFrame(renderFlight);
+                    } else {
+                        particle.remove();
+                        if (typeof sendToggleRequest === 'function') {
+                            sendToggleRequest(taskId, isCompleted, checkbox);
+                        }
+                    }
+                }
 
-    // B. Actualizar título en el tablero
-    const titleInput = form.querySelector('textarea[name="title"]');
-    const cardTitleEl = document.querySelector(`#task-card-${taskId} .task-title`);
-    if (titleInput && cardTitleEl) {
-        cardTitleEl.textContent = titleInput.value;
-    }
-
-    // C. Ocultar el modal de Bootstrap
-    if (modalEl) {
-        const modalInstance = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
-        
-        modalInstance.hide();
-
-        setTimeout(() => {
-            animateTaskToQuadrant(taskId, targetQuadrant);
-        }, 100);
-    } else {
-        animateTaskToQuadrant(taskId, targetQuadrant);
-    }
-
-    // D. Enviar datos a Django por Fetch AJAX
-    const formData = new FormData(form);
-    fetch(form.action, {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
+                requestAnimationFrame(renderFlight);
+                return;
+            }
         }
-    })
-    .then(() => {
-        if (window.selectedQuadrantForTask) {
-            delete window.selectedQuadrantForTask[taskId];
+
+        if (typeof sendToggleRequest === 'function') {
+            sendToggleRequest(taskId, isCompleted, checkbox);
         }
-    })
-    .catch(err => console.error('Error guardando tarea:', err));
-}
+    }
+});
