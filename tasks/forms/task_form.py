@@ -1,8 +1,8 @@
 from django import forms
-from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
+from django.contrib.auth import get_user_model
 from tasks.models import Task
-from boards.models import Board
+from boards.models import  Board
 
 User = get_user_model()
 
@@ -69,10 +69,12 @@ class TaskForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)
         current_board = kwargs.pop('current_board', None)
+        # Soportar actualización parcial (por ejemplo, peticiones AJAX de Drag & Drop)
+        partial = kwargs.pop('partial', False)
         
         super().__init__(*args, **kwargs)
 
-        # Formatos de fecha aceptados (incluyendo espacio o T entre fecha y hora)
+        # Formatos de fecha aceptados
         self.fields['due_date'].input_formats = [
             '%Y-%m-%d %H:%M',
             '%Y-%m-%dT%H:%M',
@@ -87,10 +89,15 @@ class TaskForm(forms.ModelForm):
         self.fields['reminder_enabled'].required = False
         self.fields['reminder_offset'].required = False
 
+        # Si se indica 'partial=True', relajamos la obligatoriedad de los demás campos
+        if partial:
+            for field in self.fields.values():
+                field.required = False
+
         # Cargar la lista completa de usuarios para asignación múltiple
         self.fields['assigned_to'].queryset = User.objects.all()
 
-        # Limpiar el nombre del tablero para que no muestre (General) / (Personalizado)
+        # Limpiar el nombre del tablero para la interfaz
         if 'board' in self.fields:
             self.fields['board'].label_from_instance = lambda obj: f"📁 {obj.title}"
 

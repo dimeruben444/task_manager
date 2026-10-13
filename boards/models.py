@@ -28,7 +28,7 @@ class Board(models.Model):
         verbose_name=_('Propietario')
     )
 
-    due_date = models.TimeField(('Fecha límite del tablero'),null=True, blank=True) #fecha vencimiento
+    due_date = models.TimeField(_('Fecha límite del tablero'),null=True, blank=True) #fecha vencimiento
     email_notifications_sent = models.BooleanField(_('Notificación enviada'),default=False)
 
     created_at = models.DateTimeField(_('Fecha de creación'), auto_now_add=True)
@@ -37,6 +37,14 @@ class Board(models.Model):
         verbose_name = _('Tablero')
         verbose_name_plural = _('Tableros')
         ordering = ['created_at']
+
+    def save(self, *args, **kwargs):
+        if self.title:
+            title_clean = self.title.strip()
+            if title_clean:
+                # Convierte el primer carácter a mayúscula y mantiene el resto intacto
+                self.title = title_clean[0].upper() + title_clean[1:]
+        super().save(*args, **kwargs)
 
     def __str__(self):
         tipo = _('General') if self.is_default else _('Personalizado')

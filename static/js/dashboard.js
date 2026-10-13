@@ -256,7 +256,7 @@ function sendToggleRequest(taskId, isCompleted, checkbox) {
 document.addEventListener('DOMContentLoaded', function () {
     let isProcessingMove = false;
 
-    // A. INICIALIZACIÓN DE SORTABLEJS (Evitar inicializaciones dobles)
+    // A. INICIALIZACIÓN DE SORTABLEJS (Soporte Drag & Drop + Animación de Fecha)
     const quadrantContainers = document.querySelectorAll('.quadrant-container');
 
     quadrantContainers.forEach(container => {
@@ -299,31 +299,67 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 isProcessingMove = true;
 
+                // Función auxiliar para reinsertar la tarjeta por encima del botón de añadir
+                const reinsertCardAboveAddBtn = (container, card) => {
+                    const inlineWrapper = container.querySelector('.add-task-inline-wrapper');
+                    if (inlineWrapper) {
+                        container.insertBefore(card, inlineWrapper);
+                    } else {
+                        container.appendChild(card);
+                    }
+                };
+
+                let urgency = 4, importance = 4;
+                if (targetQuadrant === 'Q1') { urgency = 4; importance = 4; }
+                else if (targetQuadrant === 'Q2') { urgency = 1; importance = 4; }
+                else if (targetQuadrant === 'Q3') { urgency = 4; importance = 1; }
+                else if (targetQuadrant === 'Q4') { urgency = 1; importance = 1; }
+
+                const formData = new FormData();
+                formData.append('urgency', urgency);
+                formData.append('importance', importance);
+
                 try {
-                    const response = await fetch('/tasks/move/', {
+                    const response = await fetch(`/task/${taskId}/edit/`, {
                         method: 'POST',
                         headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRFToken': getCookie('csrftoken'),
-                            'X-Requested-With': 'XMLHttpRequest'
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json',
+                            'X-CSRFToken': getCookie('csrftoken')
                         },
-                        body: JSON.stringify({
-                            task_id: taskId,
-                            target_quadrant: targetQuadrant
-                        })
+                        body: formData
                     });
 
                     const data = await response.json();
 
                     if (data.status === 'success') {
-                        window.location.reload();
+                        if (data.card_html) {
+                            const tempDiv = document.createElement('div');
+                            tempDiv.innerHTML = data.card_html.trim();
+                            const newCard = tempDiv.firstElementChild;
+                            itemEl.replaceWith(newCard);
+
+                            if (data.date_restriction_applied || data.quadrant !== targetQuadrant) {
+                                const correctContainer = document.querySelector(`.quadrant-container[data-quadrant="${data.quadrant}"]`);
+                                if (correctContainer) {
+                                    reinsertCardAboveAddBtn(correctContainer, newCard);
+                                }
+                                
+                                // AQUÍ VA EL PUNTO DOS: Retardo de 200ms para asegurar el pintado en el DOM
+                                setTimeout(() => {
+                                    if (typeof window.triggerDueDateShake === 'function') {
+                                        window.triggerDueDateShake(newCard);
+                                    }
+                                }, 200);
+                            }
+                        }
                     } else {
-                        sourceContainer.appendChild(itemEl);
-                        isProcessingMove = false;
+                        reinsertCardAboveAddBtn(sourceContainer, itemEl);
                     }
                 } catch (err) {
-                    console.error('Error al mover la tarea:', err);
-                    sourceContainer.appendChild(itemEl);
+                    console.error('Error al mover tarjeta vía Drag & Drop:', err);
+                    reinsertCardAboveAddBtn(sourceContainer, itemEl);
+                } finally {
                     isProcessingMove = false;
                 }
             }
