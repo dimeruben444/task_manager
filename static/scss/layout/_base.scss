@@ -1,72 +1,211 @@
+// static/scss/_base.scss
+// ==========================================
+// TOKENS UI - PALETA CLARITY / SLATE
+// ==========================================
 
-// ESTILOS PARA EL BUSCADOR GLOBAL (TRELLO DROPDOWN)
+$nav-bg: #1e293b;            // Slate 800
+$nav-border: #334155;        // Slate 700
+$nav-search-bg: rgba(15, 23, 42, 0.6); // Slate 900 traslúcido
+$text-logo-primary: #ffffff;
+$text-logo-accent: #60a5fa;  // Blue 400
+$text-muted-slate: #94a3b8;  // Slate 400
+$badge-workspace-bg: rgba(255, 255, 255, 0.08);
+$badge-workspace-text: #cbd5e1; // Slate 300
+$avatar-bg: #2563eb;         // Blue 600
 
+// ==========================================
+// COMPONENTE: NAVBAR SUPERIOR
+// ==========================================
+
+.app-navbar {
+  background-color: $nav-bg !important;
+  border-bottom: 1px solid $nav-border !important;
+  height: 60px;
+  width: 100%;
+  position: sticky;
+  top: 0;
+  z-index: 1020; // Asegura estar por debajo de los modales (2050)
+
+  // 1. BRANDING Y LOGO
+  .navbar-brand-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+
+    .brand-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: $text-logo-primary;
+      margin: 0;
+      letter-spacing: -0.02em;
+
+      .brand-accent {
+        color: $text-logo-accent;
+      }
+    }
+
+    .badge-workspace {
+      background-color: $badge-workspace-bg;
+      color: $badge-workspace-text;
+      font-size: 0.72rem;
+      font-weight: 500;
+      padding: 0.25rem 0.6rem;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+  }
+
+  // 2. BUSCADOR CENTRAL
+  .navbar-search-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 440px;
+
+    .search-input {
+      background-color: $nav-search-bg !important;
+      border: 1px solid $nav-border !important;
+      color: #f8fafc !important;
+      font-size: 0.85rem;
+      border-radius: 8px;
+      padding: 0.45rem 2.5rem 0.45rem 2.25rem;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+      &::placeholder {
+        color: $text-muted-slate;
+        opacity: 1;
+      }
+
+      &:focus {
+        border-color: $text-logo-accent !important;
+        box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.15) !important;
+        outline: none;
+      }
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: $text-muted-slate;
+      font-size: 0.85rem;
+      pointer-events: none;
+    }
+
+    .shortcut-badge {
+      position: absolute;
+      right: 0.6rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background-color: $nav-bg;
+      border: 1px solid $nav-border;
+      color: $text-muted-slate;
+      font-size: 0.68rem;
+      font-weight: 600;
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      user-select: none;
+      pointer-events: none;
+    }
+  }
+
+  // 3. AVATAR DE USUARIO
+  .navbar-user-wrapper {
+    .user-avatar {
+      width: 32px;
+      height: 32px;
+      background-color: $avatar-bg;
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 0.78rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    }
+  }
+}
+
+// ==========================================
+// BUSCADOR GLOBAL Y DROPDOWN FLOTANTE
+// ==========================================
 
 #globalTaskSearchWrapper {
-    position: relative !important;
+  position: relative !important;
 
-    #searchDropdownResults {
-        background-color: #1e242b !important;
-        border: 1px solid rgba(255, 255, 255, 0.15) !important;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5) !important;
-        overflow-x: hidden !important;
-        z-index: 2005 !important;
+  #searchDropdownResults {
+    background-color: #0f172a !important; // Slate 900
+    border: 1px solid #334155 !important; // Slate 700
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.4) !important;
+    border-radius: 12px;
+    overflow-x: hidden !important;
+    z-index: 1025 !important;
 
-        &::-webkit-scrollbar {
-            width: 6px;
-        }
-        &::-webkit-scrollbar-track {
-            background: #1e242b;
-        }
-        &::-webkit-scrollbar-thumb {
-            background: #4a5568;
-            border-radius: 4px;
-
-            &:hover {
-                background: #718096;
-            }
-        }
-
-        .search-result-item {
-            background-color: rgba(255, 255, 255, 0.05);
-            transition: background-color 0.15s ease-in-out, transform 0.1s ease-in-out;
-
-            &:hover {
-                background-color: rgba(255, 255, 255, 0.18) !important;
-                transform: translateX(2px);
-            }
-
-            &:active {
-                background-color: rgba(255, 255, 255, 0.25) !important;
-            }
-
-            // CONTENEDOR DEL TEXTO (Previene que empuje al badge)
-            .search-item-title-wrapper {
-                min-width: 0; // Imprescindible para flexbox truncado
-                flex: 1 1 auto;
-                overflow: hidden;
-            }
-
-            .task-title-text {
-                font-size: 0.88rem;
-                color: #ffffff;
-                white-space: nowrap !important;
-                overflow: hidden !important;
-                text-overflow: ellipsis !important;
-                display: block;
-
-                &.is-completed {
-                    color: rgba(255, 255, 255, 0.6) !important;
-                    text-decoration: line-through;
-                }
-            }
-
-            .badge {
-                font-size: 0.68rem;
-                font-weight: 500;
-                padding: 0.35em 0.65em;
-                flex-shrink: 0 !important; // Evita que el badge se aplaste o deforme
-            }
-        }
+    &::-webkit-scrollbar {
+      width: 6px;
     }
+    &::-webkit-scrollbar-track {
+      background: #0f172a;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 4px;
+
+      &:hover {
+        background: #475569;
+      }
+    }
+
+    .search-result-item {
+      background-color: rgba(255, 255, 255, 0.04);
+      border-radius: 8px;
+      transition: background-color 0.15s ease-in-out, transform 0.1s ease-in-out;
+
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.12) !important;
+        transform: translateX(2px);
+      }
+
+      &:active {
+        background-color: rgba(255, 255, 255, 0.2) !important;
+      }
+
+      .search-item-title-wrapper {
+        min-width: 0;
+        flex: 1 1 auto;
+        overflow: hidden;
+      }
+
+      .task-title-text {
+        font-size: 0.88rem;
+        color: #f8fafc;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        display: block;
+
+        &.is-completed {
+          color: #94a3b8 !important;
+          text-decoration: line-through;
+        }
+      }
+
+      .badge {
+        font-size: 0.68rem;
+        font-weight: 500;
+        padding: 0.35em 0.65em;
+        flex-shrink: 0 !important;
+      }
+    }
+  }
+}
+
+// CAPAS DE APILAMIENTO DE MODALES REFORZADAS
+.modal {
+  z-index: 2050 !important;
+}
+
+.modal-backdrop {
+  z-index: 2040 !important;
 }

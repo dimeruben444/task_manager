@@ -242,26 +242,30 @@ function sendToggleRequest(taskId, isCompleted, checkbox) {
                                    || card.textContent.trim();
 
                     const restoredCard = document.createElement('div');
-                    restoredCard.className = 'card mb-2 p-0 shadow-sm border-0 task-card';
+                    restoredCard.className = 'card mb-2 shadow-sm border-0 task-card';
                     restoredCard.id = `task-card-${taskId}`;
                     restoredCard.setAttribute('data-task-id', taskId);
                     restoredCard.setAttribute('data-urgency', card.dataset.urgency || "4");
                     restoredCard.setAttribute('data-importance', card.dataset.importance || "4");
                     restoredCard.style.cursor = 'pointer';
 
+                    // INYECCIÓN COMPLETA DE ESTRUCTURA CON TRES PUNTOS
                     restoredCard.innerHTML = `
                         <div class="card-body py-2 px-3 d-flex flex-column justify-content-center">
-                            <div class="task-card-header d-flex align-items-center position-relative w-100">
+                            <div class="task-card-header d-flex align-items-center justify-content-between position-relative w-100 gap-2" style="min-height: 24px;">
                                 <div class="task-checkbox-wrapper flex-shrink-0">
                                     <label class="task-checkbox-container m-0" onclick="event.stopPropagation();">
                                         <input type="checkbox" class="task-completion-check" data-task-id="${taskId}">
                                         <span class="checkmark"></span>
                                     </label>
                                 </div>
-                                <div class="task-title-wrapper w-100" data-bs-toggle="modal" data-bs-target="#viewTaskModal${taskId}">
-                                    <h6 class="card-title task-title mb-0 fw-semibold text-dark" style="font-size: 0.88rem; line-height: 1.35; margin: 0;">
+                                <div class="task-title-wrapper flex-grow-1 min-w-0" data-bs-toggle="modal" data-bs-target="#viewTaskModal${taskId}">
+                                    <h6 class="card-title task-title mb-0 fw-semibold text-dark" style="font-size: 0.85rem; line-height: 1.3; margin: 0;">
                                         ${titleText}
                                     </h6>
+                                </div>
+                                <div class="task-card-actions flex-shrink-0 opacity-50 hover-opacity-100 ms-1" data-bs-toggle="modal" data-bs-target="#viewTaskModal${taskId}">
+                                    <i class="bi bi-three-dots text-muted" style="font-size: 0.85rem; line-height: 1;"></i>
                                 </div>
                             </div>
                         </div>

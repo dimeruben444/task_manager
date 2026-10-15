@@ -603,3 +603,4 @@ function updateDistributionCounts() {
   if (elQ3) elQ3.textContent = `${q3} ${q3 === 1 ? 'tarea' : 'tareas'}`;
   if (elQ4) elQ4.textContent = `${q4} ${q4 === 1 ? 'tarea' : 'tareas'}`;
 }
+

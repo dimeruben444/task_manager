@@ -19,89 +19,85 @@
 </head>
 <body class="bg-light">
 
-    <!-- BARRA DE NAVEGACIÓN SUPERIOR -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm py-2">
-        <div class="container-fluid px-4 d-flex justify-content-between align-items-center">
+    <!-- BARRA DE NAVEGACIÓN SUPERIOR (CLARITY / EISENHOWER FLOW STYLE) -->
+    <nav class="app-navbar">
+        <div class="container-fluid px-4 d-flex justify-content-between align-items-center h-100">
             
-            <!-- LOGO / BRAND (IZQUIERDA) -->
-            <a class="navbar-brand fw-bold me-0" href="{% url 'dashboard' %}">
-                🎯 {% translate "Eisenhower Task Manager" %}
-            </a>
+            <!-- BRANDING Y LOGO (IZQUIERDA) -->
+            <div class="navbar-brand-wrapper d-flex align-items-center gap-2">
+                <a href="{% url 'dashboard' %}" class="text-decoration-none">
+                    <h1 class="brand-title m-0">
+                        Eisenhower<span class="brand-accent">Flow</span>
+                    </h1>
+                </a>
+                <span class="badge-workspace">Workspace</span>
+            </div>
             
-            <!-- BUSCADOR GLOBAL CON DESPLEGABLE ESTILO TRELLO -->
+            <!-- BUSCADOR GLOBAL (CENTRO) -->
             {% if request.resolver_match.url_name != 'login' and request.resolver_match.url_name != 'register' %}
-                <div id="globalTaskSearchWrapper" class="position-relative d-none d-md-block mx-3" style="width: 100%; max-width: 480px; z-index: 2000;">
-                    <div class="input-group input-group-sm">
-                        <span class="input-group-text bg-secondary border-secondary text-white-50 pe-1">🔍</span>
+                <div id="globalTaskSearchWrapper" class="navbar-search-wrapper d-none d-md-block mx-3">
+                    <div class="position-relative">
+                        <i class="bi bi-search search-icon"></i>
                         <input type="text" 
                             id="globalTaskSearchInput" 
-                            class="form-control bg-secondary text-white border-secondary shadow-none ps-2" 
+                            class="form-control search-input" 
                             placeholder="Buscar tareas..." 
                             autocomplete="off"
                             oninput="handleTaskSearchInput(this.value)"
                             onfocus="handleTaskSearchInput(this.value)">
-                        <button class="btn btn-outline-secondary border-secondary text-white-50 d-none" 
-                                type="button" 
-                                id="clearSearchBtn" 
-                                onclick="clearGlobalSearch()">✕</button>
+                        <kbd class="shortcut-badge">⌘K</kbd>
                     </div>
-                    
 
-                    <!-- Menú desplegable flotante -->
+                    <!-- Menú desplegable flotante de resultados -->
                     <div id="searchDropdownResults" 
                         class="dropdown-menu shadow-lg border-0 rounded-3 p-2 mt-1 w-100 bg-dark text-white d-none position-absolute" 
-                        style="max-height: 380px; overflow-y: auto; z-index: 2005; top: 100%; left: 0;">
+                        style="max-height: 380px; overflow-y: auto; top: 100%; left: 0;">
                     </div>
                 </div>
             {% endif %}
 
             <!-- MENÚ DE USUARIO (DERECHA) -->
-            <div class="d-flex align-items-center ms-0">
+            <div class="navbar-user-wrapper d-flex align-items-center">
                 {% if user.is_authenticated %}
                     <div class="dropdown">
-                    
                         <!-- BOTÓN SUPERIOR EN LA BARRA -->
-                        <button class="btn btn-outline-light btn-sm dropdown-toggle d-flex align-items-center gap-2 shadow-sm border-0 py-1 px-2.5 navbar-user-btn" 
+                        <button class="btn p-0 border-0 shadow-none d-flex align-items-center gap-2" 
                                 type="button" 
                                 id="userMenuButton" 
                                 data-bs-toggle="dropdown" 
                                 aria-expanded="false">
                             
-                            <!-- BOLA DE INICIALES -->
-                            <span class="rounded-circle bg-primary text-white fw-bold d-inline-flex justify-content-center align-items-center" 
-                                style="width: 28px; height: 28px; font-size: 0.75rem;">
+                            <!-- BOLA DE INICIALES AVATAR (#2563eb) -->
+                            <div class="user-avatar" title="{{ user.username }}">
                                 {% if user.first_name and user.last_name %}
                                     {{ user.first_name|slice:":1"|upper }}{{ user.last_name|slice:":1"|upper }}
                                 {% else %}
                                     {{ user.username|slice:":2"|upper }}
                                 {% endif %}
-                            </span>
+                            </div>
 
-                            <span class="fw-semibold small user-username-text">
+                            <span class="fw-semibold small text-white d-none d-sm-inline">
                                 {{ user.username }}
                             </span>
                         </button>
                         
-                        <!-- MENÚ DESPLEGABLE -->
+                        <!-- MENÚ DESPLEGABLE DE MI CUENTA -->
                         <div class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-3 p-3 mt-2" 
                             aria-labelledby="userMenuButton" 
-                            style="min-width: 260px;">
+                            style="min-width: 260px; z-index: 2060;">
                             
-                            <!-- ETIQUETA CUENTA -->
                             <div class="text-uppercase text-muted fw-bold mb-2" style="font-size: 0.7rem; letter-spacing: 0.5px;">
                                 {% translate "CUENTA" %}
                             </div>
 
-                            <!-- FILA DE USUARIO: AVATAR + NOMBRE Y CORREO -->
                             <div class="d-flex align-items-center gap-3 py-1 mb-1">
-                                <span class="rounded-circle bg-primary text-white fw-bold d-inline-flex justify-content-center align-items-center flex-shrink-0" 
-                                    style="width: 42px; height: 42px; font-size: 1rem;">
+                                <div class="user-avatar flex-shrink-0" style="width: 42px; height: 42px; font-size: 1rem;">
                                     {% if user.first_name and user.last_name %}
                                         {{ user.first_name|slice:":1"|upper }}{{ user.last_name|slice:":1"|upper }}
                                     {% else %}
                                         {{ user.username|slice:":2"|upper }}
                                     {% endif %}
-                                </span>
+                                </div>
 
                                 <div class="d-flex flex-column min-w-0" style="line-height: 1.25;">
                                     <span class="fw-bold text-dark text-truncate" style="font-size: 0.9rem;">
@@ -119,7 +115,6 @@
 
                             <hr class="my-2 text-muted opacity-25">
 
-                            <!-- OPCIÓN DE CERRAR SESIÓN -->
                             <form method="POST" action="{% url 'logout' %}" class="m-0">
                                 {% csrf_token %}
                                 <button type="submit" class="dropdown-item text-danger fw-semibold rounded-2 py-1.5 px-2 d-flex align-items-center gap-2 small">
@@ -143,31 +138,31 @@
         </div>
     </nav>
 
-   <!-- ESTRUCTURA DE 2 COLUMNAS: TABLEROS MINIMALISTA + CONTENIDO -->
-    <div class="app-dashboard-layout d-flex" style="min-height: calc(100vh - 56px);">
+    <!-- ESTRUCTURA PRINCIPAL DE 3 COLUMNAS -->
+    <div class="app-dashboard-layout d-flex" style="min-height: calc(100vh - 60px);">
         
         {% if user.is_authenticated %}
             <!-- 1. COLUMNA IZQUIERDA: LISTA DE TABLEROS MINIMALISTA -->
             <aside class="sidebar-boards p-3 bg-white border-end d-flex flex-column" style="width: 240px; flex-shrink: 0;">
                 <div class="d-flex justify-content-between align-items-center mb-3 px-1">
-                    <span class="text-muted fw-bold small text-uppercase">{% translate "Tableros" %}</span>
+                    <span class="text-muted fw-bold small text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.05em;">{% translate "Tableros" %}</span>
                 </div>
                 
                 <div class="boards-stack flex-grow-1 overflow-auto">
                     <!-- ENLACE GENERAL -->
                     <a href="{% url 'dashboard' %}" 
-                       class="board-chip d-block text-decoration-none mb-1 p-2 rounded small {% if not current_board %}bg-light fw-bold text-dark{% else %}text-secondary{% endif %}">
+                       class="board-chip d-block text-decoration-none mb-1 p-2 rounded small {% if not current_board %}active{% endif %}">
                         🌐 {% translate "General" %}
                     </a>
 
                     <!-- TABLEROS PROPIOS -->
                     {% for b in boards %}
                         {% if not b.is_default %}
-                            <div class="board-item d-flex align-items-center justify-content-between mb-1 p-2 rounded {% if current_board.id == b.id %}bg-light fw-bold{% endif %}"
+                            <div class="board-item d-flex align-items-center justify-content-between mb-1 p-2 rounded {% if current_board.id == b.id %}active{% endif %}"
                                  style="--board-color: {{ b.color|default:'#6c757d' }};">
                                 
                                 <a href="{% url 'dashboard_board' b.id %}" 
-                                   class="text-decoration-none text-truncate flex-grow-1 d-flex align-items-center gap-2 small" style="color: #333;">
+                                   class="text-decoration-none text-truncate flex-grow-1 d-flex align-items-center gap-2 small" style="color: inherit;">
                                     <span class="color-dot d-inline-block rounded-circle flex-shrink-0" style="width: 8px; height: 8px; background-color: var(--board-color);"></span>
                                     <span class="board-title text-truncate">{{ b.title }}</span>
                                 </a>
@@ -235,7 +230,6 @@
                         {% endif %}
                     {% endfor %}
 
-                    <!-- BOTÓN NUEVO TABLERO -->
                     <button class="btn btn-outline-secondary btn-sm mt-2 w-100" data-bs-toggle="modal" data-bs-target="#createBoardModal">
                         + {% translate "Nuevo Tablero" %}
                     </button>
@@ -251,7 +245,6 @@
                         <div class="bg-light p-3 rounded-4 border border-light-subtle shadow-sm">
                             <div class="d-flex flex-column gap-2">
                                 
-                                <!-- Q1: HACER -->
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div class="d-flex align-items-center gap-2">
                                         <span class="rounded-circle d-inline-block flex-shrink-0" style="width: 8px; height: 8px; background-color: #ef4444;"></span>
@@ -262,7 +255,6 @@
                                     </span>
                                 </div>
 
-                                <!-- Q2: PLANIFICAR -->
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div class="d-flex align-items-center gap-2">
                                         <span class="rounded-circle d-inline-block flex-shrink-0" style="width: 8px; height: 8px; background-color: #3b82f6;"></span>
@@ -273,7 +265,6 @@
                                     </span>
                                 </div>
 
-                                <!-- Q3: DELEGAR -->
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div class="d-flex align-items-center gap-2">
                                         <span class="rounded-circle d-inline-block flex-shrink-0" style="width: 8px; height: 8px; background-color: #f59e0b;"></span>
@@ -284,7 +275,6 @@
                                     </span>
                                 </div>
 
-                                <!-- Q4: ELIMINAR -->
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div class="d-flex align-items-center gap-2">
                                         <span class="rounded-circle d-inline-block flex-shrink-0" style="width: 8px; height: 8px; background-color: #9ca3af;"></span>
@@ -304,7 +294,7 @@
         {% endif %}
 
         <!-- 2. ÁREA PRINCIPAL -->
-        <main class="flex-grow-1 p-3 overflow-auto" style="background-color: #f4f5f7;">
+        <main class="flex-grow-1 p-0 bg-transparent overflow-auto">
             {% block content %}
             {% endblock %}
         </main>

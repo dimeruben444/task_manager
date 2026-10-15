@@ -1,66 +1,62 @@
 // static/scss/components/_stars.scss
 
-$star-active: #000000;
-$star-inactive: #d1d5db;
-$star-error: #dc2626; // Rojo de advertencia
+$star-active: #3b82f6;      // Azul Stitch primario
+$star-inactive: #e2e8f0;    // Gris claro tenue
+$star-error: #dc2626;       // Rojo de advertencia
 
 .rating-wrapper {
-    width: fit-content; // El ancho se ajusta exactamente a las estrellas
+    width: fit-content;
 }
 
 .star-rating {
     display: inline-flex;
-    flex-direction: row-reverse;
-    justify-content: space-between;
-    gap: 8px;
-    width: 100%;
+    flex-direction: row-reverse; // Invierte el orden en el DOM para que el selector ~ funcione a la izquierda
+    justify-content: flex-end;
+    gap: 6px;
 
     input[type="radio"] {
         display: none;
     }
 
     label {
-        font-size: 1.6rem;
+        font-size: 1.35rem;
         color: $star-inactive;
         cursor: pointer;
         transition: color 0.15s ease-in-out, transform 0.1s ease;
         user-select: none;
+        line-height: 1;
 
+        // Al hacer hover, colorea la estrella apuntada y todas sus anteriores a la izquierda
         &:hover,
         &:hover ~ label {
             color: $star-active !important;
         }
     }
 
-    input[type="radio"]:checked ~ label {
-        color: $star-active;
+    // Colorea las estrellas seleccionadas
+    input[type="radio"]:checked ~ label,
+    input[type="radio"]:checked + label {
+        color: $star-active !important;
     }
 
     label:hover {
         transform: scale(1.15);
     }
 
-    // Marca las estrellas en rojo con animación de agitación si no se han seleccionado
+    // Animación de agitación y estado de error
     &.is-invalid label {
         color: $star-error !important;
-        animation: shake 0.3s ease-in-out;
+        animation: shakeStars 0.3s ease-in-out;
     }
-}
-
-@keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-3px); }
-    75% { transform: translateX(3px); }
-}
-
-/* Respaldo CSS directo para error de validación */
-.star-rating.is-invalid label {
-    color: #dc2626 !important;
-    animation: shakeStars 0.3s ease-in-out;
 }
 
 @keyframes shakeStars {
     0%, 100% { transform: translateX(0); }
     25% { transform: translateX(-4px); }
     75% { transform: translateX(4px); }
+}
+
+.star-rating.is-invalid label {
+    color: $star-error !important;
+    animation: shakeStars 0.3s ease-in-out;
 }

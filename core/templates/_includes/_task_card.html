@@ -1,7 +1,7 @@
 {% load i18n %}
 
-<!-- TARJETA EN EL TABLERO -->
-<div class="card mb-2 p-0 shadow-sm border-0 task-card {% if task.is_completed %}is-completed{% endif %}" 
+<!-- TARJETA COMPACTA EN EL TABLERO -->
+<div class="card mb-2 shadow-sm border-0 task-card {% if task.is_completed %}is-completed{% endif %}" 
      id="task-card-{{ task.id }}"
      data-task-id="{{ task.id }}"
      data-urgency="{{ task.urgency }}"
@@ -11,8 +11,8 @@
     
     <div class="card-body py-2 px-3 d-flex flex-column justify-content-center">
         
-        <!-- FILA SUPERIOR: CHECKBOX + TÍTULO -->
-        <div class="task-card-header d-flex align-items-center position-relative w-100">
+        <!-- FILA SUPERIOR: CHECKBOX + TÍTULO + TRES PUNTOS -->
+        <div class="task-card-header d-flex align-items-center justify-content-between position-relative w-100 gap-2" style="min-height: 24px;">
             
             <!-- Checkbox flotante/interactivo -->
             <div class="task-checkbox-wrapper flex-shrink-0">
@@ -26,11 +26,16 @@
             </div>
 
             <!-- Título de la tarjeta -->
-            <div class="task-title-wrapper w-100" data-bs-toggle="modal" data-bs-target="#viewTaskModal{{ task.id }}">
+            <div class="task-title-wrapper flex-grow-1 min-w-0" data-bs-toggle="modal" data-bs-target="#viewTaskModal{{ task.id }}">
                 <h6 class="card-title task-title mb-0 fw-semibold text-dark {% if task.is_completed %}completed-text{% endif %}" 
-                    style="font-size: 0.88rem; line-height: 1.35; margin: 0;">
+                    style="font-size: 0.85rem; line-height: 1.3; margin: 0;">
                     {{ task.title }}
                 </h6>
+            </div>
+
+            <!-- Tres puntos de opciones -->
+            <div class="task-card-actions flex-shrink-0 opacity-50 hover-opacity-100 ms-1" data-bs-toggle="modal" data-bs-target="#viewTaskModal{{ task.id }}">
+                <i class="bi bi-three-dots text-muted" style="font-size: 0.85rem; line-height: 1;"></i>
             </div>
 
         </div>
@@ -38,47 +43,45 @@
         {% with first_assignee=task.assigned_to.first total_assignees=task.assigned_to.count %}
             {% if task.due_date or task.description or task.assigned_to.exists and total_assignees > 1 or task.assigned_to.exists and first_assignee != task.created_by %}
                 
+                <!-- METADATOS COMPACTOS (SOLO CUANDO EXISTEN) -->
                 <div class="d-flex align-items-center justify-content-between mt-1 pt-1 text-muted" 
-                     style="font-size: 0.72rem;" 
+                     style="font-size: 0.7rem;" 
                      data-bs-toggle="modal" 
                      data-bs-target="#viewTaskModal{{ task.id }}">
                     
-                    <div class="d-flex align-items-center gap-2">
+                    <div class="d-flex align-items-center gap-1.5 flex-wrap">
                         {% if task.due_date %}
-                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle d-inline-flex align-items-center gap-1 px-1.5 py-1 task-date-badge">
-                                <svg xmlns="http://www.w3.org/2000/svg" height="12px" viewBox="0 -960 960 960" width="12px" fill="currentColor"><path d="m612-292 56-56-148-148v-184h-80v216l172 172ZM480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-400Zm0 320q133 0 226.5-93.5T800-480q0-133-93.5-226.5T480-800q-133 0-226.5 93.5T160-480q0 133 93.5 226.5T480-160Z"/></svg>
+                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle d-inline-flex align-items-center gap-1 px-1.5 py-0.5 rounded-md task-date-badge" style="font-size: 0.65rem;">
+                                <i class="bi bi-calendar3"></i>
                                 {{ task.due_date|date:"d M" }}
                             </span>
                         {% endif %}
 
                         {% if task.description %}
-                            <span title="{% translate 'Tiene descripción' %}">
-                                <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="#888"><path d="M320-240h320v-80H320v80Zm0-160h320v-80H320v80ZM240-80q-33 0-56.5-23.5T160-160v-640q0-33 23.5-56.5T240-880h320l240 240v480q0 33-23.5 56.5T720-80H240Zm280-520v-200H240v640h480v-440H520ZM240-800v200-200 640-640Z"/></svg>
+                            <span class="badge bg-light text-secondary border px-1.5 py-0.5 rounded-md" title="{% translate 'Tiene descripción' %}" style="font-size: 0.65rem;">
+                                <i class="bi bi-card-text"></i> {% translate "Doc anexa" %}
                             </span>
                         {% endif %}
                     </div>
 
+                    <!-- ASIGNADOS COMPACTOS -->
                     <div class="ms-auto d-flex align-items-center gap-1">
                         {% if task.assigned_to.exists %}
-                            {% if total_assignees > 1 or first_assignee != task.created_by %}
-                                <div class="position-relative d-inline-flex align-items-center">
-                                    <!-- Iniciales del primer asignado -->
-                                    <span class="badge bg-danger text-white rounded-circle d-inline-flex align-items-center justify-content-center shadow-sm p-0" 
-                                        style="width: 22px; height: 22px; font-size: 0.65rem; font-weight: bold;"
-                                        title="{% translate 'Asignado a:' %} {{ first_assignee.username }}">
-                                        {{ first_assignee.username|slice:":2"|upper }}
-                                    </span>
+                            <div class="position-relative d-inline-flex align-items-center">
+                                <span class="badge bg-dark text-white rounded-circle d-inline-flex align-items-center justify-content-center shadow-sm p-0" 
+                                    style="width: 20px; height: 20px; font-size: 0.6rem; font-weight: bold;"
+                                    title="{% translate 'Asignado a:' %} {{ first_assignee.username }}">
+                                    {{ first_assignee.username|slice:":2"|upper }}
+                                </span>
 
-                                    <!-- Indicador +N si hay más de 1 asignado -->
-                                    {% if total_assignees > 1 %}
-                                        <span class="badge bg-dark text-white rounded-pill ms-1 d-inline-flex align-items-center justify-content-center px-1.5 py-0.5" 
-                                            style="font-size: 0.6rem; font-weight: 700; line-height: 1;"
-                                            title="{% translate 'Total de asignados:' %} {{ total_assignees }}">
-                                            +{{ total_assignees|add:"-1" }}
-                                        </span>
-                                    {% endif %}
-                                </div>
-                            {% endif %}
+                                {% if total_assignees > 1 %}
+                                    <span class="badge bg-secondary text-white rounded-pill ms-1 d-inline-flex align-items-center justify-content-center px-1 py-0.5" 
+                                        style="font-size: 0.58rem; font-weight: 700;"
+                                        title="{% translate 'Total de asignados:' %} {{ total_assignees }}">
+                                        +{{ total_assignees|add:"-1" }}
+                                    </span>
+                                {% endif %}
+                            </div>
                         {% endif %}
                     </div>
 
@@ -90,63 +93,61 @@
     </div>
 </div>
 
-<!-- MODAL DETALLE / EDICIÓN ESTILO TRELLO -->
+<!-- MODAL DETALLE / EDICIÓN ESTILO STITCH -->
 <div class="modal fade" id="viewTaskModal{{ task.id }}" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-top-aligned">
-        <div class="modal-content border-0 shadow text-dark">
+        <div class="modal-content border-0 shadow-2xl rounded-2xl text-dark bg-white" style="border-radius: 16px;">
             
             <form method="POST" action="{% url 'edit_task' task.id %}" id="editTaskForm{{ task.id }}" onsubmit="saveTaskModal('{{ task.id }}', event); return false;">
                 {% csrf_token %}
                 
-                <!-- FILA 1: BARRA SUPERIOR (DESPLEGABLE MATRIZ + BOTÓN CERRAR) -->
-                <div class="modal-header border-bottom-0 pb-1 pt-3 px-3 d-flex justify-content-between align-items-center">
+                <!-- CABECERA -->
+                <div class="modal-header border-bottom-0 pb-1 pt-4 px-4 d-flex justify-content-between align-items-center">
                     <div class="dropdown">
-                        <button class="btn btn-outline-secondary btn-sm dropdown-toggle text-start d-flex align-items-center gap-2 shadow-none" 
+                        <button class="btn btn-light btn-sm rounded-lg border text-start d-flex align-items-center gap-2 shadow-none px-3 py-1.5" 
                                 type="button" 
                                 id="quadrantDropdown{{ task.id }}" 
                                 data-bs-toggle="dropdown" 
                                 aria-expanded="false" 
-                                style="font-size: 0.85rem;">
+                                style="font-size: 0.85rem; background-color: #f8fafc; border-color: #e2e8f0;">
                             
-                            <span id="quadrantDropdownSelected{{ task.id }}" class="d-flex align-items-center gap-2 text-dark fw-medium">
+                            <i class="bi bi-grid-fill text-muted"></i>
+                            <span id="quadrantDropdownSelected{{ task.id }}" class="d-flex align-items-center gap-2 text-dark fw-semibold">
                                 {% if task.urgency >= 3 and task.importance >= 3 %}
-                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="1" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="9" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/></svg>
                                     {% translate "Urgente e Importante (Hacer ahora)" %}
                                 {% elif task.urgency <= 2 and task.importance >= 3 %}
-                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="9" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="1" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="9" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/></svg>
                                     {% translate "Importante - No Urgente (Planificar)" %}
                                 {% elif task.urgency >= 3 and task.importance <= 2 %}
-                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="9" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="1" y="9" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/></svg>
                                     {% translate "Urgente - No Importante (Delegar)" %}
                                 {% else %}
-                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="9" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="1" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="9" y="9" width="6" height="6" rx="1" fill="currentColor"/></svg>
                                     {% translate "No Urgente - No Importante (Eliminar)" %}
                                 {% endif %}
                             </span>
+                            <i class="bi bi-chevron-down text-muted ms-1" style="font-size: 0.75rem;"></i>
                         </button>
 
-                        <ul class="dropdown-menu shadow border-0 mt-1" aria-labelledby="quadrantDropdown{{ task.id }}">
+                        <ul class="dropdown-menu shadow-lg border-0 rounded-2xl mt-1 p-2" aria-labelledby="quadrantDropdown{{ task.id }}" style="border-radius: 12px; min-width: 280px;">
                             <li>
-                                <button type="button" class="dropdown-item d-flex align-items-center gap-2 small py-2" onclick="selectQuadrant('Q1', '{{ task.id }}', '{% translate "Urgente e Importante (Hacer ahora)" %}')">
-                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="1" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="9" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/></svg>
+                                <button type="button" class="dropdown-item d-flex align-items-center gap-2 small py-2 rounded-lg" onclick="selectQuadrant('Q1', '{{ task.id }}', '{% translate "Urgente e Importante (Hacer ahora)" %}')">
+                                    <span class="rounded-circle d-inline-block" style="width: 8px; height: 8px; background-color: #ef4444;"></span>
                                     <span>{% translate "Urgente e Importante (Hacer ahora)" %}</span>
                                 </button>
                             </li>
                             <li>
-                                <button type="button" class="dropdown-item d-flex align-items-center gap-2 small py-2" onclick="selectQuadrant('Q2', '{{ task.id }}', '{% translate "Importante - No Urgente (Planificar)" %}')">
-                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="9" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="1" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="9" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/></svg>
+                                <button type="button" class="dropdown-item d-flex align-items-center gap-2 small py-2 rounded-lg" onclick="selectQuadrant('Q2', '{{ task.id }}', '{% translate "Importante - No Urgente (Planificar)" %}')">
+                                    <span class="rounded-circle d-inline-block" style="width: 8px; height: 8px; background-color: #3b82f6;"></span>
                                     <span>{% translate "Importante - No Urgente (Planificar)" %}</span>
                                 </button>
                             </li>
                             <li>
-                                <button type="button" class="dropdown-item d-flex align-items-center gap-2 small py-2" onclick="selectQuadrant('Q3', '{{ task.id }}', '{% translate "Urgente - No Importante (Delegar)" %}')">
-                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="9" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="1" y="9" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/></svg>
+                                <button type="button" class="dropdown-item d-flex align-items-center gap-2 small py-2 rounded-lg" onclick="selectQuadrant('Q3', '{{ task.id }}', '{% translate "Urgente - No Importante (Delegar)" %}')">
+                                    <span class="rounded-circle d-inline-block" style="width: 8px; height: 8px; background-color: #f59e0b;"></span>
                                     <span>{% translate "Urgente - No Importante (Delegar)" %}</span>
                                 </button>
                             </li>
                             <li>
-                                <button type="button" class="dropdown-item d-flex align-items-center gap-2 small py-2" onclick="selectQuadrant('Q4', '{{ task.id }}', '{% translate "No Urgente - No Importante (Eliminar)" %}')">
-                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="9" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="1" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="9" y="9" width="6" height="6" rx="1" fill="currentColor"/></svg>
+                                <button type="button" class="dropdown-item d-flex align-items-center gap-2 small py-2 rounded-lg" onclick="selectQuadrant('Q4', '{{ task.id }}', '{% translate "No Urgente - No Importante (Eliminar)" %}')">
+                                    <span class="rounded-circle d-inline-block" style="width: 8px; height: 8px; background-color: #9ca3af;"></span>
                                     <span>{% translate "No Urgente - No Importante (Eliminar)" %}</span>
                                 </button>
                             </li>
@@ -157,265 +158,234 @@
                     <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
-                <!-- FILA 2: TÍTULO MULTILÍNEA CON AJUSTE INSTANTÁNEO -->
-                <div class="px-3 pb-2 pt-1">
+                <!-- TÍTULO EDITABLE -->
+                <div class="px-4 pt-2 pb-0">
                     <textarea name="title" 
-                              class="form-control form-control-lg border-0 fs-4 fw-bold p-1 shadow-none bg-transparent task-title-textarea" 
+                              class="form-control form-control-lg border-0 fw-bold p-0 shadow-none bg-transparent task-title-textarea" 
                               placeholder="{% translate 'Título de la tarea' %}" 
                               required 
-                              style="resize: none; width: 100%; overflow: hidden; line-height: 1.35; word-break: break-word; overflow-wrap: anywhere; field-sizing: content;"
+                              style="resize: none; width: 100%; overflow: hidden; line-height: 1.3; font-size: 1.35rem; color: #18181b;"
                               oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';">{{ task.title }}</textarea>
                 </div>
 
                 <!-- CUERPO DEL MODAL -->
-                <div class="modal-body p-4 pt-2" style="overflow: visible !important;">
+                <div class="modal-body p-4">
                     <div class="row g-4">
                         
-                        <div class="col-md-7 d-flex flex-column justify-content-between">
-                            <div>
-                                <div class="p-3 bg-light rounded mb-3">
-                                    <div class="row g-0 align-items-center">
-                                        <div class="col-6 pe-4 border-end text-center">
-                                            <div class="d-flex justify-content-between align-items-center text-muted fw-bold small px-1 mb-1 ps-4 pe-4">
-                                                <span>-</span>
-                                                <span>{% translate "Urgencia" %}</span>
-                                                <span>+</span>
-                                            </div>
-                                            <div class="star-rating d-inline-flex">
-                                                <input type="radio" id="detail-urgency-4-{{ task.id }}" name="urgency" value="4" {% if task.urgency == 4 %}checked{% endif %}>
-                                                <label for="detail-urgency-4-{{ task.id }}">★</label>
-
-                                                <input type="radio" id="detail-urgency-3-{{ task.id }}" name="urgency" value="3" {% if task.urgency == 3 %}checked{% endif %}>
-                                                <label for="detail-urgency-3-{{ task.id }}">★</label>
-
-                                                <input type="radio" id="detail-urgency-2-{{ task.id }}" name="urgency" value="2" {% if task.urgency == 2 %}checked{% endif %}>
-                                                <label for="detail-urgency-2-{{ task.id }}">★</label>
-
-                                                <input type="radio" id="detail-urgency-1-{{ task.id }}" name="urgency" value="1" {% if task.urgency == 1 %}checked{% endif %}>
-                                                <label for="detail-urgency-1-{{ task.id }}">★</label>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-6 ps-4 text-center">
-                                            <div class="d-flex justify-content-between align-items-center text-muted fw-bold small px-1 mb-1 ps-4 pe-4">
-                                                <span>-</span>
-                                                <span>{% translate "Importancia" %}</span>
-                                                <span>+</span>
-                                            </div>
-                                            <div class="star-rating d-inline-flex">
-                                                <input type="radio" id="detail-importance-4-{{ task.id }}" name="importance" value="4" {% if task.importance == 4 %}checked{% endif %}>
-                                                <label for="detail-importance-4-{{ task.id }}">★</label>
-
-                                                <input type="radio" id="detail-importance-3-{{ task.id }}" name="importance" value="3" {% if task.importance == 3 %}checked{% endif %}>
-                                                <label for="detail-importance-3-{{ task.id }}">★</label>
-
-                                                <input type="radio" id="detail-importance-2-{{ task.id }}" name="importance" value="2" {% if task.importance == 2 %}checked{% endif %}>
-                                                <label for="detail-importance-2-{{ task.id }}">★</label>
-
-                                                <input type="radio" id="detail-importance-1-{{ task.id }}" name="importance" value="1" {% if task.importance == 1 %}checked{% endif %}>
-                                                <label for="detail-importance-1-{{ task.id }}">★</label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- OPCIONES DE LA TAREA (FECHAS, TABLERO Y DESCRIPCIÓN) -->
-                                <div class="d-flex flex-column gap-2 mb-3">
+                        <!-- COLUMNA IZQUIERDA -->
+                        <div class="col-md-7 border-end-md pe-md-4">
+                            
+                            <!-- CAJA DE EVALUACIÓN (URGENCIA & IMPORTANCIA) -->
+                            <div class="p-3 bg-light-subtle rounded-2xl border mb-3" style="border-radius: 12px; background-color: #fcfcfd;">
+                                <div class="row g-0 align-items-center">
                                     
-                                    <!-- 1. DESPLEGABLE FECHAS -->
-                                    <div class="dropdown">
-                                        <button class="btn btn-outline-secondary btn-sm text-start w-100 d-flex justify-content-between align-items-center bg-white shadow-none py-2 px-3 border rounded-3" 
-                                                type="button" 
-                                                id="dropdownDate{{ task.id }}" 
-                                                data-bs-toggle="dropdown" 
-                                                data-bs-auto-close="outside" 
-                                                aria-expanded="false">
-                                            <span class="d-flex align-items-center gap-2 text-dark">
-                                                <svg xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 -960 960 960" width="18px" fill="#6c757d"><path d="m612-292 56-56-148-148v-184h-80v216l172 172ZM480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-400Zm0 320q133 0 226.5-93.5T800-480q0-133-93.5-226.5T480-800q-133 0-226.5 93.5T160-480q0 133 93.5 226.5T480-160Z"/></svg>
-                                                <span class="fw-medium text-dark">{% translate "Fechas" %}</span>
-                                            </span>
-                                            <small class="text-muted fw-semibold" id="dateBadgeDisplay{{ task.id }}">{% if task.due_date %}{{ task.due_date|date:"d/m/Y H:i" }}{% else %}+{% endif %}</small>
-                                        </button>
-                                        
-                                        <div class="dropdown-menu dropdown-menu-dates p-3 shadow-lg border-0 rounded-3 mt-1 bg-white" aria-labelledby="dropdownDate{{ task.id }}" style="width: 310px; z-index: 1060;">
-                                            <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
-                                                <span class="fw-bold small text-dark">{% translate "Fechas" %}</span>
-                                                <button type="button" class="btn-close btn-sm" onclick="bootstrap.Dropdown.getInstance(document.getElementById('dropdownDate{{ task.id }}')).hide();"></button>
-                                            </div>
+                                    <!-- Urgencia -->
+                                    <div class="col-6 pe-3 border-end text-center">
+                                        <div class="d-flex justify-content-between align-items-center text-muted fw-bold small px-2 mb-1" style="font-size: 0.72rem;">
+                                            <span>-</span>
+                                            <span>{% translate "Urgencia" %}</span>
+                                            <span>+</span>
+                                        </div>
+                                        <div class="star-rating rating-wrapper d-inline-flex justify-content-center">
+                                            <input type="radio" id="detail-urgency-4-{{ task.id }}" name="urgency" value="4" {% if task.urgency == 4 %}checked{% endif %}>
+                                            <label for="detail-urgency-4-{{ task.id }}" title="Muy Urgente - 4">★</label>
 
-                                            <div id="inlineCalendar{{ task.id }}" class="mb-2 d-flex justify-content-center flatpickr-clean-container"></div>
+                                            <input type="radio" id="detail-urgency-3-{{ task.id }}" name="urgency" value="3" {% if task.urgency == 3 %}checked{% endif %}>
+                                            <label for="detail-urgency-3-{{ task.id }}" title="Urgente - 3">★</label>
 
-                                            <div class="mb-2">
-                                                <label class="form-label small text-muted mb-1 fw-bold">{% translate "Fecha de vencimiento" %}</label>
-                                                <div class="row g-2">
-                                                    <div class="col-7">
-                                                        <input type="text" id="displayDate{{ task.id }}" class="form-control form-control-sm text-center fw-medium" placeholder="AAAA-MM-DD" value="{% if task.due_date %}{{ task.due_date|date:'Y-m-d' }}{% endif %}">
-                                                    </div>
-                                                    <div class="col-5">
-                                                        <input type="time" id="displayTime{{ task.id }}" class="form-control form-control-sm text-center fw-medium" value="{% if task.due_date %}{{ task.due_date|date:'H:i' }}{% else %}12:00{% endif %}">
-                                                    </div>
-                                                </div>
-                                            </div>
+                                            <input type="radio" id="detail-urgency-2-{{ task.id }}" name="urgency" value="2" {% if task.urgency == 2 %}checked{% endif %}>
+                                            <label for="detail-urgency-2-{{ task.id }}" title="Moderado - 2">★</label>
 
-                                            <input type="hidden" name="due_date" id="hiddenDueDate{{ task.id }}" value="{{ task.due_date|date:'Y-m-d H:i' }}">
-
-                                            <div class="mb-2 form-check">
-                                                <input type="checkbox" class="form-check-input" name="reminder_enabled" id="reminder_enabled_{{ task.id }}" {% if task.reminder_enabled %}checked{% endif %}>
-                                                <label class="form-check-label small fw-bold text-dark" for="reminder_enabled_{{ task.id }}">
-                                                    {% translate "Crear recordatorio" %}
-                                                </label>
-                                            </div>
-
-                                            <div class="mb-3">
-                                                <select name="reminder_offset" class="form-select form-select-sm border">
-                                                    <option value="at_time" {% if task.reminder_offset == 'at_time' %}selected{% endif %}>{% translate "A la hora del vencimiento" %}</option>
-                                                    <option value="5_min" {% if task.reminder_offset == '5_min' %}selected{% endif %}>{% translate "5 minutos antes" %}</option>
-                                                    <option value="15_min" {% if task.reminder_offset == '15_min' %}selected{% endif %}>{% translate "15 minutos antes" %}</option>
-                                                    <option value="1_hour" {% if task.reminder_offset == '1_hour' %}selected{% endif %}>{% translate "1 hora antes" %}</option>
-                                                    <option value="2_hours" {% if task.reminder_offset == '2_hours' %}selected{% endif %}>{% translate "2 horas antes" %}</option>
-                                                    <option value="1_day" {% if task.reminder_offset == '1_day' %}selected{% endif %}>{% translate "1 día antes" %}</option>
-                                                    <option value="2_days" {% if task.reminder_offset == '2_days' %}selected{% endif %}>{% translate "2 días antes" %}</option>
-                                                    <option value="1_week" {% if task.reminder_offset == '1_week' %}selected{% endif %}>{% translate "1 semana antes" %}</option>
-                                                    <option value="2_weeks" {% if task.reminder_offset == '2_weeks' %}selected{% endif %}>{% translate "2 semanas antes" %}</option>
-                                                </select>
-                                            </div>
-
-                                            <div class="d-flex gap-2 mt-3">
-                                                <button type="button" class="btn btn-outline-danger btn-sm w-50 fw-bold" onclick="removeTaskDate('{{ task.id }}')">
-                                                    {% translate "Quitar" %}
-                                                </button>
-                                                <button type="button" class="btn btn-primary btn-sm w-50 fw-bold" onclick="saveTaskModal('{{ task.id }}', event)">
-                                                    {% translate "Guardar" %}
-                                                </button>
-                                            </div>
+                                            <input type="radio" id="detail-urgency-1-{{ task.id }}" name="urgency" value="1" {% if task.urgency == 1 %}checked{% endif %}>
+                                            <label for="detail-urgency-1-{{ task.id }}" title="Baja - 1">★</label>
                                         </div>
                                     </div>
 
-                                    
-                                    <!-- 2. DESPLEGABLE SELECCIONAR TABLERO CON COLOR -->
-                                    <div class="dropdown">
-                                        <button class="btn btn-outline-secondary btn-sm text-start w-100 d-flex justify-content-between align-items-center bg-white shadow-none py-2 px-3 border rounded-3" 
-                                                type="button" 
-                                                id="dropdownBoard{{ task.id }}" 
-                                                data-bs-toggle="dropdown" 
-                                                aria-expanded="false">
-                                            <span class="d-flex align-items-center gap-2 text-dark">
-                                                <svg xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 -960 960 960" width="18px" fill="#6c757d">
-                                                    <path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h240v-560H200v560Zm320 0h240v-240H520v240Zm0-320h240v-240H520v240Z"/>
-                                                </svg>
-                                                <span class="fw-medium text-dark">{% translate "Tablero" %}</span>
-                                            </span>
-                                            <span class="d-flex align-items-center gap-2">
-                                                {% if task.board and task.board.color %}
-                                                    <span class="rounded-circle d-inline-block" style="width: 8px; height: 8px; background-color: {{ task.board.color }};"></span>
-                                                {% endif %}
-                                                <small class="text-muted fw-semibold" id="boardBadgeDisplay{{ task.id }}">
-                                                    {% if task.board %}{{ task.board.title }}{% else %}General{% endif %}
-                                                </small>
-                                            </span>
-                                        </button>
-
-                                        <div class="dropdown-menu p-2 shadow-lg border-0 rounded-3 mt-1 bg-white" aria-labelledby="dropdownBoard{{ task.id }}" style="width: 280px; z-index: 1060;">
-                                            <div class="d-flex justify-content-between align-items-center px-2 py-1 mb-2 border-bottom">
-                                                <span class="fw-bold small text-dark">{% translate "Seleccionar Tablero" %}</span>
-                                                <button type="button" class="btn-close btn-sm" onclick="bootstrap.Dropdown.getInstance(document.getElementById('dropdownBoard{{ task.id }}')).hide();"></button>
-                                            </div>
-
-                                            <div class="d-flex flex-column gap-1">
-                                                {% if user.boards.all %}
-                                                    {% for board in user.boards.all %}
-                                                        <div class="custom-board-item d-flex justify-content-between align-items-center py-2 px-3 rounded-2 fw-semibold"
-                                                            style="cursor: pointer; color: #1f2937 !important; background-color: {% if task.board and board.id == task.board.id %}#e5e7eb{% else %}transparent{% endif %};"
-                                                            onclick="selectBoardOption('{{ board.id }}', '{{ board.title|escapejs }}', '{{ task.id }}')">
-                                                            
-                                                            <!-- Punto de color + Nombre del tablero -->
-                                                            <div class="d-flex align-items-center gap-2">
-                                                                <span class="rounded-circle d-inline-block flex-shrink-0" 
-                                                                    style="width: 8px; height: 8px; background-color: {{ board.color|default:'#0d6efd' }};"></span>
-                                                                <span style="color: #1f2937 !important; font-size: 0.88rem;">{{ board.title }}</span>
-                                                            </div>
-
-                                                            {% if task.board and board.id == task.board.id %}
-                                                                <svg xmlns="http://www.w3.org/2000/svg" height="16px" viewBox="0 -960 960 960" width="16px" fill="#0d6efd"><path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z"/></svg>
-                                                            {% endif %}
-                                                        </div>
-                                                    {% endfor %}
-                                                {% else %}
-                                                    <div class="custom-board-item d-flex justify-content-between align-items-center py-2 px-3 rounded-2 fw-semibold"
-                                                        style="cursor: pointer; color: #1f2937 !important; background-color: #e5e7eb;"
-                                                        onclick="selectBoardOption('', 'General', '{{ task.id }}')">
-                                                        
-                                                        <div class="d-flex align-items-center gap-2">
-                                                            <span class="rounded-circle d-inline-block flex-shrink-0" style="width: 8px; height: 8px; background-color: #0d6efd;"></span>
-                                                            <span style="color: #1f2937 !important; font-size: 0.88rem;">General</span>
-                                                        </div>
-
-                                                        <svg xmlns="http://www.w3.org/2000/svg" height="16px" viewBox="0 -960 960 960" width="16px" fill="#0d6efd"><path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z"/></svg>
-                                                    </div>
-                                                {% endif %}
-                                            </div>
-
-                                            <input type="hidden" name="board" id="hiddenBoardId{{ task.id }}" value="{% if task.board %}{{ task.board.id }}{% endif %}">
+                                    <!-- Importancia -->
+                                    <div class="col-6 ps-3 text-center">
+                                        <div class="d-flex justify-content-between align-items-center text-muted fw-bold small px-2 mb-1" style="font-size: 0.72rem;">
+                                            <span>-</span>
+                                            <span>{% translate "Importancia" %}</span>
+                                            <span>+</span>
                                         </div>
-                                    </div>
+                                        <div class="star-rating rating-wrapper d-inline-flex justify-content-center">
+                                            <input type="radio" id="detail-importance-4-{{ task.id }}" name="importance" value="4" {% if task.importance == 4 %}checked{% endif %}>
+                                            <label for="detail-importance-4-{{ task.id }}" title="Muy Importante - 4">★</label>
 
-                                    <!-- 3. DESCRIPCIÓN (BOTÓN + DESPLEGABLE COLLAPSE) -->
-                                    <button class="btn btn-outline-secondary btn-sm text-start w-100 d-flex justify-content-between align-items-center bg-white shadow-none py-2 px-3 border rounded-3" 
-                                            type="button" 
-                                            data-bs-toggle="collapse" 
-                                            data-bs-target="#collapseDesc{{ task.id }}">
-                                        <span class="d-flex align-items-center gap-2 text-dark">
-                                            <svg xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 -960 960 960" width="18px" fill="#6c757d">
-                                                <path d="M320-240h320v-80H320v80Zm0-160h320v-80H320v80ZM240-80q-33 0-56.5-23.5T160-160v-640q0-33 23.5-56.5T240-880h320l240 240v480q0 33-23.5 56.5T720-80H240Zm280-520v-200H240v640h480v-440H520ZM240-800v200-200 640-640Z"/>
-                                            </svg>
-                                            <span class="fw-medium text-dark">{% translate "Descripción" %}</span>
-                                        </span>
-                                        <small class="text-muted fw-bold">{% if task.description %}✓{% else %}+{% endif %}</small>
-                                    </button>
+                                            <input type="radio" id="detail-importance-3-{{ task.id }}" name="importance" value="3" {% if task.importance == 3 %}checked{% endif %}>
+                                            <label for="detail-importance-3-{{ task.id }}" title="Importante - 3">★</label>
 
-                                    <div class="collapse {% if task.description %}show{% endif %}" id="collapseDesc{{ task.id }}">
-                                        <div class="p-2 border rounded bg-white mt-1">
-                                            <textarea name="description" class="form-control form-control-sm border-0 shadow-none" rows="3" placeholder="{% translate 'Escribe una descripción más detallada...' %}">{{ task.description|default:'' }}</textarea>
+                                            <input type="radio" id="detail-importance-2-{{ task.id }}" name="importance" value="2" {% if task.importance == 2 %}checked{% endif %}>
+                                            <label for="detail-importance-2-{{ task.id }}" title="Moderado - 2">★</label>
+
+                                            <input type="radio" id="detail-importance-1-{{ task.id }}" name="importance" value="1" {% if task.importance == 1 %}checked{% endif %}>
+                                            <label for="detail-importance-1-{{ task.id }}" title="Baja - 1">★</label>
                                         </div>
                                     </div>
 
                                 </div>
                             </div>
-
-                            <!-- BOTONERA INFERIOR -->
-                            <div class="pt-4 d-flex justify-content-between align-items-center">
-                                <button type="button" 
-                                        class="btn btn-outline-danger btn-sm"
-                                        onclick="deleteTaskModal('{{ task.id }}', '{% url 'delete_task' task.id %}')">
-                                    {% translate "Eliminar" %}
-                                </button>
+                            <div class="d-flex flex-column gap-2">
                                 
-                                <div class="d-flex gap-2">
-                                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">{% translate "Cancelar" %}</button>
-                                    <button type="button" class="btn btn-primary btn-sm fw-bold" onclick="saveTaskModal('{{ task.id }}', event)">
-                                        {% translate "Guardar" %}
+                                <!-- DESPLEGABLE FECHAS EN EL MODAL -->
+                                <div class="dropdown position-relative">
+                                    <button class="btn btn-outline-secondary btn-sm text-start w-100 d-flex justify-content-between align-items-center bg-white shadow-none py-2 px-3 border rounded-xl" 
+                                            type="button" 
+                                            id="dropdownDate{{ task.id }}" 
+                                            data-bs-toggle="dropdown" 
+                                            data-bs-auto-close="outside" 
+                                            data-bs-display="static" 
+                                            aria-expanded="false" 
+                                            style="border-radius: 10px;">
+                                        <span class="d-flex align-items-center gap-2 text-dark">
+                                            <i class="bi bi-clock text-muted"></i>
+                                            <span class="fw-medium text-dark">{% translate "Fechas" %}</span>
+                                        </span>
+                                        <small class="text-muted fw-semibold" id="dateBadgeDisplay{{ task.id }}">
+                                            {% if task.due_date %}{{ task.due_date|date:"d/m/Y H:i" }}{% else %}+{% endif %}
+                                        </small>
                                     </button>
+                                    
+                                    <div class="dropdown-menu dropdown-menu-dates p-3 shadow-lg border-0 rounded-2xl mt-1 bg-white" 
+                                        aria-labelledby="dropdownDate{{ task.id }}">
+                                        
+                                        <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+                                            <span class="fw-bold small text-dark">{% translate "Fechas" %}</span>
+                                            <button type="button" class="btn-close btn-sm" onclick="bootstrap.Dropdown.getInstance(document.getElementById('dropdownDate{{ task.id }}')).hide();"></button>
+                                        </div>
+
+                                        <!-- Calendario Flatpickr -->
+                                        <div id="inlineCalendar{{ task.id }}" class="mb-2 d-flex justify-content-center flatpickr-clean-container"></div>
+
+                                        <!-- Inputs de Fecha y Hora -->
+                                        <div class="mb-2">
+                                            <label class="form-label small text-muted mb-1 fw-bold">{% translate "Fecha de vencimiento" %}</label>
+                                            <div class="row g-2">
+                                                <div class="col-7">
+                                                    <input type="text" id="displayDate{{ task.id }}" class="form-control form-control-sm text-center fw-medium" placeholder="AAAA-MM-DD" value="{% if task.due_date %}{{ task.due_date|date:'Y-m-d' }}{% endif %}">
+                                                </div>
+                                                <div class="col-5">
+                                                    <input type="time" id="displayTime{{ task.id }}" class="form-control form-control-sm text-center fw-medium" value="{% if task.due_date %}{{ task.due_date|date:'H:i' }}{% else %}12:00{% endif %}">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- NOTIFICACIÓN / RECORDATORIO POR CORREO -->
+                                        <div class="form-check form-switch mt-2 mb-1 d-flex align-items-center gap-2 ps-0">
+                                            <input class="form-check-input ms-0 me-2" 
+                                                type="checkbox" 
+                                                name="reminder_enabled" 
+                                                id="reminder_enabled_{{ task.id }}" 
+                                                {% if task.reminder_enabled %}checked{% endif %}
+                                                style="cursor: pointer;">
+                                            <label class="form-check-label small text-dark fw-medium" for="reminder_enabled_{{ task.id }}" style="cursor: pointer; font-size: 0.8rem;">
+                                                <i class="bi bi-bell me-1 text-muted"></i> {% translate "Recibir recordatorio por correo" %}
+                                            </label>
+                                        </div>
+
+                                        <input type="hidden" name="due_date" id="hiddenDueDate{{ task.id }}" value="{{ task.due_date|date:'Y-m-d H:i' }}">
+
+                                        <!-- Botones de Acción -->
+                                        <div class="d-flex gap-2 mt-3 pt-1 border-top">
+                                            <button type="button" class="btn btn-outline-danger btn-sm w-50 fw-bold rounded-lg" onclick="removeTaskDate('{{ task.id }}')">
+                                                {% translate "Quitar" %}
+                                            </button>
+                                            <button type="button" class="btn btn-primary btn-sm w-50 fw-bold rounded-lg" onclick="saveTaskModal('{{ task.id }}', event)">
+                                                {% translate "Guardar" %}
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
+
+                                <!-- TABLERO -->
+                                <div class="dropdown">
+                                    <button class="btn btn-outline-secondary btn-sm text-start w-100 d-flex justify-content-between align-items-center bg-white shadow-none py-2 px-3 border rounded-xl" 
+                                            type="button" 
+                                            id="dropdownBoard{{ task.id }}" 
+                                            data-bs-toggle="dropdown" 
+                                            aria-expanded="false" style="border-radius: 10px;">
+                                        <span class="d-flex align-items-center gap-2 text-dark">
+                                            <i class="bi bi-kanban text-muted"></i>
+                                            <span class="fw-medium text-dark">{% translate "Tablero" %}</span>
+                                        </span>
+                                        <span class="d-flex align-items-center gap-2">
+                                            {% if task.board and task.board.color %}
+                                                <span class="rounded-circle d-inline-block" style="width: 8px; height: 8px; background-color: {{ task.board.color }};"></span>
+                                            {% endif %}
+                                            <small class="text-muted fw-semibold" id="boardBadgeDisplay{{ task.id }}">
+                                                {% if task.board %}{{ task.board.title }}{% else %}General{% endif %}
+                                            </small>
+                                        </span>
+                                    </button>
+
+                                    <div class="dropdown-menu p-2 shadow-lg border-0 rounded-2xl mt-1 bg-white" aria-labelledby="dropdownBoard{{ task.id }}" style="width: 280px; z-index: 1060; border-radius: 14px;">
+                                        <div class="d-flex justify-content-between align-items-center px-2 py-1 mb-2 border-bottom">
+                                            <span class="fw-bold small text-dark">{% translate "Seleccionar Tablero" %}</span>
+                                            <button type="button" class="btn-close btn-sm" onclick="bootstrap.Dropdown.getInstance(document.getElementById('dropdownBoard{{ task.id }}')).hide();"></button>
+                                        </div>
+
+                                        <div class="d-flex flex-column gap-1">
+                                            {% if user.boards.all %}
+                                                {% for board in user.boards.all %}
+                                                    <div class="custom-board-item d-flex justify-content-between align-items-center py-2 px-3 rounded-lg fw-semibold"
+                                                        style="cursor: pointer; color: #1f2937 !important; background-color: {% if task.board and board.id == task.board.id %}#e5e7eb{% else %}transparent{% endif %};"
+                                                        onclick="selectBoardOption('{{ board.id }}', '{{ board.title|escapejs }}', '{{ task.id }}')">
+                                                        
+                                                        <div class="d-flex align-items-center gap-2">
+                                                            <span class="rounded-circle d-inline-block flex-shrink-0" 
+                                                                style="width: 8px; height: 8px; background-color: {{ board.color|default:'#0d6efd' }};"></span>
+                                                            <span style="font-size: 0.88rem;">{{ board.title }}</span>
+                                                        </div>
+
+                                                        {% if task.board and board.id == task.board.id %}
+                                                            <i class="bi bi-check-lg text-primary"></i>
+                                                        {% endif %}
+                                                    </div>
+                                                {% endfor %}
+                                            {% endif %}
+                                        </div>
+
+                                        <input type="hidden" name="board" id="hiddenBoardId{{ task.id }}" value="{% if task.board %}{{ task.board.id }}{% endif %}">
+                                    </div>
+                                </div>
+
+                                <!-- DESCRIPCIÓN -->
+                                <button class="btn btn-outline-secondary btn-sm text-start w-100 d-flex justify-content-between align-items-center bg-white shadow-none py-2 px-3 border rounded-xl" 
+                                        type="button" 
+                                        data-bs-toggle="collapse" 
+                                        data-bs-target="#collapseDesc{{ task.id }}" style="border-radius: 10px;">
+                                    <span class="d-flex align-items-center gap-2 text-dark">
+                                        <i class="bi bi-card-text text-muted"></i>
+                                        <span class="fw-medium text-dark">{% translate "Descripción" %}</span>
+                                    </span>
+                                    <small class="text-muted fw-bold">{% if task.description %}✓{% else %}+{% endif %}</small>
+                                </button>
+
+                                <div class="collapse {% if task.description %}show{% endif %}" id="collapseDesc{{ task.id }}">
+                                    <div class="p-2 border rounded-xl bg-white mt-1">
+                                        <textarea name="description" class="form-control form-control-sm border-0 shadow-none" rows="3" placeholder="{% translate 'Escribe una descripción más detallada...' %}">{{ task.description|default:'' }}</textarea>
+                                    </div>
+                                </div>
+
                             </div>
 
                         </div>
 
                         <!-- COLUMNA DERECHA -->
-                        <div class="col-md-5 bg-light p-3 rounded d-flex flex-column justify-content-between">
+                        <div class="col-md-5 d-flex flex-column justify-content-between">
                             <div>
-                                <!-- CABECERA CREADOR Y TABLERO -->
-                                <div class="d-flex align-items-start gap-2 mb-3">
-                                    <div class="rounded-circle bg-danger text-white fw-bold d-flex align-items-center justify-content-center flex-shrink-0" 
-                                        style="width: 32px; height: 32px; font-size: 0.85rem;" 
+                                <div class="d-flex align-items-center gap-3 mb-3">
+                                    <span class="rounded-circle bg-danger text-white fw-bold d-inline-flex align-items-center justify-content-center flex-shrink-0 shadow-sm" 
+                                        style="width: 36px; height: 36px; font-size: 0.85rem;" 
                                         title="{{ task.created_by.get_full_name|default:task.created_by.username }}">
                                         {{ task.created_by.username|slice:":2"|upper }}
-                                    </div>
+                                    </span>
 
-                                    <div style="font-size: 0.85rem; line-height: 1.3;">
+                                    <div style="font-size: 0.82rem; line-height: 1.35;">
                                         <div>
                                             <strong class="text-dark">{{ task.created_by.get_full_name|default:task.created_by.username }}</strong> 
                                             <span class="text-muted">{% translate "ha añadido esta tarjeta a" %}</span> 
-                                            <span class="text-muted fw-semibold">{% if task.board %}{{ task.board.title }}{% else %}General{% endif %}</span>
+                                            <strong class="text-dark">{% if task.board %}{{ task.board.title }}{% else %}General{% endif %}</strong>
                                         </div>
                                         <small class="text-muted" style="font-size: 0.75rem;">
                                             {{ task.created_at|date:"d M Y, H:i" }}
@@ -423,16 +393,14 @@
                                     </div>
                                 </div>
 
-                                <!-- SECCIÓN ASIGNADA A (DESPLEGABLE TOTALMENTE ANCLADO) -->
-                                <div class="mb-3 pt-2 border-top">
-                                    <small class="text-muted fw-bold d-block mb-2">
-                                        <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="#b8b8b8" class="me-1 align-text-bottom"><path d="M365-580Zm-5 540-40-40v-240H120v-80l80-80v-280h-40v-80h285q-18 17-32.5 37T387-760H280v314l-46 46h263q24 14 49.5 23.5T600-363v43H400v240l-40 40Zm322.5-617.5Q700-675 700-700t-17.5-42.5Q665-760 640-760t-42.5 17.5Q580-725 580-700t17.5 42.5Q615-640 640-640t42.5-17.5Zm14 123Q722-549 739-573q-22-13-47-20t-52-7q-27 0-52 7t-47 20q17 24 42.5 38.5T640-520q31 0 56.5-14.5Zm-198 36Q440-557 440-640t58.5-141.5Q557-840 640-840t141.5 58.5Q840-723 840-640t-58.5 141.5Q723-440 640-440t-141.5-58.5Z"/></svg>
+                                <div class="pt-3 border-top">
+                                    <small class="text-muted fw-bold d-block mb-2" style="font-size: 0.78rem;">
+                                        <i class="bi bi-person-plus me-1 text-muted"></i>
                                         {% translate "Asignada a" %}
                                     </small>
 
                                     <div class="d-flex flex-wrap gap-2 align-items-center">
                                         
-                                        <!-- 1. BOTÓN Y DESPLEGABLE CON ANCLAJE ESTÁTICO DE BOOTSTRAP -->
                                         <div class="dropdown">
                                             <button class="btn btn-light btn-sm rounded-circle border shadow-sm d-flex align-items-center justify-content-center p-0" 
                                                     type="button" 
@@ -441,13 +409,13 @@
                                                     data-bs-auto-close="outside" 
                                                     data-bs-display="static" 
                                                     aria-expanded="false" 
-                                                    style="width: 30px; height: 30px; font-weight: bold;">
+                                                    style="width: 32px; height: 32px; font-weight: bold; background-color: #f8fafc;">
                                                 +
                                             </button>
 
-                                            <div class="dropdown-menu p-2 shadow-lg border-0 rounded-3 mt-1 bg-white" 
+                                            <div class="dropdown-menu p-2 shadow-lg border-0 rounded-2xl mt-1 bg-white" 
                                                 aria-labelledby="dropdownAssignees{{ task.id }}" 
-                                                style="width: 270px; z-index: 1055;">
+                                                style="width: 270px; z-index: 1055; border-radius: 14px;">
                                                 
                                                 <div class="d-flex justify-content-between align-items-center px-2 py-1 mb-2 border-bottom">
                                                     <span class="fw-bold small text-dark">{% translate "Miembros" %}</span>
@@ -470,15 +438,15 @@
                                                                 onchange="toggleMemberRow(this)">
                                                             
                                                             <label for="assign-user-{{ task.id }}-{{ u.id }}" 
-                                                                class="custom-member-item d-flex align-items-center justify-content-between py-1.5 px-2 rounded-2 fw-semibold w-100 m-0"
-                                                                style="cursor: pointer; color: #1f2937 !important; background-color: {% if u in task.assigned_to.all %}#e5e7eb{% else %}transparent{% endif %};">
+                                                                class="custom-member-item d-flex align-items-center justify-content-between py-1.5 px-2 rounded-lg fw-semibold w-100 m-0"
+                                                                style="cursor: pointer; background-color: {% if u in task.assigned_to.all %}#e5e7eb{% else %}transparent{% endif %};">
                                                                 
                                                                 <div class="d-flex align-items-center gap-2">
                                                                     <span class="badge rounded-circle bg-info text-dark border-0 p-0 d-inline-flex align-items-center justify-content-center flex-shrink-0" 
                                                                         style="width: 24px; height: 24px; font-size: 0.7rem; font-weight: bold;">
                                                                         {{ u.username|slice:":2"|upper }}
                                                                     </span>
-                                                                    <span style="color: #1f2937 !important; font-size: 0.85rem;">
+                                                                    <span style="font-size: 0.85rem;">
                                                                         {{ u.get_full_name|default:u.username }}
                                                                     </span>
                                                                 </div>
@@ -486,7 +454,7 @@
                                                                 <div class="member-check-indicator d-flex align-items-center justify-content-center rounded-circle border"
                                                                     style="width: 18px; height: 18px; border-color: {% if u in task.assigned_to.all %}#0d6efd{% else %}#d1d5db{% endif %} !important; background-color: {% if u in task.assigned_to.all %}#0d6efd{% else %}#ffffff{% endif %};">
                                                                     {% if u in task.assigned_to.all %}
-                                                                        <svg xmlns="http://www.w3.org/2000/svg" height="12px" viewBox="0 -960 960 960" width="12px" fill="#ffffff"><path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z"/></svg>
+                                                                        <i class="bi bi-check-lg text-white" style="font-size: 0.65rem;"></i>
                                                                     {% endif %}
                                                                 </div>
                                                             </label>
@@ -496,16 +464,15 @@
                                             </div>
                                         </div>
 
-                                        <!-- 2. CONTENEDOR DE PÍLDORAS (SE COLOCA A LA DERECHA DEL BOTÓN Y CRECE HACIA ADELANTE) -->
                                         <div id="assignedBadgesContainer{{ task.id }}" class="d-flex flex-wrap gap-2 align-items-center">
                                             {% for user_assigned in task.assigned_to.all %}
-                                                <div class="d-flex align-items-center gap-2 bg-white pe-2 rounded-pill border shadow-sm" id="badge-user-{{ task.id }}-{{ user_assigned.id }}">
+                                                <div class="d-flex align-items-center gap-2 bg-light pe-2.5 rounded-pill border shadow-xs" id="badge-user-{{ task.id }}-{{ user_assigned.id }}">
                                                     <div class="rounded-circle bg-info text-dark fw-bold d-flex align-items-center justify-content-center flex-shrink-0" 
                                                         style="width: 28px; height: 28px; font-size: 0.75rem;" 
                                                         title="{{ user_assigned.get_full_name|default:user_assigned.username }}">
                                                         {{ user_assigned.username|slice:":2"|upper }}
                                                     </div>
-                                                    <span class="small text-dark fw-semibold" style="font-size: 0.8rem;">
+                                                    <span class="small text-dark fw-semibold" style="font-size: 0.78rem;">
                                                         {{ user_assigned.get_full_name|default:user_assigned.username }}
                                                     </span>
                                                 </div>
@@ -518,6 +485,24 @@
                             </div>
                         </div>
 
+                    </div>
+                </div>
+
+                <!-- PIE DEL MODAL -->
+                <div class="modal-footer border-top-0 px-4 pb-4 pt-2 d-flex justify-content-between align-items-center">
+                    <button type="button" 
+                            class="btn btn-outline-danger btn-sm rounded-pill px-3 py-1.5 fw-semibold"
+                            onclick="deleteTaskModal('{{ task.id }}', '{% url 'delete_task' task.id %}')">
+                        {% translate "Eliminar" %}
+                    </button>
+                    
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-light btn-sm rounded-pill px-3 py-1.5 fw-semibold text-secondary" data-bs-dismiss="modal">
+                            {% translate "Cancelar" %}
+                        </button>
+                        <button type="button" class="btn btn-primary btn-sm rounded-pill px-4 py-1.5 fw-bold shadow-sm" onclick="saveTaskModal('{{ task.id }}', event)">
+                            {% translate "Guardar" %}
+                        </button>
                     </div>
                 </div>
 

@@ -1,4 +1,31 @@
 // ==========================================
+// TOKENS DE COLOR - EISENHOWER FLOW PALETTE
+// ==========================================
+
+$bg-app: #f8fafc;
+$bg-surface: #ffffff;
+$bg-surface-subtle: #f8fafc;
+
+$border-light: #f1f5f9;
+$border-default: #e2e8f0;
+$border-strong: #cbd5e1;
+
+$text-primary: #0f172a;
+$text-secondary: #475569;
+$text-muted: #94a3b8;
+
+$primary-blue: #2563eb;
+$primary-blue-hover: #1d4ed8;
+$primary-blue-bg: #eff6ff;
+
+$star-gold: #eab308;
+$star-inactive: #cbd5e1;
+$star-error: #ef4444;
+
+$success-emerald: #10b981;
+$success-emerald-bg: #ecfdf5;
+
+// ==========================================
 // ANIMACIONES KEYFRAMES
 // ==========================================
 
@@ -18,24 +45,38 @@
   100% { transform: translateX(0); }
 }
 
+@keyframes shakeBadge {
+  0%, 100% { transform: translateX(0) scale(1); }
+  15% { transform: translateX(-8px) rotate(-5deg) scale(1.08); }
+  30% { transform: translateX(8px) rotate(5deg) scale(1.08); }
+  45% { transform: translateX(-6px) rotate(-3deg); }
+  60% { transform: translateX(6px) rotate(3deg); }
+  75% { transform: translateX(-3px); }
+}
+
 // ==========================================
-// COMPONENTE: TARJETA DE TAREA
+// COMPONENTE: TARJETA DE TAREA COMPACTA
 // ==========================================
 
 .task-card {
   position: relative;
-  background-color: #ffffff;
-  border-radius: 8px;
+  background-color: $bg-surface !important;
+  border: 1px solid $border-default !important;
+  border-radius: 12px !important;
   cursor: pointer;
   overflow: hidden;
-  padding: 0.5rem 0.75rem;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.3s ease, filter 0.3s ease;
+  margin-bottom: 0.5rem !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03) !important;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+
+  .card-body {
+    padding: 0.5rem 0.75rem !important;
+  }
 
   .task-card-header {
     min-height: 24px;
   }
 
-  // CHECKBOX: Flotante a la izquierda, centrado verticalmente
   .task-checkbox-wrapper {
     position: absolute;
     left: 0;
@@ -46,36 +87,26 @@
     z-index: 2;
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.4s cubic-bezier(0.5, 0, 0.75, 0), 
-                transform 0.45s cubic-bezier(0.5, 0, 0.75, 0), 
-                visibility 0.4s cubic-bezier(0.5, 0, 0.75, 0);
+    transition: all 0.25s ease;
   }
 
-  // TÍTULO: Se desplaza suavemente al hacer hover para dejar espacio al checkbox
   .task-title-wrapper {
-    width: 100%;
-    padding-right: 1.5rem;
     transform: translateX(0);
-    transition: transform 0.45s cubic-bezier(0.5, 0, 0.75, 0);
+    transition: transform 0.25s ease;
   }
 
   .task-title {
-    color: #212529;
+    color: $text-primary;
     word-break: break-word;
     overflow-wrap: break-word;
     white-space: normal;
-    padding-right: 0.25rem;
     transition: color 0.3s ease, text-decoration-color 0.3s ease;
   }
 
-  // ZONA DERECHA RESERVADA: Metadatos/Avatares
-  .task-card-meta {
-    min-width: 28px;
-  }
-
-  // HOVER EN CUADRANTE
   &:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06) !important;
+    border-color: $border-strong !important;
 
     .task-checkbox-wrapper {
       opacity: 1;
@@ -84,11 +115,10 @@
     }
 
     .task-title-wrapper {
-      transform: translateX(25px);
+      transform: translateX(22px);
     }
   }
 
-  // ESTADO COMPLETADA (EN CUADRANTE O EN SIDEBAR)
   &.is-completed {
     opacity: 0.65;
     filter: grayscale(15%);
@@ -100,13 +130,13 @@
     }
 
     .task-title-wrapper {
-      transform: translateX(25px);
+      transform: translateX(22px);
     }
 
     .task-title {
       text-decoration: line-through;
       text-decoration-thickness: 2px;
-      color: #6c757d !important;
+      color: $text-muted !important;
     }
   }
 
@@ -115,28 +145,23 @@
   }
 }
 
-// ==========================================
-// ESTILOS ESPECÍFICOS PARA TARJETAS COMPLETADAS (SIDEBAR)
-// ==========================================
-
-.completed-task-item {
-  border-radius: 8px;
-  background-color: #ffffff;
-  transition: background-color 0.2s ease, opacity 0.2s ease;
-
+.task-card-actions {
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  padding: 2px 4px;
+  border-radius: 4px;
+  color: $text-muted;
+  transition: background-color 0.15s ease, color 0.15s ease;
+  
   &:hover {
-    background-color: #f1f3f5;
-  }
-
-  .task-completion-check {
-    width: 16px;
-    height: 16px;
-    accent-color: #198754;
+    background-color: $bg-surface-subtle;
+    color: $text-primary;
   }
 }
 
 // ==========================================
-// CHECKBOX ANIMADO CIRCULAR (17px)
+// CHECKBOX ANIMADO CIRCULAR (ESMERALDA 17px)
 // ==========================================
 
 .task-checkbox-container {
@@ -162,8 +187,8 @@
     left: 0;
     height: 17px;
     width: 17px;
-    background-color: #fff;
-    border: 2px solid #adb5bd;
+    background-color: $bg-surface;
+    border: 2px solid $border-strong;
     border-radius: 50%;
     transition: border-color 0.2s ease, background-color 0.2s ease;
 
@@ -175,19 +200,19 @@
       top: 2px;
       width: 4px;
       height: 8px;
-      border: solid white;
+      border: solid $bg-surface;
       border-width: 0 2px 2px 0;
       transform: rotate(45deg);
     }
   }
 
   &:hover input ~ .checkmark {
-    border-color: #198754;
+    border-color: $success-emerald;
   }
 
   input:checked ~ .checkmark {
-    background-color: #198754;
-    border-color: #198754;
+    background-color: $success-emerald;
+    border-color: $success-emerald;
     animation: checkPop 0.35s ease-in-out forwards;
 
     &::after {
@@ -197,181 +222,131 @@
 }
 
 // ==========================================
-// ALTA RÁPIDA IN-LINE (TRELLO STYLE)
+// MODAL DE DETALLE Y DESPLEGABLE FLOTANTE
+// ==========================================
+
+.modal-dialog.modal-top-aligned {
+  margin-top: 4rem !important;
+  margin-bottom: 2.5rem !important;
+}
+
+/* Desbordamiento visible para evitar cortes */
+.modal-dialog,
+.modal-content,
+.modal-body {
+  overflow: visible !important;
+}
+
+.modal-dialog {
+  .modal-content {
+    background-color: $bg-surface !important;
+    border-radius: 16px !important;
+    box-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.1), 0 8px 10px -6px rgba(15, 23, 42, 0.05) !important;
+  }
+
+  @media (min-width: 768px) {
+    .border-end-md {
+      border-right: 1px solid $border-light !important;
+    }
+  }
+}
+
+/* Desplegable de fechas adaptado al diseño sin scroll horizontal */
+.dropdown-menu-dates {
+  width: 340px !important;
+  min-width: 340px !important;
+  max-width: 340px !important;
+  background-color: $bg-surface !important;
+  border: 1px solid $border-default !important;
+  z-index: 1090 !important;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.15) !important;
+  padding: 1rem !important;
+  overflow: hidden !important;
+}
+
+/* Contenedor e items internos del calendario Flatpickr */
+.flatpickr-clean-container {
+  width: 100% !important;
+  display: flex !important;
+  justify-content: center !important;
+  overflow: hidden !important;
+
+  .flatpickr-calendar {
+    box-shadow: none !important;
+    border: none !important;
+    background: transparent !important;
+    width: 307px !important;
+    margin: 0 auto !important;
+  }
+
+  .flatpickr-days,
+  .dayContainer {
+    width: 307px !important;
+    min-width: 307px !important;
+    max-width: 307px !important;
+  }
+}
+
+.flatpickr-day.today {
+  border-bottom: 2px solid $primary-blue !important;
+  border-radius: 4px;
+  font-weight: bold;
+
+  &.selected {
+    background-color: $primary-blue !important;
+    border-bottom: 2px solid $bg-surface !important;
+    color: $bg-surface !important;
+  }
+}
+
+/* Items interactivos de listas desplegables (Tableros / Miembros) */
+.custom-board-item,
+.custom-member-item {
+  transition: background-color 0.15s ease;
+  user-select: none;
+
+  &:hover {
+    background-color: $primary-blue-bg !important;
+    color: $primary-blue !important;
+  }
+}
+
+/* Resaltado de sacudida de fecha de vencimiento vencida */
+.shake-due-date {
+  display: inline-flex !important;
+  animation: shakeBadge 0.75s ease-in-out !important;
+  background-color: #fee2e2 !important;
+  border-color: #fecaca !important;
+  color: #dc2626 !important;
+  box-shadow: 0 0 8px rgba(220, 38, 38, 0.3) !important;
+}
+
+// ==========================================
+// BOTÓN AÑADIR TAREA IN-LINE (ESTILO STITCH)
 // ==========================================
 
 .add-task-inline-wrapper {
   .btn-add-inline {
-    background-color: transparent;
-    transition: background-color 0.2s ease, color 0.2s ease;
+    background-color: transparent !important;
+    border: none !important; // Quita el borde rectangular gris
+    box-shadow: none !important; // Elimina sombras
+    color: #475569 !important; // Texto gris azulado Slate-600
+    font-weight: 600 !important;
+    font-size: 0.88rem !important;
+    border-radius: 10px !important;
+    padding: 0.5rem 0.75rem !important;
+    width: 100%;
+    text-align: center;
+    transition: background-color 0.15s ease, color 0.15s ease;
 
     &:hover {
-      background-color: rgba(9, 30, 66, 0.08);
-      color: #172b4d !important;
+      background-color: rgba(148, 163, 184, 0.15) !important; // Fondo gris suave en hover
+      color: #0f172a !important; // Texto más oscuro Slate-900
+    }
+
+    &:active, &:focus {
+      background-color: rgba(148, 163, 184, 0.25) !important;
+      box-shadow: none !important;
     }
   }
-
-  .inline-task-form {
-    .card {
-      background-color: #ffffff;
-      border-radius: 8px;
-    }
-
-    .task-inline-input:focus {
-      outline: none;
-      box-shadow: none;
-    }
-
-    .btn-close-inline {
-      background: transparent;
-      border: none;
-      padding: 4px 8px;
-      border-radius: 4px;
-      cursor: pointer;
-
-      &:hover {
-        background-color: rgba(9, 30, 66, 0.08);
-        color: #091e42 !important;
-      }
-    }
-  }
-}
-
-
-/* ==========================================================================
-   Estilos de Datepicker y Pop-overs para Task Cards (Flatpickr / Trello style)
-   ========================================================================== */
-
-/* Contenedor del desplegable de fechas */
-.dropdown-menu-dates {
-    width: 335px;
-    min-width: 335px;
-    z-index: 1055;
-
-    @media (max-width: 400px) {
-        width: 100%;
-        min-width: auto;
-    }
-}
-
-/* Limpieza de sombras y bordes del calendario Flatpickr Inline */
-.flatpickr-clean-container {
-    .flatpickr-calendar {
-        box-shadow: none !important;
-        border: none !important;
-        background: transparent !important;
-    }
-}
-
-/* Posicionamiento superior del modal de detalle de tarea */
-.modal-dialog {
-    &.modal-top-aligned {
-        margin-top: 3rem !important; /* Ajusta la distancia desde arriba según tu gusto */
-    }
-}
-
-/* Animación suave de desplazamiento entre cuadrantes */
-.task-card {
-    transition: transform 0.45s cubic-bezier(0.2, 0, 0, 1), opacity 0.3s ease;
-    will-change: transform, opacity;
-}
-
-/* Clase temporal durante el desplazamiento/movimiento */
-.task-card-moving {
-    z-index: 1000;
-    pointer-events: none;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.15) !important;
-}
-
-/* Animación de sacudida para indicar bloqueo por fecha */
-/* Animación de sacudida más pronunciada y legible */
-@keyframes shakeBadge {
-    0%, 100% { transform: translateX(0) scale(1); }
-    15% { transform: translateX(-8px) rotate(-5deg) scale(1.08); }
-    30% { transform: translateX(8px) rotate(5deg) scale(1.08); }
-    45% { transform: translateX(-6px) rotate(-3deg); }
-    60% { transform: translateX(6px) rotate(3deg); }
-    75% { transform: translateX(-3px); }
-}
-
-.shake-due-date {
-    display: inline-flex !important;
-    animation: shakeBadge 0.75s ease-in-out !important;
-    background-color: #fee2e2 !important;
-    border-color: #ef4444 !important;
-    color: #dc2626 !important;
-    box-shadow: 0 0 8px rgba(239, 68, 68, 0.4) !important;
-}
-
-
-/* Subrayado para el día actual en Flatpickr */
-.flatpickr-day.today {
-    border-bottom: 2px solid #0d6efd !important;
-    border-radius: 4px;
-    font-weight: bold;
-}
-
-.flatpickr-day.today.selected {
-    border-bottom: 2px solid #ffffff !important;
-}
-
-/* Asegurar que el menú desplegable de tableros se posicione por encima de todo */
-.dropdown-menu-boards {
-    z-index: 1060 !important;
-    max-height: 220px;
-    overflow-y: auto;
-}
-
-/* Estilo limpio para las opciones de tableros */
-.option-board-item:hover {
-    background-color: #f1f3f5 !important;
-    color: #0d6efd !important;
-}
-
-.option-board-item:hover span {
-    color: #0d6efd !important;
-}
-
-/* Evita que el contenido interno del modal corte los desplegables */
-.modal-body {
-    overflow: visible !important;
-}
-
-/* Forzar visibilidad en elementos de selección de tablero */
-.custom-board-item {
-    transition: background-color 0.15s ease, color 0.15s ease;
-}
-
-.custom-board-item:hover {
-    background-color: #f3f4f6 !important;
-    color: #0d6efd !important;
-}
-
-.custom-board-item:hover span {
-    color: #0d6efd !important;
-}
-
-
-/* Estilo limpio para la lista de miembros */
-.custom-member-item {
-    transition: background-color 0.15s ease;
-    user-select: none;
-}
-
-.custom-member-item:hover {
-    background-color: #f3f4f6 !important;
-}
-
-.custom-member-item:hover span {
-    color: #1f2937 !important;
-}
-
-/* Anular cualquier movimiento por Popper.js */
-.dropdown-menu.dropdown-static-fixed {
-    position: absolute !important;
-    top: 100% !important;
-    right: 0 !important;
-    left: auto !important;
-    transform: none !important; /* Desactiva el desplazamiento por JS */
-    margin-top: 0.25rem !important;
 }
