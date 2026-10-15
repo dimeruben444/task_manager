@@ -53,7 +53,7 @@
 
                         {% if task.description %}
                             <span title="{% translate 'Tiene descripción' %}">
-                                <svg xmlns="http://www.w3.org/2000/svg" height="14px" viewBox="0 -960 960 960" width="14px" fill="#888"><path d="M320-240h320v-80H320v80Zm0-160h320v-80H320v80ZM240-80q-33 0-56.5-23.5T160-160v-640q0-33 23.5-56.5T240-880h320l240 240v480q0 33-23.5 56.5T720-80H240Zm280-520v-200H240v640h480v-440H520ZM240-800v200-200 640-640Z"/></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="#888"><path d="M320-240h320v-80H320v80Zm0-160h320v-80H320v80ZM240-80q-33 0-56.5-23.5T160-160v-640q0-33 23.5-56.5T240-880h320l240 240v480q0 33-23.5 56.5T720-80H240Zm280-520v-200H240v640h480v-440H520ZM240-800v200-200 640-640Z"/></svg>
                             </span>
                         {% endif %}
                     </div>
@@ -61,11 +61,23 @@
                     <div class="ms-auto d-flex align-items-center gap-1">
                         {% if task.assigned_to.exists %}
                             {% if total_assignees > 1 or first_assignee != task.created_by %}
-                                <span class="badge bg-danger text-white rounded-circle d-inline-flex align-items-center justify-content-center shadow-sm p-0" 
-                                      style="width: 20px; height: 20px; font-size: 0.6rem; font-weight: bold;"
-                                      title="{% translate 'Asignado a:' %} {{ first_assignee.username }}">
-                                    {{ first_assignee.username|slice:":2"|upper }}
-                                </span>
+                                <div class="position-relative d-inline-flex align-items-center">
+                                    <!-- Iniciales del primer asignado -->
+                                    <span class="badge bg-danger text-white rounded-circle d-inline-flex align-items-center justify-content-center shadow-sm p-0" 
+                                        style="width: 22px; height: 22px; font-size: 0.65rem; font-weight: bold;"
+                                        title="{% translate 'Asignado a:' %} {{ first_assignee.username }}">
+                                        {{ first_assignee.username|slice:":2"|upper }}
+                                    </span>
+
+                                    <!-- Indicador +N si hay más de 1 asignado -->
+                                    {% if total_assignees > 1 %}
+                                        <span class="badge bg-dark text-white rounded-pill ms-1 d-inline-flex align-items-center justify-content-center px-1.5 py-0.5" 
+                                            style="font-size: 0.6rem; font-weight: 700; line-height: 1;"
+                                            title="{% translate 'Total de asignados:' %} {{ total_assignees }}">
+                                            +{{ total_assignees|add:"-1" }}
+                                        </span>
+                                    {% endif %}
+                                </div>
                             {% endif %}
                         {% endif %}
                     </div>
@@ -156,7 +168,7 @@
                 </div>
 
                 <!-- CUERPO DEL MODAL -->
-                <div class="modal-body p-4 pt-2">
+                <div class="modal-body p-4 pt-2" style="overflow: visible !important;">
                     <div class="row g-4">
                         
                         <div class="col-md-7 d-flex flex-column justify-content-between">
@@ -207,30 +219,32 @@
                                     </div>
                                 </div>
 
+                                <!-- OPCIONES DE LA TAREA (FECHAS, TABLERO Y DESCRIPCIÓN) -->
                                 <div class="d-flex flex-column gap-2 mb-3">
                                     
-                                    <!-- Pop-over Fecha y Hora -->
+                                    <!-- 1. DESPLEGABLE FECHAS -->
                                     <div class="dropdown">
-                                        <button class="btn btn-outline-secondary btn-sm text-start w-100 d-flex justify-content-between align-items-center shadow-none" 
+                                        <button class="btn btn-outline-secondary btn-sm text-start w-100 d-flex justify-content-between align-items-center bg-white shadow-none py-2 px-3 border rounded-3" 
                                                 type="button" 
                                                 id="dropdownDate{{ task.id }}" 
                                                 data-bs-toggle="dropdown" 
                                                 data-bs-auto-close="outside" 
                                                 aria-expanded="false">
-                                            <span><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#b8b8b8"><path d="m612-292 56-56-148-148v-184h-80v216l172 172ZM480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-400Zm0 320q133 0 226.5-93.5T800-480q0-133-93.5-226.5T480-800q-133 0-226.5 93.5T160-480q0 133 93.5 226.5T480-160Z"/></svg> {% translate "Fechas" %}</span>
-                                            <small class="text-muted" id="dateBadgeDisplay{{ task.id }}">{% if task.due_date %}{{ task.due_date|date:"d/m/Y H:i" }}{% else %}+{% endif %}</small>
+                                            <span class="d-flex align-items-center gap-2 text-dark">
+                                                <svg xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 -960 960 960" width="18px" fill="#6c757d"><path d="m612-292 56-56-148-148v-184h-80v216l172 172ZM480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-400Zm0 320q133 0 226.5-93.5T800-480q0-133-93.5-226.5T480-800q-133 0-226.5 93.5T160-480q0 133 93.5 226.5T480-160Z"/></svg>
+                                                <span class="fw-medium text-dark">{% translate "Fechas" %}</span>
+                                            </span>
+                                            <small class="text-muted fw-semibold" id="dateBadgeDisplay{{ task.id }}">{% if task.due_date %}{{ task.due_date|date:"d/m/Y H:i" }}{% else %}+{% endif %}</small>
                                         </button>
                                         
-                                        <div class="dropdown-menu dropdown-menu-dates p-3 shadow-lg border-0 rounded-3 mt-1" aria-labelledby="dropdownDate{{ task.id }}">
+                                        <div class="dropdown-menu dropdown-menu-dates p-3 shadow-lg border-0 rounded-3 mt-1 bg-white" aria-labelledby="dropdownDate{{ task.id }}" style="width: 310px; z-index: 1060;">
                                             <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
                                                 <span class="fw-bold small text-dark">{% translate "Fechas" %}</span>
                                                 <button type="button" class="btn-close btn-sm" onclick="bootstrap.Dropdown.getInstance(document.getElementById('dropdownDate{{ task.id }}')).hide();"></button>
                                             </div>
 
-                                            <!-- CALENDARIO INLINE FLATPICKR -->
                                             <div id="inlineCalendar{{ task.id }}" class="mb-2 d-flex justify-content-center flatpickr-clean-container"></div>
 
-                                            <!-- CAMPOS EDITABLES -->
                                             <div class="mb-2">
                                                 <label class="form-label small text-muted mb-1 fw-bold">{% translate "Fecha de vencimiento" %}</label>
                                                 <div class="row g-2">
@@ -266,55 +280,102 @@
                                                 </select>
                                             </div>
 
-                                            
-                                            <div class="d-flex gap-2">
-                                                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">{% translate "Cancelar" %}</button>
-                                                <button type="button" class="btn btn-primary btn-sm fw-bold" onclick="saveTaskModal('{{ task.id }}', event)">
+                                            <div class="d-flex gap-2 mt-3">
+                                                <button type="button" class="btn btn-outline-danger btn-sm w-50 fw-bold" onclick="removeTaskDate('{{ task.id }}')">
+                                                    {% translate "Quitar" %}
+                                                </button>
+                                                <button type="button" class="btn btn-primary btn-sm w-50 fw-bold" onclick="saveTaskModal('{{ task.id }}', event)">
                                                     {% translate "Guardar" %}
                                                 </button>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <!-- Pop-over Cambiar de Tablero -->
+                                    
+                                    <!-- 2. DESPLEGABLE SELECCIONAR TABLERO CON COLOR -->
                                     <div class="dropdown">
-                                        <button class="btn btn-outline-secondary btn-sm text-start w-100 d-flex justify-content-between align-items-center shadow-none" 
+                                        <button class="btn btn-outline-secondary btn-sm text-start w-100 d-flex justify-content-between align-items-center bg-white shadow-none py-2 px-3 border rounded-3" 
                                                 type="button" 
                                                 id="dropdownBoard{{ task.id }}" 
                                                 data-bs-toggle="dropdown" 
-                                                data-bs-auto-close="outside" 
                                                 aria-expanded="false">
-                                            <span><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#b8b8b8"><path d="M160-120q-33 0-56.5-23.5T80-200v-560q0-33 23.5-56.5T160-840h560q33 0 56.5 23.5T800-760v80h80v80h-80v80h80v80h-80v80h80v80h-80v80q0 33-23.5 56.5T720-120H160Zm0-80h560v-560H160v560Zm80-80h200v-160H240v160Zm240-280h160v-120H480v120Zm-240 80h200v-200H240v200Zm240 200h160v-240H480v240ZM160-760v560-560Z"/></svg>{% translate "Tablero" %}</span>
-                                            <small class="text-muted">{{ task.board.title }}</small>
+                                            <span class="d-flex align-items-center gap-2 text-dark">
+                                                <svg xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 -960 960 960" width="18px" fill="#6c757d">
+                                                    <path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h240v-560H200v560Zm320 0h240v-240H520v240Zm0-320h240v-240H520v240Z"/>
+                                                </svg>
+                                                <span class="fw-medium text-dark">{% translate "Tablero" %}</span>
+                                            </span>
+                                            <span class="d-flex align-items-center gap-2">
+                                                {% if task.board and task.board.color %}
+                                                    <span class="rounded-circle d-inline-block" style="width: 8px; height: 8px; background-color: {{ task.board.color }};"></span>
+                                                {% endif %}
+                                                <small class="text-muted fw-semibold" id="boardBadgeDisplay{{ task.id }}">
+                                                    {% if task.board %}{{ task.board.title }}{% else %}General{% endif %}
+                                                </small>
+                                            </span>
                                         </button>
-                                        <div class="dropdown-menu p-3 shadow-lg border-0 rounded-3 mt-1 w-100" aria-labelledby="dropdownBoard{{ task.id }}" style="z-index: 1055;">
-                                            <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
-                                                <span class="fw-bold small">{% translate "Seleccionar Tablero" %}</span>
+
+                                        <div class="dropdown-menu p-2 shadow-lg border-0 rounded-3 mt-1 bg-white" aria-labelledby="dropdownBoard{{ task.id }}" style="width: 280px; z-index: 1060;">
+                                            <div class="d-flex justify-content-between align-items-center px-2 py-1 mb-2 border-bottom">
+                                                <span class="fw-bold small text-dark">{% translate "Seleccionar Tablero" %}</span>
+                                                <button type="button" class="btn-close btn-sm" onclick="bootstrap.Dropdown.getInstance(document.getElementById('dropdownBoard{{ task.id }}')).hide();"></button>
                                             </div>
-                                            <select name="board" class="form-select form-select-sm border mb-2">
-                                                {% for b in boards %}
-                                                    <option value="{{ b.id }}" {% if task.board.id == b.id %}selected{% endif %}>
-                                                         {{ b.title }}
-                                                    </option>
-                                                {% endfor %}
-                                            </select>
-                                            <button type="button" class="btn btn-primary btn-sm w-100 fw-bold" onclick="bootstrap.Dropdown.getInstance(document.getElementById('dropdownBoard{{ task.id }}')).hide();">
-                                                {% translate "Aplicar" %}
-                                            </button>
+
+                                            <div class="d-flex flex-column gap-1">
+                                                {% if user.boards.all %}
+                                                    {% for board in user.boards.all %}
+                                                        <div class="custom-board-item d-flex justify-content-between align-items-center py-2 px-3 rounded-2 fw-semibold"
+                                                            style="cursor: pointer; color: #1f2937 !important; background-color: {% if task.board and board.id == task.board.id %}#e5e7eb{% else %}transparent{% endif %};"
+                                                            onclick="selectBoardOption('{{ board.id }}', '{{ board.title|escapejs }}', '{{ task.id }}')">
+                                                            
+                                                            <!-- Punto de color + Nombre del tablero -->
+                                                            <div class="d-flex align-items-center gap-2">
+                                                                <span class="rounded-circle d-inline-block flex-shrink-0" 
+                                                                    style="width: 8px; height: 8px; background-color: {{ board.color|default:'#0d6efd' }};"></span>
+                                                                <span style="color: #1f2937 !important; font-size: 0.88rem;">{{ board.title }}</span>
+                                                            </div>
+
+                                                            {% if task.board and board.id == task.board.id %}
+                                                                <svg xmlns="http://www.w3.org/2000/svg" height="16px" viewBox="0 -960 960 960" width="16px" fill="#0d6efd"><path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z"/></svg>
+                                                            {% endif %}
+                                                        </div>
+                                                    {% endfor %}
+                                                {% else %}
+                                                    <div class="custom-board-item d-flex justify-content-between align-items-center py-2 px-3 rounded-2 fw-semibold"
+                                                        style="cursor: pointer; color: #1f2937 !important; background-color: #e5e7eb;"
+                                                        onclick="selectBoardOption('', 'General', '{{ task.id }}')">
+                                                        
+                                                        <div class="d-flex align-items-center gap-2">
+                                                            <span class="rounded-circle d-inline-block flex-shrink-0" style="width: 8px; height: 8px; background-color: #0d6efd;"></span>
+                                                            <span style="color: #1f2937 !important; font-size: 0.88rem;">General</span>
+                                                        </div>
+
+                                                        <svg xmlns="http://www.w3.org/2000/svg" height="16px" viewBox="0 -960 960 960" width="16px" fill="#0d6efd"><path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z"/></svg>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+
+                                            <input type="hidden" name="board" id="hiddenBoardId{{ task.id }}" value="{% if task.board %}{{ task.board.id }}{% endif %}">
                                         </div>
                                     </div>
 
-                                    <!-- Descripción / Notas -->
-                                    <button class="btn btn-outline-secondary btn-sm text-start w-100 d-flex justify-content-between align-items-center" 
+                                    <!-- 3. DESCRIPCIÓN (BOTÓN + DESPLEGABLE COLLAPSE) -->
+                                    <button class="btn btn-outline-secondary btn-sm text-start w-100 d-flex justify-content-between align-items-center bg-white shadow-none py-2 px-3 border rounded-3" 
                                             type="button" 
                                             data-bs-toggle="collapse" 
                                             data-bs-target="#collapseDesc{{ task.id }}">
-                                        <span><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#b8b8b8"><path d="M320-240h320v-80H320v80Zm0-160h320v-80H320v80ZM240-80q-33 0-56.5-23.5T160-160v-640q0-33 23.5-56.5T240-880h320l240 240v480q0 33-23.5 56.5T720-80H240Zm280-520v-200H240v640h480v-440H520ZM240-800v200-200 640-640Z"/></svg> {% translate "Descripción" %}</span>
-                                        <small class="text-muted">{% if task.description %}✓{% else %}+{% endif %}</small>
+                                        <span class="d-flex align-items-center gap-2 text-dark">
+                                            <svg xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 -960 960 960" width="18px" fill="#6c757d">
+                                                <path d="M320-240h320v-80H320v80Zm0-160h320v-80H320v80ZM240-80q-33 0-56.5-23.5T160-160v-640q0-33 23.5-56.5T240-880h320l240 240v480q0 33-23.5 56.5T720-80H240Zm280-520v-200H240v640h480v-440H520ZM240-800v200-200 640-640Z"/>
+                                            </svg>
+                                            <span class="fw-medium text-dark">{% translate "Descripción" %}</span>
+                                        </span>
+                                        <small class="text-muted fw-bold">{% if task.description %}✓{% else %}+{% endif %}</small>
                                     </button>
+
                                     <div class="collapse {% if task.description %}show{% endif %}" id="collapseDesc{{ task.id }}">
                                         <div class="p-2 border rounded bg-white mt-1">
-                                            <textarea name="description" class="form-control form-control-sm" rows="3" placeholder="{% translate 'Escribe una descripción más detallada...' %}">{{ task.description|default:'' }}</textarea>
+                                            <textarea name="description" class="form-control form-control-sm border-0 shadow-none" rows="3" placeholder="{% translate 'Escribe una descripción más detallada...' %}">{{ task.description|default:'' }}</textarea>
                                         </div>
                                     </div>
 
@@ -331,7 +392,7 @@
                                 
                                 <div class="d-flex gap-2">
                                     <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">{% translate "Cancelar" %}</button>
-                                    <button type="button" class="btn btn-primary btn-sm fw-bold" onclick="saveTaskModal('{{ task.id }}')">
+                                    <button type="button" class="btn btn-primary btn-sm fw-bold" onclick="saveTaskModal('{{ task.id }}', event)">
                                         {% translate "Guardar" %}
                                     </button>
                                 </div>
@@ -342,6 +403,7 @@
                         <!-- COLUMNA DERECHA -->
                         <div class="col-md-5 bg-light p-3 rounded d-flex flex-column justify-content-between">
                             <div>
+                                <!-- CABECERA CREADOR Y TABLERO -->
                                 <div class="d-flex align-items-start gap-2 mb-3">
                                     <div class="rounded-circle bg-danger text-white fw-bold d-flex align-items-center justify-content-center flex-shrink-0" 
                                         style="width: 32px; height: 32px; font-size: 0.85rem;" 
@@ -353,7 +415,7 @@
                                         <div>
                                             <strong class="text-dark">{{ task.created_by.get_full_name|default:task.created_by.username }}</strong> 
                                             <span class="text-muted">{% translate "ha añadido esta tarjeta a" %}</span> 
-                                            <span class="text-muted fw-semibold">{{ task.board.title }}</span>
+                                            <span class="text-muted fw-semibold">{% if task.board %}{{ task.board.title }}{% else %}General{% endif %}</span>
                                         </div>
                                         <small class="text-muted" style="font-size: 0.75rem;">
                                             {{ task.created_at|date:"d M Y, H:i" }}
@@ -361,6 +423,7 @@
                                     </div>
                                 </div>
 
+                                <!-- SECCIÓN ASIGNADA A (DESPLEGABLE TOTALMENTE ANCLADO) -->
                                 <div class="mb-3 pt-2 border-top">
                                     <small class="text-muted fw-bold d-block mb-2">
                                         <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="#b8b8b8" class="me-1 align-text-bottom"><path d="M365-580Zm-5 540-40-40v-240H120v-80l80-80v-280h-40v-80h285q-18 17-32.5 37T387-760H280v314l-46 46h263q24 14 49.5 23.5T600-363v43H400v240l-40 40Zm322.5-617.5Q700-675 700-700t-17.5-42.5Q665-760 640-760t-42.5 17.5Q580-725 580-700t17.5 42.5Q615-640 640-640t42.5-17.5Zm14 123Q722-549 739-573q-22-13-47-20t-52-7q-27 0-52 7t-47 20q17 24 42.5 38.5T640-520q31 0 56.5-14.5Zm-198 36Q440-557 440-640t58.5-141.5Q557-840 640-840t141.5 58.5Q840-723 840-640t-58.5 141.5Q723-440 640-440t-141.5-58.5Z"/></svg>
@@ -368,67 +431,87 @@
                                     </small>
 
                                     <div class="d-flex flex-wrap gap-2 align-items-center">
-                                        {% for user_assigned in task.assigned_to.all %}
-                                            <div class="d-flex align-items-center gap-2 bg-white pe-2 rounded-pill border shadow-sm">
-                                                <div class="rounded-circle bg-info text-dark fw-bold d-flex align-items-center justify-content-center flex-shrink-0" 
-                                                     style="width: 28px; height: 28px; font-size: 0.75rem;" 
-                                                     title="{{ user_assigned.get_full_name|default:user_assigned.username }}">
-                                                    {{ user_assigned.username|slice:":2"|upper }}
-                                                </div>
-                                                <span class="small text-dark fw-semibold" style="font-size: 0.8rem;">
-                                                    {{ user_assigned.get_full_name|default:user_assigned.username }}
-                                                </span>
-                                            </div>
-                                        {% endfor %}
-
+                                        
+                                        <!-- 1. BOTÓN Y DESPLEGABLE CON ANCLAJE ESTÁTICO DE BOOTSTRAP -->
                                         <div class="dropdown">
                                             <button class="btn btn-light btn-sm rounded-circle border shadow-sm d-flex align-items-center justify-content-center p-0" 
                                                     type="button" 
                                                     id="dropdownAssignees{{ task.id }}" 
                                                     data-bs-toggle="dropdown" 
                                                     data-bs-auto-close="outside" 
+                                                    data-bs-display="static" 
                                                     aria-expanded="false" 
                                                     style="width: 30px; height: 30px; font-weight: bold;">
                                                 +
                                             </button>
 
-                                            <div class="dropdown-menu p-3 shadow-lg border-0 rounded-3 mt-1" 
-                                                 aria-labelledby="dropdownAssignees{{ task.id }}" 
-                                                 style="width: 260px; z-index: 1055;">
+                                            <div class="dropdown-menu p-2 shadow-lg border-0 rounded-3 mt-1 bg-white" 
+                                                aria-labelledby="dropdownAssignees{{ task.id }}" 
+                                                style="width: 270px; z-index: 1055;">
                                                 
-                                                <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+                                                <div class="d-flex justify-content-between align-items-center px-2 py-1 mb-2 border-bottom">
                                                     <span class="fw-bold small text-dark">{% translate "Miembros" %}</span>
+                                                    <button type="button" class="btn-close btn-sm" onclick="bootstrap.Dropdown.getInstance(document.getElementById('dropdownAssignees{{ task.id }}')).hide();"></button>
                                                 </div>
 
                                                 <div class="d-flex flex-column gap-1">
                                                     {% for u in users %}
                                                         <div>
                                                             <input type="checkbox" 
-                                                                   name="assigned_to" 
-                                                                   value="{{ u.id }}" 
-                                                                   id="assign-user-{{ task.id }}-{{ u.id }}" 
-                                                                   class="btn-check assign-check-toggle" 
-                                                                   {% if u in task.assigned_to.all %}checked{% endif %}>
+                                                                name="assigned_to" 
+                                                                value="{{ u.id }}" 
+                                                                id="assign-user-{{ task.id }}-{{ u.id }}" 
+                                                                class="d-none member-check-input" 
+                                                                data-username="{{ u.get_full_name|default:u.username }}"
+                                                                data-initials="{{ u.username|slice:':2'|upper }}"
+                                                                data-task-id="{{ task.id }}"
+                                                                data-user-id="{{ u.id }}"
+                                                                {% if u in task.assigned_to.all %}checked{% endif %}
+                                                                onchange="toggleMemberRow(this)">
                                                             
-                                                            <label class="btn btn-outline-dark btn-sm w-100 text-start d-flex justify-content-between align-items-center py-1 px-2 border-0 bg-light-hover" 
-                                                                   for="assign-user-{{ task.id }}-{{ u.id }}"
-                                                                   style="font-size: 0.8rem; cursor: pointer;">
+                                                            <label for="assign-user-{{ task.id }}-{{ u.id }}" 
+                                                                class="custom-member-item d-flex align-items-center justify-content-between py-1.5 px-2 rounded-2 fw-semibold w-100 m-0"
+                                                                style="cursor: pointer; color: #1f2937 !important; background-color: {% if u in task.assigned_to.all %}#e5e7eb{% else %}transparent{% endif %};">
                                                                 
                                                                 <div class="d-flex align-items-center gap-2">
-                                                                    <span class="badge rounded-circle bg-info text-dark border p-0 d-inline-flex align-items-center justify-content-center" 
-                                                                          style="width: 22px; height: 22px; font-size: 0.65rem;">
+                                                                    <span class="badge rounded-circle bg-info text-dark border-0 p-0 d-inline-flex align-items-center justify-content-center flex-shrink-0" 
+                                                                        style="width: 24px; height: 24px; font-size: 0.7rem; font-weight: bold;">
                                                                         {{ u.username|slice:":2"|upper }}
                                                                     </span>
-                                                                    <span class="text-dark">{{ u.get_full_name|default:u.username }}</span>
+                                                                    <span style="color: #1f2937 !important; font-size: 0.85rem;">
+                                                                        {{ u.get_full_name|default:u.username }}
+                                                                    </span>
                                                                 </div>
 
-                                                                <span class="badge rounded-circle border toggle-icon text-dark bg-white" style="width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center;"></span>
+                                                                <div class="member-check-indicator d-flex align-items-center justify-content-center rounded-circle border"
+                                                                    style="width: 18px; height: 18px; border-color: {% if u in task.assigned_to.all %}#0d6efd{% else %}#d1d5db{% endif %} !important; background-color: {% if u in task.assigned_to.all %}#0d6efd{% else %}#ffffff{% endif %};">
+                                                                    {% if u in task.assigned_to.all %}
+                                                                        <svg xmlns="http://www.w3.org/2000/svg" height="12px" viewBox="0 -960 960 960" width="12px" fill="#ffffff"><path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z"/></svg>
+                                                                    {% endif %}
+                                                                </div>
                                                             </label>
                                                         </div>
                                                     {% endfor %}
                                                 </div>
                                             </div>
                                         </div>
+
+                                        <!-- 2. CONTENEDOR DE PÍLDORAS (SE COLOCA A LA DERECHA DEL BOTÓN Y CRECE HACIA ADELANTE) -->
+                                        <div id="assignedBadgesContainer{{ task.id }}" class="d-flex flex-wrap gap-2 align-items-center">
+                                            {% for user_assigned in task.assigned_to.all %}
+                                                <div class="d-flex align-items-center gap-2 bg-white pe-2 rounded-pill border shadow-sm" id="badge-user-{{ task.id }}-{{ user_assigned.id }}">
+                                                    <div class="rounded-circle bg-info text-dark fw-bold d-flex align-items-center justify-content-center flex-shrink-0" 
+                                                        style="width: 28px; height: 28px; font-size: 0.75rem;" 
+                                                        title="{{ user_assigned.get_full_name|default:user_assigned.username }}">
+                                                        {{ user_assigned.username|slice:":2"|upper }}
+                                                    </div>
+                                                    <span class="small text-dark fw-semibold" style="font-size: 0.8rem;">
+                                                        {{ user_assigned.get_full_name|default:user_assigned.username }}
+                                                    </span>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+
                                     </div>
                                 </div>
 

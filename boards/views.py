@@ -79,6 +79,12 @@ def dashboard_view(request, board_id=None):
     completed_tasks = Task.objects.filter(id__in=completed_task_ids).order_by('-updated_at')[:15]
     # =================================================================
 
+    # Clasificación en listas para las columnas del tablero
+    q1_list = list(active_tasks.filter(urgency__gte=3, importance__gte=3))
+    q2_list = list(active_tasks.filter(urgency__lt=3, importance__gte=3))
+    q3_list = list(active_tasks.filter(urgency__gte=3, importance__lt=3))
+    q4_list = list(active_tasks.filter(urgency__lt=3, importance__lt=3))
+
     context = {
         'form': form,
         'board_form': BoardForm(),
@@ -89,12 +95,18 @@ def dashboard_view(request, board_id=None):
         'default_board': default_board,
         'has_shared_tasks': has_shared_tasks,
         
-        # Filtros clasificados
-        'q1_tasks': list(active_tasks.filter(urgency__gte=3, importance__gte=3)),
-        'q2_tasks': list(active_tasks.filter(urgency__lt=3, importance__gte=3)),
-        'q3_tasks': list(active_tasks.filter(urgency__gte=3, importance__lt=3)),
-        'q4_tasks': list(active_tasks.filter(urgency__lt=3, importance__lt=3)),
+        # Listas de tareas activas por cuadrante
+        'q1_tasks': q1_list,
+        'q2_tasks': q2_list,
+        'q3_tasks': q3_list,
+        'q4_tasks': q4_list,
         'completed_tasks': completed_tasks,
+
+        # Conteos numéricos para el bloque "DISTRIBUCIÓN ACTUAL" del sidebar
+        'q1_count': len(q1_list),
+        'q2_count': len(q2_list),
+        'q3_count': len(q3_list),
+        'q4_count': len(q4_list),
     }
 
     return render(request, 'tasks/dashboard.html', context)

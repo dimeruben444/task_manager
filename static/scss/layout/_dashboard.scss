@@ -268,3 +268,22 @@
 #searchDropdownResults .dropdown-item:hover {
     background-color: rgba(255, 255, 255, 0.15) !important;
 }
+
+
+/* Estilos para el selector interactivo de paleta de colores */
+.color-picker-item input[type="radio"]:checked + span {
+    ring: 2px solid #0d6efd;
+    outline: 2px solid #0d6efd;
+    outline-offset: 2px;
+    transform: scale(1.1);
+    transition: transform 0.15s ease, outline 0.15s ease;
+}
+
+.color-picker-item span {
+    transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.color-picker-item:hover span {
+    opacity: 0.85;
+    transform: scale(1.05);
+}

@@ -573,3 +573,5 @@ document.addEventListener('click', function (e) {
         dropdown.classList.add('d-none');
     }
 });
+
+

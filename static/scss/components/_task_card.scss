@@ -302,3 +302,76 @@
     color: #dc2626 !important;
     box-shadow: 0 0 8px rgba(239, 68, 68, 0.4) !important;
 }
+
+
+/* Subrayado para el día actual en Flatpickr */
+.flatpickr-day.today {
+    border-bottom: 2px solid #0d6efd !important;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.flatpickr-day.today.selected {
+    border-bottom: 2px solid #ffffff !important;
+}
+
+/* Asegurar que el menú desplegable de tableros se posicione por encima de todo */
+.dropdown-menu-boards {
+    z-index: 1060 !important;
+    max-height: 220px;
+    overflow-y: auto;
+}
+
+/* Estilo limpio para las opciones de tableros */
+.option-board-item:hover {
+    background-color: #f1f3f5 !important;
+    color: #0d6efd !important;
+}
+
+.option-board-item:hover span {
+    color: #0d6efd !important;
+}
+
+/* Evita que el contenido interno del modal corte los desplegables */
+.modal-body {
+    overflow: visible !important;
+}
+
+/* Forzar visibilidad en elementos de selección de tablero */
+.custom-board-item {
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.custom-board-item:hover {
+    background-color: #f3f4f6 !important;
+    color: #0d6efd !important;
+}
+
+.custom-board-item:hover span {
+    color: #0d6efd !important;
+}
+
+
+/* Estilo limpio para la lista de miembros */
+.custom-member-item {
+    transition: background-color 0.15s ease;
+    user-select: none;
+}
+
+.custom-member-item:hover {
+    background-color: #f3f4f6 !important;
+}
+
+.custom-member-item:hover span {
+    color: #1f2937 !important;
+}
+
+/* Anular cualquier movimiento por Popper.js */
+.dropdown-menu.dropdown-static-fixed {
+    position: absolute !important;
+    top: 100% !important;
+    right: 0 !important;
+    left: auto !important;
+    transform: none !important; /* Desactiva el desplazamiento por JS */
+    margin-top: 0.25rem !important;
+}
