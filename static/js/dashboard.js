@@ -1,12 +1,68 @@
 // static/js/dashboard.js
 
-// 1. FUNCIONES DE FORMULARIOS INLINE Y UTILS
-// static/js/dashboard.js
+// 1. CÁLCULO DINÁMICO DEL DESTINO PREVISTO (ALTA RÁPIDA)
+function updateQuickTargetQuadrantDisplay() {
+    const targetEl = document.getElementById('quickTaskTargetQuadrant');
+    if (!targetEl) return;
 
-// static/js/dashboard.js
+    // Buscar expresamente los inputs marcados dentro de quickTaskForm
+    const quickForm = document.getElementById('quickTaskForm');
+    if (!quickForm) return;
 
-// static/js/dashboard.js
+    const selectedUrgency = quickForm.querySelector('input[name="urgency"]:checked');
+    const selectedImportance = quickForm.querySelector('input[name="importance"]:checked');
 
+    // Si falta alguno de los dos, forzar "-"
+    if (!selectedUrgency || !selectedImportance) {
+        targetEl.textContent = '-';
+        targetEl.className = 'fw-bold text-secondary';
+        return;
+    }
+
+    const urgencyVal = parseInt(selectedUrgency.value, 10);
+    const importanceVal = parseInt(selectedImportance.value, 10);
+
+    if (isNaN(urgencyVal) || isNaN(importanceVal) || urgencyVal <= 0 || importanceVal <= 0) {
+        targetEl.textContent = '-';
+        targetEl.className = 'fw-bold text-secondary';
+        return;
+    }
+
+    const isUrgent = urgencyVal >= 3;
+    const isImportant = importanceVal >= 3;
+
+    if (isUrgent && isImportant) {
+        targetEl.textContent = 'Q1 (Hacer ahora)';
+        targetEl.className = 'fw-bold text-danger';
+    } else if (!isUrgent && isImportant) {
+        targetEl.textContent = 'Q2 (Planificar)';
+        targetEl.className = 'fw-bold text-primary';
+    } else if (isUrgent && !isImportant) {
+        targetEl.textContent = 'Q3 (Delegar)';
+        targetEl.className = 'fw-bold text-warning';
+    } else {
+        targetEl.textContent = 'Q4 (Eliminar)';
+        targetEl.className = 'fw-bold text-secondary';
+    }
+}
+
+function initQuickQuadrantListeners() {
+    const quickForm = document.getElementById('quickTaskForm');
+    if (!quickForm) return;
+
+    const ratingInputs = quickForm.querySelectorAll('input[name="urgency"], input[name="importance"]');
+    
+    // Desmarcar todos los radios al cargar la página para limpiar estado inicial/caché
+    ratingInputs.forEach(input => {
+        input.checked = false;
+        input.addEventListener('change', updateQuickTargetQuadrantDisplay);
+    });
+
+    // Resetear el texto del cuadrante a "-"
+    updateQuickTargetQuadrantDisplay();
+}
+
+// 2. FUNCIONES DE FORMULARIOS INLINE Y UTILS
 function showInlineForm(button) {
     const wrapper = button.closest('.add-task-inline-wrapper');
     const quadrantContainer = button.closest('.quadrant-container');
@@ -87,10 +143,6 @@ function getCookie(name) {
     return cookieValue;
 }
 
-// static/js/dashboard.js
-
-// static/js/dashboard.js
-
 function sendToggleRequest(taskId, isCompleted, checkbox) {
     const csrftoken = getCookie('csrftoken');
 
@@ -125,7 +177,6 @@ function sendToggleRequest(taskId, isCompleted, checkbox) {
                     const urgency = card.dataset.urgency || "4";
                     const importance = card.dataset.importance || "4";
 
-                    // Crear elemento en completadas
                     const completedItem = document.createElement('div');
                     completedItem.className = 'completed-task-item task-card card border-0 shadow-sm mb-2 p-2 d-flex flex-row align-items-center justify-content-between gap-2 bg-light';
                     completedItem.setAttribute('data-task-id', taskId);
@@ -159,7 +210,6 @@ function sendToggleRequest(taskId, isCompleted, checkbox) {
                     targetContainer.prepend(completedItem);
                     card.remove();
 
-                    // Incrementar contador
                     const countBadge = document.getElementById('completed-count');
                     if (countBadge) {
                         let currentCount = parseInt(countBadge.textContent, 10) || 0;
@@ -169,7 +219,6 @@ function sendToggleRequest(taskId, isCompleted, checkbox) {
             } 
             // 2. SI DESMARCAMOS (DESCOMPLETAR)
             else if (!isCompleted && card) {
-                // Determinar el cuadrante de destino según la respuesta o metadatos de la tarjeta
                 let targetQuadrantCode = data.quadrant; 
                 
                 if (!targetQuadrantCode) {
@@ -185,7 +234,6 @@ function sendToggleRequest(taskId, isCompleted, checkbox) {
                 const targetQuadrantContainer = document.querySelector(`.quadrant-container[data-quadrant="${targetQuadrantCode}"]`);
 
                 if (targetQuadrantContainer) {
-                    // Ocultar mensaje de "No hay tareas"
                     const emptyMsg = targetQuadrantContainer.querySelector('.empty-msg');
                     if (emptyMsg) emptyMsg.classList.add('d-none');
 
@@ -193,7 +241,6 @@ function sendToggleRequest(taskId, isCompleted, checkbox) {
                                    || card.querySelector('span')?.textContent.trim() 
                                    || card.textContent.trim();
 
-                    // Recrear la tarjeta en la matriz
                     const restoredCard = document.createElement('div');
                     restoredCard.className = 'card mb-2 p-0 shadow-sm border-0 task-card';
                     restoredCard.id = `task-card-${taskId}`;
@@ -220,7 +267,6 @@ function sendToggleRequest(taskId, isCompleted, checkbox) {
                         </div>
                     `;
 
-                    // Insertar antes del botón de añadir tarea
                     const inlineWrapper = targetQuadrantContainer.querySelector('.add-task-inline-wrapper');
                     if (inlineWrapper) {
                         targetQuadrantContainer.insertBefore(restoredCard, inlineWrapper);
@@ -230,12 +276,10 @@ function sendToggleRequest(taskId, isCompleted, checkbox) {
 
                     card.remove();
                 } else {
-                    // Si por algún motivo no encuentra el cuadrante, recargar como fallback
                     window.location.reload();
                     return;
                 }
 
-                // Decrementar contador de completadas
                 const countBadge = document.getElementById('completed-count');
                 if (countBadge) {
                     let currentCount = parseInt(countBadge.textContent, 10) || 0;
@@ -252,11 +296,13 @@ function sendToggleRequest(taskId, isCompleted, checkbox) {
     });
 }
 
-
 document.addEventListener('DOMContentLoaded', function () {
     let isProcessingMove = false;
 
-    // A. INICIALIZACIÓN DE SORTABLEJS (Soporte Drag & Drop + Animación de Fecha)
+    // Inicialización de la vista previa del destino en el Alta Rápida
+    initQuickQuadrantListeners();
+
+    // A. INICIALIZACIÓN DE SORTABLEJS (Soporte Drag & Drop)
     const quadrantContainers = document.querySelectorAll('.quadrant-container');
 
     quadrantContainers.forEach(container => {
@@ -299,7 +345,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 isProcessingMove = true;
 
-                // Función auxiliar para reinsertar la tarjeta por encima del botón de añadir
                 const reinsertCardAboveAddBtn = (container, card) => {
                     const inlineWrapper = container.querySelector('.add-task-inline-wrapper');
                     if (inlineWrapper) {
@@ -345,7 +390,6 @@ document.addEventListener('DOMContentLoaded', function () {
                                     reinsertCardAboveAddBtn(correctContainer, newCard);
                                 }
                                 
-                                // AQUÍ VA EL PUNTO DOS: Retardo de 200ms para asegurar el pintado en el DOM
                                 setTimeout(() => {
                                     if (typeof window.triggerDueDateShake === 'function') {
                                         window.triggerDueDateShake(newCard);
@@ -427,11 +471,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
-
-
 // BUSCADOR CON DESPLEGABLE EMERGENTE (ESTILO TRELLO)
-
-
 function handleTaskSearchInput(query) {
     const cleanQuery = query.toLowerCase().trim();
     const dropdown = document.getElementById('searchDropdownResults');
@@ -496,20 +536,20 @@ function handleTaskSearchInput(query) {
         
         matches.forEach(item => {
             html += `
-                            <button type="button" 
-                                    class="dropdown-item text-white rounded-2 p-2 mb-1 d-flex align-items-center justify-content-between gap-2 border-0 search-result-item"
-                                    style="cursor: pointer; text-align: left; width: 100%;"
-                                    onclick="openSearchResultModal('${item.id}')">
-                                <div class="d-flex align-items-center gap-2 min-w-0 search-item-title-wrapper">
-                                    <span class="fs-6 flex-shrink-0">${item.isCompleted ? '☑️' : '📋'}</span>
-                                    <span class="fw-medium task-title-text ${item.isCompleted ? 'is-completed' : ''}" title="${escapeHtml(item.title)}">
-                                        ${escapeHtml(item.title)}
-                                    </span>
-                                </div>
-                                <span class="badge ${item.badgeBg} flex-shrink-0">
-                                    ${item.location}
-                                </span>
-                            </button>
+                <button type="button" 
+                        class="dropdown-item text-white rounded-2 p-2 mb-1 d-flex align-items-center justify-content-between gap-2 border-0 search-result-item"
+                        style="cursor: pointer; text-align: left; width: 100%;"
+                        onclick="openSearchResultModal('${item.id}')">
+                    <div class="d-flex align-items-center gap-2 min-w-0 search-item-title-wrapper">
+                        <span class="fs-6 flex-shrink-0">${item.isCompleted ? '☑️' : '📋'}</span>
+                        <span class="fw-medium task-title-text ${item.isCompleted ? 'is-completed' : ''}" title="${escapeHtml(item.title)}">
+                            ${escapeHtml(item.title)}
+                        </span>
+                    </div>
+                    <span class="badge ${item.badgeBg} flex-shrink-0">
+                        ${item.location}
+                    </span>
+                </button>
             `;
         });
 
@@ -525,18 +565,15 @@ function handleTaskSearchInput(query) {
     }
 }
 
-
 function openSearchResultModal(taskId) {
     const dropdown = document.getElementById('searchDropdownResults');
     if (dropdown) dropdown.classList.add('d-none');
 
-    // Buscar el modal por ID
     const modalEl = document.getElementById(`viewTaskModal${taskId}`);
     if (modalEl) {
         const modalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
         modalInstance.show();
     } else {
-        // Fallback: si no hay modal (por ejemplo en completadas), se busca el elemento en el tablero
         const targetCard = document.querySelector(`[data-task-id="${taskId}"]`);
         if (targetCard) {
             targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -573,5 +610,3 @@ document.addEventListener('click', function (e) {
         dropdown.classList.add('d-none');
     }
 });
-
-
