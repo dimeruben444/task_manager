@@ -323,22 +323,34 @@
     </div>
 
     <!-- REJILLA PRINCIPAL: MATRIZ EISENHOWER + PANEL DERECHO COMPLETADAS (FLEXBOX SIN DESFASE) -->
-    <div class="d-flex gap-4 align-items-start w-100">
+    <div class="d-flex gap-5 align-items-start w-100">
         
         <!-- SECCIÓN IZQUIERDA: LOS 4 CUADRANTES DE EISENHOWER (OCUPA EL ESPACIO RESTANTE) -->
-        <div class="flex-grow-1 min-w-0">
+        <div class="matrix-container-wrapper flex-grow-1 min-w-0">
             <div class="row g-4">
                 
                 <!-- Q1: HACER AHORA -->
                 <div class="col-md-6 ">
                     <div class="quadrant quadrant-q1 h-100 d-flex flex-column ">
                         <div class="d-flex align-items-center justify-content-between mb-3 px-1">
-                            <div>
-                                <h6 class="fw-bold mb-0 text-dark" style="font-size: 0.92rem;">
-                                    🔥 {% translate "Urgente - Importante" %}
-                                </h6>
-                                <small class="text-danger fw-semibold" style="font-size: 0.72rem;">{% translate "Hacer ahora • Crisis y plazos clave" %}</small>
+                            <div class="d-flex align-items-center gap-2">
+                                <!-- Icono a la izquierda -->
+                                <span class="quadrant-icon-box q1-bg flex-shrink-0">
+                                    <img src="{% static 'img/fire.svg' %}" alt="Eliminar" width="16" height="16"> 
+                                </span>
+                                
+                                <!-- Contenedor con título arriba y texto secundario abajo -->
+                                <div class="d-flex flex-column gap-1">
+                                    <h6 class="fw-bold mb-0 text-dark" style="font-size: 1.1rem; line-height: 1.2;">
+                                        {% translate "Urgente - Importante" %}
+                                    </h6>
+                                    <small class="text-danger fw-semibold" style="font-size: 0.85rem; line-height: 1.2;">
+                                        {% translate "Hacer ahora • Crisis y plazos clave" %}
+                                    </small>
+                                </div>
                             </div>
+
+                            <!-- Badge de contador -->
                             <span class="quadrant-header-badge bg-danger text-white">{{ q1_tasks|length }}</span>
                         </div>
                         
@@ -382,12 +394,24 @@
                 <div class="col-md-6">
                     <div class="quadrant quadrant-q2 h-100 d-flex flex-column">
                         <div class="d-flex align-items-center justify-content-between mb-3 px-1">
-                            <div>
-                                <h6 class="fw-bold mb-0 text-dark" style="font-size: 0.92rem;">
-                                    📅 {% translate "Importante - No Urgente" %}
-                                </h6>
-                                <small class="text-primary fw-semibold" style="font-size: 0.72rem;">{% translate "Planificar • Metas a medio plazo" %}</small>
+                            <div class="d-flex align-items-center gap-2">
+                                <!-- Icono a la izquierda -->
+                                <span class="quadrant-icon-box q2-bg flex-shrink-0">
+                                    <img src="{% static 'img/calendar.svg' %}" alt="Eliminar" width="16" height="16"> 
+                                </span>
+                                
+                                <!-- Contenedor con título arriba y texto secundario abajo -->
+                                <div class="d-flex flex-column gap-1">
+                                    <h6 class="fw-bold mb-0 text-dark" style="font-size: 1.1rem; line-height: 1.2;">
+                                        {% translate "Importante - No Urgente" %}
+                                    </h6>
+                                    <small class="text-primary fw-semibold" style="font-size: 0.85rem; line-height: 1.2;">
+                                        {% translate "Planificar • Metas a medio plazo" %}
+                                    </small>
+                                </div>
                             </div>
+
+                            <!-- Badge de contador -->
                             <span class="quadrant-header-badge bg-primary text-white">{{ q2_tasks|length }}</span>
                         </div>
                         
@@ -431,12 +455,24 @@
                 <div class="col-md-6">
                     <div class="quadrant quadrant-q3 h-100 d-flex flex-column">
                         <div class="d-flex align-items-center justify-content-between mb-3 px-1">
-                            <div>
-                                <h6 class="fw-bold mb-0 text-dark" style="font-size: 0.92rem;">
-                                    👥 {% translate "Urgente - No Importante" %}
-                                </h6>
-                                <small class="text-warning fw-semibold" style="font-size: 0.72rem; color: #d97706 !important;">{% translate "Delegar • Interrupciones y tareas operativas" %}</small>
+                            <div class="d-flex align-items-center gap-2">
+                                <!-- Icono a la izquierda -->
+                                <span class="quadrant-icon-box q3-bg flex-shrink-0">
+                                    <img src="{% static 'img/group.svg' %}" alt="Eliminar" width="16" height="16"> 
+                                </span>
+                                
+                                <!-- Contenedor con título arriba y texto secundario abajo -->
+                                <div class="d-flex flex-column gap-1">
+                                    <h6 class="fw-bold mb-0 text-dark" style="font-size: 1.1rem; line-height: 1.2;">
+                                        {% translate "Urgente - No Importante" %}
+                                    </h6>
+                                    <small class="text-warning fw-semibold" style="font-size: 0.85rem; line-height: 1.2;">
+                                        {% translate "Delegar • Interrupciones y tareas operativas" %}
+                                    </small>
+                                </div>
                             </div>
+
+                            <!-- Badge de contador -->
                             <span class="quadrant-header-badge bg-warning text-dark">{{ q3_tasks|length }}</span>
                         </div>
                         
@@ -480,12 +516,24 @@
                 <div class="col-md-6">
                     <div class="quadrant quadrant-q4 h-100 d-flex flex-column">
                         <div class="d-flex align-items-center justify-content-between mb-3 px-1">
-                            <div>
-                                <h6 class="fw-bold mb-0 text-dark" style="font-size: 0.92rem;">
-                                    🗑️ {% translate "No Urgente - No Importante" %}
-                                </h6>
-                                <small class="text-muted fw-semibold" style="font-size: 0.72rem;">{% translate "Eliminar • Distracciones e irrelevantes" %}</small>
+                            <div class="d-flex align-items-center gap-2">
+                                <!-- Icono a la izquierda -->
+                                <span class="quadrant-icon-box q4-bg flex-shrink-0">
+                                    <img src="{% static 'img/trash.svg' %}" alt="Eliminar" width="16" height="16"> 
+                                </span>
+                                
+                                <!-- Contenedor con título arriba y texto secundario abajo -->
+                                <div class="d-flex flex-column gap-1">
+                                    <h6 class="fw-bold mb-0 text-dark" style="font-size: 1.1rem; line-height: 1.2;">
+                                        {% translate "No Urgente - No Importante" %}
+                                    </h6>
+                                    <small class="text-muted fw-semibold" style="font-size: 0.85rem; line-height: 1.2;">
+                                        {% translate "Eliminar • Distracciones e irrelevantes" %}
+                                    </small>
+                                </div>
                             </div>
+
+                            <!-- Badge de contador -->
                             <span class="quadrant-header-badge bg-secondary text-white">{{ q4_tasks|length }}</span>
                         </div>
                         

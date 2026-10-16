@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" overflow="visible" style="display: block;" width="16" height="16" viewBox="0 0 16 16" fill="none">
+  <g id="SVG">
+    <!-- Cuerpo del calendario con bordes redondeados -->
+    <rect x="2.66667" y="4" width="10.6667" height="9.33333" rx="2" stroke="#2563EB" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+    
+    <!-- Anillas superiores -->
+    <path d="M5.33333 2.66667V4.66667" stroke="#2563EB" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M10.6667 2.66667V4.66667" stroke="#2563EB" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+    
+    <!-- Línea horizontal interna -->
+    <path d="M5.33333 7.33333H10.6667" stroke="#2563EB" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>

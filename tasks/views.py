@@ -415,3 +415,27 @@ def clear_completed_tasks(request):
         Task.objects.filter(id__in=task_ids).delete()
 
     return redirect('dashboard')
+
+
+@login_required
+def search_tasks_api(request):
+    query = request.GET.get('q', '').strip()
+    if len(query) < 2:
+        return JsonResponse({'results': []})
+
+    # Usamos created_by en lugar de user
+    tasks = Task.objects.filter(
+        created_by=request.user,
+        title__icontains=query
+    )[:10]
+
+    results = []
+    for task in tasks:
+        results.append({
+            'id': task.id,
+            'title': task.title,
+            'is_completed': task.is_completed,
+            'quadrant': str(task.quadrant or 'Q1'),
+        })
+
+    return JsonResponse({'results': results})

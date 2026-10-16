@@ -215,6 +215,7 @@ function sendToggleRequest(taskId, isCompleted, checkbox) {
                         let currentCount = parseInt(countBadge.textContent, 10) || 0;
                         countBadge.textContent = currentCount + 1;
                     }
+                    updateMatrixAndSidebarCounts();
                 }
             } 
             // 2. SI DESMARCAMOS (DESCOMPLETAR)
@@ -289,6 +290,7 @@ function sendToggleRequest(taskId, isCompleted, checkbox) {
                     let currentCount = parseInt(countBadge.textContent, 10) || 0;
                     countBadge.textContent = Math.max(0, currentCount - 1);
                 }
+                updateMatrixAndSidebarCounts();
             }
         } else {
             checkbox.checked = !isCompleted;
@@ -475,13 +477,26 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
-// BUSCADOR CON DESPLEGABLE EMERGENTE (ESTILO TRELLO)
-function handleTaskSearchInput(query) {
+// ==========================================
+// BUSCADOR GLOBAL EN TIEMPO REAL (TRELLO STYLE)
+// ==========================================
+window.handleTaskSearchInput = function(query) {
     const cleanQuery = query.toLowerCase().trim();
     const dropdown = document.getElementById('searchDropdownResults');
+    const searchInput = document.getElementById('globalTaskSearchInput');
     const clearBtn = document.getElementById('clearSearchBtn');
 
-    if (!dropdown) return;
+    if (!dropdown || !searchInput) return;
+
+    const safeHtml = (str) => {
+        if (!str) return '';
+        return String(str)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    };
 
     if (clearBtn) {
         if (cleanQuery !== '') {
@@ -491,25 +506,38 @@ function handleTaskSearchInput(query) {
         }
     }
 
+    // SI LA BÚSQUEDA ESTÁ VACÍA -> OCULTAR POR COMPLETO Y MANTENER EN NONE
     if (cleanQuery === '') {
         dropdown.classList.add('d-none');
+        dropdown.classList.remove('show');
+        dropdown.style.display = 'none';
         dropdown.innerHTML = '';
         return;
     }
 
-    const allCards = document.querySelectorAll('.task-card, .completed-task-item');
+    // Calcular posición dinámica exacta
+    const rect = searchInput.getBoundingClientRect();
+    dropdown.style.top = (rect.bottom + 6) + 'px';
+    dropdown.style.left = rect.left + 'px';
+    dropdown.style.width = rect.width + 'px';
+
+    const allCardElements = document.querySelectorAll('.task-card, .completed-task-item, [data-task-id], [id^="task-card-"]');
     const matches = [];
 
-    allCards.forEach(card => {
+    allCardElements.forEach(card => {
+        if (card.classList.contains('add-task-inline-wrapper') || card.tagName === 'FORM') return;
+
         let taskId = card.dataset.taskId || card.getAttribute('data-task-id');
         if (!taskId && card.id && card.id.startsWith('task-card-')) {
             taskId = card.id.replace('task-card-', '');
         }
 
+        if (!taskId) return;
+
         const titleEl = card.querySelector('.task-title') || card.querySelector('h6') || card.querySelector('span');
         const titleText = titleEl ? titleEl.textContent.trim() : card.textContent.trim();
 
-        if (titleText.toLowerCase().includes(cleanQuery) && taskId) {
+        if (titleText && titleText.toLowerCase().includes(cleanQuery)) {
             const isCompleted = card.classList.contains('completed-task-item') || card.closest('#completed-tasks-container') !== null;
             
             let locationLabel = "Completada";
@@ -521,17 +549,19 @@ function handleTaskSearchInput(query) {
                 if (quadCode === 'Q1') { locationLabel = "Urgente e Importante"; badgeBg = "bg-danger"; }
                 else if (quadCode === 'Q2') { locationLabel = "Planificar"; badgeBg = "bg-primary"; }
                 else if (quadCode === 'Q3') { locationLabel = "Delegar"; badgeBg = "bg-warning text-dark"; }
-                else if (quadCode === 'Q4') { locationLabel = "Eliminar"; badgeBg = "bg-info text-dark"; }
+                else if (quadCode === 'Q4') { locationLabel = "Eliminar"; badgeBg = "bg-secondary"; }
                 else { locationLabel = "Matriz"; badgeBg = "bg-secondary"; }
             }
 
-            matches.push({
-                id: taskId,
-                title: titleText,
-                isCompleted: isCompleted,
-                location: locationLabel,
-                badgeBg: badgeBg
-            });
+            if (!matches.some(m => m.id === String(taskId))) {
+                matches.push({
+                    id: String(taskId),
+                    title: titleText,
+                    isCompleted: isCompleted,
+                    location: locationLabel,
+                    badgeBg: badgeBg
+                });
+            }
         }
     });
 
@@ -542,12 +572,12 @@ function handleTaskSearchInput(query) {
             html += `
                 <button type="button" 
                         class="dropdown-item text-white rounded-2 p-2 mb-1 d-flex align-items-center justify-content-between gap-2 border-0 search-result-item"
-                        style="cursor: pointer; text-align: left; width: 100%;"
+                        style="cursor: pointer; text-align: left; width: 100%; background: rgba(255, 255, 255, 0.05);"
                         onclick="openSearchResultModal('${item.id}')">
                     <div class="d-flex align-items-center gap-2 min-w-0 search-item-title-wrapper">
                         <span class="fs-6 flex-shrink-0">${item.isCompleted ? '☑️' : '📋'}</span>
-                        <span class="fw-medium task-title-text ${item.isCompleted ? 'is-completed' : ''}" title="${escapeHtml(item.title)}">
-                            ${escapeHtml(item.title)}
+                        <span class="fw-medium task-title-text ${item.isCompleted ? 'is-completed' : ''}" title="${safeHtml(item.title)}">
+                            ${safeHtml(item.title)}
                         </span>
                     </div>
                     <span class="badge ${item.badgeBg} flex-shrink-0">
@@ -559,19 +589,27 @@ function handleTaskSearchInput(query) {
 
         dropdown.innerHTML = html;
         dropdown.classList.remove('d-none');
+        dropdown.style.display = 'block';
     } else {
         dropdown.innerHTML = `
             <div class="p-3 text-center text-white-50 small">
-                No se encontraron tareas con "${escapeHtml(cleanQuery)}"
+                No se encontraron tareas con "${safeHtml(cleanQuery)}"
             </div>
         `;
         dropdown.classList.remove('d-none');
+        dropdown.style.display = 'block';
     }
-}
+};
 
-function openSearchResultModal(taskId) {
+// CERRAR DESPLEGABLE AL ABRIR UN MODAL
+window.openSearchResultModal = function(taskId) {
     const dropdown = document.getElementById('searchDropdownResults');
-    if (dropdown) dropdown.classList.add('d-none');
+    if (dropdown) {
+        dropdown.classList.add('d-none');
+        dropdown.classList.remove('show');
+        dropdown.style.display = 'none';
+        dropdown.innerHTML = '';
+    }
 
     const modalEl = document.getElementById(`viewTaskModal${taskId}`);
     if (modalEl) {
@@ -585,8 +623,18 @@ function openSearchResultModal(taskId) {
             setTimeout(() => targetCard.classList.remove('bg-warning-subtle'), 2000);
         }
     }
-}
+};
 
+// CERRAR AL HACER CLIC FUERA
+document.addEventListener('click', function (e) {
+    const searchWrapper = e.target.closest('#globalTaskSearchWrapper');
+    const dropdown = document.getElementById('searchDropdownResults');
+    if (!searchWrapper && dropdown) {
+        dropdown.classList.add('d-none');
+        dropdown.classList.remove('show');
+        dropdown.style.display = 'none';
+    }
+});
 function clearGlobalSearch() {
     const searchInput = document.getElementById('globalTaskSearchInput');
     const dropdown = document.getElementById('searchDropdownResults');
@@ -607,10 +655,50 @@ function escapeHtml(str) {
     return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
 }
 
-document.addEventListener('click', function (e) {
-    const searchWrapper = e.target.closest('#globalTaskSearchWrapper');
-    const dropdown = document.getElementById('searchDropdownResults');
-    if (!searchWrapper && dropdown) {
-        dropdown.classList.add('d-none');
+// ==========================================
+// ATAJO DE TECLADO GLOBAL (⌘K / Ctrl+K)
+// ==========================================
+document.addEventListener('keydown', function(e) {
+    // Detecta Cmd + K (Mac) o Ctrl + K (Windows/Linux)
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        const searchInput = document.getElementById('globalTaskSearchInput');
+        if (searchInput) {
+            e.preventDefault(); // Evita el comportamiento por defecto del navegador
+            searchInput.focus();
+            searchInput.select(); // Selecciona el texto existente si lo hay
+        }
+    }
+    
+    // Opcional: Cerrar el buscador al pulsar la tecla Escape
+    if (e.key === 'Escape') {
+        const dropdown = document.getElementById('searchDropdownResults');
+        if (dropdown) {
+            dropdown.classList.add('d-none');
+            dropdown.style.display = 'none';
+        }
     }
 });
+
+//actualiza tanto el número de cada cuadrante
+function updateMatrixAndSidebarCounts() {
+    // 1. Recalcular cada cuadrante de la Matriz (Q1, Q2, Q3, Q4)
+    ['Q1', 'Q2', 'Q3', 'Q4'].forEach(quadCode => {
+        const container = document.querySelector(`.quadrant-container[data-quadrant="${quadCode}"]`);
+        if (!container) return;
+
+        // Contar tarjetas reales activas
+        const count = container.querySelectorAll('.task-card:not(.completed-task-item)').length;
+
+        // Actualizar el número en el encabezado del cuadrante
+        const quadrantHeaderBadge = container.closest('.quadrant')?.querySelector('.quadrant-header-badge');
+        if (quadrantHeaderBadge) {
+            quadrantHeaderBadge.textContent = count;
+        }
+
+        // Actualizar la cifra del panel lateral "Distribución Actual"
+        const sidebarCountEl = document.getElementById(`sidebar-${quadCode.toLowerCase()}-count`);
+        if (sidebarCountEl) {
+            sidebarCountEl.textContent = `${count} ${count === 1 ? 'tarea' : 'tareas'}`;
+        }
+    });
+}

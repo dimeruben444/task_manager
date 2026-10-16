@@ -21,4 +21,5 @@ urlpatterns = [
     path('tasks/quick-create/', views.quick_create_task, name='quick_create_task'),
     path('tasks/clear-completed/', views.clear_completed_tasks, name='clear_completed_tasks'),
     path('tasks/move/', views.update_task_position, name='update_task_position'),
+    path('tasks/search/', views.search_tasks_api, name='search_tasks_api')
 ]

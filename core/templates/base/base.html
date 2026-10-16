@@ -35,7 +35,7 @@
             
             <!-- BUSCADOR GLOBAL (CENTRO) -->
             {% if request.resolver_match.url_name != 'login' and request.resolver_match.url_name != 'register' %}
-                <div id="globalTaskSearchWrapper" class="navbar-search-wrapper d-none d-md-block mx-3">
+                <div id="globalTaskSearchWrapper" class="navbar-search-wrapper position-relative d-none d-md-block mx-3">
                     <div class="position-relative">
                         <i class="bi bi-search search-icon"></i>
                         <input type="text" 
@@ -48,11 +48,7 @@
                         <kbd class="shortcut-badge">⌘K</kbd>
                     </div>
 
-                    <!-- Menú desplegable flotante de resultados -->
-                    <div id="searchDropdownResults" 
-                        class="dropdown-menu shadow-lg border-0 rounded-3 p-2 mt-1 w-100 bg-dark text-white d-none position-absolute" 
-                        style="max-height: 380px; overflow-y: auto; top: 100%; left: 0;">
-                    </div>
+                    
                 </div>
             {% endif %}
 
@@ -299,6 +295,12 @@
             {% endblock %}
         </main>
 
+    </div>
+
+    <!-- Menú desplegable flotante de resultados -->
+    <div id="searchDropdownResults" 
+        class="dropdown-menu shadow-lg border-0 p-2 bg-dark text-white d-none" 
+        style="position: fixed !important; max-height: 400px; overflow-y: auto; overflow-x: hidden !important; z-index: 1060 !important; box-sizing: border-box !important;">
     </div>
 
     <!-- Bootstrap 5 JS Bundle -->

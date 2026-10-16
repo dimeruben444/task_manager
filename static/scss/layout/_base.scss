@@ -128,79 +128,84 @@ $avatar-bg: #2563eb;         // Blue 600
 }
 
 // ==========================================
+// BUSCADOR GLOBAL Y DROPDOWN FLOTANTE (CORREGIDO)
+// ==========================================
+
+// ==========================================
 // BUSCADOR GLOBAL Y DROPDOWN FLOTANTE
 // ==========================================
 
-#globalTaskSearchWrapper {
-  position: relative !important;
+// ==========================================
+// BUSCADOR GLOBAL Y DROPDOWN FLOTANTE
+// ==========================================
 
-  #searchDropdownResults {
-    background-color: #0f172a !important; // Slate 900
-    border: 1px solid #334155 !important; // Slate 700
-    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.4) !important;
-    border-radius: 12px;
-    overflow-x: hidden !important;
-    z-index: 1025 !important;
+#searchDropdownResults {
+  background-color: #0f172a !important; // Slate 900
+  border: 1px solid #334155 !important; // Slate 700
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.5) !important;
+  border-radius: 12px;
+  overflow-x: hidden !important;
+  box-sizing: border-box !important;
 
-    &::-webkit-scrollbar {
-      width: 6px;
+  /* Regla clave: Si tiene la clase d-none se oculta 100% sin dejar barra vacía */
+  &.d-none {
+    display: none !important;
+  }
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  &::-webkit-scrollbar-track {
+    background: #0f172a;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 4px;
+
+    &:hover {
+      background: #475569;
     }
-    &::-webkit-scrollbar-track {
-      background: #0f172a;
+  }
+
+  .search-result-item {
+    background-color: rgba(255, 255, 255, 0.04);
+    border-radius: 8px;
+    transition: background-color 0.15s ease-in-out;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.12) !important;
     }
-    &::-webkit-scrollbar-thumb {
-      background: #334155;
-      border-radius: 4px;
 
-      &:hover {
-        background: #475569;
+    .search-item-title-wrapper {
+      min-width: 0;
+      flex: 1 1 auto;
+      overflow: hidden;
+    }
+
+    .task-title-text {
+      font-size: 0.88rem;
+      color: #f8fafc;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      display: block;
+
+      &.is-completed {
+        color: #94a3b8 !important;
+        text-decoration: line-through;
       }
     }
 
-    .search-result-item {
-      background-color: rgba(255, 255, 255, 0.04);
-      border-radius: 8px;
-      transition: background-color 0.15s ease-in-out, transform 0.1s ease-in-out;
-
-      &:hover {
-        background-color: rgba(255, 255, 255, 0.12) !important;
-        transform: translateX(2px);
-      }
-
-      &:active {
-        background-color: rgba(255, 255, 255, 0.2) !important;
-      }
-
-      .search-item-title-wrapper {
-        min-width: 0;
-        flex: 1 1 auto;
-        overflow: hidden;
-      }
-
-      .task-title-text {
-        font-size: 0.88rem;
-        color: #f8fafc;
-        white-space: nowrap !important;
-        overflow: hidden !important;
-        text-overflow: ellipsis !important;
-        display: block;
-
-        &.is-completed {
-          color: #94a3b8 !important;
-          text-decoration: line-through;
-        }
-      }
-
-      .badge {
-        font-size: 0.68rem;
-        font-weight: 500;
-        padding: 0.35em 0.65em;
-        flex-shrink: 0 !important;
-      }
+    .badge {
+      font-size: 0.68rem;
+      font-weight: 500;
+      padding: 0.35em 0.65em;
+      flex-shrink: 0 !important;
     }
   }
 }
-
 // CAPAS DE APILAMIENTO DE MODALES REFORZADAS
 .modal {
   z-index: 2050 !important;

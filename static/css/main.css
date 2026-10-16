@@ -389,7 +389,7 @@
   --q4-accent: #64748b;
 }
 
-/* 1. UNIFICACIÓN DEL FONDO DEL LIENZO Y ESTRUCTURA CENTRAL */
+/* 1. UNIFICACIÓN DEL LIENZO PRINCIPAL */
 body,
 .app-dashboard-layout,
 .main-content,
@@ -407,17 +407,21 @@ body,
   box-shadow: none !important;
 }
 
-/* 2. Layout Principal de 3 Columnas */
+/* 2. LAYOUT PRINCIPAL RESPONSIVO */
 .app-dashboard-layout {
   display: flex !important;
-  gap: 3rem;
-  padding: 2.5rem;
+  gap: 3rem !important;
+  padding: 1.5rem !important;
   background-color: var(--bg-app) !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
 }
 
-/* 3. Barra Lateral Izquierda (Tableros) */
+/* 3. BARRA LATERAL IZQUIERDA (TABLEROS) */
 .sidebar-boards {
   width: 260px !important;
+  min-width: 260px !important;
+  flex-shrink: 0 !important;
   background-color: var(--bg-surface);
   border-radius: 16px;
   border: 1px solid var(--border-default);
@@ -439,7 +443,7 @@ body,
   font-weight: 600;
 }
 
-/* 4. Tarjeta de Alta Rápida (Quick-Add Bar) */
+/* 4. TARJETA DE ALTA RÁPIDA (QUICK ADD BAR) */
 .quick-add-card {
   background-color: var(--bg-surface);
   border-radius: 16px !important;
@@ -447,12 +451,17 @@ body,
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04) !important;
 }
 
-/* 5. Estructura de Cuadrantes 2x2 */
+/* 5. ESTRUCTURA DE MATRIZ Y PROPORCIÓN DE COLUMNAS (ADAPTATIVA) */
+.matrix-container-wrapper {
+  flex: 1 1 68% !important; /* Toma de forma fluida el 68% del área de trabajo */
+  min-width: 0 !important;
+}
+
 .quadrant {
   background-color: #f1f5f9 !important;
   border: 1px solid var(--border-default) !important;
   border-radius: 16px !important;
-  padding: 1.6rem !important;
+  padding: 1.15rem !important; /* Padding equilibrado para que quepan los botones in-line */
 }
 .quadrant .quadrant-header-badge {
   width: 22px;
@@ -472,7 +481,11 @@ body,
   color: var(--text-muted);
 }
 
-/* 6. BOTÓN AÑADIR TAREA IN-LINE (ESTILO STITCH SIN BORDES) */
+/* 6. BOTÓN AÑADIR TAREA IN-LINE */
+.add-task-inline-wrapper {
+  width: 100%;
+  box-sizing: border-box;
+}
 .add-task-inline-wrapper .btn-add-inline {
   background-color: transparent !important;
   border: none !important;
@@ -482,9 +495,12 @@ body,
   font-size: 0.88rem !important;
   border-radius: 10px !important;
   padding: 0.5rem 0.75rem !important;
-  width: 100%;
+  width: 100% !important;
   text-align: center;
   transition: background-color 0.15s ease, color 0.15s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .add-task-inline-wrapper .btn-add-inline:hover {
   background-color: rgba(148, 163, 184, 0.18) !important;
@@ -495,9 +511,22 @@ body,
   box-shadow: none !important;
 }
 
-/* 7. Panel Lateral Derecho (Completadas) */
+/* 7. PANEL LATERAL DERECHO (COMPLETADAS - MÁS ANCHO Y ADAPTATIVO) */
+.completed-panel-wrapper {
+  flex: 0 0 420px !important; /* Aumentado de 320px a 420px */
+  min-width: 380px !important; /* Ancho mínimo más amplio para no verse estrecho */
+  max-width: 480px !important; /* Permite crecer hasta 480px en pantallas grandes */
+  flex-shrink: 0 !important;
+}
+
+/* En monitores ultra panorámicos (1800px+), el panel se amplía aún más */
+@media (min-width: 1800px) {
+  .completed-panel-wrapper {
+    flex: 0 0 460px !important;
+  }
+}
 .completed-panel {
-  width: 340px !important;
+  width: 100% !important;
   background-color: var(--bg-surface);
   border: 1px solid var(--border-default);
   border-radius: 16px;
@@ -506,7 +535,7 @@ body,
 .completed-panel .completed-item {
   background-color: var(--bg-surface-subtle);
   border-radius: 10px;
-  padding: 0.55rem 0.75rem;
+  padding: 0.65rem 0.85rem; /* Un poco más de padding interno para mejor legibilidad */
   border: 1px solid var(--border-light);
   transition: background-color 0.15s ease;
 }
@@ -514,7 +543,14 @@ body,
   background-color: #f1f5f9;
 }
 
-/* Animación de error en calificación por estrellas */
+/* 8. CONTENEDOR GLOBAL MAX-WIDTH (EVITA ESTIRAMIENTO EXTREMO EN 4K) */
+.container-fluid {
+  max-width: 1750px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* ANIMACIÓN DE ERROR */
 @keyframes shakeRating {
   10%, 90% {
     transform: translate3d(-1px, 0, 0);
@@ -536,23 +572,38 @@ body,
   color: #ef4444 !important;
 }
 
-/* 1. Limitar el ancho máximo del contenedor principal para que no se estire de más en monitores grandes */
-.container-fluid {
-  max-width: 1600px !important; /* Limita la expansión horizontal extrema */
-  margin-left: auto !important;
-  margin-right: auto !important;
+.quadrant-icon-box {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+.quadrant-icon-box img, .quadrant-icon-box svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+.quadrant-icon-box.q1-bg {
+  background-color: #FFE4E6;
+}
+.quadrant-icon-box.q2-bg {
+  background-color: #DBEAFE;
+}
+.quadrant-icon-box.q3-bg {
+  background-color: #FEF3C7;
+}
+.quadrant-icon-box.q4-bg {
+  background-color: #f9fafb;
 }
 
-/* 3. Asegurar que las tarjetas de los cuadrantes tengan una altura y proporción compacta */
-.quadrant {
-  max-width: 100%;
-}
-
-.completed-panel-wrapper {
-  width: 370px !important;
-  min-width: 340px !important;
-  flex-shrink: 0 !important;
-  margin-left: 1.5rem;
+.quadrant-header-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .app-navbar {
@@ -649,48 +700,47 @@ body,
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
-#globalTaskSearchWrapper {
-  position: relative !important;
-}
-#globalTaskSearchWrapper #searchDropdownResults {
+#searchDropdownResults {
   background-color: #0f172a !important;
   border: 1px solid #334155 !important;
-  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.4) !important;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.5) !important;
   border-radius: 12px;
   overflow-x: hidden !important;
-  z-index: 1025 !important;
+  box-sizing: border-box !important;
+  /* Regla clave: Si tiene la clase d-none se oculta 100% sin dejar barra vacía */
 }
-#globalTaskSearchWrapper #searchDropdownResults::-webkit-scrollbar {
+#searchDropdownResults.d-none {
+  display: none !important;
+}
+#searchDropdownResults::-webkit-scrollbar {
   width: 6px;
 }
-#globalTaskSearchWrapper #searchDropdownResults::-webkit-scrollbar-track {
+#searchDropdownResults::-webkit-scrollbar-track {
   background: #0f172a;
 }
-#globalTaskSearchWrapper #searchDropdownResults::-webkit-scrollbar-thumb {
+#searchDropdownResults::-webkit-scrollbar-thumb {
   background: #334155;
   border-radius: 4px;
 }
-#globalTaskSearchWrapper #searchDropdownResults::-webkit-scrollbar-thumb:hover {
+#searchDropdownResults::-webkit-scrollbar-thumb:hover {
   background: #475569;
 }
-#globalTaskSearchWrapper #searchDropdownResults .search-result-item {
+#searchDropdownResults .search-result-item {
   background-color: rgba(255, 255, 255, 0.04);
   border-radius: 8px;
-  transition: background-color 0.15s ease-in-out, transform 0.1s ease-in-out;
+  transition: background-color 0.15s ease-in-out;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
 }
-#globalTaskSearchWrapper #searchDropdownResults .search-result-item:hover {
+#searchDropdownResults .search-result-item:hover {
   background-color: rgba(255, 255, 255, 0.12) !important;
-  transform: translateX(2px);
 }
-#globalTaskSearchWrapper #searchDropdownResults .search-result-item:active {
-  background-color: rgba(255, 255, 255, 0.2) !important;
-}
-#globalTaskSearchWrapper #searchDropdownResults .search-result-item .search-item-title-wrapper {
+#searchDropdownResults .search-result-item .search-item-title-wrapper {
   min-width: 0;
   flex: 1 1 auto;
   overflow: hidden;
 }
-#globalTaskSearchWrapper #searchDropdownResults .search-result-item .task-title-text {
+#searchDropdownResults .search-result-item .task-title-text {
   font-size: 0.88rem;
   color: #f8fafc;
   white-space: nowrap !important;
@@ -698,11 +748,11 @@ body,
   text-overflow: ellipsis !important;
   display: block;
 }
-#globalTaskSearchWrapper #searchDropdownResults .search-result-item .task-title-text.is-completed {
+#searchDropdownResults .search-result-item .task-title-text.is-completed {
   color: #94a3b8 !important;
   text-decoration: line-through;
 }
-#globalTaskSearchWrapper #searchDropdownResults .search-result-item .badge {
+#searchDropdownResults .search-result-item .badge {
   font-size: 0.68rem;
   font-weight: 500;
   padding: 0.35em 0.65em;
