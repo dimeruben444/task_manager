@@ -214,3 +214,105 @@ $avatar-bg: #2563eb;         // Blue 600
 .modal-backdrop {
   z-index: 2040 !important;
 }
+
+.rating-box-container {
+  border-color: #cbd5e1 !important;
+  transition: border-color 0.15s ease-in-out;
+
+  &:focus-within {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+  }
+}
+
+// Estilos para el sistema de valoración por estrellas dentro de las cajas
+.star-rating {
+  display: inline-flex;
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+
+  input {
+    display: none;
+  }
+
+  label {
+    font-size: 1.25rem;
+    color: #cbd5e1; // Color gris por defecto para estrellas vacías
+    cursor: pointer;
+    transition: color 0.1s ease-in-out;
+
+    &:hover,
+    &:hover ~ label {
+      color: #fbbf24; // Color al pasar el ratón
+    }
+  }
+
+  input:checked ~ label {
+    color: #6366f1; // Color principal de estrellas seleccionadas (puedes cambiarlo por #3b82f6 o #4f46e5)
+  }
+}
+
+// ==========================================
+// ESTILOS DE LA BARRA DE ALTA RÁPIDA (QUICK ADD)
+// ==========================================
+.quick-label {
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+}
+
+.quick-sublabel {
+  font-size: 0.75rem;
+}
+
+.quick-input-box {
+  background-color: #f8fafc;
+  height: 38px;
+  border-color: #cbd5e1 !important;
+  transition: border-color 0.15s ease-in-out;
+
+  &:focus-within {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+  }
+}
+
+.rating-symbol {
+  font-size: 0.9rem;
+}
+
+.quick-action-btn {
+  height: 38px;
+}
+
+// Fondo gris suave para el input del título de la tarea renderizado por Django
+#quickTaskInput, 
+.quick-add-card input[type="text"] {
+  background-color: #f8fafc !important;
+}
+
+// Estrellas de valoración
+.star-rating {
+  display: inline-flex;
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+
+  input {
+    display: none;
+  }
+
+  label {
+    font-size: 1.25rem;
+    color: #cbd5e1;
+    cursor: pointer;
+    transition: color 0.1s ease-in-out;
+
+    &:hover,
+    &:hover ~ label {
+      color: #fbbf24;
+    }
+  }
+
+  input:checked ~ label {
+    color: #6366f1;
+  }
+}

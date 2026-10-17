@@ -1,16 +1,55 @@
-// static/js/dashboard.js
+// Configuración exacta para cada nivel numérico (1 al 4) en Urgencia
+const urgencyConfig = {
+    4: { text: 'Crítica (4/4)', color: '#dc2626' },   // Rojo para Crítica
+    3: { text: 'Alta (3/4)', color: '#dc2626' },      // Rojo para Alta
+    2: { text: 'Moderada (2/4)', color: '#fbbf24' },  // Morado para Moderada
+    1: { text: 'Baja (1/4)', color: '#fbbf24' }       // Amarillo para Baja
+};
 
-// 1. CÁLCULO DINÁMICO DEL DESTINO PREVISTO (ALTA RÁPIDA)
+// Configuración exacta para cada nivel numérico (1 al 4) en Importancia
+const importanceConfig = {
+    4: { text: 'Crítica (4/4)', color: '#6466F1' },   // Morado para Crítica
+    3: { text: 'Alta (3/4)', color: '#6466F1' },      // Morado para Alta
+    2: { text: 'Moderada (2/4)', color: '#41c6f6' },  // Azul para Moderada
+    1: { text: 'Baja (1/4)', color: '#41c6f6' }       // Azul para Baja
+};
+
+function updateLabel(type, value) {
+    // Seleccionamos estrictamente el sublabel (el span de texto superior)
+    const labelEl = document.getElementById(type === 'urgency' ? 'urgencyLabelQuick' : 'importanceLabelQuick');
+    if (!labelEl) return;
+
+    const config = type === 'urgency' ? urgencyConfig : importanceConfig;
+    if (value && config[value]) {
+        labelEl.textContent = config[value].text;
+        labelEl.style.setProperty('color', config[value].color, 'important'); // Forzamos el color exacto
+    } else {
+        labelEl.textContent = '';
+        labelEl.style.removeProperty('color');
+    }
+}
+
+function resetLabel(type) {
+    const form = document.getElementById('quickTaskForm');
+    if (!form) return;
+    const checked = form.querySelector(`input[name="${type}"]:checked`);
+    updateLabel(type, checked ? checked.value : null);
+}
+
+// CÁLCULO DINÁMICO DEL DESTINO PREVISTO Y GESTIÓN DE ETIQUETAS
 function updateQuickTargetQuadrantDisplay() {
     const targetEl = document.getElementById('quickTaskTargetQuadrant');
-    if (!targetEl) return;
-
-    // Buscar expresamente los inputs marcados dentro de quickTaskForm
     const quickForm = document.getElementById('quickTaskForm');
     if (!quickForm) return;
 
     const selectedUrgency = quickForm.querySelector('input[name="urgency"]:checked');
     const selectedImportance = quickForm.querySelector('input[name="importance"]:checked');
+
+    // Refrescar los textos y colores en sus respectivos span superiores
+    updateLabel('urgency', selectedUrgency ? selectedUrgency.value : null);
+    updateLabel('importance', selectedImportance ? selectedImportance.value : null);
+
+    if (!targetEl) return;
 
     // Si falta alguno de los dos, forzar "-"
     if (!selectedUrgency || !selectedImportance) {
@@ -46,21 +85,41 @@ function updateQuickTargetQuadrantDisplay() {
     }
 }
 
-function initQuickQuadrantListeners() {
-    const quickForm = document.getElementById('quickTaskForm');
-    if (!quickForm) return;
+// Inicializar eventos de Hover y selección en las estrellas
+document.addEventListener('DOMContentLoaded', () => {
+    ['urgency', 'importance'].forEach(type => {
+        const inputs = document.querySelectorAll(`input[name="${type}"]`);
+        inputs.forEach(input => {
+            const label = document.querySelector(`label[for="${input.id}"]`);
+            if (label) {
+                // Al pasar el ratón por encima (hover)
+                label.addEventListener('mouseenter', () => {
+                    updateLabel(type, input.value);
+                });
 
-    const ratingInputs = quickForm.querySelectorAll('input[name="urgency"], input[name="importance"]');
-    
-    // Desmarcar todos los radios al cargar la página para limpiar estado inicial/caché
-    ratingInputs.forEach(input => {
-        input.checked = false;
-        input.addEventListener('change', updateQuickTargetQuadrantDisplay);
+                // Al hacer clic directamente en la etiqueta de la estrella
+                label.addEventListener('click', () => {
+                    input.checked = true;
+                    updateLabel(type, input.value);
+                    updateQuickTargetQuadrantDisplay();
+                });
+
+                // Al salir el ratón del contenedor, recupera el valor seleccionado (si lo hay)
+                const starRatingContainer = label.closest('.star-rating');
+                if (starRatingContainer) {
+                    starRatingContainer.addEventListener('mouseleave', () => {
+                        resetLabel(type);
+                    });
+                }
+            }
+
+            // Cambios de estado en el input oculto
+            input.addEventListener('change', () => {
+                updateQuickTargetQuadrantDisplay();
+            });
+        });
     });
-
-    // Resetear el texto del cuadrante a "-"
-    updateQuickTargetQuadrantDisplay();
-}
+});
 
 // 2. FUNCIONES DE FORMULARIOS INLINE Y UTILS
 function showInlineForm(button) {
@@ -546,7 +605,7 @@ window.handleTaskSearchInput = function(query) {
             if (!isCompleted) {
                 const container = card.closest('.quadrant-container');
                 const quadCode = container ? container.getAttribute('data-quadrant') : '';
-                if (quadCode === 'Q1') { locationLabel = "Urgente e Importante"; badgeBg = "bg-danger"; }
+                if (quadCode === 'Q1') { locationLabel = "Hacer ahora"; badgeBg = "bg-danger"; }
                 else if (quadCode === 'Q2') { locationLabel = "Planificar"; badgeBg = "bg-primary"; }
                 else if (quadCode === 'Q3') { locationLabel = "Delegar"; badgeBg = "bg-warning text-dark"; }
                 else if (quadCode === 'Q4') { locationLabel = "Eliminar"; badgeBg = "bg-secondary"; }

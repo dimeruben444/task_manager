@@ -1,54 +1,107 @@
 // static/scss/components/_stars.scss
 
-$star-active: #3b82f6;      // Azul Stitch primario
-$star-inactive: #e2e8f0;    // Gris claro tenue
-$star-error: #dc2626;       // Rojo de advertencia
+$star-active-importance: #6466F1;      
+$star-active-urgency: #fbbf24;
+$star-inactive: #e2e8f0;    
+$star-error: #dc2626;        
 
 .rating-wrapper {
     width: fit-content;
 }
+.importance-box{
 
-.star-rating {
-    display: inline-flex;
-    flex-direction: row-reverse; // Invierte el orden en el DOM para que el selector ~ funcione a la izquierda
-    justify-content: flex-end;
-    gap: 6px;
+    .star-rating {
+        display: inline-flex;
+        flex-direction: row-reverse; // Invierte el orden en el DOM para que el selector ~ funcione a la izquierda
+        justify-content: flex-end;
+        gap: 6px;
 
-    input[type="radio"] {
-        display: none;
-    }
+        input[type="radio"] {
+            display: none;
+        }
+        
+        label {
+            font-size: 1.35rem;
+            color: $star-inactive;
+            cursor: pointer;
+            transition: color 0.15s ease-in-out, transform 0.1s ease;
+            user-select: none;
+            line-height: 1;
 
-    label {
-        font-size: 1.35rem;
-        color: $star-inactive;
-        cursor: pointer;
-        transition: color 0.15s ease-in-out, transform 0.1s ease;
-        user-select: none;
-        line-height: 1;
+            // Al hacer hover, colorea la estrella apuntada y todas sus anteriores a la izquierda
+            &:hover,
+            &:hover ~ label {
+                color: $star-active-importance !important;
+            }
+        }
 
-        // Al hacer hover, colorea la estrella apuntada y todas sus anteriores a la izquierda
-        &:hover,
-        &:hover ~ label {
-            color: $star-active !important;
+
+        // Colorea las estrellas seleccionadas
+        input[type="radio"]:checked ~ label,
+        input[type="radio"]:checked + label {
+            color: $star-active-importance !important;
+        }
+
+        label:hover {
+            transform: scale(1.15);
+        }
+
+        // Animación de agitación y estado de error
+        &.is-invalid label {
+            color: $star-error !important;
+            animation: shakeStars 0.3s ease-in-out;
         }
     }
+}
 
-    // Colorea las estrellas seleccionadas
-    input[type="radio"]:checked ~ label,
-    input[type="radio"]:checked + label {
-        color: $star-active !important;
-    }
+.urgency-box{
 
-    label:hover {
-        transform: scale(1.15);
-    }
+    .star-rating {
+        display: inline-flex;
+        flex-direction: row-reverse; // Invierte el orden en el DOM para que el selector ~ funcione a la izquierda
+        justify-content: flex-end;
+        gap: 6px;
 
-    // Animación de agitación y estado de error
-    &.is-invalid label {
-        color: $star-error !important;
-        animation: shakeStars 0.3s ease-in-out;
+        input[type="radio"] {
+            display: none;
+        }
+        
+        label {
+            font-size: 1.35rem;
+            color: $star-inactive;
+            cursor: pointer;
+            transition: color 0.15s ease-in-out, transform 0.1s ease;
+            user-select: none;
+            line-height: 1;
+
+            // Al hacer hover, colorea la estrella apuntada y todas sus anteriores a la izquierda
+            &:hover,
+            &:hover ~ label {
+                color: $star-active-urgency !important;
+            }
+        }
+
+
+        // Colorea las estrellas seleccionadas
+        input[type="radio"]:checked ~ label,
+        input[type="radio"]:checked + label {
+            color: $star-active-urgency !important;
+        }
+
+        label:hover {
+            transform: scale(1.15);
+        }
+
+        // Animación de agitación y estado de error
+        &.is-invalid label {
+            color: $star-active-urgency !important;
+            animation: shakeStars 0.3s ease-in-out;
+        }
     }
 }
+
+
+    
 
 @keyframes shakeStars {
     0%, 100% { transform: translateX(0); }
@@ -60,3 +113,4 @@ $star-error: #dc2626;       // Rojo de advertencia
     color: $star-error !important;
     animation: shakeStars 0.3s ease-in-out;
 }
+

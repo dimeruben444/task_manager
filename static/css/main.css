@@ -3,16 +3,16 @@
   width: fit-content;
 }
 
-.star-rating {
+.importance-box .star-rating {
   display: inline-flex;
   flex-direction: row-reverse;
   justify-content: flex-end;
   gap: 6px;
 }
-.star-rating input[type=radio] {
+.importance-box .star-rating input[type=radio] {
   display: none;
 }
-.star-rating label {
+.importance-box .star-rating label {
   font-size: 1.35rem;
   color: #e2e8f0;
   cursor: pointer;
@@ -20,18 +20,50 @@
   user-select: none;
   line-height: 1;
 }
-.star-rating label:hover, .star-rating label:hover ~ label {
-  color: #3b82f6 !important;
+.importance-box .star-rating label:hover, .importance-box .star-rating label:hover ~ label {
+  color: #6466F1 !important;
 }
-.star-rating input[type=radio]:checked ~ label,
-.star-rating input[type=radio]:checked + label {
-  color: #3b82f6 !important;
+.importance-box .star-rating input[type=radio]:checked ~ label,
+.importance-box .star-rating input[type=radio]:checked + label {
+  color: #6466F1 !important;
 }
-.star-rating label:hover {
+.importance-box .star-rating label:hover {
   transform: scale(1.15);
 }
-.star-rating.is-invalid label {
+.importance-box .star-rating.is-invalid label {
   color: #dc2626 !important;
+  animation: shakeStars 0.3s ease-in-out;
+}
+
+.urgency-box .star-rating {
+  display: inline-flex;
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+  gap: 6px;
+}
+.urgency-box .star-rating input[type=radio] {
+  display: none;
+}
+.urgency-box .star-rating label {
+  font-size: 1.35rem;
+  color: #e2e8f0;
+  cursor: pointer;
+  transition: color 0.15s ease-in-out, transform 0.1s ease;
+  user-select: none;
+  line-height: 1;
+}
+.urgency-box .star-rating label:hover, .urgency-box .star-rating label:hover ~ label {
+  color: #fbbf24 !important;
+}
+.urgency-box .star-rating input[type=radio]:checked ~ label,
+.urgency-box .star-rating input[type=radio]:checked + label {
+  color: #fbbf24 !important;
+}
+.urgency-box .star-rating label:hover {
+  transform: scale(1.15);
+}
+.urgency-box .star-rating.is-invalid label {
+  color: #fbbf24 !important;
   animation: shakeStars 0.3s ease-in-out;
 }
 
@@ -765,6 +797,90 @@ body,
 
 .modal-backdrop {
   z-index: 2040 !important;
+}
+
+.rating-box-container {
+  border-color: #cbd5e1 !important;
+  transition: border-color 0.15s ease-in-out;
+}
+.rating-box-container:focus-within {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.star-rating {
+  display: inline-flex;
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+}
+.star-rating input {
+  display: none;
+}
+.star-rating label {
+  font-size: 1.25rem;
+  color: #cbd5e1;
+  cursor: pointer;
+  transition: color 0.1s ease-in-out;
+}
+.star-rating label:hover, .star-rating label:hover ~ label {
+  color: #fbbf24;
+}
+.star-rating input:checked ~ label {
+  color: #6366f1;
+}
+
+.quick-label {
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+}
+
+.quick-sublabel {
+  font-size: 0.75rem;
+}
+
+.quick-input-box {
+  background-color: #f8fafc;
+  height: 38px;
+  border-color: #cbd5e1 !important;
+  transition: border-color 0.15s ease-in-out;
+}
+.quick-input-box:focus-within {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.rating-symbol {
+  font-size: 0.9rem;
+}
+
+.quick-action-btn {
+  height: 38px;
+}
+
+#quickTaskInput,
+.quick-add-card input[type=text] {
+  background-color: #f8fafc !important;
+}
+
+.star-rating {
+  display: inline-flex;
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+}
+.star-rating input {
+  display: none;
+}
+.star-rating label {
+  font-size: 1.25rem;
+  color: #cbd5e1;
+  cursor: pointer;
+  transition: color 0.1s ease-in-out;
+}
+.star-rating label:hover, .star-rating label:hover ~ label {
+  color: #fbbf24;
+}
+.star-rating input:checked ~ label {
+  color: #6366f1;
 }
 
 /*# sourceMappingURL=main.css.map */
