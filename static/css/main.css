@@ -7,7 +7,7 @@
   display: inline-flex;
   flex-direction: row-reverse;
   justify-content: flex-end;
-  gap: 6px;
+  gap: 0.32rem;
 }
 .importance-box .star-rating input[type=radio] {
   display: none;
@@ -39,7 +39,7 @@
   display: inline-flex;
   flex-direction: row-reverse;
   justify-content: flex-end;
-  gap: 6px;
+  gap: 0.32rem;
 }
 .urgency-box .star-rating input[type=radio] {
   display: none;
@@ -402,6 +402,29 @@
   box-shadow: none !important;
 }
 
+.task-title-textarea {
+  border: 1px solid transparent !important;
+  border-radius: 12px;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+.task-title-textarea:focus {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important;
+  outline: none !important;
+}
+
+.task-card * {
+  /* Permite que los clics y arrastres traspasen los elementos internos hacia la tarjeta principal */
+  pointer-events: auto;
+}
+
+/* Excepto los elementos interactivos reales donde sí quieres hacer clic específico (checkboxes y botones) */
+.task-card input,
+.task-card button,
+.task-card label {
+  pointer-events: auto;
+}
+
 :root {
   --bg-app: #f8fafc;
   --bg-surface: #ffffff;
@@ -639,7 +662,7 @@ body,
 }
 
 .app-navbar {
-  background-color: #1e293b !important;
+  background-color: #0F172A !important;
   border-bottom: 1px solid #334155 !important;
   height: 60px;
   width: 100%;
@@ -708,7 +731,7 @@ body,
   right: 0.6rem;
   top: 50%;
   transform: translateY(-50%);
-  background-color: #1e293b;
+  background-color: #0F172A;
   border: 1px solid #334155;
   color: #94a3b8;
   font-size: 0.68rem;
@@ -721,7 +744,7 @@ body,
 .app-navbar .navbar-user-wrapper .user-avatar {
   width: 32px;
   height: 32px;
-  background-color: #2563eb;
+  background-color: #60a5fa;
   color: #ffffff;
   font-weight: 700;
   font-size: 0.78rem;

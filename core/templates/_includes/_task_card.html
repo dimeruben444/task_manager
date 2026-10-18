@@ -161,11 +161,11 @@
                 <!-- TÍTULO EDITABLE -->
                 <div class="px-4 pt-2 pb-0">
                     <textarea name="title" 
-                              class="form-control form-control-lg border-0 fw-bold p-0 shadow-none bg-transparent task-title-textarea" 
-                              placeholder="{% translate 'Título de la tarea' %}" 
-                              required 
-                              style="resize: none; width: 100%; overflow: hidden; line-height: 1.3; font-size: 1.35rem; color: #18181b;"
-                              oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';">{{ task.title }}</textarea>
+                        class="form-control form-control-lg fw-bold bg-white task-title-textarea" 
+                        style="resize: none; width: 100%; overflow: hidden; line-height: 1.3; font-size: 1.35rem; color: #18101b; padding-top: 1rem;" 
+                        placeholder="Título de la tarea" 
+                        required 
+                        oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';">{{task.title}}</textarea>
                 </div>
 
                 <!-- CUERPO DEL MODAL -->

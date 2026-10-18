@@ -350,3 +350,27 @@ $success-emerald-bg: #ecfdf5;
     }
   }
 }
+
+.task-title-textarea {
+  border: 1px solid transparent !important; // Sin borde por defecto
+  border-radius: 12px;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+
+  &:focus {
+    border-color: #3b82f6 !important; // Color del borde al seleccionarlo (azul claro o el tono que prefieras)
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important; // Sombra sutil exterior opcional
+    outline: none !important;
+  }
+}
+
+.task-card * {
+    /* Permite que los clics y arrastres traspasen los elementos internos hacia la tarjeta principal */
+    pointer-events: auto; 
+}
+
+/* Excepto los elementos interactivos reales donde sí quieres hacer clic específico (checkboxes y botones) */
+.task-card input, 
+.task-card button, 
+.task-card label {
+    pointer-events: auto;
+}

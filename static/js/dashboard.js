@@ -24,7 +24,7 @@ function updateLabel(type, value) {
         labelEl.textContent = config[value].text;
         labelEl.style.setProperty('color', config[value].color, 'important'); // Forzamos el color exacto
     } else {
-        labelEl.textContent = '';
+        labelEl.innerHTML = '&nbsp;';
         labelEl.style.removeProperty('color');
     }
 }
@@ -277,7 +277,7 @@ function sendToggleRequest(taskId, isCompleted, checkbox) {
                     updateMatrixAndSidebarCounts();
                 }
             } 
-            // 2. SI DESMARCAMOS (DESCOMPLETAR)
+            // 2. SI DESMARCAMOS (DESCOMPLETAR) CON ANIMACIÓN DE VUELO
             else if (!isCompleted && card) {
                 let targetQuadrantCode = data.quadrant; 
                 
@@ -301,6 +301,9 @@ function sendToggleRequest(taskId, isCompleted, checkbox) {
                                    || card.querySelector('span')?.textContent.trim() 
                                    || card.textContent.trim();
 
+                    // Obtenemos la posición de origen en el panel de completadas
+                    const startRect = card.getBoundingClientRect();
+
                     const restoredCard = document.createElement('div');
                     restoredCard.className = 'card mb-2 shadow-sm border-0 task-card';
                     restoredCard.id = `task-card-${taskId}`;
@@ -309,7 +312,6 @@ function sendToggleRequest(taskId, isCompleted, checkbox) {
                     restoredCard.setAttribute('data-importance', card.dataset.importance || "4");
                     restoredCard.style.cursor = 'pointer';
 
-                    // INYECCIÓN COMPLETA DE ESTRUCTURA CON TRES PUNTOS
                     restoredCard.innerHTML = `
                         <div class="card-body py-2 px-3 d-flex flex-column justify-content-center">
                             <div class="task-card-header d-flex align-items-center justify-content-between position-relative w-100 gap-2" style="min-height: 24px;">
@@ -338,7 +340,25 @@ function sendToggleRequest(taskId, isCompleted, checkbox) {
                         targetQuadrantContainer.appendChild(restoredCard);
                     }
 
-                    card.remove();
+                    // Obtenemos la posición final y aplicamos la animación de vuelo (FLIP)
+                    const endRect = restoredCard.getBoundingClientRect();
+                    const deltaX = startRect.left - endRect.left;
+                    const deltaY = startRect.top - endRect.top;
+
+                    restoredCard.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(0.95)`;
+                    restoredCard.style.transition = 'transform 0s, opacity 0s';
+                    restoredCard.style.opacity = '1';
+
+                    requestAnimationFrame(() => {
+                        restoredCard.style.transition = 'transform 0.85s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.4s ease';
+                        restoredCard.style.transform = 'translate(0, 0) scale(1)';
+                        restoredCard.style.opacity = '1';
+                    });
+
+                    card.style.transition = 'opacity 0.3s ease';
+                    card.style.opacity = '0';
+                    setTimeout(() => card.remove(), 300);
+
                 } else {
                     window.location.reload();
                     return;
@@ -361,6 +381,13 @@ function sendToggleRequest(taskId, isCompleted, checkbox) {
     });
 }
 
+function initQuickQuadrantListeners() {
+    // Lógica para inicializar los selectores de urgencia/importancia si es necesario
+    const quickForm = document.getElementById('quickTaskForm');
+    if (!quickForm) return;
+    updateQuickTargetQuadrantDisplay();
+}
+
 document.addEventListener('DOMContentLoaded', function () {
     let isProcessingMove = false;
 
@@ -376,20 +403,25 @@ document.addEventListener('DOMContentLoaded', function () {
 
         new Sortable(container, {
             group: 'eisenhower-matrix',
-            draggable: '.task-card',
-            filter: '.empty-msg, .add-task-inline-wrapper',
+            draggable: '.task-card, .completed-task-item',
+            filter: '.empty-msg, .add-task-inline-wrapper', 
+            preventOnFilter: false,
             animation: 150,
             ghostClass: 'opacity-50',
+            
+            setData: function (dataTransfer, dragEl) {
+                dataTransfer.setData('Text', dragEl.textContent);
+            },
 
             onAdd: function (evt) {
-                const emptyMsg = evt.to.querySelector('.empty-msg');
+                const emptyMsg = evt.to.querySelector('.empty-msg, #empty-trash-msg');
                 if (emptyMsg) emptyMsg.style.display = 'none';
             },
 
             onRemove: function (evt) {
-                const remainingCards = evt.from.querySelectorAll('.task-card');
+                const remainingCards = evt.from.querySelectorAll('.task-card, .completed-task-item');
                 if (remainingCards.length === 0) {
-                    const emptyMsg = evt.from.querySelector('.empty-msg');
+                    const emptyMsg = evt.from.querySelector('.empty-msg, #empty-trash-msg');
                     if (emptyMsg) emptyMsg.style.display = 'block';
                 }
             },
@@ -401,6 +433,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 const targetContainer = evt.to;
                 const sourceContainer = evt.from;
 
+                // Asegurar que el botón de añadir se mantenga al final del contenedor de destino
+                const inlineWrapperTarget = targetContainer.querySelector('.add-task-inline-wrapper');
+                if (inlineWrapperTarget) {
+                    targetContainer.appendChild(inlineWrapperTarget);
+                }
+
                 if (targetContainer === sourceContainer) return;
 
                 const taskId = itemEl.getAttribute('data-task-id');
@@ -410,15 +448,106 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 isProcessingMove = true;
 
-                const reinsertCardAboveAddBtn = (container, card) => {
-                    const inlineWrapper = container.querySelector('.add-task-inline-wrapper');
-                    if (inlineWrapper) {
-                        container.insertBefore(card, inlineWrapper);
-                    } else {
-                        container.appendChild(card);
+                // 1. SI SE ARRASTRA A LA COLUMNA DE COMPLETADAS (DONE)
+                if (targetQuadrant === 'DONE') {
+                    const checkbox = itemEl.querySelector('.task-completion-check');
+                    if (checkbox && !checkbox.checked) {
+                        checkbox.checked = true;
+                        sendToggleRequest(taskId, true, checkbox);
+                    } else if (!checkbox) {
+                        sendToggleRequest(taskId, true, { closest: () => itemEl });
                     }
-                };
+                    isProcessingMove = false;
+                    return;
+                }
 
+                // 2. SI VIENE DE COMPLETADAS Y SE MUEVE A UN CUADRANTE DE LA MATRIZ
+                const sourceQuadrant = sourceContainer.getAttribute('data-quadrant');
+                if (sourceQuadrant === 'DONE') {
+                    let urgency = 4, importance = 4;
+                    if (targetQuadrant === 'Q1') { urgency = 4; importance = 4; }
+                    else if (targetQuadrant === 'Q2') { urgency = 1; importance = 4; }
+                    else if (targetQuadrant === 'Q3') { urgency = 4; importance = 1; }
+                    else if (targetQuadrant === 'Q4') { urgency = 1; importance = 1; }
+
+                    const titleText = itemEl.querySelector('.task-title')?.textContent.trim() || "Tarea sin título";
+
+                    const formData = new FormData();
+                    formData.append('is_completed', 'false');
+                    formData.append('urgency', urgency);
+                    formData.append('importance', importance);
+
+                    try {
+                        const response = await fetch(`/task/${taskId}/edit/`, {
+                            method: 'POST',
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'Accept': 'application/json',
+                                'X-CSRFToken': getCookie('csrftoken')
+                            },
+                            body: formData
+                        });
+
+                        const data = await response.json();
+
+                        if (data.status === 'success') {
+                            const restoredCard = document.createElement('div');
+                            restoredCard.className = 'card mb-2 shadow-sm border-0 task-card';
+                            restoredCard.id = `task-card-${taskId}`;
+                            restoredCard.setAttribute('data-task-id', taskId);
+                            restoredCard.setAttribute('data-urgency', urgency);
+                            restoredCard.setAttribute('data-importance', importance);
+                            restoredCard.style.cursor = 'pointer';
+
+                            restoredCard.innerHTML = `
+                                <div class="card-body py-2 px-3 d-flex flex-column justify-content-center">
+                                    <div class="task-card-header d-flex align-items-center justify-content-between position-relative w-100 gap-2" style="min-height: 24px;">
+                                        <div class="task-checkbox-wrapper flex-shrink-0">
+                                            <label class="task-checkbox-container m-0" onclick="event.stopPropagation();">
+                                                <input type="checkbox" class="task-completion-check" data-task-id="${taskId}">
+                                                <span class="checkmark"></span>
+                                            </label>
+                                        </div>
+                                        <div class="task-title-wrapper flex-grow-1 min-w-0" data-bs-toggle="modal" data-bs-target="#viewTaskModal${taskId}">
+                                            <h6 class="card-title task-title mb-0 fw-semibold text-dark" style="font-size: 0.85rem; line-height: 1.3; margin: 0;">
+                                                ${titleText}
+                                            </h6>
+                                        </div>
+                                        <div class="task-card-actions flex-shrink-0 opacity-50 hover-opacity-100 ms-1" data-bs-toggle="modal" data-bs-target="#viewTaskModal${taskId}">
+                                            <i class="bi bi-three-dots text-muted" style="font-size: 0.85rem; line-height: 1;"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+
+                            // Respetamos la posición exacta donde soltó el elemento SortableJS
+                            itemEl.replaceWith(restoredCard);
+
+                            const finalContainer = document.querySelector(`.quadrant-container[data-quadrant="${targetQuadrant}"]`) || targetContainer;
+                            const inlineWrapper = finalContainer.querySelector('.add-task-inline-wrapper');
+                            if (inlineWrapper) {
+                                finalContainer.appendChild(inlineWrapper); // Mantiene el botón abajo del todo
+                            }
+
+                            updateMatrixAndSidebarCounts();
+                            const countBadge = document.getElementById('completed-count');
+                            if (countBadge) {
+                                let currentCount = parseInt(countBadge.textContent, 10) || 0;
+                                countBadge.textContent = Math.max(0, currentCount - 1);
+                            }
+                        } else {
+                            sourceContainer.appendChild(itemEl);
+                        }
+                    } catch (err) {
+                        console.error('Error al sacar tarjeta de completadas:', err);
+                        sourceContainer.appendChild(itemEl);
+                    } finally {
+                        isProcessingMove = false;
+                    }
+                    return;
+                }
+
+                // 3. LÓGICA NORMAL DE CAMBIO DE CUADRANTE ENTRE Q1, Q2, Q3 y Q4
                 let urgency = 4, importance = 4;
                 if (targetQuadrant === 'Q1') { urgency = 4; importance = 4; }
                 else if (targetQuadrant === 'Q2') { urgency = 1; importance = 4; }
@@ -447,27 +576,22 @@ document.addEventListener('DOMContentLoaded', function () {
                             const tempDiv = document.createElement('div');
                             tempDiv.innerHTML = data.card_html.trim();
                             const newCard = tempDiv.firstElementChild;
+                            
+                            // Mantiene la tarjeta en el hueco exacto donde se soltó el ratón
                             itemEl.replaceWith(newCard);
 
-                            if (data.date_restriction_applied || data.quadrant !== targetQuadrant) {
-                                const correctContainer = document.querySelector(`.quadrant-container[data-quadrant="${data.quadrant}"]`);
-                                if (correctContainer) {
-                                    reinsertCardAboveAddBtn(correctContainer, newCard);
-                                }
-                                
-                                setTimeout(() => {
-                                    if (typeof window.triggerDueDateShake === 'function') {
-                                        window.triggerDueDateShake(newCard);
-                                    }
-                                }, 200);
+                            const finalContainer = document.querySelector(`.quadrant-container[data-quadrant="${data.quadrant || targetQuadrant}"]`) || targetContainer;
+                            const inlineWrapper = finalContainer.querySelector('.add-task-inline-wrapper');
+                            if (inlineWrapper) {
+                                finalContainer.appendChild(inlineWrapper); // Asegura que el botón de añadir permanezca abajo
                             }
                         }
                     } else {
-                        reinsertCardAboveAddBtn(sourceContainer, itemEl);
+                        sourceContainer.appendChild(itemEl);
                     }
                 } catch (err) {
                     console.error('Error al mover tarjeta vía Drag & Drop:', err);
-                    reinsertCardAboveAddBtn(sourceContainer, itemEl);
+                    sourceContainer.appendChild(itemEl);
                 } finally {
                     isProcessingMove = false;
                 }
@@ -475,65 +599,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // B. EVITAR DOBLE ENVÍO EN EL FORMULARIO PRINCIPAL / ALTA RÁPIDA
-    const quickForm = document.getElementById('quickTaskForm');
 
-    if (quickForm) {
-        quickForm.addEventListener('submit', function (e) {
-            if (quickForm.dataset.submitting === 'true') {
-                e.preventDefault();
-                return;
-            }
-
-            const urgencyChecked = quickForm.querySelector('input[name="urgency"]:checked');
-            const importanceChecked = quickForm.querySelector('input[name="importance"]:checked');
-
-            let hasError = false;
-            document.querySelectorAll('.rating-wrapper').forEach(w => w.classList.remove('shake-error'));
-
-            if (!urgencyChecked) {
-                hasError = true;
-                const urgencyInput = quickForm.querySelector('input[name="urgency"]');
-                if (urgencyInput) {
-                    const wrapper = urgencyInput.closest('.rating-wrapper');
-                    if (wrapper) wrapper.classList.add('shake-error');
-                }
-            }
-
-            if (!importanceChecked) {
-                hasError = true;
-                const importanceInput = quickForm.querySelector('input[name="importance"]');
-                if (importanceInput) {
-                    const wrapper = importanceInput.closest('.rating-wrapper');
-                    if (wrapper) wrapper.classList.add('shake-error');
-                }
-            }
-
-            if (hasError) {
-                e.preventDefault();
-                e.stopPropagation();
-                setTimeout(() => {
-                    document.querySelectorAll('.rating-wrapper').forEach(w => w.classList.remove('shake-error'));
-                }, 400);
-            } else {
-                quickForm.dataset.submitting = 'true';
-            }
-        });
-    }
-
-    // C. FILTROS Y RESTAURACIÓN DE SCROLL
-    const savedScrollPos = localStorage.getItem('dashboard_scroll_pos');
-    if (savedScrollPos !== null) {
-        window.scrollTo({
-            top: parseInt(savedScrollPos, 10),
-            behavior: 'instant'
-        });
-        localStorage.removeItem('dashboard_scroll_pos');
-    }
-
-    document.addEventListener('submit', function (e) {
-        localStorage.setItem('dashboard_scroll_pos', window.scrollY);
-    });
 });
 
 // ==========================================

@@ -14,7 +14,7 @@ $star-error: #dc2626;
         display: inline-flex;
         flex-direction: row-reverse; // Invierte el orden en el DOM para que el selector ~ funcione a la izquierda
         justify-content: flex-end;
-        gap: 6px;
+        gap: 0.32rem;
 
         input[type="radio"] {
             display: none;
@@ -60,7 +60,7 @@ $star-error: #dc2626;
         display: inline-flex;
         flex-direction: row-reverse; // Invierte el orden en el DOM para que el selector ~ funcione a la izquierda
         justify-content: flex-end;
-        gap: 6px;
+        gap: 0.32rem;
 
         input[type="radio"] {
             display: none;

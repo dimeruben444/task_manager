@@ -40,22 +40,25 @@
                 {% csrf_token %}
                 
                 <div class="row g-5 align-items-center mb-2">
-                    <div class="col-md-5">
-                        <label class="form-label text-uppercase fw-bold text-muted mb-1" style="font-size: 0.7rem; letter-spacing: 0.05em;">
-                            {% translate "TÍTULO DE LA TAREA" %}
-                        </label>
-                        {{ form.title }}
+                    <div class="col-md-5 ">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <label class="form-label text-uppercase fw-bold text-muted mb-1 " style="font-size: 0.7rem; letter-spacing: 0.05em;margin-left: 8px;">
+                                {% translate "TÍTULO DE LA TAREA" %}
+                            </label>
+                            <span class="fw-bold small invisible"></span>
+                        </div>
+                            {{ form.title }}
                     </div>
 
                     <!-- COLUMNA URGENCIA -->
-                    <div class="col-md-3 ">
-                        <div class="d-flex justify-content-between align-items-center mb-1">
-                            <span class="text-uppercase fw-bold text-muted quick-label">{% translate "URGENCIA" %}</span>
-                            <span class="fw-bold small text-danger quick-sublabel" id="urgencyLabelQuick"></span>
+                    <div class="col-md-3">
+                        <div class="d-flex justify-content-between align-items-center mb-1" style="min-height: 20px;">
+                            <span class="text-uppercase fw-bold text-muted quick-label" style="margin-left: 8px;">{% translate "URGENCIA" %}</span>
+                            <span class="fw-bold small quick-sublabel d-inline-block" style="margin-right: 16px;"  id="urgencyLabelQuick"></span>
                         </div>
-                        <div class="rating-box-container urgency-box px-3 py-1.5 border rounded-3 d-flex justify-content-between align-items-center quick-input-box">
+                        <div class="rating-box-container urgency-box px-3 py-1.5 border rounded-3 d-flex justify-content-between align-items-center quick-input-box mt-2">
                             <span class="text-muted fw-bold rating-symbol">-</span>
-                            <div class="star-rating d-flex align-items-center gap-1">
+                            <div class="star-rating d-flex align-items-center ">
                                 <input type="radio" id="urgency-4" name="urgency" value="4" onchange="updateQuickTargetQuadrantDisplay()">
                                 <label for="urgency-4" title="4">★</label>
                                 <input type="radio" id="urgency-3" name="urgency" value="3" onchange="updateQuickTargetQuadrantDisplay()">
@@ -71,13 +74,13 @@
 
                     <!-- COLUMNA IMPORTANCIA -->
                     <div class="col-md-3">
-                        <div class="d-flex justify-content-between align-items-center mb-1">
-                            <span class="text-uppercase fw-bold text-muted quick-label">{% translate "IMPORTANCIA" %}</span>
-                            <span class="fw-bold small text-primary quick-sublabel" id="importanceLabelQuick"></span>
+                        <div class="d-flex justify-content-between align-items-center mb-1" style="min-height: 20px;">
+                            <span class="text-uppercase fw-bold text-muted quick-label " style="margin-left: 8px;">{% translate "IMPORTANCIA" %}</span>
+                            <span class="fw-bold small quick-sublabel  d-inline-block" style="margin-right: 16px;" id="importanceLabelQuick"></span>
                         </div>
-                        <div class="rating-box-container importance-box px-3 py-1.5 border rounded-3 d-flex justify-content-between align-items-center quick-input-box">
+                        <div class="rating-box-container importance-box px-3 py-1.5 border rounded-3 d-flex justify-content-between align-items-center quick-input-box mt-2">
                             <span class="text-muted fw-bold rating-symbol">-</span>
-                            <div class="star-rating d-flex align-items-center gap-1">
+                            <div class="star-rating d-flex align-items-center ">
                                 <input type="radio" id="importance-4" name="importance" value="4" onchange="updateQuickTargetQuadrantDisplay()">
                                 <label for="importance-4" title="4">★</label>
                                 <input type="radio" id="importance-3" name="importance" value="3" onchange="updateQuickTargetQuadrantDisplay()">
@@ -92,13 +95,12 @@
                     </div>
 
                     <!-- BOTÓN SUBMIT A LA DERECHA (COMPACTO) -->
-                    <div class="col-md-1">
+                    <div class="col-md-1 "style="align-self: flex-end;">
                         <button type="submit" class="btn btn-primary fw-bold rounded-3 shadow-sm w-100 d-flex align-items-center justify-content-center quick-action-btn">
                             <i class="bi bi-plus-lg fs-5"></i>
                         </button>
                     </div>
-
-
+                </div>
 
                 <!-- OPCIONES AVANZADAS Y DESTINO PREVISTO EN LA MISMA LÍNEA -->
                 <div class="d-flex justify-content-between align-items-center mt-3 pe-1">
@@ -113,7 +115,7 @@
                     </button>
 
                     <!-- Destino previsto dinámico (Derecha) -->
-                    <div  style="font-size: 0.9rem; margin-right: 6rem ">
+                    <div style="font-size: 0.9rem; margin-right: 8rem;">
                         <span class="text-muted me-1">{% translate "Destino previsto:" %}</span>
                         <span id="quickTaskTargetQuadrant" class="fw-bold text-secondary">-</span>
                     </div>
@@ -133,7 +135,7 @@
                                             data-bs-toggle="dropdown" 
                                             aria-expanded="false">
                                         <span class="d-flex align-items-center gap-2 text-dark">
-                                            <i class="bi bi-kanban text-muted"></i>
+                                            <i class="bi bi-kanban" style="color: #6466F1 !important;"></i>
                                             <span class="fw-medium text-dark">{% translate "Tablero" %}</span>
                                         </span>
                                         <span class="d-flex align-items-center gap-2">
@@ -181,7 +183,7 @@
                                             data-bs-auto-close="outside" 
                                             aria-expanded="false">
                                         <span class="d-flex align-items-center gap-2 text-dark">
-                                            <i class="bi bi-calendar3 text-muted"></i>
+                                            <i class="bi bi-calendar3" style="color: #dc2626 !important;"></i>
                                             <span class="fw-medium text-dark">{% translate "Fechas" %}</span>
                                         </span>
                                         <small class="text-muted fw-semibold" id="quickDateBadgeDisplay">+</small>
@@ -212,15 +214,12 @@
                                             <input class="form-check-input ms-0 me-2" 
                                                 type="checkbox" 
                                                 name="reminder_enabled" 
-                                                id="reminder_enabled_{{ task.id }}" 
-                                                {% if task.reminder_enabled %}checked{% endif %}
+                                                id="reminder_enabled_quick" 
                                                 style="cursor: pointer;">
-                                            <label class="form-check-label small text-dark fw-medium" for="reminder_enabled_{{ task.id }}" style="cursor: pointer; font-size: 0.8rem;">
+                                            <label class="form-check-label small text-dark fw-medium" for="reminder_enabled_quick" style="cursor: pointer; font-size: 0.8rem;">
                                                 <i class="bi bi-bell me-1 text-muted"></i> {% translate "Recibir recordatorio por correo" %}
                                             </label>
                                         </div>
-
-                                        <input type="hidden" name="due_date" id="hiddenDueDate{{ task.id }}" value="{{ task.due_date|date:'Y-m-d H:i' }}">
 
                                         <input type="hidden" name="due_date" id="quickHiddenDueDate">
 
@@ -246,7 +245,7 @@
                                             data-bs-auto-close="outside" 
                                             aria-expanded="false">
                                         <span class="d-flex align-items-center gap-2 text-dark">
-                                            <i class="bi bi-people text-muted"></i>
+                                            <i class="bi bi-people" style="color: #fbbf24; !important"></i>
                                             <span class="fw-medium text-dark">{% translate "Asignada a" %}</span>
                                         </span>
                                         <small class="text-muted fw-semibold" id="quickAssigneesCounter">+</small>
@@ -302,7 +301,7 @@
                                         data-bs-toggle="collapse" 
                                         data-bs-target="#collapseQuickDesc">
                                     <span class="d-flex align-items-center gap-2 text-dark">
-                                        <i class="bi bi-card-text text-muted"></i>
+                                        <i class="bi bi-card-text" style="color: #5cbcf3; !important"></i>
                                         <span class="fw-medium text-dark">{% translate "Descripción" %}</span>
                                     </span>
                                     <small class="text-muted fw-bold">+</small>
