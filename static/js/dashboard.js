@@ -827,3 +827,34 @@ function updateMatrixAndSidebarCounts() {
         }
     });
 }
+
+
+//scroll ajustado para que se vean los tableros
+let isAnimating = false;
+
+window.addEventListener('wheel', function(e) {
+    // Si ya se está desplazando con animación, ignoramos nuevos ticks para que no salte raro
+    if (isAnimating) {
+        e.preventDefault();
+        return;
+    }
+
+    // Si estamos arriba del todo y el usuario gira la rueda hacia abajo
+    if (window.scrollY < 100 && e.deltaY > 0) {
+        e.preventDefault();
+        isAnimating = true;
+
+        const matrixSection = document.querySelector('.matrix-container-section') || document.querySelector('.quadrant-row');
+        
+        if (matrixSection) {
+            matrixSection.scrollIntoView({ behavior: 'smooth' });
+        } else {
+            window.scrollBy({ top: 232, behavior: 'smooth' });
+        }
+
+        // Liberamos el bloqueo solo cuando termina la animación (aprox. 600-800ms)
+        setTimeout(() => {
+            isAnimating = false;
+        }, 950);
+    }
+}, { passive: false });

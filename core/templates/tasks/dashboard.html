@@ -34,8 +34,8 @@
     </div>
 
     <!-- TARJETA ALTA RÁPIDA (QUICK ADD BAR ESTILO STITCH) -->
-    <div class="card mb-4 quick-add-card">
-        <div class="card-body p-4">
+    <div class="card mb-4 quick-add-card dashboard-hero-section">
+        <div class="card-body p-4 ">
             <form id="quickTaskForm" method="POST" action="" novalidate autocomplete="off">
                 {% csrf_token %}
                 
@@ -135,12 +135,13 @@
                                             data-bs-toggle="dropdown" 
                                             aria-expanded="false">
                                         <span class="d-flex align-items-center gap-2 text-dark">
-                                            <i class="bi bi-kanban" style="color: #6466F1 !important;"></i>
+                                            <i class="bi bi-kanban" style="color: #6466F1 !important; transform: rotate(-90deg); display: inline-block;"></i>
                                             <span class="fw-medium text-dark">{% translate "Tablero" %}</span>
                                         </span>
                                         <span class="d-flex align-items-center gap-2">
                                             {% if current_board and current_board.color %}
-                                                <span class="rounded-circle d-inline-block" style="width: 8px; height: 8px; background-color: {{ current_board.color }};"></span>
+                                                <span class="color-dot d-inline-block flex-shrink-0" 
+                                                                style="width: 9px; height: 9px; background-color: {{ current_board.color }}; border-radius: 3px;"></span>
                                             {% endif %}
                                             <small class="text-muted fw-semibold" id="boardBadgeDisplayQuick">
                                                 {% if current_board %}{{ current_board.title }}{% else %}General{% endif %}
@@ -161,7 +162,8 @@
                                                         style="cursor: pointer; color: #1f2937 !important; background-color: {% if current_board and current_board.id == b.id %}#e5e7eb{% else %}transparent{% endif %};"
                                                         onclick="selectBoardOption('{{ b.id }}', '{{ b.title|escapejs }}', 'Quick')">
                                                         <div class="d-flex align-items-center gap-2">
-                                                            <span class="rounded-circle d-inline-block flex-shrink-0" style="width: 8px; height: 8px; background-color: {{ b.color|default:'#0d6efd' }};"></span>
+                                                            <span class="color-dot d-inline-block flex-shrink-0" 
+                                                                style="width: 11px; height: 11px; background-color: {{ b.color|default:'#6466F1' }}; border-radius: 3px;"></span>
                                                             <span style="font-size: 0.88rem;">{{ b.title }}</span>
                                                         </div>
                                                     </div>
@@ -324,7 +326,7 @@
     <div class="d-flex gap-5 align-items-start w-100">
         
         <!-- SECCIÓN IZQUIERDA: LOS 4 CUADRANTES DE EISENHOWER (OCUPA EL ESPACIO RESTANTE) -->
-        <div class="matrix-container-wrapper flex-grow-1 min-w-0">
+        <div class="matrix-container-wrapper flex-grow-1 min-w-0 matrix-section">
             <div class="row g-4">
                 
                 <!-- Q1: HACER AHORA -->

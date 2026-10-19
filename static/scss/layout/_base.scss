@@ -13,6 +13,11 @@ $badge-workspace-bg: rgba(255, 255, 255, 0.08);
 $badge-workspace-text: #cbd5e1; // Slate 300
 $avatar-bg: #60a5fa;         // Blue 600
 
+$star-active-importance: #6466F1;      
+$star-active-urgency: #fbbf24;
+$star-inactive: #e2e8f0;    
+$star-error: #dc2626;        
+
 // ==========================================
 // COMPONENTE: NAVBAR SUPERIOR
 // ==========================================
@@ -127,13 +132,6 @@ $avatar-bg: #60a5fa;         // Blue 600
   }
 }
 
-// ==========================================
-// BUSCADOR GLOBAL Y DROPDOWN FLOTANTE (CORREGIDO)
-// ==========================================
-
-// ==========================================
-// BUSCADOR GLOBAL Y DROPDOWN FLOTANTE
-// ==========================================
 
 // ==========================================
 // BUSCADOR GLOBAL Y DROPDOWN FLOTANTE
@@ -226,31 +224,52 @@ $avatar-bg: #60a5fa;         // Blue 600
 }
 
 // Estilos para el sistema de valoración por estrellas dentro de las cajas
+// Estilos comunes para cualquier .star-rating (si lo deseas)
 .star-rating {
-  display: inline-flex;
-  flex-direction: row-reverse;
-  justify-content: flex-end;
+    display: inline-flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
 
-  input {
-    display: none;
-  }
-
-  label {
-    font-size: 1.25rem;
-    color: #cbd5e1; // Color gris por defecto para estrellas vacías
-    cursor: pointer;
-    transition: color 0.1s ease-in-out;
-
-    &:hover,
-    &:hover ~ label {
-      color: #fbbf24; // Color al pasar el ratón
+    input {
+        display: none;
     }
-  }
 
-  input:checked ~ label {
-    color: #6366f1; // Color principal de estrellas seleccionadas (puedes cambiarlo por #3b82f6 o #4f46e5)
-  }
+    label {
+        font-size: 1.25rem;
+        color: #cbd5e1; // Color gris por defecto para estrellas vacías
+        cursor: pointer;
+        transition: color 0.1s ease-in-out;
+    }
 }
+
+// 1. Selector específico para URGENCIA (clase pegada para máxima especificidad)
+.star-rating.urgency-box-modal {
+    label {
+        &:hover,
+        &:hover ~ label {
+            color: $star-active-urgency; // Color de urgencia al pasar el ratón
+        }
+    }
+
+    input:checked ~ label {
+        color: $star-active-urgency; // Color de urgencia al seleccionar
+    }
+}
+
+// 2. Selector específico para IMPORTANCIA (clase pegada para máxima especificidad)
+.star-rating.importance-box-modal {
+    label {
+        &:hover,
+        &:hover ~ label {
+            color: $star-active-importance; // Color de importancia al pasar el ratón
+        }
+    }
+
+    input:checked ~ label {
+        color: $star-active-importance; // Color de importancia al seleccionar
+    }
+}
+
 
 // ==========================================
 // ESTILOS DE LA BARRA DE ALTA RÁPIDA (QUICK ADD)
@@ -290,29 +309,18 @@ $avatar-bg: #60a5fa;         // Blue 600
   background-color: #f8fafc !important;
 }
 
-// Estrellas de valoración
-.star-rating {
-  display: inline-flex;
-  flex-direction: row-reverse;
-  justify-content: flex-end;
 
-  input {
-    display: none;
-  }
 
-  label {
-    font-size: 1.25rem;
-    color: #cbd5e1;
-    cursor: pointer;
-    transition: color 0.1s ease-in-out;
 
-    &:hover,
-    &:hover ~ label {
-      color: #fbbf24;
-    }
-  }
+// Activamos el anclaje magnético global en el HTML
+html {
+    scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
+}
 
-  input:checked ~ label {
-    color: #6366f1;
-  }
+// Hacemos que cada sección detectada por el scroll ocupe exactamente la vista del navegador de forma natural
+.dashboard-hero-section,
+.matrix-section {
+    scroll-snap-align: start;
+    scroll-snap-stop: always; // Fuerza a que el scroll se detenga en cada sección al girar la rueda
 }

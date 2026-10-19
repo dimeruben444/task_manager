@@ -845,11 +845,19 @@ body,
   cursor: pointer;
   transition: color 0.1s ease-in-out;
 }
-.star-rating label:hover, .star-rating label:hover ~ label {
+
+.star-rating.urgency-box-modal label:hover, .star-rating.urgency-box-modal label:hover ~ label {
   color: #fbbf24;
 }
-.star-rating input:checked ~ label {
-  color: #6366f1;
+.star-rating.urgency-box-modal input:checked ~ label {
+  color: #fbbf24;
+}
+
+.star-rating.importance-box-modal label:hover, .star-rating.importance-box-modal label:hover ~ label {
+  color: #6466F1;
+}
+.star-rating.importance-box-modal input:checked ~ label {
+  color: #6466F1;
 }
 
 .quick-label {
@@ -885,25 +893,15 @@ body,
   background-color: #f8fafc !important;
 }
 
-.star-rating {
-  display: inline-flex;
-  flex-direction: row-reverse;
-  justify-content: flex-end;
+html {
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
 }
-.star-rating input {
-  display: none;
-}
-.star-rating label {
-  font-size: 1.25rem;
-  color: #cbd5e1;
-  cursor: pointer;
-  transition: color 0.1s ease-in-out;
-}
-.star-rating label:hover, .star-rating label:hover ~ label {
-  color: #fbbf24;
-}
-.star-rating input:checked ~ label {
-  color: #6366f1;
+
+.dashboard-hero-section,
+.matrix-section {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
 }
 
 /*# sourceMappingURL=main.css.map */

@@ -129,25 +129,25 @@
                         <ul class="dropdown-menu shadow-lg border-0 rounded-2xl mt-1 p-2" aria-labelledby="quadrantDropdown{{ task.id }}" style="border-radius: 12px; min-width: 280px;">
                             <li>
                                 <button type="button" class="dropdown-item d-flex align-items-center gap-2 small py-2 rounded-lg" onclick="selectQuadrant('Q1', '{{ task.id }}', '{% translate "Urgente e Importante (Hacer ahora)" %}')">
-                                    <span class="rounded-circle d-inline-block" style="width: 8px; height: 8px; background-color: #ef4444;"></span>
+                                    <span class="color-dot d-inline-block flex-shrink-0" style="width: 13px; height: 13px; background-color: #ef4444 ; border-radius: 3px;"></span>
                                     <span>{% translate "Urgente e Importante (Hacer ahora)" %}</span>
                                 </button>
                             </li>
                             <li>
                                 <button type="button" class="dropdown-item d-flex align-items-center gap-2 small py-2 rounded-lg" onclick="selectQuadrant('Q2', '{{ task.id }}', '{% translate "Importante - No Urgente (Planificar)" %}')">
-                                    <span class="rounded-circle d-inline-block" style="width: 8px; height: 8px; background-color: #3b82f6;"></span>
+                                    <span class="color-dot d-inline-block flex-shrink-0" style="width: 13px; height: 13px; background-color: #3b82f6 ; border-radius: 3px;"></span>
                                     <span>{% translate "Importante - No Urgente (Planificar)" %}</span>
                                 </button>
                             </li>
                             <li>
                                 <button type="button" class="dropdown-item d-flex align-items-center gap-2 small py-2 rounded-lg" onclick="selectQuadrant('Q3', '{{ task.id }}', '{% translate "Urgente - No Importante (Delegar)" %}')">
-                                    <span class="rounded-circle d-inline-block" style="width: 8px; height: 8px; background-color: #f59e0b;"></span>
+                                    <span class="color-dot d-inline-block flex-shrink-0" style="width: 13px; height: 13px; background-color: #f59e0b; border-radius: 3px;"></span>
                                     <span>{% translate "Urgente - No Importante (Delegar)" %}</span>
                                 </button>
                             </li>
                             <li>
                                 <button type="button" class="dropdown-item d-flex align-items-center gap-2 small py-2 rounded-lg" onclick="selectQuadrant('Q4', '{{ task.id }}', '{% translate "No Urgente - No Importante (Eliminar)" %}')">
-                                    <span class="rounded-circle d-inline-block" style="width: 8px; height: 8px; background-color: #9ca3af;"></span>
+                                    <span class="color-dot d-inline-block flex-shrink-0" style="width: 13px; height: 13px; background-color: #9ca3af; border-radius: 3px;"></span>
                                     <span>{% translate "No Urgente - No Importante (Eliminar)" %}</span>
                                 </button>
                             </li>
@@ -186,7 +186,7 @@
                                             <span>{% translate "Urgencia" %}</span>
                                             <span>+</span>
                                         </div>
-                                        <div class="star-rating rating-wrapper d-inline-flex justify-content-center">
+                                        <div class="urgency-box-modal star-rating rating-wrapper d-inline-flex justify-content-center">
                                             <input type="radio" id="detail-urgency-4-{{ task.id }}" name="urgency" value="4" {% if task.urgency == 4 %}checked{% endif %}>
                                             <label for="detail-urgency-4-{{ task.id }}" title="Muy Urgente - 4">★</label>
 
@@ -208,7 +208,7 @@
                                             <span>{% translate "Importancia" %}</span>
                                             <span>+</span>
                                         </div>
-                                        <div class="star-rating rating-wrapper d-inline-flex justify-content-center">
+                                        <div class=" star-rating rating-wrapper d-inline-flex justify-content-center importance-box-modal">
                                             <input type="radio" id="detail-importance-4-{{ task.id }}" name="importance" value="4" {% if task.importance == 4 %}checked{% endif %}>
                                             <label for="detail-importance-4-{{ task.id }}" title="Muy Importante - 4">★</label>
 
@@ -238,7 +238,7 @@
                                             aria-expanded="false" 
                                             style="border-radius: 10px;">
                                         <span class="d-flex align-items-center gap-2 text-dark">
-                                            <i class="bi bi-clock text-muted"></i>
+                                            <i class="bi bi-calendar3" style="color: #dc2626 !important;"></i>
                                             <span class="fw-medium text-dark">{% translate "Fechas" %}</span>
                                         </span>
                                         <small class="text-muted fw-semibold" id="dateBadgeDisplay{{ task.id }}">
@@ -305,7 +305,7 @@
                                             data-bs-toggle="dropdown" 
                                             aria-expanded="false" style="border-radius: 10px;">
                                         <span class="d-flex align-items-center gap-2 text-dark">
-                                            <i class="bi bi-kanban text-muted"></i>
+                                            <i class="bi bi-kanban" style="color: #6466F1 !important; transform: rotate(-90deg); display: inline-block;"></i>
                                             <span class="fw-medium text-dark">{% translate "Tablero" %}</span>
                                         </span>
                                         <span class="d-flex align-items-center gap-2">
@@ -332,8 +332,8 @@
                                                         onclick="selectBoardOption('{{ board.id }}', '{{ board.title|escapejs }}', '{{ task.id }}')">
                                                         
                                                         <div class="d-flex align-items-center gap-2">
-                                                            <span class="rounded-circle d-inline-block flex-shrink-0" 
-                                                                style="width: 8px; height: 8px; background-color: {{ board.color|default:'#0d6efd' }};"></span>
+                                                            <span class="color-dot d-inline-block flex-shrink-0" 
+                                                                style="width: 11px; height: 11px; background-color: {{ board.color|default:'#6466F1' }}; border-radius: 3px;"></span>
                                                             <span style="font-size: 0.88rem;">{{ board.title }}</span>
                                                         </div>
 
@@ -355,7 +355,7 @@
                                         data-bs-toggle="collapse" 
                                         data-bs-target="#collapseDesc{{ task.id }}" style="border-radius: 10px;">
                                     <span class="d-flex align-items-center gap-2 text-dark">
-                                        <i class="bi bi-card-text text-muted"></i>
+                                        <i class="bi bi-card-text" style="color: #5cbcf3; !important"></i>
                                         <span class="fw-medium text-dark">{% translate "Descripción" %}</span>
                                     </span>
                                     <small class="text-muted fw-bold">{% if task.description %}✓{% else %}+{% endif %}</small>
@@ -394,8 +394,8 @@
                                 </div>
 
                                 <div class="pt-3 border-top">
-                                    <small class="text-muted fw-bold d-block mb-2" style="font-size: 0.78rem;">
-                                        <i class="bi bi-person-plus me-1 text-muted"></i>
+                                    <small class="text-muted fw-bold d-block mb-2" style="font-size: 0.92rem;">
+                                        <i class="bi bi-people" style="color: #fbbf24; !important"></i>
                                         {% translate "Asignada a" %}
                                     </small>
 
