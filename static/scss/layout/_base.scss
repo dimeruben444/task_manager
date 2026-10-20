@@ -133,6 +133,8 @@ $star-error: #dc2626;
 }
 
 
+
+
 // ==========================================
 // BUSCADOR GLOBAL Y DROPDOWN FLOTANTE
 // ==========================================
@@ -210,7 +212,7 @@ $star-error: #dc2626;
 }
 
 .modal-backdrop {
-  z-index: 2040 !important;
+  display: none !important;
 }
 
 .rating-box-container {
@@ -323,4 +325,14 @@ html {
 .matrix-section {
     scroll-snap-align: start;
     scroll-snap-stop: always; // Fuerza a que el scroll se detenga en cada sección al girar la rueda
+}
+
+/* Contenedor de la barra lateral izquierda (Tableros y Distribución) */
+.sidebar-boards {
+    position: sticky;
+    top: 84px;                  // Distancia exacta desde arriba cuando haces scroll
+    height: calc(100vh - 24px); // Altura ajustada para que no desborde la ventana
+    margin-top: 8px;           // Empuja toda la barra lateral hacia abajo para que coincida con la altura de los cuadrantes
+    border-radius: 16px; // Opcional: si quieres redondear ligeramente las esquinas derechas de la barra
+    overflow-y: auto;           // Scroll interno si la lista de tableros es muy larga
 }

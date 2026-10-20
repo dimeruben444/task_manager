@@ -40,7 +40,7 @@
                 {% csrf_token %}
                 
                 <div class="row g-5 align-items-center mb-2">
-                    <div class="col-md-5 ">
+                    <div class="col-md-5 " style="margin-top: 52px;">
                         <div class="d-flex justify-content-between align-items-center mb-1">
                             <label class="form-label text-uppercase fw-bold text-muted mb-1 " style="font-size: 0.7rem; letter-spacing: 0.05em;margin-left: 8px;">
                                 {% translate "TÍTULO DE LA TAREA" %}
@@ -140,11 +140,12 @@
                                         </span>
                                         <span class="d-flex align-items-center gap-2">
                                             {% if current_board and current_board.color %}
-                                                <span class="color-dot d-inline-block flex-shrink-0" 
-                                                                style="width: 9px; height: 9px; background-color: {{ current_board.color }}; border-radius: 3px;"></span>
+                                                <i class="bi bi-grid-fill flex-shrink-0" style="color: {{ current_board.color }} !important; font-size: 0.7rem;"></i>
+                                            {% else %}
+                                                <i class="bi bi-grid-fill flex-shrink-0" style="color: #42C6F6 !important; font-size: 0.7rem;"></i>
                                             {% endif %}
                                             <small class="text-muted fw-semibold" id="boardBadgeDisplayQuick">
-                                                {% if current_board %}{{ current_board.title }}{% else %}General{% endif %}
+                                                {% if current_board %}{{ current_board.title }}{% else %}General{% endif %} 
                                             </small>
                                         </span>
                                     </button>
@@ -162,8 +163,7 @@
                                                         style="cursor: pointer; color: #1f2937 !important; background-color: {% if current_board and current_board.id == b.id %}#e5e7eb{% else %}transparent{% endif %};"
                                                         onclick="selectBoardOption('{{ b.id }}', '{{ b.title|escapejs }}', 'Quick')">
                                                         <div class="d-flex align-items-center gap-2">
-                                                            <span class="color-dot d-inline-block flex-shrink-0" 
-                                                                style="width: 11px; height: 11px; background-color: {{ b.color|default:'#6466F1' }}; border-radius: 3px;"></span>
+                                                            <i class="bi bi-grid-fill flex-shrink-0" style="color: {{ b.color|default:'#42C6F6' }} !important; font-size: 0.9rem;"></i>
                                                             <span style="font-size: 0.88rem;">{{ b.title }}</span>
                                                         </div>
                                                     </div>
@@ -313,7 +313,18 @@
                         </div>
 
                         <div class="collapse mt-2" id="collapseQuickDesc">
-                            <textarea name="description" class="form-control form-control-sm bg-white" rows="2" placeholder="{% translate 'Escribe una descripción más detallada...' %}"></textarea>
+                            <textarea name="description" 
+                                    id="quickDescriptionTextarea" 
+                                    class="form-control form-control-sm bg-white" 
+                                    rows="2" 
+                                    maxlength="500" 
+                                    oninput="document.getElementById('charCountQuick').textContent = this.value.length;"
+                                    placeholder="{% translate 'Escribe una descripción más detallada...' %}"></textarea>
+                            <div class="d-flex justify-content-end mt-1">
+                                <small class="text-muted" style="font-size: 0.7rem;">
+                                    <span id="charCountQuick">0</span>/500 {% translate "caracteres" %}
+                                </small>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -323,10 +334,10 @@
     </div>
 
     <!-- REJILLA PRINCIPAL: MATRIZ EISENHOWER + PANEL DERECHO COMPLETADAS (FLEXBOX SIN DESFASE) -->
-    <div class="d-flex gap-5 align-items-start w-100">
+    <div class="d-flex flex-column flex-lg-row gap-5 align-items-start w-100">
         
         <!-- SECCIÓN IZQUIERDA: LOS 4 CUADRANTES DE EISENHOWER (OCUPA EL ESPACIO RESTANTE) -->
-        <div class="matrix-container-wrapper flex-grow-1 min-w-0 matrix-section">
+        <div class="matrix-container-wrapper flex-grow-1 min-w-0 w-100">
             <div class="row g-4">
                 
                 <!-- Q1: HACER AHORA -->
@@ -577,7 +588,7 @@
         </div>
 
         <!-- SECCIÓN DERECHA: PANEL COMPLETADAS (ANCHO FIJO SIN DESFASE) -->
-        <div class="completed-panel-wrapper flex-shrink-0">
+        <div class="completed-panel-wrapper w-100">
             <div class="completed-panel p-3 h-100 d-flex flex-column">
                 <div class="d-flex align-items-center justify-content-between pb-3 border-bottom mb-2">
                     <div class="d-flex align-items-center gap-2">

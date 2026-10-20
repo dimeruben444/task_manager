@@ -157,15 +157,57 @@ body,
   }
 }
 
-/* 7. PANEL LATERAL DERECHO (COMPLETADAS - MÁS ANCHO Y ADAPTATIVO) */
+/* 7. PANEL LATERAL DERECHO (COMPLETADAS - ADAPTATIVO A FILA/COLUMNA) */
+/* 7. PANEL LATERAL DERECHO (COMPLETADAS - REDUCCIÓN PROPORCIONAL CADA 200PX) */
 .completed-panel-wrapper {
-  flex: 0 0 420px !important;    /* Aumentado de 320px a 420px */
-  min-width: 380px !important;   /* Ancho mínimo más amplio para no verse estrecho */
-  max-width: 480px !important;   /* Permite crecer hasta 480px en pantallas grandes */
+  flex: 0 0 430px !important;    
+  min-width: 0 !important;   
+  max-width: 490px !important;   
   flex-shrink: 0 !important;
+  transition: flex-basis 0.2s ease, max-width 0.2s ease;
 }
 
-/* En monitores ultra panorámicos (1800px+), el panel se amplía aún más */
+/* Pantallas grandes / monitores amplios (< 1600px) */
+@media (max-width: 1600px) {
+  .completed-panel-wrapper {
+    flex: 0 0 360px !important;
+    max-width: 380px !important;
+  }
+}
+
+/* Reducción a 1400px (< 1400px) */
+@media (max-width: 1400px) {
+  .completed-panel-wrapper {
+    flex: 0 0 300px !important;
+    max-width: 320px !important;
+  }
+}
+
+/* Reducción a 1200px / Tablets grandes (< 1200px) */
+@media (max-width: 1200px) {
+  .completed-panel-wrapper {
+    flex: 0 0 240px !important;
+    max-width: 260px !important;
+  }
+}
+
+/* Reducción a 1000px (< 1000px) */
+@media (max-width: 1000px) {
+  .completed-panel-wrapper {
+    flex: 0 0 180px !important;
+    max-width: 200px !important;
+  }
+}
+
+/* Punto de quiebre para Tablets pequeñas y móviles: Salta debajo de los cuadrantes (< 900px) */
+@media (max-width: 900px) {
+  .completed-panel-wrapper {
+    flex: 0 0 100% !important;
+    max-width: 100% !important;
+  }
+}
+
+/* En monitores ultra panorámicos (1800px+) */
 @media (min-width: 1800px) {
   .completed-panel-wrapper {
     flex: 0 0 460px !important;
@@ -182,7 +224,7 @@ body,
   .completed-item {
     background-color: var(--bg-surface-subtle);
     border-radius: 10px;
-    padding: 0.65rem 0.85rem; /* Un poco más de padding interno para mejor legibilidad */
+    padding: 0.65rem 0.85rem; 
     border: 1px solid var(--border-light);
     transition: background-color 0.15s ease;
 
@@ -191,7 +233,6 @@ body,
     }
   }
 }
-
 /* 8. CONTENEDOR GLOBAL MAX-WIDTH (EVITA ESTIRAMIENTO EXTREMO EN 4K) */
 .container-fluid {
   max-width: 1750px !important;

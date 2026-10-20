@@ -25,12 +25,13 @@
             
             <!-- BRANDING Y LOGO (IZQUIERDA) -->
             <div class="navbar-brand-wrapper d-flex align-items-center gap-2">
-                <a href="{% url 'dashboard' %}" class="text-decoration-none">
+                <a href="{% url 'dashboard' %}" class="text-decoration-none d-flex align-items-center gap-2">
+                    <img src="{% static 'img/eisenhowerFlow.svg' %}" alt="Logo" style="height: 36px; width: auto; margin-top: 6px;">
                     <h1 class="brand-title m-0">
                         Eisenhower<span class="brand-accent">Flow</span>
                     </h1>
                 </a>
-                <span class="badge-workspace">Workspace</span>
+                <span class="badge-workspace align-self-center">Workspace</span>
             </div>
             
             <!-- BUSCADOR GLOBAL (CENTRO) -->
@@ -47,8 +48,6 @@
                             onfocus="handleTaskSearchInput(this.value)">
                         <kbd class="shortcut-badge">⌘K</kbd>
                     </div>
-
-                    
                 </div>
             {% endif %}
 
@@ -148,7 +147,7 @@
                     <!-- ENLACE GENERAL -->
                     <a href="{% url 'dashboard' %}" 
                        class="board-chip d-block text-decoration-none mb-1 p-2 rounded small {% if not current_board %}active{% endif %}">
-                        🌐 {% translate "General" %}
+                        <i class="bi bi-grid-fill" style="color: #42C6F6 !important;"></i> {% translate "General" %}
                     </a>
 
                     <!-- TABLEROS PROPIOS -->
@@ -159,7 +158,7 @@
                                 
                                 <a href="{% url 'dashboard_board' b.id %}" 
                                    class="text-decoration-none text-truncate flex-grow-1 d-flex align-items-center gap-2 small" style="color: inherit;">
-                                    <span class="color-dot d-inline-block flex-shrink-0" style="width: 11px; height: 11px; background-color: var(--board-color); border-radius: 3px;"></span>
+                                    <i class="bi bi-grid-fill flex-shrink-0" style="color: var(--board-color) !important; font-size: 0.9rem;"></i>
                                     <span class="board-title text-truncate">{{ b.title }}</span>
                                 </a>
 
@@ -171,57 +170,6 @@
                                         style="font-size: 0.75rem;">
                                     •••
                                 </button>
-                            </div>
-
-                            <!-- MODAL DE EDICIÓN DE TABLERO -->
-                            <div class="modal fade" id="editBoardModalSidebar{{ b.id }}" tabindex="-1" aria-hidden="true">
-                                <div class="modal-dialog">
-                                    <div class="modal-content text-dark">
-                                        <form method="POST" action="{% url 'edit_board' b.id %}">
-                                            {% csrf_token %}
-                                            <div class="modal-header">
-                                                <h5 class="modal-title fw-bold">⚙ {% translate "Editar Tablero" %}: {{ b.title }}</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                            </div>
-                                            <div class="modal-body text-start">
-                                                <div class="mb-3">
-                                                    <label class="form-label small fw-bold">{% translate "Nombre del tablero" %}</label>
-                                                    <input type="text" name="title" value="{{ b.title }}" class="form-control" required>
-                                                </div>
-
-                                                <div class="mb-3">
-                                                    <label class="form-label small fw-bold">{% translate "Color del tablero" %}</label>
-                                                    <select name="color" class="form-select">
-                                                        <option value="#3B82F6" {% if b.color == "#3B82F6" %}selected{% endif %}>🔵 {% translate "Azul" %}</option>
-                                                        <option value="#10B981" {% if b.color == "#10B981" %}selected{% endif %}>🟢 {% translate "Verde" %}</option>
-                                                        <option value="#EF4444" {% if b.color == "#EF4444" %}selected{% endif %}>🔴 {% translate "Rojo" %}</option>
-                                                        <option value="#F59E0B" {% if b.color == "#F59E0B" %}selected{% endif %}>🟠 {% translate "Naranja" %}</option>
-                                                        <option value="#8B5CF6" {% if b.color == "#8B5CF6" %}selected{% endif %}>🟣 {% translate "Púrpura" %}</option>
-                                                        <option value="#6B7280" {% if b.color == "#6B7280" %}selected{% endif %}>⚪ {% translate "Gris" %}</option>
-                                                    </select>
-                                                </div>
-
-                                                <div class="mb-3">
-                                                    <label class="form-label small">{% translate "Descripción" %}</label>
-                                                    <textarea name="description" class="form-control" rows="3">{{ b.description|default:'' }}</textarea>
-                                                </div>
-                                            </div>
-                                            <div class="modal-footer justify-content-between">
-                                                <button type="submit" 
-                                                        formaction="{% url 'delete_board' b.id %}" 
-                                                        class="btn btn-outline-danger btn-sm"
-                                                        onclick="return confirm('¿Seguro que quieres eliminar el tablero {{ b.title }}?');">
-                                                    🗑️ {% translate "Eliminar Tablero" %}
-                                                </button>
-                                                
-                                                <div>
-                                                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">{% translate "Cancelar" %}</button>
-                                                    <button type="submit" class="btn btn-primary btn-sm">{% translate "Guardar Cambios" %}</button>
-                                                </div>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
                             </div>
                         {% endif %}
                     {% endfor %}
@@ -243,7 +191,7 @@
                                 
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div class="d-flex align-items-center gap-2">
-                                        <span class="rounded-circle d-inline-block flex-shrink-0" style="width: 8px; height: 8px; background-color: #ef4444;"></span>
+                                        <span class="d-inline-block flex-shrink-0" style="width: 8px; height: 8px; background-color: #ef4444; border-radius: 2px;"></span>
                                         <span class="fw-semibold text-secondary" style="font-size: 0.82rem;">Q1 (Hacer)</span>
                                     </div>
                                     <span class="fw-bold text-dark" style="font-size: 0.82rem;" id="sidebar-q1-count">
@@ -253,7 +201,7 @@
 
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div class="d-flex align-items-center gap-2">
-                                        <span class="rounded-circle d-inline-block flex-shrink-0" style="width: 8px; height: 8px; background-color: #3b82f6;"></span>
+                                        <span class="d-inline-block flex-shrink-0" style="width: 8px; height: 8px; background-color: #3b82f6; border-radius: 2px;"></span>
                                         <span class="fw-semibold text-secondary" style="font-size: 0.82rem;">Q2 (Planificar)</span>
                                     </div>
                                     <span class="fw-bold text-dark" style="font-size: 0.82rem;" id="sidebar-q2-count">
@@ -263,7 +211,7 @@
 
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div class="d-flex align-items-center gap-2">
-                                        <span class="rounded-circle d-inline-block flex-shrink-0" style="width: 8px; height: 8px; background-color: #f59e0b;"></span>
+                                        <span class="d-inline-block flex-shrink-0" style="width: 8px; height: 8px; background-color: #f59e0b; border-radius: 2px;"></span>
                                         <span class="fw-semibold text-secondary" style="font-size: 0.82rem;">Q3 (Delegar)</span>
                                     </div>
                                     <span class="fw-bold text-dark" style="font-size: 0.82rem;" id="sidebar-q3-count">
@@ -273,7 +221,7 @@
 
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div class="d-flex align-items-center gap-2">
-                                        <span class="rounded-circle d-inline-block flex-shrink-0" style="width: 8px; height: 8px; background-color: #9ca3af;"></span>
+                                        <span class="d-inline-block flex-shrink-0" style="width: 8px; height: 8px; background-color: #9ca3af; border-radius: 2px;"></span>
                                         <span class="fw-semibold text-secondary" style="font-size: 0.82rem;">Q4 (Eliminar)</span>
                                     </div>
                                     <span class="fw-bold text-dark" style="font-size: 0.82rem;" id="sidebar-q4-count">
@@ -287,6 +235,61 @@
 
                 </div>
             </aside>
+
+            <!-- MODALES DE EDICIÓN DE TABLERO (FUERA DEL ASIDE PARA EVITAR PROBLEMAS DE APILAMIENTO) -->
+            {% for b in boards %}
+                {% if not b.is_default %}
+                    <div class="modal fade" id="editBoardModalSidebar{{ b.id }}" tabindex="-1" aria-hidden="true" data-bs-backdrop="false" style="z-index: 1060 !important;">
+                        <div class="modal-dialog">
+                            <div class="modal-content text-dark">
+                                <form method="POST" action="{% url 'edit_board' b.id %}">
+                                    {% csrf_token %}
+                                    <div class="modal-header">
+                                        <h5 class="modal-title fw-bold">⚙ {% translate "Editar Tablero" %}: {{ b.title }}</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body text-start">
+                                        <div class="mb-3">
+                                            <label class="form-label small fw-bold">{% translate "Nombre del tablero" %}</label>
+                                            <input type="text" name="title" value="{{ b.title }}" class="form-control" required>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label small fw-bold">{% translate "Color del tablero" %}</label>
+                                            <select name="color" class="form-select">
+                                                <option value="#3B82F6" {% if b.color == "#3B82F6" %}selected{% endif %}>🟦 {% translate "Azul" %}</option>
+                                                <option value="#10B981" {% if b.color == "#10B981" %}selected{% endif %}>🟩 {% translate "Verde" %}</option>
+                                                <option value="#EF4444" {% if b.color == "#EF4444" %}selected{% endif %}>🟥 {% translate "Rojo" %}</option>
+                                                <option value="#F59E0B" {% if b.color == "#F59E0B" %}selected{% endif %}>🟧 {% translate "Naranja" %}</option>
+                                                <option value="#8B5CF6" {% if b.color == "#8B5CF6" %}selected{% endif %}>🟪 {% translate "Púrpura" %}</option>
+                                                <option value="#6B7280" {% if b.color == "#6B7280" %}selected{% endif %}>⬜ {% translate "Gris" %}</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label small">{% translate "Descripción" %}</label>
+                                            <textarea name="description" class="form-control" rows="3">{{ b.description|default:'' }}</textarea>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer justify-content-between">
+                                        <button type="submit" 
+                                                formaction="{% url 'delete_board' b.id %}" 
+                                                class="btn btn-outline-danger btn-sm"
+                                                onclick="return confirm('¿Seguro que quieres eliminar el tablero {{ b.title }}?');">
+                                            {% translate "Eliminar Tablero" %}
+                                        </button>
+                                        
+                                        <div>
+                                            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">{% translate "Cancelar" %}</button>
+                                            <button type="submit" class="btn btn-primary btn-sm">{% translate "Guardar Cambios" %}</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
         {% endif %}
 
         <!-- 2. ÁREA PRINCIPAL -->

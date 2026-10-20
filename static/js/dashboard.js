@@ -849,7 +849,7 @@ window.addEventListener('wheel', function(e) {
         if (matrixSection) {
             matrixSection.scrollIntoView({ behavior: 'smooth' });
         } else {
-            window.scrollBy({ top: 232, behavior: 'smooth' });
+            window.scrollBy({ top: 234, behavior: 'smooth' });
         }
 
         // Liberamos el bloqueo solo cuando termina la animación (aprox. 600-800ms)
