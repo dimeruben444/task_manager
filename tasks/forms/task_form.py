@@ -1,8 +1,9 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model
+from django.db.models import Q  
 from tasks.models import Task
-from boards.models import  Board
+from boards.models import Board
 
 User = get_user_model()
 
@@ -102,14 +103,59 @@ class TaskForm(forms.ModelForm):
             self.fields['board'].label_from_instance = lambda obj: f"📁 {obj.title}"
 
         if user:
-            # Filtrar tableros pertenecientes al usuario activo
-            user_boards = Board.objects.filter(owner=user)
-            self.fields['board'].queryset = user_boards
+            # 1. SI ESTAMOS EDITANDO UNA TAREA EXISTENTE
+            if self.instance and self.instance.pk:
+                task_creator = self.instance.created_by
+                board_owner = self.instance.board.owner if self.instance.board else None
 
-            # Selección del tablero por defecto
-            if current_board:
+                # Caso 1: El usuario actual ES el creador de la tarea O el dueño de su tablero (Persona A)
+                if user == task_creator or (board_owner and user == board_owner):
+                    user_boards = Board.objects.filter(
+                        Q(owner=user) | Q(members=user)
+                    ).distinct()
+                    self.fields['board'].queryset = user_boards
+
+                # Caso 2: El usuario actual ES UN INVITADO (Persona B)
+                else:
+                    person_a = board_owner or task_creator
+
+                    if person_a:
+                        # Buscamos los tableros que A y B comparten
+                        shared_boards = Board.objects.filter(
+                            Q(owner=person_a, members=user) |
+                            Q(owner=user, members=person_a) |
+                            (Q(members=user) & Q(members=person_a))
+                        ).distinct()
+
+                        # Si la tarea ya tiene un tablero asignado, aseguramos que se incluya en el QuerySet
+                        if self.instance.board:
+                            shared_boards = (shared_boards | Board.objects.filter(pk=self.instance.board.pk)).distinct()
+
+                        self.fields['board'].queryset = shared_boards
+
+                        # Si solo comparten este tablero, deshabilitamos el selector para que no la mueva a otro sitio
+                        if shared_boards.count() <= 1:
+                            self.fields['board'].disabled = True
+                    else:
+                        if self.instance.board:
+                            self.fields['board'].queryset = Board.objects.filter(pk=self.instance.board.pk)
+                        else:
+                            self.fields['board'].queryset = Board.objects.none()
+                        self.fields['board'].disabled = True
+
+            # 2. SI ES UNA CREACIÓN NUEVA DESDE CERO
+            else:
+                user_boards = Board.objects.filter(
+                    Q(owner=user) | Q(members=user)
+                ).distinct()
+                self.fields['board'].queryset = user_boards
+
+            # Selección del tablero inicial
+            if self.instance and self.instance.board:
+                self.fields['board'].initial = self.instance.board
+            elif current_board:
                 self.fields['board'].initial = current_board
             else:
-                default_board = user_boards.filter(is_default=True).first()
+                default_board = user_boards.filter(is_default=True).first() if 'user_boards' in locals() else None
                 if default_board:
                     self.fields['board'].initial = default_board

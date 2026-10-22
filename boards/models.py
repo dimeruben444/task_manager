@@ -17,7 +17,7 @@ class Board(models.Model):
 
     title = models.CharField(_('Título'), max_length=150)
     description = models.TextField(_('Descripción'), blank=True)
-    color = models.CharField(_('Color'),choices=COLOR_CHOICES, max_length=7 ,blank=True, null=True,)
+    color = models.CharField(_('Color'),choices=COLOR_CHOICES, max_length=7 ,blank=True, null=True,default='#6B7280')
 
     is_default = models.BooleanField(_('¿Tablero general?'),default=False)
 
@@ -26,6 +26,13 @@ class Board(models.Model):
         on_delete= models.CASCADE,
         related_name='boards',
         verbose_name=_('Propietario')
+    )
+
+    members = models.ManyToManyField(
+        settings.AUTH_USER_MODEL,
+        related_name='shared_boards',
+        blank=True,
+        verbose_name=_('Miembros compartidos')
     )
 
     due_date = models.TimeField(_('Fecha límite del tablero'),null=True, blank=True) #fecha vencimiento

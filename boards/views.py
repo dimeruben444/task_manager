@@ -25,28 +25,37 @@ def dashboard_view(request, board_id=None):
     default_board = user_boards.filter(is_default=True).first()
 
     # 2. Tableros compartidos
-    shared_boards = Board.objects.filter(
-        tasks__assigned_to=request.user,
-        is_default=False
-    ).exclude(owner=request.user).distinct()
+    shared_boards = Board.objects.filter(members=request.user).distinct()
 
     current_board = None
 
     if board_id:
         board_queryset = Board.objects.filter(
-            Q(id=board_id) & (Q(owner=request.user) | Q(tasks__assigned_to=request.user))
+            Q(id=board_id) & (Q(owner=request.user) | Q(members=request.user))
         ).distinct()
 
         current_board = get_object_or_404(board_queryset)
 
-        base_tasks = Task.objects.filter(
-            Q(board=current_board) & (Q(board__owner=request.user) | Q(assigned_to=request.user))
-        )
+        base_tasks = Task.objects.filter(board=current_board)
     else:
-        # En la raíz (/), muestra tareas de tableros propios O asignadas al usuario
+        # En la raíz (/), muestra tareas de tableros propios O asignadas al usuario O de tableros compartidos
         base_tasks = Task.objects.filter(
-            Q(board__owner=request.user) | Q(assigned_to=request.user)
-        )
+            Q(board__owner=request.user) | Q(board__members=request.user) | Q(assigned_to=request.user)
+        ).distinct()
+
+        task_filter = request.GET.get('filter', 'all')
+        
+        if task_filter == 'mine':
+            # 👤 Mis tareas: Creadas por el usuario actual
+            base_tasks = base_tasks.filter(created_by=request.user)
+        elif task_filter == 'shared':
+            # 🤝 Asignadas: Tareas asignadas directamente O pertenecientes a tableros compartidos (excluyendo creadas por él)
+            base_tasks = base_tasks.filter(
+                Q(assigned_to=request.user) |
+                Q(board__members=request.user) |
+                (Q(board__owner=request.user) & Q(board__members__isnull=False))
+            ).distinct()
+        # Si es 'all', muestra todas sin aplicar exclusiones adicionales
 
     has_shared_tasks = base_tasks.filter(~Q(created_by=request.user)).exists()
 
@@ -56,7 +65,17 @@ def dashboard_view(request, board_id=None):
             task = form.save(commit=False)
             task.created_by = request.user
             
-            if not task.board:
+            # Validar y asignar el tablero (soporta tableros propios y compartidos como miembro)
+            selected_board = form.cleaned_data.get('board')
+            if selected_board:
+                is_owner = selected_board.owner == request.user
+                is_member = selected_board.members.filter(id=request.user.id).exists()
+                
+                if is_owner or is_member:
+                    task.board = selected_board
+                else:
+                    task.board = current_board or default_board
+            else:
                 task.board = current_board or default_board
                 
             task.save()
@@ -134,7 +153,7 @@ class BoardUpdateView(LoginRequiredMixin, UpdateView):
     pk_url_kwarg = 'board_id'
 
     def get_queryset(self):
-        return Board.objects.filter(owner=self.request.user)
+        return Board.objects.filter(Q(owner=self.request.user) | Q(members=self.request.user)).distinct()
 
     def post(self, request, *args, **kwargs):
         board = self.get_object()
@@ -148,6 +167,9 @@ class BoardUpdateView(LoginRequiredMixin, UpdateView):
                 board.color = color
             board.description = description
             board.save()
+
+        members_ids = request.POST.getlist('members')
+        board.members.set(members_ids)
 
         return redirect('dashboard_board', board_id=board.id)
 

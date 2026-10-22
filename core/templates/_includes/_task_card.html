@@ -2,12 +2,15 @@
 
 <!-- TARJETA COMPACTA EN EL TABLERO -->
 <div class="card mb-2 shadow-sm border-0 task-card {% if task.is_completed %}is-completed{% endif %}" 
-     id="task-card-{{ task.id }}"
-     data-task-id="{{ task.id }}"
-     data-urgency="{{ task.urgency }}"
-     data-importance="{{ task.importance }}"
-     data-created-by="{% if task.created_by == request.user %}mine{% else %}shared{% endif %}"
-     style="cursor: pointer;">
+    id="task-card-{{ task.id }}"
+    data-task-id="{{ task.id }}"
+    data-urgency="{{ task.urgency }}"
+    data-importance="{{ task.importance }}"
+    data-created-by="{% if task.created_by == request.user %}mine{% else %}shared{% endif %}"
+    data-due-date="{{ task.due_date|date:'d M'|default:'' }}"
+    data-has-description="{% if task.description %}true{% else %}false{% endif %}"
+    data-is-shared="{% if task.assigned_to.exists or task.board.members.exists %}true{% else %}false{% endif %}"
+    style="cursor: pointer;">
     
     <div class="card-body py-2 px-3 d-flex flex-column justify-content-center">
         
@@ -44,22 +47,32 @@
             {% if task.due_date or task.description or task.assigned_to.exists and total_assignees > 1 or task.assigned_to.exists and first_assignee != task.created_by %}
                 
                 <!-- METADATOS COMPACTOS (SOLO CUANDO EXISTEN) -->
-                <div class="d-flex align-items-center justify-content-between mt-1 pt-1 text-muted" 
+                <div class="d-flex align-items-center justify-content-between text-muted" 
                      style="font-size: 0.7rem;" 
                      data-bs-toggle="modal" 
                      data-bs-target="#viewTaskModal{{ task.id }}">
                     
                     <div class="d-flex align-items-center gap-1.5 flex-wrap">
+                        <!-- Fecha vencimiento -->
                         {% if task.due_date %}
-                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle d-inline-flex align-items-center gap-1 px-1.5 py-0.5 rounded-md task-date-badge" style="font-size: 0.65rem;">
-                                <i class="bi bi-calendar3"></i>
+                            <span class="badge border d-inline-flex align-items-center gap-1 px-1.5 py-0.5 rounded-md task-date-badge" 
+                                style="font-size: 0.65rem; background-color: #FFE4E6 !important; color: #dc2626 !important; border-color: #fecdd3 !important;">
+                                <i class="bi bi-calendar3" style="color: #dc2626 !important;"></i>
                                 {{ task.due_date|date:"d M" }}
                             </span>
                         {% endif %}
-
+                            <!-- descripcion -->
                         {% if task.description %}
                             <span class="badge  text-secondary  px-1.5 py-0.5 rounded-md" title="{% translate 'Tiene descripción' %}" style="font-size: 0.98rem;">
-                                <i class="bi bi-card-text"></i> 
+                                <i class="bi bi-card-text" style="color: #5cbcf3; !important"></i> 
+                            </span>
+                        {% endif %}
+                        <!-- Tarea asignada -->
+                        {% if task.assigned_to.exists or task.board.members.exists %}
+                            <span class="badge text-warning px-1.5 py-0.5 rounded-md" 
+                                title="{% translate 'Tarea compartida / asignada' %}" 
+                                style="font-size: 0.85rem;">
+                                <i class="bi bi-people-fill" style="color: #fbbf24 !important;"></i>
                             </span>
                         {% endif %}
                     </div>
@@ -299,54 +312,148 @@
 
                                 <!-- TABLERO -->
                                 <div class="dropdown">
-                                    <button class="btn btn-outline-secondary btn-sm text-start w-100 d-flex justify-content-between align-items-center bg-white shadow-none py-2 px-3 border rounded-xl" 
-                                            type="button" 
-                                            id="dropdownBoard{{ task.id }}" 
-                                            data-bs-toggle="dropdown" 
-                                            aria-expanded="false" style="border-radius: 10px;">
-                                        <span class="d-flex align-items-center gap-2 text-dark">
-                                            <i class="bi bi-kanban" style="color: #6466F1 !important; transform: rotate(-90deg); display: inline-block;"></i>
-                                            <span class="fw-medium text-dark">{% translate "Tablero" %}</span>
-                                        </span>
-                                        <span class="d-flex align-items-center gap-2">
-                                            {% if task.board and task.board.color %}
-                                                <span class="rounded-circle d-inline-block" style="width: 8px; height: 8px; background-color: {{ task.board.color }};"></span>
-                                            {% endif %}
-                                            <small class="text-muted fw-semibold" id="boardBadgeDisplay{{ task.id }}">
-                                                {% if task.board %}{{ task.board.title }}{% else %}General{% endif %}
-                                            </small>
-                                        </span>
-                                    </button>
+                                    {% if task.board and task.board.owner != request.user %}
+                                        <!-- CASO INVITADO (PERSONA B): BOTÓN BLOQUEADO SIN DESPLEGABLE -->
+                                        <button class="btn btn-outline-secondary btn-sm text-start w-100 d-flex justify-content-between align-items-center bg-light shadow-none py-2 px-3 border rounded-xl" 
+                                                type="button" 
+                                                disabled 
+                                                style="border-radius: 10px; cursor: not-allowed;">
+                                            <span class="d-flex align-items-center gap-2 text-dark">
+                                                <i class="bi bi-kanban" style="color: #6466F1 !important; transform: rotate(-90deg); display: inline-block;"></i>
+                                                <span class="fw-medium text-dark">{% translate "Tablero" %}</span>
+                                            </span>
+                                            <span class="d-flex align-items-center gap-2">
+                                                {% if task.board.color %}
+                                                    <i class="bi bi-grid-fill flex-shrink-0" 
+                                                    style="background: linear-gradient(135deg, {{ task.board.color }} 0%, {{ task.board.color }} 35%, color-mix(in srgb, {{ task.board.color }} 10%, white) 100%);
+                                                            -webkit-background-clip: text;
+                                                            -webkit-text-fill-color: transparent;
+                                                            color: transparent !important;
+                                                            font-size: 0.9rem;
+                                                            display: inline-block;"></i>
+                                                {% else %}
+                                                    <i class="bi bi-grid-fill flex-shrink-0" 
+                                                    style="background: linear-gradient(135deg, #4f52f8 0%, #4f52f8 35%, #42C6F6 100%);
+                                                            -webkit-background-clip: text;
+                                                            -webkit-text-fill-color: transparent;
+                                                            color: transparent !important;
+                                                            font-size: 0.9rem;
+                                                            display: inline-block;"></i>
+                                                {% endif %}
+                                                <small class="text-muted fw-semibold">
+                                                    {{ task.board.title }}
+                                                </small>
+                                            </span>
+                                        </button>
+                                        <input type="hidden" name="board" id="hiddenBoardId{{ task.id }}" value="{{ task.board.id }}">
 
-                                    <div class="dropdown-menu p-2 shadow-lg border-0 rounded-2xl mt-1 bg-white" aria-labelledby="dropdownBoard{{ task.id }}" style="width: 280px; z-index: 1060; border-radius: 14px;">
-                                        <div class="d-flex justify-content-between align-items-center px-2 py-1 mb-2 border-bottom">
-                                            <span class="fw-bold small text-dark">{% translate "Seleccionar Tablero" %}</span>
-                                            <button type="button" class="btn-close btn-sm" onclick="bootstrap.Dropdown.getInstance(document.getElementById('dropdownBoard{{ task.id }}')).hide();"></button>
-                                        </div>
+                                    {% else %}
+                                        <!-- CASO PROPIETARIO (PERSONA A) O TAREA PROPIA: DROPDOWN HABITUAL -->
+                                        <button class="btn btn-outline-secondary btn-sm text-start w-100 d-flex justify-content-between align-items-center bg-white shadow-none py-2 px-3 border rounded-xl" 
+                                                type="button" 
+                                                id="dropdownBoard{{ task.id }}" 
+                                                data-bs-toggle="dropdown" 
+                                                aria-expanded="false" style="border-radius: 10px;">
+                                            <span class="d-flex align-items-center gap-2 text-dark">
+                                                <i class="bi bi-kanban" style="color: #6466F1 !important; transform: rotate(-90deg); display: inline-block;"></i>
+                                                <span class="fw-medium text-dark">{% translate "Tablero" %}</span>
+                                            </span>
+                                            <span class="d-flex align-items-center gap-2">
+                                                {% if task.board and not task.board.is_default and task.board.color %}
+                                                    <i class="bi bi-grid-fill flex-shrink-0" 
+                                                    id="boardBadgeIcon{{ task.id }}" 
+                                                    style="background: linear-gradient(135deg, {{ task.board.color }} 0%, {{ task.board.color }} 35%, color-mix(in srgb, {{ task.board.color }} 10%, white) 100%);
+                                                            -webkit-background-clip: text;
+                                                            -webkit-text-fill-color: transparent;
+                                                            color: transparent !important;
+                                                            font-size: 0.9rem;
+                                                            display: inline-block;"></i>
+                                                {% else %}
+                                                    <i class="bi bi-grid-fill flex-shrink-0" 
+                                                    id="boardBadgeIcon{{ task.id }}" 
+                                                    style="background: linear-gradient(135deg, #4f52f8 0%, #4f52f8 35%, #42C6F6 100%);
+                                                            -webkit-background-clip: text;
+                                                            -webkit-text-fill-color: transparent;
+                                                            color: transparent !important;
+                                                            font-size: 0.9rem;
+                                                            display: inline-block;"></i>
+                                                {% endif %}
+                                                
+                                                <small class="text-muted fw-semibold" id="boardBadgeDisplay{{ task.id }}">
+                                                    {% if task.board and not task.board.is_default %}{{ task.board.title }}{% else %}General{% endif %}
+                                                </small>
+                                            </span>
+                                        </button>
 
-                                        <div class="d-flex flex-column gap-1">
-                                            {% if user.boards.all %}
-                                                {% for board in user.boards.all %}
-                                                    <div class="custom-board-item d-flex justify-content-between align-items-center py-2 px-3 rounded-lg fw-semibold"
-                                                        style="cursor: pointer; color: #1f2937 !important; background-color: {% if task.board and board.id == task.board.id %}#e5e7eb{% else %}transparent{% endif %};"
-                                                        onclick="selectBoardOption('{{ board.id }}', '{{ board.title|escapejs }}', '{{ task.id }}')">
-                                                        
-                                                        <div class="d-flex align-items-center gap-2">
-                                                            <span class="color-dot d-inline-block flex-shrink-0" 
-                                                                style="width: 11px; height: 11px; background-color: {{ board.color|default:'#6466F1' }}; border-radius: 3px;"></span>
-                                                            <span style="font-size: 0.88rem;">{{ board.title }}</span>
-                                                        </div>
+                                        <div class="dropdown-menu p-2 shadow-lg border-0 rounded-2xl mt-1 bg-white" aria-labelledby="dropdownBoard{{ task.id }}" style="width: 280px; z-index: 1060; border-radius: 14px;">
+                                            <div class="d-flex justify-content-between align-items-center px-2 py-1 mb-2 border-bottom">
+                                                <span class="fw-bold small text-dark">{% translate "Seleccionar Tablero" %}</span>
+                                                <button type="button" class="btn-close btn-sm" onclick="bootstrap.Dropdown.getInstance(document.getElementById('dropdownBoard{{ task.id }}')).hide();"></button>
+                                            </div>
 
-                                                        {% if task.board and board.id == task.board.id %}
-                                                            <i class="bi bi-check-lg text-primary"></i>
-                                                        {% endif %}
+                                            <div class="d-flex flex-column gap-1">
+                                                <!-- OPCIÓN GENERAL (#42C6F6 / #4f52f8) -->
+                                                <div class="custom-board-item d-flex justify-content-between align-items-center py-2 px-3 rounded-lg fw-semibold"
+                                                    style="cursor: pointer; color: #1f2937 !important; background-color: {% if not task.board or task.board.is_default %}#e5e7eb{% else %}transparent{% endif %};"
+                                                    onclick="selectBoardOption('', 'General', '{{ task.id }}', '')">
+                                                    
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <i class="bi bi-grid-fill flex-shrink-0" 
+                                                        style="background: linear-gradient(135deg, #4f52f8 0%, #4f52f8 35%, #42C6F6 100%);
+                                                                -webkit-background-clip: text;
+                                                                -webkit-text-fill-color: transparent;
+                                                                color: transparent !important;
+                                                                font-size: 0.9rem;
+                                                                display: inline-block;"></i>
+                                                        <span style="font-size: 0.88rem;">General</span>
                                                     </div>
-                                                {% endfor %}
-                                            {% endif %}
-                                        </div>
 
-                                        <input type="hidden" name="board" id="hiddenBoardId{{ task.id }}" value="{% if task.board %}{{ task.board.id }}{% endif %}">
-                                    </div>
+                                                    {% if not task.board or task.board.is_default %}
+                                                        <i class="bi bi-check-lg text-primary"></i>
+                                                    {% endif %}
+                                                </div>
+
+                                                <!-- LISTA DE TABLEROS PERSONALIZADOS DEL USUARIO -->
+                                                {% if user.boards.all %}
+                                                    {% for board in user.boards.all %}
+                                                        {% if not board.is_default %}
+                                                            <div class="custom-board-item d-flex justify-content-between align-items-center py-2 px-3 rounded-lg fw-semibold"
+                                                                style="cursor: pointer; color: #1f2937 !important; background-color: {% if task.board and board.id == task.board.id %}#e5e7eb{% else %}transparent{% endif %};"
+                                                                onclick="selectBoardOption('{{ board.id }}', '{{ board.title|escapejs }}', '{{ task.id }}', '{{ board.color|default:'' }}')">
+                                                                
+                                                                <div class="d-flex align-items-center gap-2">
+                                                                    {% if board.color %}
+                                                                        <i class="bi bi-grid-fill flex-shrink-0" 
+                                                                        style="background: linear-gradient(135deg, {{ board.color }} 0%, {{ board.color }} 35%, color-mix(in srgb, {{ board.color }} 10%, white) 100%);
+                                                                                -webkit-background-clip: text;
+                                                                                -webkit-text-fill-color: transparent;
+                                                                                color: transparent !important;
+                                                                                font-size: 0.9rem;
+                                                                                display: inline-block;"></i>
+                                                                    {% else %}
+                                                                        <i class="bi bi-grid-fill flex-shrink-0" 
+                                                                        style="background: linear-gradient(135deg, #4f52f8 0%, #4f52f8 35%, #42C6F6 100%);
+                                                                                -webkit-background-clip: text;
+                                                                                -webkit-text-fill-color: transparent;
+                                                                                color: transparent !important;
+                                                                                font-size: 0.9rem;
+                                                                                display: inline-block;"></i>
+                                                                    {% endif %}
+                                                                    <span style="font-size: 0.88rem;">{{ board.title }}</span> 
+                                                                </div>
+
+                                                                {% if task.board and board.id == task.board.id %}
+                                                                    <i class="bi bi-check-lg text-primary"></i>
+                                                                {% endif %}
+                                                            </div>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </div>
+
+                                            <input type="hidden" name="board" id="hiddenBoardId{{ task.id }}" value="{% if task.board %}{{ task.board.id }}{% endif %}">
+                                        </div>
+                                    {% endif %}
                                 </div>
 
                                 <!-- DESCRIPCIÓN -->
@@ -395,7 +502,7 @@
 
                                 <div class="pt-3 border-top">
                                     <small class="text-muted fw-bold d-block mb-2" style="font-size: 0.92rem;">
-                                        <i class="bi bi-people" style="color: #fbbf24; !important"></i>
+                                        <i class="bi bi-people-fill" style="color: #fbbf24; !important"></i>
                                         {% translate "Asignada a" %}
                                     </small>
 

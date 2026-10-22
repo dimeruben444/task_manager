@@ -472,7 +472,7 @@ function deleteTaskModal(taskId, deleteUrl) {
 
 
 // SELECCIÓN DIRECTA DE TABLERO EN DESPLEGABLES
-function selectBoardOption(boardId, boardName, targetSuffix) {
+function selectBoardOption(boardId, boardName, targetSuffix, boardColor) {
   // 1. Asignar el ID al input oculto
   const hiddenInput = document.getElementById(`hiddenBoardId${targetSuffix}`);
   if (hiddenInput) {
@@ -485,7 +485,22 @@ function selectBoardOption(boardId, boardName, targetSuffix) {
     badgeDisplay.textContent = boardName;
   }
 
-  // 3. Cerrar el desplegable
+  // 3. Actualizar el DEGRADADO del icono bi-grid-fill al instante
+  const iconDisplay = document.getElementById(`boardBadgeIcon${targetSuffix}`);
+  if (iconDisplay) {
+    if (boardColor && boardColor.trim() !== '') {
+      // Degradado intenso para tableros con color propio (35% base + color-mix claro al final)
+      iconDisplay.style.background = `linear-gradient(135deg, ${boardColor} 0%, ${boardColor} 35%, color-mix(in srgb, ${boardColor} 10%, white) 100%)`;
+    } else {
+      // Degradado azul/morado por defecto (General)
+      iconDisplay.style.background = 'linear-gradient(135deg, #4f52f8 0%, #4f52f8 35%, #42C6F6 100%)';
+    }
+    iconDisplay.style.webkitBackgroundClip = 'text';
+    iconDisplay.style.webkitTextFillColor = 'transparent';
+    iconDisplay.style.setProperty('color', 'transparent', 'important');
+  }
+
+  // 4. Cerrar el desplegable
   const dropdownBtn = document.getElementById(`dropdownBoard${targetSuffix}`);
   if (dropdownBtn && typeof bootstrap !== "undefined") {
     const bsDropdown = bootstrap.Dropdown.getInstance(dropdownBtn);

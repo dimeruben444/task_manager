@@ -100,6 +100,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Al hacer clic directamente en la etiqueta de la estrella
                 label.addEventListener('click', () => {
                     input.checked = true;
+                    // Al seleccionar una estrella, quitamos el estado de error de su contenedor si lo tenía
+                    const container = label.closest('.star-rating');
+                    if (container) container.classList.remove('is-invalid');
+
                     updateLabel(type, input.value);
                     updateQuickTargetQuadrantDisplay();
                 });
@@ -119,7 +123,47 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     });
+
+    // =========================================================
+    // VALIDACIÓN Y SACUDIDA DE ESTRELLAS AL ENVIAR FORMULARIO RÁPIDO
+    // =========================================================
+    const quickForm = document.getElementById('quickTaskForm');
+    if (quickForm) {
+        quickForm.addEventListener('submit', function (e) {
+            const selectedUrgency = quickForm.querySelector('input[name="urgency"]:checked');
+            const selectedImportance = quickForm.querySelector('input[name="importance"]:checked');
+
+            let hasError = false;
+
+            if (!selectedUrgency || !selectedImportance) {
+                hasError = true;
+
+                // Buscar los contenedores de urgencia e importancia
+                const starContainers = quickForm.querySelectorAll('.star-rating');
+                starContainers.forEach(container => {
+                    const hasSelection = container.querySelector('input:checked');
+                    if (!hasSelection) {
+                        container.classList.remove('is-invalid');
+                        void container.offsetWidth; // Forzar reflow para reiniciar la animación
+                        container.classList.add('is-invalid');
+
+                        // Retiramos la clase a los 200ms para coincidir con la animación rápida
+                        setTimeout(() => {
+                            container.classList.remove('is-invalid');
+                        }, 200);
+                    }
+                });
+            }
+
+            if (hasError) {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            }
+        });
+    }
 });
+
 
 // 2. FUNCIONES DE FORMULARIOS INLINE Y UTILS
 function showInlineForm(button) {
@@ -236,11 +280,21 @@ function sendToggleRequest(taskId, isCompleted, checkbox) {
                     const urgency = card.dataset.urgency || "4";
                     const importance = card.dataset.importance || "4";
 
+                    // Extraer atributos de metadatos para preservarlos
+                    const dueDate = card.dataset.dueDate || "";
+                    const hasDescription = card.dataset.hasDescription || "false";
+                    const isShared = card.dataset.isShared || "false";
+
                     const completedItem = document.createElement('div');
                     completedItem.className = 'completed-task-item task-card card border-0 shadow-sm mb-2 p-2 d-flex flex-row align-items-center justify-content-between gap-2 bg-light';
                     completedItem.setAttribute('data-task-id', taskId);
                     completedItem.setAttribute('data-urgency', urgency);
                     completedItem.setAttribute('data-importance', importance);
+                    
+                    // Guardar metadatos en el dataset del elemento completado
+                    if (dueDate) completedItem.setAttribute('data-due-date', dueDate);
+                    if (hasDescription === 'true') completedItem.setAttribute('data-has-description', 'true');
+                    if (isShared === 'true') completedItem.setAttribute('data-is-shared', 'true');
 
                     completedItem.innerHTML = `
                         <div class="d-flex align-items-center gap-2 flex-grow-1 min-w-0" style="overflow: hidden;">
@@ -301,6 +355,50 @@ function sendToggleRequest(taskId, isCompleted, checkbox) {
                                    || card.querySelector('span')?.textContent.trim() 
                                    || card.textContent.trim();
 
+                    // Leer metadatos guardados en la tarjeta
+                    const dueDate = card.dataset.dueDate || "";
+                    const hasDescription = card.dataset.hasDescription === 'true';
+                    const isShared = card.dataset.isShared === 'true';
+
+                    // Construcción dinámica del bloque HTML de metadatos
+                    let metadataHtml = '';
+                    if (dueDate || hasDescription || isShared) {
+                        let dateBadge = '';
+                        if (dueDate) {
+                            dateBadge = `
+                                <span class="badge border d-inline-flex align-items-center gap-1 px-1.5 py-0.5 rounded-md task-date-badge" 
+                                      style="font-size: 0.65rem; background-color: #FFE4E6 !important; color: #dc2626 !important; border-color: #fecdd3 !important;">
+                                    <i class="bi bi-calendar3" style="color: #dc2626 !important;"></i>
+                                    ${dueDate}
+                                </span>`;
+                        }
+
+                        let descBadge = '';
+                        if (hasDescription) {
+                            descBadge = `
+                                <span class="badge text-secondary px-1.5 py-0.5 rounded-md" title="Tiene descripción" style="font-size: 0.98rem;">
+                                    <i class="bi bi-card-text" style="color: #5cbcf3; !important"></i> 
+                                </span>`;
+                        }
+
+                        let sharedBadge = '';
+                        if (isShared) {
+                            sharedBadge = `
+                                <span class="badge text-warning px-1.5 py-0.5 rounded-md" title="Tarea compartida / asignada" style="font-size: 0.85rem;">
+                                    <i class="bi bi-people-fill" style="color: #fbbf24 !important;"></i>
+                                </span>`;
+                        }
+
+                        metadataHtml = `
+                            <div class="d-flex align-items-center justify-content-between text-muted mt-1" style="font-size: 0.7rem;" data-bs-toggle="modal" data-bs-target="#viewTaskModal${taskId}">
+                                <div class="d-flex align-items-center gap-1.5 flex-wrap">
+                                    ${dateBadge}
+                                    ${descBadge}
+                                    ${sharedBadge}
+                                </div>
+                            </div>`;
+                    }
+
                     // Obtenemos la posición de origen en el panel de completadas
                     const startRect = card.getBoundingClientRect();
 
@@ -310,6 +408,9 @@ function sendToggleRequest(taskId, isCompleted, checkbox) {
                     restoredCard.setAttribute('data-task-id', taskId);
                     restoredCard.setAttribute('data-urgency', card.dataset.urgency || "4");
                     restoredCard.setAttribute('data-importance', card.dataset.importance || "4");
+                    if (dueDate) restoredCard.setAttribute('data-due-date', dueDate);
+                    if (hasDescription) restoredCard.setAttribute('data-has-description', 'true');
+                    if (isShared) restoredCard.setAttribute('data-is-shared', 'true');
                     restoredCard.style.cursor = 'pointer';
 
                     restoredCard.innerHTML = `
@@ -330,6 +431,7 @@ function sendToggleRequest(taskId, isCompleted, checkbox) {
                                     <i class="bi bi-three-dots text-muted" style="font-size: 0.85rem; line-height: 1;"></i>
                                 </div>
                             </div>
+                            ${metadataHtml}
                         </div>
                     `;
 
@@ -849,7 +951,7 @@ window.addEventListener('wheel', function(e) {
         if (matrixSection) {
             matrixSection.scrollIntoView({ behavior: 'smooth' });
         } else {
-            window.scrollBy({ top: 234, behavior: 'smooth' });
+            window.scrollBy({ top: 314, behavior: 'smooth' });
         }
 
         // Liberamos el bloqueo solo cuando termina la animación (aprox. 600-800ms)

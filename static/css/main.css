@@ -67,20 +67,35 @@
   animation: shakeStars 0.3s ease-in-out;
 }
 
+/* Animación de sacudida rápida (0.2s) */
 @keyframes shakeStars {
   0%, 100% {
     transform: translateX(0);
   }
-  25% {
+  20% {
+    transform: translateX(-6px);
+  }
+  40% {
+    transform: translateX(6px);
+  }
+  60% {
     transform: translateX(-4px);
   }
-  75% {
+  80% {
     transform: translateX(4px);
   }
 }
-.star-rating.is-invalid label {
+/* Fuerza el color rojo en todas las estrellas y aplica la animación rápida */
+.urgency-box .star-rating.is-invalid label,
+.urgency-box .star-rating.is-invalid label i {
   color: #dc2626 !important;
-  animation: shakeStars 0.3s ease-in-out;
+  animation: shakeStars 0.2s ease-in-out;
+}
+
+.importance-box .star-rating.is-invalid label,
+.importance-box .star-rating.is-invalid label i {
+  color: #dc2626 !important;
+  animation: shakeStars 0.2s ease-in-out;
 }
 
 .quadrant {
@@ -426,7 +441,7 @@
 }
 
 :root {
-  --bg-app: #f8fafc;
+  --bg-app: #F1F5FA;
   --bg-surface: #ffffff;
   --bg-surface-subtle: #f8fafc;
   --border-light: #f1f5f9;
@@ -513,7 +528,7 @@ body,
 }
 
 .quadrant {
-  background-color: #f1f5f9 !important;
+  background-color: #EAEEF5 !important;
   border: 1px solid var(--border-default) !important;
   border-radius: 16px !important;
   padding: 1.15rem !important; /* Padding equilibrado para que quepan los botones in-line */
@@ -944,11 +959,12 @@ html {
 /* Contenedor de la barra lateral izquierda (Tableros y Distribución) */
 .sidebar-boards {
   position: sticky;
-  top: 84px;
-  height: calc(100vh - 24px);
+  top: 78px;
+  height: calc(100vh - 100px);
   margin-top: 8px;
   border-radius: 16px;
   overflow-y: auto;
+  margin-top: 0;
 }
 
 /*# sourceMappingURL=main.css.map */

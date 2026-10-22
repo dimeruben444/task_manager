@@ -6,8 +6,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}{% translate "Gestor de Tareas Eisenhower" %}{% endblock %}</title>
+    <title>{% block title %}{% translate "EisenhowerFlow" %}{% endblock %}</title>
 
+    <!-- FAVICON SVG ESCALABLE -->
+    <link rel="icon" type="image/svg+xml" sizes="any" href="{% static 'img/eisenhowerFlow.svg' %}">
+
+    <!-- ICONO DE ALTA RESOLUCIÓN / DISPOSITIVOS APPLE -->
+    <link rel="apple-touch-icon" href="{% static 'img/eisenhowerFlow.svg' %}">
     <!-- Bootstrap 5 CSS e Iconos -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
@@ -26,7 +31,7 @@
             <!-- BRANDING Y LOGO (IZQUIERDA) -->
             <div class="navbar-brand-wrapper d-flex align-items-center gap-2">
                 <a href="{% url 'dashboard' %}" class="text-decoration-none d-flex align-items-center gap-2">
-                    <img src="{% static 'img/eisenhowerFlow.svg' %}" alt="Logo" style="height: 36px; width: auto; margin-top: 6px;">
+                    <img src="{% static 'img/eisenhowerFlow.svg' %}" alt="Logo" style="height: 30px; width: auto;">
                     <h1 class="brand-title m-0">
                         Eisenhower<span class="brand-accent">Flow</span>
                     </h1>
@@ -73,7 +78,7 @@
 
                             <span class="fw-semibold small text-white d-none d-sm-inline">
                                 {{ user.username }}
-                            </span>
+                            </span>▽
                         </button>
                         
                         <!-- MENÚ DESPLEGABLE DE MI CUENTA -->
@@ -146,33 +151,84 @@
                 <div class="boards-stack flex-grow-1 overflow-auto">
                     <!-- ENLACE GENERAL -->
                     <a href="{% url 'dashboard' %}" 
-                       class="board-chip d-block text-decoration-none mb-1 p-2 rounded small {% if not current_board %}active{% endif %}">
-                        <i class="bi bi-grid-fill" style="color: #42C6F6 !important;"></i> {% translate "General" %}
+                    class="board-chip d-flex text-decoration-none mb-1 p-2 gap-2 rounded small {% if not current_board %}active{% endif %}">
+                        <i class="bi bi-grid-fill flex-shrink-0" 
+                        style="background: linear-gradient(135deg, #6722fb 0%, #5f6cf7 35%, #42C6F6 100%);
+                                -webkit-background-clip: text;
+                                -webkit-text-fill-color: transparent;
+                                color: transparent !important;
+                                font-size: 0.9rem;
+                                display: inline-block;"></i> {% translate "General" %}
                     </a>
 
                     <!-- TABLEROS PROPIOS -->
                     {% for b in boards %}
                         {% if not b.is_default %}
                             <div class="board-item d-flex align-items-center justify-content-between mb-1 p-2 rounded {% if current_board.id == b.id %}active{% endif %}"
-                                 style="--board-color: {{ b.color|default:'#6c757d' }};">
+                                style="--board-color: {{ b.color|default:'#6c757d' }};">
                                 
                                 <a href="{% url 'dashboard_board' b.id %}" 
-                                   class="text-decoration-none text-truncate flex-grow-1 d-flex align-items-center gap-2 small" style="color: inherit;">
-                                    <i class="bi bi-grid-fill flex-shrink-0" style="color: var(--board-color) !important; font-size: 0.9rem;"></i>
+                                class="text-decoration-none text-truncate flex-grow-1 d-flex align-items-center gap-2 small" style="color: inherit;">
+                                    <i class="bi bi-grid-fill flex-shrink-0" 
+                                        style="background: linear-gradient(135deg, var(--board-color) 0%, var(--board-color) 35%, color-mix(in srgb, var(--board-color) 10%, white) 100%);
+                                                -webkit-background-clip: text;
+                                                -webkit-text-fill-color: transparent;
+                                                color: transparent !important;
+                                                font-size: 0.9rem;
+                                                display: inline-block;"></i>
                                     <span class="board-title text-truncate">{{ b.title }}</span>
                                 </a>
 
-                                <button type="button" 
-                                        class="btn btn-sm p-0 border-0 shadow-none text-muted opacity-50 hover-opacity-100 ms-1" 
-                                        data-bs-toggle="modal" 
-                                        data-bs-target="#editBoardModalSidebar{{ b.id }}"
-                                        title="{% translate 'Editar tablero' %}"
-                                        style="font-size: 0.75rem;">
-                                    •••
-                                </button>
+                                <div class="d-flex align-items-center gap-1">
+                                    <!-- MODIFICADO: Muestra el icono si el tablero tiene miembros asociados (para el creador) O si no es el propietario (para los invitados) -->
+                                    {% if b.members.exists or b.owner != request.user %}
+                                        <i class="bi bi-people-fill" style="color: #fbbf24 !important; font-size: 0.85rem;" title="{% translate 'Tablero compartido' %}"></i>
+                                    {% endif %}
+
+                                    <button type="button" 
+                                            class="btn btn-sm p-0 border-0 shadow-none text-muted opacity-50 hover-opacity-100 ms-1" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#editBoardModalSidebar{{ b.id }}"
+                                            title="{% translate 'Editar tablero' %}"
+                                            style="font-size: 0.75rem;">
+                                        •••
+                                    </button>
+                                </div>
                             </div>
                         {% endif %}
                     {% endfor %}
+
+                    <!-- TABLEROS COMPARTIDOS (Por si los listas por separado en la variable shared_boards) -->
+                    {% if shared_boards %}
+                        {% for sb in shared_boards %}
+                            <div class="board-item d-flex align-items-center justify-content-between mb-1 p-2 rounded {% if current_board.id == sb.id %}active{% endif %}"
+                                style="--board-color: {{ sb.color|default:'#6c757d' }};">
+                                
+                                <a href="{% url 'dashboard_board' sb.id %}" 
+                                class="text-decoration-none text-truncate flex-grow-1 d-flex align-items-center gap-2 small" style="color: inherit;">
+                                    <i class="bi bi-grid-fill flex-shrink-0" style="color: var(--board-color) !important; font-size: 0.9rem;"></i>
+                                    <span class="board-title text-truncate">{{ sb.title }}</span>
+                                </a>
+
+                                <div class="d-flex align-items-center gap-1">
+                                    <!-- Icono de compartido para tableros externos -->
+                                    {% if b.members.exists or b.owner != request.user %}
+                                        <i class="bi bi-people-fill" style="color: #fbbf24 !important; font-size: 0.85rem;" title="{% translate 'Tablero compartido' %}"></i>
+                                    {% endif %}
+                                    {% if b.owner == request.user %}
+                                        <button type="button" 
+                                                class="btn btn-sm p-0 border-0 shadow-none text-muted opacity-50 hover-opacity-100 ms-1" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#editBoardModalSidebar{{ sb.id }}"
+                                                title="{% translate 'Editar tablero' %}"
+                                                style="font-size: 0.75rem;">
+                                            •••
+                                        </button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
 
                     <button class="btn btn-outline-secondary btn-sm mt-2 w-100" data-bs-toggle="modal" data-bs-target="#createBoardModal">
                         + {% translate "Nuevo Tablero" %}
@@ -270,7 +326,27 @@
                                             <label class="form-label small">{% translate "Descripción" %}</label>
                                             <textarea name="description" class="form-control" rows="3">{{ b.description|default:'' }}</textarea>
                                         </div>
+
+                                        <!-- NUEVO: SECCIÓN PARA COMPARTIR CON MIEMBROS -->
+                                        <div class="mb-3">
+                                            <label class="form-label small fw-bold">{% translate "Compartir con miembros" %}</label>
+                                            <div class="border rounded-3 p-2 bg-light" style="max-height: 140px; overflow-y: auto;">
+                                                {% for u in users %}
+                                                    {% if u != request.user %}
+                                                        <div class="form-check">
+                                                            <!-- Comprobamos si el usuario ya es miembro de este tablero para marcarlo por defecto -->
+                                                            <input class="form-check-input" type="checkbox" name="members" value="{{ u.id }}" id="board-member-{{ b.id }}-{{ u.id }}"
+                                                                {% if u in b.members.all %}checked{% endif %}>
+                                                            <label class="form-check-label small text-dark" for="board-member-{{ b.id }}-{{ u.id }}">
+                                                                {{ u.get_full_name|default:u.username }}
+                                                            </label>
+                                                        </div>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </div>
+                                        </div>
                                     </div>
+                                    
                                     <div class="modal-footer justify-content-between">
                                         <button type="submit" 
                                                 formaction="{% url 'delete_board' b.id %}" 
