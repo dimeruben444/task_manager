@@ -81,45 +81,99 @@
                         </button>
                         
                         <!-- MENÚ DESPLEGABLE DE NOTIFICACIONES -->
-                        <div class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-3 p-3 mt-2" 
+                        <div class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-4 p-3 mt-2" 
                             aria-labelledby="notificationsDropdown" 
-                            style="min-width: 300px; max-width: 350px; z-index: 2060;">
+                            style="min-width: 320px; max-width: 360px; z-index: 2060;">
                             
-                            <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div class="d-flex justify-content-between align-items-center mb-2 px-1">
                                 <span class="text-uppercase text-muted fw-bold" style="font-size: 0.7rem; letter-spacing: 0.5px;">
                                     {% translate "NOTIFICACIONES" %}
                                 </span>
                                 {% if unread_notifications_count > 0 %}
-                                    <span class="badge bg-danger rounded-pill small">{{ unread_notifications_count }} nueva{% if unread_notifications_count > 1 %}s{% endif %}</span>
+                                    <span class="badge bg-danger rounded-pill px-2 py-1 small fw-bold">
+                                        {{ unread_notifications_count }} {% translate "nueva" %}{% if unread_notifications_count > 1 %}s{% endif %}
+                                    </span>
                                 {% endif %}
                             </div>
 
                             <hr class="my-2 text-muted opacity-25">
 
-                            <div class="notifications-list" style="max-height: 320px; overflow-y: auto;">
+                            <div class="notifications-list pe-1" style="max-height: 340px; overflow-y: auto;">
                                 {% for notif in notifications_list %}
-                                    <div class="p-2 mb-2 rounded bg-light border-start border-3 {% if notif.notification_type == 'invitation' %}border-primary{% else %}border-info{% endif %}">
-                                        <div class="d-flex align-items-center mb-1">
-                                            <strong class="me-auto small text-dark">{{ notif.actor.username }}</strong>
-                                            <small class="text-muted" style="font-size: 0.7rem;">{{ notif.created_at|timesince }}</small>
-                                        </div>
-                                        <p class="mb-1 small text-secondary" style="line-height: 1.3;">{{ notif.verb }}</p>
+                                    <div class="p-3 mb-2 rounded-3 bg-light border-start border-4 position-relative"
+                                        style="{% if notif.notification_type == 'invitation' %}border-left-color: #6466F1 !important;
+                                            {% elif notif.notification_type == 'task_assigned' %}border-left-color: #fbbf24 !important;
+                                            {% elif notif.notification_type == 'task_updated' %}border-left-color: #42C6F6 !important;
+                                            {% else %}border-left-color: #6b7280 !important;{% endif %}">
+                                        
+                                        <!-- BOTÓN 'X' PARA BORRAR / DESCARTAR (SÓLO SI NO ES ACEPTAR/RECHAZAR) -->
+                                        {% if notif.notification_type != 'invitation' %}
+                                            <form method="POST" action="{% url 'delete_notification' notif.id %}" class="position-absolute top-0 end-0 mt-2 me-2">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn-close btn-sm p-1" style="font-size: 0.65rem;" title="{% translate 'Descartar notificación' %}"></button>
+                                            </form>
+                                        {% endif %}
 
+                                        <!-- CABECERA: ICONO PERSONALIZADO + USUARIO + TIEMPO -->
+                                        <div class="d-flex align-items-center gap-2 mb-1 pe-3">
+                                            <span class="d-inline-flex align-items-center justify-content-center rounded-circle flex-shrink-0" 
+                                                style="width: 24px; height: 24px; font-size: 0.8rem;
+                                                {% if notif.notification_type == 'invitation' %}background-color: #dfdff5; color: #6466F1;
+                                                {% elif notif.notification_type == 'task_assigned' %}background-color: #fef3c7; color: #d97706;
+                                                {% elif notif.notification_type == 'task_updated' %}background-color: #ddecf1; color: #42C6F6;
+                                                {% else %}background-color: #f3f4f6; color: #4b5563;{% endif %}">
+                                                
+                                                {% if notif.notification_type == 'invitation' %}
+                                                    <i class="bi bi-kanban" style="color: #6466F1 !important; transform: rotate(-90deg); display: inline-block;"></i>
+                                                {% elif notif.notification_type == 'task_assigned' %}
+                                                    <i class="bi bi-people-fill" style="color: #d97706 !important; font-size: 0.85rem;" title="{% translate 'Tablero compartido' %}"></i>
+                                                {% elif notif.notification_type == 'task_updated' %}
+                                                    <i class="bi bi-card-text" style="color: #5cbcf3 !important;"></i>
+                                                {% elif notif.notification_type == 'mention' %}
+                                                    <i class="bi bi-chat-quote-fill"></i>
+                                                {% else %}
+                                                    <i class="bi bi-bell-fill"></i>
+                                                {% endif %}
+                                            </span>
+
+                                            <strong class="me-auto small text-dark fw-bold" style="font-size: 0.85rem;">
+                                                {{ notif.actor.username }}
+                                            </strong>
+                                            
+                                            <small class="text-muted" style="font-size: 0.72rem;">
+                                                {{ notif.created_at|timesince }}
+                                            </small>
+                                        </div>
+
+                                        <!-- MENSAJE DE LA NOTIFICACIÓN -->
+                                        <p class="mb-2 small text-secondary fw-medium" style="line-height: 1.35; font-size: 0.82rem;">
+                                            {{ notif.verb }}
+                                        </p>
+
+                                        <!-- BOTONES DE ACCIÓN SEGÚN EL TIPO -->
                                         {% if notif.notification_type == 'invitation' and notif.invitation %}
                                             <div class="d-flex gap-2 mt-2">
-                                                <a href="{% url 'accept_invitation' notif.invitation.id %}" class="btn btn-sm btn-success flex-fill py-1" style="font-size: 0.75rem;">
-                                                    <i class="bi bi-check-lg"></i> Aceptar
+                                                <a href="{% url 'accept_invitation' notif.invitation.id %}" class="btn btn-sm btn-success flex-fill py-1 rounded-3 fw-bold shadow-sm d-inline-flex align-items-center justify-content-center gap-1" style="font-size: 0.78rem;">
+                                                    <i class="bi bi-check-lg"></i> {% translate "Aceptar" %}
                                                 </a>
-                                                <a href="{% url 'reject_invitation' notif.invitation.id %}" class="btn btn-sm btn-outline-danger flex-fill py-1" style="font-size: 0.75rem;">
-                                                    <i class="bi bi-x-lg"></i> Rechazar
+                                                <a href="{% url 'reject_invitation' notif.invitation.id %}" class="btn btn-sm btn-outline-danger flex-fill py-1 rounded-3 fw-semibold d-inline-flex align-items-center justify-content-center gap-1" style="font-size: 0.78rem;">
+                                                    <i class="bi bi-x-lg"></i> {% translate "Rechazar" %}
                                                 </a>
                                             </div>
+                                        {% elif notif.target_board %}
+                                            <a href="{% url 'dashboard_board' notif.target_board.id %}" class="btn btn-sm btn-outline-primary w-100 mt-2 py-1 rounded-3 fw-semibold d-inline-flex align-items-center justify-content-center gap-1" style="font-size: 0.78rem;">
+                                                <i class="bi bi-kanban"></i> {% translate "Ver en el tablero" %}
+                                            </a>
+                                        {% elif notif.target_task %}
+                                            <a href="{% url 'dashboard' %}" class="btn btn-sm btn-outline-primary w-100 mt-2 py-1 rounded-3 fw-semibold d-inline-flex align-items-center justify-content-center gap-1" style="font-size: 0.78rem;">
+                                                <i class="bi bi-grid-fill"></i> {% translate "Ver en General" %}
+                                            </a>
                                         {% endif %}
                                     </div>
                                 {% empty %}
-                                    <div class="text-center text-muted small py-3">
-                                        <i class="bi bi-bell-slash d-block fs-4 mb-1 text-secondary"></i>
-                                        No tienes notificaciones pendientes.
+                                    <div class="text-center text-muted small py-4">
+                                        <i class="bi bi-bell-slash d-block fs-4 mb-1 text-secondary opacity-50"></i>
+                                        {% translate "No tienes notificaciones pendientes." %}
                                     </div>
                                 {% endfor %}
                             </div>
@@ -217,42 +271,81 @@
                     <span class="text-muted fw-bold small text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.05em;">{% translate "Tableros" %}</span>
                 </div>
                 
-                <div class="boards-stack flex-grow-1 overflow-auto">
-                    <!-- ENLACE GENERAL -->
-                    <a href="{% url 'dashboard' %}" 
-                    class="board-chip d-flex text-decoration-none mb-1 p-2 gap-2 rounded small {% if not current_board %}active{% endif %}">
-                        <i class="bi bi-grid-fill flex-shrink-0" 
-                        style="background: linear-gradient(135deg, #6722fb 0%, #5f6cf7 35%, #42C6F6 100%);
-                                -webkit-background-clip: text;
-                                -webkit-text-fill-color: transparent;
-                                color: transparent !important;
-                                font-size: 0.9rem;
-                                display: inline-block;"></i> {% translate "General" %}
-                    </a>
+            
+            <div class="boards-stack flex-grow-1 overflow-auto">
+                <!-- ENLACE GENERAL -->
+                <a href="{% url 'dashboard' %}" 
+                class="board-chip d-flex text-decoration-none mb-1 p-2 gap-2 rounded small {% if not current_board %}active{% endif %}">
+                    <i class="bi bi-grid-fill flex-shrink-0" 
+                    style="background: linear-gradient(135deg, #6722fb 0%, #5f6cf7 35%, #42C6F6 100%);
+                            -webkit-background-clip: text;
+                            -webkit-text-fill-color: transparent;
+                            color: transparent !important;
+                            font-size: 0.9rem;
+                            display: inline-block;"></i> {% translate "General" %}
+                </a>
 
-                    <!-- TABLEROS PROPIOS -->
-                    {% for b in boards %}
-                        {% if not b.is_default %}
+                <!-- 1. TABLEROS PERSONALES (Creados por ti y sin miembros) -->
+                {% for b in boards %}
+                    {% if not b.is_default and b.owner == request.user and not b.members.exists %}
+                        <div class="board-item d-flex align-items-center justify-content-between mb-1 p-2 rounded {% if current_board.id == b.id %}active{% endif %}"
+                            style="--board-color: {{ b.color|default:'#6c757d' }};">
+                            
+                            <a href="{% url 'dashboard_board' b.id %}" 
+                            class="text-decoration-none text-truncate flex-grow-1 d-flex align-items-center gap-2 small" style="color: inherit;">
+                                <i class="bi bi-grid-fill flex-shrink-0" 
+                                style="background: linear-gradient(135deg, var(--board-color) 0%, var(--board-color) 35%, color-mix(in srgb, var(--board-color) 10%, white) 100%);
+                                        -webkit-background-clip: text;
+                                        -webkit-text-fill-color: transparent;
+                                        color: transparent !important;
+                                        font-size: 0.9rem;
+                                        display: inline-block;"></i>
+                                <span class="board-title text-truncate">{{ b.title }}</span>
+                            </a>
+
+                            <div class="d-flex align-items-center gap-1">
+                                <button type="button" 
+                                        class="btn btn-sm p-0 border-0 shadow-none text-muted opacity-50 hover-opacity-100 ms-1" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#editBoardModalSidebar{{ b.id }}"
+                                        title="{% translate 'Editar tablero' %}"
+                                        style="font-size: 0.75rem;">
+                                    •••
+                                </button>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+
+                {% if has_shared_boards %}
+                    <hr class="my-2  border-0 opacity-100 mx-auto" style="height: 2px; width: 70%; background-color: #fbecae;">
+                {% endif %}
+
+                <!-- 2. TABLEROS COMPARTIDOS (Tienen miembros o fuiste invitado) -->
+                {% for b in boards %}
+                    {% if not b.is_default %}
+                        {% if b.owner != request.user or b.members.exists %}
+                            {% if forloop.first %}
+                                <hr class="my-2 border-0 opacity-100" style="height: 2px; background-color: #FBBF24;">
+                            {% endif %}
+
                             <div class="board-item d-flex align-items-center justify-content-between mb-1 p-2 rounded {% if current_board.id == b.id %}active{% endif %}"
                                 style="--board-color: {{ b.color|default:'#6c757d' }};">
                                 
                                 <a href="{% url 'dashboard_board' b.id %}" 
                                 class="text-decoration-none text-truncate flex-grow-1 d-flex align-items-center gap-2 small" style="color: inherit;">
                                     <i class="bi bi-grid-fill flex-shrink-0" 
-                                        style="background: linear-gradient(135deg, var(--board-color) 0%, var(--board-color) 35%, color-mix(in srgb, var(--board-color) 10%, white) 100%);
-                                                -webkit-background-clip: text;
-                                                -webkit-text-fill-color: transparent;
-                                                color: transparent !important;
-                                                font-size: 0.9rem;
-                                                display: inline-block;"></i>
+                                    style="background: linear-gradient(135deg, var(--board-color) 0%, var(--board-color) 35%, color-mix(in srgb, var(--board-color) 10%, white) 100%);
+                                            -webkit-background-clip: text;
+                                            -webkit-text-fill-color: transparent;
+                                            color: transparent !important;
+                                            font-size: 0.9rem;
+                                            display: inline-block;"></i>
                                     <span class="board-title text-truncate">{{ b.title }}</span>
                                 </a>
 
                                 <div class="d-flex align-items-center gap-1">
-                                    <!-- MODIFICADO: Muestra el icono si el tablero tiene miembros asociados (para el creador) O si no es el propietario (para los invitados) -->
-                                    {% if b.members.exists or b.owner != request.user %}
-                                        <i class="bi bi-people-fill" style="color: #fbbf24 !important; font-size: 0.85rem;" title="{% translate 'Tablero compartido' %}"></i>
-                                    {% endif %}
+                                    <i class="bi bi-people-fill" style="color: #fbbf24 !important; font-size: 0.85rem;" title="{% translate 'Tablero compartido' %}"></i>
 
                                     <button type="button" 
                                             class="btn btn-sm p-0 border-0 shadow-none text-muted opacity-50 hover-opacity-100 ms-1" 
@@ -265,100 +358,71 @@
                                 </div>
                             </div>
                         {% endif %}
-                    {% endfor %}
-
-                    <!-- TABLEROS COMPARTIDOS (Por si los listas por separado en la variable shared_boards) -->
-                    {% if shared_boards %}
-                        {% for sb in shared_boards %}
-                            <div class="board-item d-flex align-items-center justify-content-between mb-1 p-2 rounded {% if current_board.id == sb.id %}active{% endif %}"
-                                style="--board-color: {{ sb.color|default:'#6c757d' }};">
-                                
-                                <a href="{% url 'dashboard_board' sb.id %}" 
-                                class="text-decoration-none text-truncate flex-grow-1 d-flex align-items-center gap-2 small" style="color: inherit;">
-                                    <i class="bi bi-grid-fill flex-shrink-0" style="color: var(--board-color) !important; font-size: 0.9rem;"></i>
-                                    <span class="board-title text-truncate">{{ sb.title }}</span>
-                                </a>
-
-                                <div class="d-flex align-items-center gap-1">
-                                    <!-- Icono de compartido para tableros externos -->
-                                    {% if b.members.exists or b.owner != request.user %}
-                                        <i class="bi bi-people-fill" style="color: #fbbf24 !important; font-size: 0.85rem;" title="{% translate 'Tablero compartido' %}"></i>
-                                    {% endif %}
-                                    {% if b.owner == request.user %}
-                                        <button type="button" 
-                                                class="btn btn-sm p-0 border-0 shadow-none text-muted opacity-50 hover-opacity-100 ms-1" 
-                                                data-bs-toggle="modal" 
-                                                data-bs-target="#editBoardModalSidebar{{ sb.id }}"
-                                                title="{% translate 'Editar tablero' %}"
-                                                style="font-size: 0.75rem;">
-                                            •••
-                                        </button>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        {% endfor %}
                     {% endif %}
+                {% endfor %}
 
-                    <button class="btn btn-outline-secondary btn-sm mt-2 w-100" data-bs-toggle="modal" data-bs-target="#createBoardModal">
-                        + {% translate "Nuevo Tablero" %}
-                    </button>
 
-                    <hr class="my-3 text-muted opacity-25">
+                <!-- BOTÓN NUEVO TABLERO -->
+                <button class="btn btn-outline-secondary btn-sm mt-2 w-100" data-bs-toggle="modal" data-bs-target="#createBoardModal">
+                    + {% translate "Nuevo Tablero" %}
+                </button>
 
-                    <!-- BLOQUE DISTRIBUCIÓN ACTUAL -->
-                    <div class="px-1 mt-2">
-                        <small class="text-uppercase fw-bold text-muted d-block mb-2" style="font-size: 0.72rem; letter-spacing: 0.05em;">
-                            {% translate "DISTRIBUCIÓN ACTUAL" %}
-                        </small>
+                <hr class="my-3 text-muted opacity-25">
 
-                        <div class="bg-light p-3 rounded-4 border border-light-subtle shadow-sm">
-                            <div class="d-flex flex-column gap-2">
-                                
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="d-flex align-items-center gap-2">
-                                        <span class="d-inline-block flex-shrink-0" style="width: 8px; height: 8px; background-color: #ef4444; border-radius: 2px;"></span>
-                                        <span class="fw-semibold text-secondary" style="font-size: 0.82rem;">Q1 (Hacer)</span>
-                                    </div>
-                                    <span class="fw-bold text-dark" style="font-size: 0.82rem;" id="sidebar-q1-count">
-                                        {{ q1_count|default:0 }} {% if q1_count == 1 %}tarea{% else %}tareas{% endif %}
-                                    </span>
+                <!-- BLOQUE DISTRIBUCIÓN ACTUAL -->
+                <div class="px-1 mt-2">
+                    <small class="text-uppercase fw-bold text-muted d-block mb-2" style="font-size: 0.72rem; letter-spacing: 0.05em;">
+                        {% translate "DISTRIBUCIÓN ACTUAL" %}
+                    </small>
+
+                    <div class="bg-light p-3 rounded-4 border border-light-subtle shadow-sm">
+                        <div class="d-flex flex-column gap-2">
+                            
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="d-inline-block flex-shrink-0" style="width: 8px; height: 8px; background-color: #ef4444; border-radius: 2px;"></span>
+                                    <span class="fw-semibold text-secondary" style="font-size: 0.82rem;">Q1 (Hacer)</span>
                                 </div>
-
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="d-flex align-items-center gap-2">
-                                        <span class="d-inline-block flex-shrink-0" style="width: 8px; height: 8px; background-color: #3b82f6; border-radius: 2px;"></span>
-                                        <span class="fw-semibold text-secondary" style="font-size: 0.82rem;">Q2 (Planificar)</span>
-                                    </div>
-                                    <span class="fw-bold text-dark" style="font-size: 0.82rem;" id="sidebar-q2-count">
-                                        {{ q2_count|default:0 }} {% if q2_count == 1 %}tarea{% else %}tareas{% endif %}
-                                    </span>
-                                </div>
-
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="d-flex align-items-center gap-2">
-                                        <span class="d-inline-block flex-shrink-0" style="width: 8px; height: 8px; background-color: #f59e0b; border-radius: 2px;"></span>
-                                        <span class="fw-semibold text-secondary" style="font-size: 0.82rem;">Q3 (Delegar)</span>
-                                    </div>
-                                    <span class="fw-bold text-dark" style="font-size: 0.82rem;" id="sidebar-q3-count">
-                                        {{ q3_count|default:0 }} {% if q3_count == 1 %}tarea{% else %}tareas{% endif %}
-                                    </span>
-                                </div>
-
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="d-flex align-items-center gap-2">
-                                        <span class="d-inline-block flex-shrink-0" style="width: 8px; height: 8px; background-color: #9ca3af; border-radius: 2px;"></span>
-                                        <span class="fw-semibold text-secondary" style="font-size: 0.82rem;">Q4 (Eliminar)</span>
-                                    </div>
-                                    <span class="fw-bold text-dark" style="font-size: 0.82rem;" id="sidebar-q4-count">
-                                        {{ q4_count|default:0 }} {% if q4_count == 1 %}tarea{% else %}tareas{% endif %}
-                                    </span>
-                                </div>
-
+                                <span class="fw-bold text-dark" style="font-size: 0.82rem;" id="sidebar-q1-count">
+                                    {{ q1_count|default:0 }} {% if q1_count == 1 %}{% translate "tarea" %}{% else %}{% translate "tareas" %}{% endif %}
+                                </span>
                             </div>
+
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="d-inline-block flex-shrink-0" style="width: 8px; height: 8px; background-color: #3b82f6; border-radius: 2px;"></span>
+                                    <span class="fw-semibold text-secondary" style="font-size: 0.82rem;">Q2 (Planificar)</span>
+                                </div>
+                                <span class="fw-bold text-dark" style="font-size: 0.82rem;" id="sidebar-q2-count">
+                                    {{ q2_count|default:0 }} {% if q2_count == 1 %}{% translate "tarea" %}{% else %}{% translate "tareas" %}{% endif %}
+                                </span>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="d-inline-block flex-shrink-0" style="width: 8px; height: 8px; background-color: #f59e0b; border-radius: 2px;"></span>
+                                    <span class="fw-semibold text-secondary" style="font-size: 0.82rem;">Q3 (Delegar)</span>
+                                </div>
+                                <span class="fw-bold text-dark" style="font-size: 0.82rem;" id="sidebar-q3-count">
+                                    {{ q3_count|default:0 }} {% if q3_count == 1 %}{% translate "tarea" %}{% else %}{% translate "tareas" %}{% endif %}
+                                </span>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="d-inline-block flex-shrink-0" style="width: 8px; height: 8px; background-color: #9ca3af; border-radius: 2px;"></span>
+                                    <span class="fw-semibold text-secondary" style="font-size: 0.82rem;">Q4 (Eliminar)</span>
+                                </div>
+                                <span class="fw-bold text-dark" style="font-size: 0.82rem;" id="sidebar-q4-count">
+                                    {{ q4_count|default:0 }} {% if q4_count == 1 %}{% translate "tarea" %}{% else %}{% translate "tareas" %}{% endif %}
+                                </span>
+                            </div>
+
                         </div>
                     </div>
-
                 </div>
+
+            </div>
             </aside>
 
             <!-- MODALES DE EDICIÓN Y GESTIÓN DE TABLERO -->
@@ -376,7 +440,7 @@
                                         <h5 class="modal-title fw-bold text-dark d-flex align-items-center gap-2">
                                             ⚙ {% translate "Ajustes del Tablero" %}: {{ b.title }}
                                         </h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{% translate 'Cerrar' %}"></button>
                                     </div>
 
                                     <div class="modal-body text-start px-4 py-3">
@@ -402,13 +466,13 @@
                                             </div>
                                             <div class="col-md-7">
                                                 <label class="form-label small fw-bold text-dark">{% translate "Descripción" %}</label>
-                                                <input type="text" name="description" value="{{ b.description|default:'' }}" class="form-control rounded-3" placeholder="Opcional">
+                                                <input type="text" name="description" value="{{ b.description|default:'' }}" class="form-control rounded-3" placeholder="{% translate 'Opcional' %}">
                                             </div>
                                         </div>
 
                                         <hr class="my-3 text-muted opacity-25">
 
-                                        <!-- SECCIÓN: INVITAR NUEVO MIEMBRO -->
+                                        <!-- SECCIÓN: INVITAR NUEVO MIEMBRO CON SUGERENCIAS AUTOMÁTICAS -->
                                         <div class="mb-3">
                                             <label class="form-label small fw-bold text-dark d-flex align-items-center gap-1">
                                                 <i class="bi bi-person-plus text-primary"></i> {% translate "Invitar a un nuevo miembro" %}
@@ -418,7 +482,9 @@
                                                 <input type="text" 
                                                     id="invite-input-{{ b.id }}" 
                                                     class="form-control form-control-sm rounded-start-3" 
-                                                    placeholder="Usuario o email exacto...">
+                                                    list="collaboratorsList-{{ b.id }}"
+                                                    placeholder="{% translate 'Escribe usuario, email o selecciona...' %}"
+                                                    autocomplete="off">
                                                 
                                                 <button type="button" 
                                                         class="btn btn-primary btn-sm rounded-end-3 px-3 fw-bold" 
@@ -426,8 +492,16 @@
                                                     {% translate "Enviar Invitación" %}
                                                 </button>
                                             </div>
+
+                                            <!-- DESPLEGABLE DE SUGERENCIAS AUTOMÁTICAS -->
+                                            <datalist id="collaboratorsList-{{ b.id }}">
+                                                {% for collaborator in frequent_collaborators %}
+                                                    <option value="{{ collaborator.username }}">{{ collaborator.get_full_name|default:collaborator.username }} ({{ collaborator.email }})</option>
+                                                {% endfor %}
+                                            </datalist>
+
                                             <small class="text-muted" style="font-size: 0.72rem;">
-                                                Le llegará una notificación inmediata a su campana para unirse.
+                                                {% translate "Le llegará una notificación inmediata para unirse." %}
                                             </small>
                                         </div>
 
@@ -444,7 +518,7 @@
                                                         </span>
                                                         <span class="small fw-semibold text-dark">{{ b.owner.get_full_name|default:b.owner.username }}</span>
                                                     </div>
-                                                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle" style="font-size: 0.65rem;">Propietario</span>
+                                                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle" style="font-size: 0.65rem;">{% translate "Propietario" %}</span>
                                                 </div>
 
                                                 <!-- Miembros del tablero -->
@@ -459,13 +533,13 @@
                                                         
                                                         {% if b.owner == request.user %}
                                                             <div class="form-check m-0">
-                                                                <input class="form-check-input" type="checkbox" name="members" value="{{ member.id }}" id="member-keep-{{ b.id }}-{{ member.id }}" checked title="Desmarca para quitar miembro">
+                                                                <input class="form-check-input" type="checkbox" name="members" value="{{ member.id }}" id="member-keep-{{ b.id }}-{{ member.id }}" checked title="{% translate 'Desmarca para quitar miembro' %}">
                                                             </div>
                                                         {% endif %}
                                                     </div>
                                                 {% empty %}
                                                     <div class="text-center text-muted small py-2" style="font-size: 0.78rem;">
-                                                        Sin miembros colaboradores adicionales.
+                                                        {% translate "Sin miembros colaboradores adicionales." %}
                                                     </div>
                                                 {% endfor %}
                                             </div>
@@ -479,7 +553,7 @@
                                             <button type="submit" 
                                                     formaction="{% url 'delete_board' b.id %}" 
                                                     class="btn btn-outline-danger btn-sm rounded-3"
-                                                    onclick="return confirm('¿Seguro que quieres eliminar el tablero {{ b.title }}?');">
+                                                    onclick="return confirm('{% translate '¿Seguro que quieres eliminar el tablero' %} {{ b.title }}?');">
                                                 {% translate "Eliminar Tablero" %}
                                             </button>
                                         {% else %}

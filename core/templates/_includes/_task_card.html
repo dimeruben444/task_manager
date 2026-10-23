@@ -604,11 +604,27 @@
 
                 <!-- PIE DEL MODAL -->
                 <div class="modal-footer border-top-0 px-4 pb-4 pt-2 d-flex justify-content-between align-items-center">
-                    <button type="button" 
-                            class="btn btn-outline-danger btn-sm rounded-pill px-3 py-1.5 fw-semibold"
-                            onclick="deleteTaskModal('{{ task.id }}', '{% url 'delete_task' task.id %}')">
-                        {% translate "Eliminar" %}
-                    </button>
+                    <!-- BOTÓN ELIMINAR EN EL MODAL DE TAREA -->
+                    {% if task.created_by == request.user or task.board.owner == request.user %}
+                        <!-- Para el Creador o Propietario del tablero: Botón de eliminar activo en rojo -->
+                        <form method="POST" action="{% url 'delete_task' task.id %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" 
+                                    class="btn btn-outline-danger btn-sm rounded-3 fw-semibold"
+                                    onclick="return confirm('{% translate "¿Seguro que quieres eliminar esta tarea?" %}');">
+                                <i class="bi bi-trash me-1"></i> {% translate "Eliminar Tarea" %}
+                            </button>
+                        </form>
+                    {% else %}
+                        <!-- Para Miembros/Invitados (Persona B): Botón desactivado y en gris -->
+                        <button type="button" 
+                                class="btn btn-outline-secondary btn-sm rounded-3 fw-semibold opacity-50" 
+                                disabled 
+                                style="cursor: not-allowed;" 
+                                title="{% translate 'Solo el creador o el propietario del tablero pueden eliminar esta tarea' %}">
+                            <i class="bi bi-trash me-1"></i> {% translate "Eliminar Tarea" %}
+                        </button>
+                    {% endif %}
                     
                     <div class="d-flex gap-2">
                         <button type="button" class="btn btn-light btn-sm rounded-pill px-3 py-1.5 fw-semibold text-secondary" data-bs-dismiss="modal">

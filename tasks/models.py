@@ -6,6 +6,11 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from datetime import timedelta
 from boards.models import Board
 
+from django.db.models.signals import m2m_changed
+from django.dispatch import receiver
+from boards.models import Notification
+from django.contrib.auth import get_user_model
+from django.db.models.signals import pre_save
 
 class Task(models.Model):
     QUADRANT_CHOICES = [
@@ -162,3 +167,70 @@ class Task(models.Model):
 
     def __str__(self):
         return f"[{self.quadrant}] {self.title}"
+
+
+User = get_user_model()
+
+@receiver(m2m_changed, sender=Task.assigned_to.through)
+def notify_task_assignment(sender, instance, action, pk_set, **kwargs):
+    if action == "post_add" and pk_set:
+        assigned_users = User.objects.filter(pk__in=pk_set)
+        
+        # Obtenemos el usuario activo o el creador de la tarea
+        actor = getattr(instance, 'updated_by', getattr(instance, 'created_by', None))
+        
+        for user in assigned_users:
+            # Nunca notificar al propio usuario que realiza la acción
+            if actor and actor == user:
+                continue
+
+            # Borrar posibles 'task_updated' no leídas generadas inmediatamente antes en el mismo POST
+            Notification.objects.filter(
+                recipient=user,
+                target_task=instance,
+                notification_type='task_updated',
+                is_read=False
+            ).delete()
+
+            # Crear de forma única la notificación de asignación
+            Notification.objects.get_or_create(
+                recipient=user,
+                target_task=instance,
+                notification_type='task_assigned',
+                is_read=False,
+                defaults={
+                    'actor': actor if actor else user,
+                    'verb': f"te ha asignado la tarea '{instance.title}'",
+                    'target_board': instance.board if hasattr(instance, 'board') else None
+                }
+            )
+
+
+@receiver(pre_save, sender=Task)
+def notify_task_update(sender, instance, **kwargs):
+    # Solo notificar si la tarea ya existía (es una edición, no una creación)
+    if not instance.pk:
+        return
+
+    try:
+        old_instance = Task.objects.get(pk=instance.pk)
+    except Task.DoesNotExist:
+        return
+
+    # Comprobar si hubo cambios significativos en el título o descripción
+    if old_instance.title != instance.title or old_instance.description != instance.description:
+        # Notificar a los asignados (excluyendo al que hace el cambio si está disponible)
+        recipients = instance.assigned_to.all()
+        
+        for recipient in recipients:
+            Notification.objects.create(
+                recipient=recipient,
+                actor=getattr(instance, 'updated_by', recipient),
+                notification_type='task_updated',
+                verb=f"ha actualizado la tarea '{instance.title}'",
+                target_task=instance,
+                target_board=instance.board
+            )
+
+
+

@@ -795,34 +795,91 @@
     </div>
 
     <!-- MODALES -->
-    <div class="modal fade" id="createBoardModal" tabindex="-1" aria-hidden="true">
+   <!-- MODAL PARA CREAR UN NUEVO TABLERO -->
+    <div class="modal fade" id="createBoardModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="false" style="z-index: 1060 !important;">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="modal-content text-dark border-0 shadow-lg rounded-4">
+                
                 <form method="POST" action="{% url 'create_board' %}">
                     {% csrf_token %}
-                    <div class="modal-header border-0 pb-0 pt-4 px-4">
-                        <h5 class="modal-title fw-bold text-dark">{% translate "Crear nuevo tablero" %}</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    
+                    <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
+                        <h5 class="modal-title fw-bold text-dark d-flex align-items-center gap-2">
+                            ➕ {% translate "Crear nuevo tablero" %}
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{% translate 'Cerrar' %}"></button>
                     </div>
-                    <div class="modal-body p-4">
+
+                    <div class="modal-body text-start px-4 py-3">
+                        
+                        <!-- NOMBRE DEL TABLERO -->
                         <div class="mb-3">
-                            <label class="form-label small fw-bold text-dark mb-1">{% translate "Nombre del tablero" %}</label>
-                            {{ board_form.title }}
+                            <label class="form-label small fw-bold text-dark">{% translate "Nombre del tablero" %}</label>
+                            <input type="text" name="title" class="form-control rounded-3" placeholder="{% translate 'Nombre del tablero...' %}" required autocomplete="off">
                         </div>
-                        <div class="mb-2">
-                            <label class="form-label small text-muted fw-semibold mb-1">{% translate "Descripción (opcional)" %}</label>
-                            {{ board_form.description }}
+
+                        <!-- COLOR Y DESCRIPCIÓN (INPUT CORTO EN LUGAR DE TEXTAREA) -->
+                        <div class="row g-2 mb-3">
+                            <div class="col-md-5">
+                                <label class="form-label small fw-bold text-dark">{% translate "Color" %}</label>
+                                <select name="color" class="form-select rounded-3">
+                                    <option value="#3B82F6" selected>🟦 {% translate "Azul" %}</option>
+                                    <option value="#10B981">🟩 {% translate "Verde" %}</option>
+                                    <option value="#EF4444">🟥 {% translate "Rojo" %}</option>
+                                    <option value="#F59E0B">🟧 {% translate "Naranja" %}</option>
+                                    <option value="#8B5CF6">🟪 {% translate "Púrpura" %}</option>
+                                    <option value="#6B7280">⬜ {% translate "Gris" %}</option>
+                                </select>
+                            </div>
+                            <div class="col-md-7">
+                                <label class="form-label small fw-bold text-dark">{% translate "Descripción" %}</label>
+                                <input type="text" name="description" class="form-control rounded-3" placeholder="{% translate 'Opcional' %}">
+                            </div>
                         </div>
+
+                        <hr class="my-3 text-muted opacity-25">
+
+                        <!-- SECCIÓN: INVITAR NUEVO MIEMBRO CON SUGERENCIAS AUTOMÁTICAS -->
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-dark d-flex align-items-center gap-1">
+                                <i class="bi bi-person-plus text-primary"></i> {% translate "Invitar a un nuevo miembro" %}
+                            </label>
+                            
+                            <div class="input-group">
+                                <input type="text" 
+                                    name="invite_identifier"
+                                    id="create-invite-input" 
+                                    class="form-control form-control-sm rounded-start-3" 
+                                    list="collaboratorsListNewBoard"
+                                    placeholder="{% translate 'Escribe usuario, email o selecciona...' %}"
+                                    autocomplete="off">
+                            </div>
+
+                            <!-- DESPLEGABLE DE SUGERENCIAS AUTOMÁTICAS -->
+                            <datalist id="collaboratorsListNewBoard">
+                                {% for collaborator in frequent_collaborators %}
+                                    <option value="{{ collaborator.username }}">{{ collaborator.get_full_name|default:collaborator.username }} ({{ collaborator.email }})</option>
+                                {% endfor %}
+                            </datalist>
+
+                            <small class="text-muted" style="font-size: 0.72rem;">
+                                {% translate "Le llegará una notificación inmediata para unirse al guardar." %}
+                            </small>
+                        </div>
+
                     </div>
-                    <div class="modal-footer border-0 bg-light px-4 py-3">
-                        <button type="button" class="btn btn-outline-secondary btn-sm fw-semibold rounded-3 px-3" data-bs-dismiss="modal">{% translate "Cancelar" %}</button>
-                        <button type="submit" class="btn btn-primary btn-sm fw-bold rounded-3 px-4 shadow-sm">{% translate "Guardar Tablero" %}</button>
+                    
+                    <!-- BOTONES DE ACCIÓN -->
+                    <div class="modal-footer justify-content-end border-top-0 bg-light px-4 py-3 gap-2">
+                        <button type="button" class="btn btn-outline-secondary btn-sm rounded-3 fw-semibold" data-bs-dismiss="modal">{% translate "Cancelar" %}</button>
+                        <button type="submit" class="btn btn-primary btn-sm rounded-3 fw-bold shadow-sm">{% translate "Guardar Tablero" %}</button>
                     </div>
                 </form>
+
             </div>
         </div>
     </div>
-
+    <!-- MODAL PARA ELIMINAR TAREAS COMLETADAS-->
     <div class="modal fade" id="clearCompletedModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-sm">
             <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden text-center p-3">
@@ -848,8 +905,8 @@
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script> 
 
-<script src="{% static 'js/dashboard.js' %}"></script> 
-<script src="{% static 'js/task-modal.js' %}"></script>
-<script src="{% static 'js/task-quick-options.js' %}"></script>
-<script src="{% static 'js/task-animation.js' %}"></script> 
+<script src="{% static 'js/dashboard.js' %}?v=1.1"></script> 
+<script src="{% static 'js/task-modal.js' %}?v=1.1"></script>
+<script src="{% static 'js/task-quick-options.js' %}?v=1.1"></script>
+<script src="{% static 'js/task-animation.js' %}?v=1.1"></script> 
 {% endblock %}

@@ -6,6 +6,7 @@ from django.urls import reverse_lazy
 from django.http import JsonResponse
 from .models import Task, Board
 from .forms import TaskForm
+from boards.models import Notification  # Importamos para generar la notificación
 
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_protect
@@ -46,12 +47,12 @@ class ToggleTaskDoneView(LoginRequiredMixin, View):
         task.is_completed = not task.is_completed
         task.save()
 
-
         return JsonResponse({
             'status': 'success',
             'is_completed': task.is_completed,
             'task_id': task.id
         })
+
 
 class TaskUpdateView(LoginRequiredMixin, UpdateView):
     model = Task
@@ -161,6 +162,33 @@ class TaskUpdateView(LoginRequiredMixin, UpdateView):
         task.save()
         form.save_m2m()
 
+        # DISPARAR NOTIFICACIÓN DE 'task_updated' DE FORMA CONTROLADA
+        # 1. Obtenemos los asignados excluyendo al usuario que edita la tarea
+        assigned_users = task.assigned_to.exclude(id=self.request.user.id)
+        
+        for recipient in assigned_users:
+            # 2. Si este usuario recibe hoy una asignación, no le enviamos también 'task_updated'
+            # para evitar notificaciones dobles
+            has_recent_assignment = Notification.objects.filter(
+                recipient=recipient,
+                target_task=task,
+                notification_type='task_assigned',
+                is_read=False
+            ).exists()
+
+            if not has_recent_assignment:
+                Notification.objects.get_or_create(
+                    recipient=recipient,
+                    target_task=task,
+                    notification_type='task_updated',
+                    is_read=False,
+                    defaults={
+                        'actor': self.request.user,
+                        'verb': f"ha actualizado la tarea '{task.title}'",
+                        'target_board': task.board
+                    }
+                )
+
         is_ajax = (
             self.request.headers.get('x-requested-with') == 'XMLHttpRequest' or
             self.request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest' or
@@ -193,64 +221,6 @@ class TaskUpdateView(LoginRequiredMixin, UpdateView):
                 }, status=400)
 
         return super().form_valid(form)
-        task = form.save(commit=False)
-        
-        # SI PERSONA B (MIEMBRO) EDITA Y NO TIENE CAMPO BOARD EN EL POST,
-        # O SI VENÍA CON UN VALOR VACÍO, PRESERVAR EL TABLERO ORIGINAL DE LA TAREA
-        if not task.board_id and self.object.board_id:
-            task.board_id = self.object.board_id
-
-        if form.cleaned_data.get('reminder_enabled'):
-            task.reminder_sent = False
-
-        # RESTRICCIÓN DE NEGOCIO POR FECHA:
-        date_blocked = False
-        if task.due_date:
-            today = timezone.now().date()
-            due_date = task.due_date.date() if hasattr(task.due_date, 'date') else task.due_date
-            days_left = (due_date - today).days
-
-            if days_left <= 2 and int(task.urgency or 4) <= 2:
-                task.urgency = 3  # Fuerza a Urgente
-                date_blocked = True
-
-        urgency = int(task.urgency or 4)
-        importance = int(task.importance or 4)
-
-        if urgency >= 3 and importance >= 3:
-            task.quadrant = 'Q1'
-        elif urgency <= 2 and importance >= 3:
-            task.quadrant = 'Q2'
-        elif urgency >= 3 and importance <= 2:
-            task.quadrant = 'Q3'
-        else:
-            task.quadrant = 'Q4'
-
-        task.save()
-        form.save_m2m()
-
-        is_ajax = (
-            self.request.headers.get('x-requested-with') == 'XMLHttpRequest' or
-            self.request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest' or
-            self.request.accepts('application/json')
-        )
-
-        if is_ajax:
-            card_html = render_to_string(
-                '_includes/_task_card.html',
-                {'task': task, 'request': self.request},
-                request=self.request
-            )
-
-            return JsonResponse({
-                'status': 'success',
-                'task_id': task.id,
-                'quadrant': task.quadrant,
-                'card_html': card_html,
-                'date_restriction_applied': date_blocked
-            })
-
-        return super().form_valid(form)
 
     def form_invalid(self, form):
         is_ajax = (
@@ -271,8 +241,7 @@ class TaskDeleteView(LoginRequiredMixin, DeleteView):
     model = Task
     pk_url_kwarg = 'pk'
 
-    def get_queryset(self): # (Los usuarios asignados pueden marcarla como completada o moverla, pero no borrarla).
-        
+    def get_queryset(self):
         return Task.objects.filter(
             Q(created_by=self.request.user) | Q(board__owner=self.request.user)
         ).distinct()
@@ -282,8 +251,6 @@ class TaskDeleteView(LoginRequiredMixin, DeleteView):
 
 
 # 4. Crear tarea rápida desde el cuadrante 
-# tasks/views.py
-
 @login_required
 @require_POST
 def quick_create_task(request):
@@ -295,7 +262,6 @@ def quick_create_task(request):
     if title:
         board = None
         if board_id:
-            # PERMISOS: Busca el tablero si el usuario actual es PROPIETARIO o MIEMBRO invitado
             board = Board.objects.filter(
                 Q(id=board_id) & (Q(owner=request.user) | Q(members=request.user))
             ).distinct().first()
@@ -310,6 +276,7 @@ def quick_create_task(request):
 
     return redirect(request.META.get('HTTP_REFERER', 'dashboard'))
 
+
 # 5. Mover tarea mediante Drag & Drop (SortableJS)
 @login_required
 @csrf_protect
@@ -323,7 +290,6 @@ def update_task_position(request):
         if not task_id or not target_quadrant:
             return JsonResponse({'status': 'error', 'message': 'Parámetros incompletos'}, status=400)
 
-        # Buscar la tarea validando que el usuario tenga permisos sobre ella
         task = get_object_or_404(
             Task.objects.filter(
                 Q(created_by=request.user) |
@@ -333,12 +299,10 @@ def update_task_position(request):
             pk=task_id
         )
 
-        # Mover a la columna de completadas
         if target_quadrant == 'DONE':
             task.is_completed = True
             task.quadrant = 'DONE'
 
-        # Mover/Reactivar hacia un cuadrante de la matriz
         elif target_quadrant in QUADRANT_DEFAULTS:
             task.is_completed = False
             task.quadrant = target_quadrant
@@ -370,7 +334,6 @@ def clear_completed_tasks(request):
     if request.method == 'POST':
         time_filter = request.POST.get('time_filter', 'all')
         
-        # 1. Obtenemos las tareas base del usuario sin .distinct() al final para poder borrarlas
         base_tasks = Task.objects.filter(
             Q(created_by=request.user) |
             Q(assigned_to=request.user) |
@@ -378,7 +341,6 @@ def clear_completed_tasks(request):
             is_completed=True
         )
 
-        # 2. Aplicamos el filtro de tiempo si es necesario
         if time_filter == 'today':
             today = timezone.now().date()
             base_tasks = base_tasks.filter(updated_at__date=today)
@@ -386,7 +348,6 @@ def clear_completed_tasks(request):
             seven_days_ago = timezone.now() - timedelta(days=7)
             base_tasks = base_tasks.filter(updated_at__gte=seven_days_ago)
 
-        # 3. Borramos los elementos únicos usando una subconsulta o extrayendo los IDs limpios
         task_ids = base_tasks.values_list('id', flat=True).distinct()
         Task.objects.filter(id__in=task_ids).delete()
 
@@ -399,7 +360,6 @@ def search_tasks_api(request):
     if len(query) < 2:
         return JsonResponse({'results': []})
 
-    # Usamos created_by en lugar de user
     tasks = Task.objects.filter(
         created_by=request.user,
         title__icontains=query

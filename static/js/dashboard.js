@@ -496,7 +496,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Inicialización de la vista previa del destino en el Alta Rápida
     initQuickQuadrantListeners();
 
-    // A. INICIALIZACIÓN DE SORTABLEJS (Soporte Drag & Drop)
+    // A. INICIALIZACIÓN DE SORTABLEJS (Scroll Nativo Directo)
     const quadrantContainers = document.querySelectorAll('.quadrant-container');
 
     quadrantContainers.forEach(container => {
@@ -511,6 +511,15 @@ document.addEventListener('DOMContentLoaded', function () {
             animation: 150,
             ghostClass: 'opacity-50',
             
+            // =========================================================
+            // CONFIGURACIÓN NATIVA DE SORTABLEJS
+            // =========================================================
+            scroll: true,
+            scrollSensitivity: 200, // Sensibilidad amplia para detectar el borde antes del Dock
+            scrollSpeed: 30,        // Velocidad de paso
+            bubbleScroll: true,     // Propaga el scroll al contenedor padre (.matrix-container-wrapper)
+            forceAutoScrollFallback: true, // Forzar comportamiento fluido nativo
+
             setData: function (dataTransfer, dragEl) {
                 dataTransfer.setData('Text', dragEl.textContent);
             },
@@ -535,7 +544,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 const targetContainer = evt.to;
                 const sourceContainer = evt.from;
 
-                // Asegurar que el botón de añadir se mantenga al final del contenedor de destino
                 const inlineWrapperTarget = targetContainer.querySelector('.add-task-inline-wrapper');
                 if (inlineWrapperTarget) {
                     targetContainer.appendChild(inlineWrapperTarget);
@@ -622,13 +630,12 @@ document.addEventListener('DOMContentLoaded', function () {
                                 </div>
                             `;
 
-                            // Respetamos la posición exacta donde soltó el elemento SortableJS
                             itemEl.replaceWith(restoredCard);
 
                             const finalContainer = document.querySelector(`.quadrant-container[data-quadrant="${targetQuadrant}"]`) || targetContainer;
                             const inlineWrapper = finalContainer.querySelector('.add-task-inline-wrapper');
                             if (inlineWrapper) {
-                                finalContainer.appendChild(inlineWrapper); // Mantiene el botón abajo del todo
+                                finalContainer.appendChild(inlineWrapper);
                             }
 
                             updateMatrixAndSidebarCounts();
@@ -679,13 +686,12 @@ document.addEventListener('DOMContentLoaded', function () {
                             tempDiv.innerHTML = data.card_html.trim();
                             const newCard = tempDiv.firstElementChild;
                             
-                            // Mantiene la tarjeta en el hueco exacto donde se soltó el ratón
                             itemEl.replaceWith(newCard);
 
                             const finalContainer = document.querySelector(`.quadrant-container[data-quadrant="${data.quadrant || targetQuadrant}"]`) || targetContainer;
                             const inlineWrapper = finalContainer.querySelector('.add-task-inline-wrapper');
                             if (inlineWrapper) {
-                                finalContainer.appendChild(inlineWrapper); // Asegura que el botón de añadir permanezca abajo
+                                finalContainer.appendChild(inlineWrapper);
                             }
                         }
                     } else {
@@ -700,8 +706,6 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     });
-
-
 });
 
 // ==========================================

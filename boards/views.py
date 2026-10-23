@@ -16,6 +16,7 @@ from django.utils import timezone
 from datetime import timedelta
 
 from django.contrib import messages
+from django.db.models import Case, When, Value, IntegerField, Count
 
 User = get_user_model()
 
@@ -40,14 +41,31 @@ def dashboard_view(request, board_id=None):
     # 2. Tableros compartidos
     shared_boards = Board.objects.filter(members=request.user).distinct()
 
+    # 3. Consulta unificada con ordenación garantizada (Personales 0, Compartidos 1)
+    all_boards = Board.objects.filter(
+        Q(owner=request.user) | Q(members=request.user)
+    ).annotate(
+        members_count=Count('members'),
+        is_shared=Case(
+            # Si NO es el propietario OR el tablero TIENE miembros -> Considerar COMPARTIDO (1)
+            When(Q(members_count__gt=0) | ~Q(owner=request.user), then=Value(1)),
+            # Si es el propietario Y NO tiene miembros -> Considerar PERSONAL (0)
+            default=Value(0),
+            output_field=IntegerField(),
+        )
+    ).order_by('is_shared', '-is_default', 'created_at').distinct()
+
     current_board = None
 
     if board_id:
-        board_queryset = Board.objects.filter(
+        current_board = Board.objects.filter(
             Q(id=board_id) & (Q(owner=request.user) | Q(members=request.user))
-        ).distinct()
+        ).distinct().first()
 
-        current_board = get_object_or_404(board_queryset)
+        # Si el tablero no existe o el usuario ha dejado de ser miembro/propietario
+        if not current_board:
+            messages.warning(request, "Ya no tienes acceso a este tablero o ha sido eliminado.")
+            return redirect('dashboard')
 
         base_tasks = Task.objects.filter(board=current_board)
     else:
@@ -130,12 +148,14 @@ def dashboard_view(request, board_id=None):
     context = {
         'form': form,
         'board_form': BoardForm(),
-        'boards': user_boards,
-        'shared_boards': shared_boards,
+        'boards': all_boards,          # Lista unificada y ordenada (Personales -> Compartidos)
+        'user_boards': user_boards,    # Mapeo retrocompatible para tableros propios
+        'shared_boards': shared_boards,# Mapeo retrocompatible para tableros compartidos
         'users': User.objects.all(),
         'current_board': current_board,
         'default_board': default_board,
         'has_shared_tasks': has_shared_tasks,
+        'has_shared_boards': any(b.members.exists() or b.owner != request.user for b in all_boards if not b.is_default),
         
         # Listas de tareas activas por cuadrante
         'q1_tasks': q1_list,
@@ -153,14 +173,58 @@ def dashboard_view(request, board_id=None):
 
     return render(request, 'tasks/dashboard.html', context)
 
-
 class BoardCreateView(LoginRequiredMixin, CreateView):
     model = Board
     form_class = BoardForm
     
     def form_valid(self, form):
+        # 1. Asignar propietario, color y descripción desde la petición
         form.instance.owner = self.request.user
-        return super().form_valid(form)
+        
+        color = self.request.POST.get('color')
+        if color:
+            form.instance.color = color
+            
+        description = self.request.POST.get('description', '').strip()
+        if description:
+            form.instance.description = description
+
+        # Guardar el tablero primero
+        response = super().form_valid(form)
+        board = self.object
+
+        # 2. Procesar la invitación usando 'receiver' para BoardInvitation
+        invite_identifier = self.request.POST.get('invite_identifier', '').strip()
+        if invite_identifier:
+            target_user = User.objects.filter(
+                Q(username=invite_identifier) | Q(email=invite_identifier)
+            ).exclude(id=self.request.user.id).first()
+
+            if target_user:
+                # Crear la invitación usando 'receiver'
+                invitation, created = BoardInvitation.objects.get_or_create(
+                    board=board,
+                    sender=self.request.user,
+                    receiver=target_user,
+                    defaults={'status': 'pending'}
+                )
+
+                # Notificación para el invitado usando 'recipient'
+                Notification.objects.create(
+                    recipient=target_user,
+                    actor=self.request.user,
+                    notification_type='invitation',
+                    verb=f"te ha invitado a unirte al tablero '{board.title}'",
+                    target_board=board,
+                    invitation=invitation
+                )
+            else:
+                messages.warning(
+                    self.request, 
+                    f"El tablero fue creado, pero no se encontró al usuario '{invite_identifier}'."
+                )
+
+        return response
 
     def form_invalid(self, form):
         print("❌ Error al crear tablero:", form.errors)
@@ -168,8 +232,7 @@ class BoardCreateView(LoginRequiredMixin, CreateView):
 
     def get_success_url(self):
         return reverse_lazy('dashboard_board', kwargs={'board_id': self.object.id})
-
-
+    
 class BoardUpdateView(LoginRequiredMixin, UpdateView):
     model = Board
     form_class = BoardForm
@@ -216,12 +279,11 @@ def invite_to_board(request, board_id):
     # Solo el dueño o miembros actuales pueden invitar
     if board.owner != request.user and request.user not in board.members.all():
         messages.error(request, "No tienes permiso para invitar a este tablero.")
-        return redirect('board_detail', board_id=board.id)
+        return redirect('dashboard_board', board_id=board.id)
 
     if request.method == 'POST':
         identifier = request.POST.get('identifier', '').strip()
 
-        # Buscar usuario por username o email exacto
         receiver = User.objects.filter(
             Q(username__iexact=identifier) | Q(email__iexact=identifier)
         ).first()
@@ -233,7 +295,6 @@ def invite_to_board(request, board_id):
         elif receiver in board.members.all() or receiver == board.owner:
             messages.info(request, "Este usuario ya pertenece al tablero.")
         else:
-            # Crear la invitación (o recuperarla si ya existía una pendiente)
             invitation, created = BoardInvitation.objects.get_or_create(
                 board=board,
                 receiver=receiver,
@@ -242,7 +303,6 @@ def invite_to_board(request, board_id):
             )
 
             if created:
-                # Crear la notificación para la persona invitada
                 Notification.objects.create(
                     recipient=receiver,
                     actor=request.user,
@@ -255,29 +315,55 @@ def invite_to_board(request, board_id):
             else:
                 messages.info(request, f"Ya hay una invitación pendiente para {receiver.username}.")
 
-    return redirect('board_detail', board_id=board.id)
+    return redirect('dashboard_board', board_id=board.id)
 
 
 @login_required
 def accept_invitation(request, invitation_id):
-    invitation = get_object_or_404(BoardInvitation, id=invitation_id, receiver=request.user, status='pending')
+    invitation = get_object_or_404(BoardInvitation, id=invitation_id, receiver=request.user)
     
-    # 1. Añadir al usuario como miembro del tablero
+    # 1. Añadir al usuario como miembro activo del tablero
     invitation.board.members.add(request.user)
     
-    # 2. Actualizar el estado de la invitación
-    invitation.status = 'accepted'
-    invitation.save()
+    # 2. Manejo seguro del estado para evitar IntegrityError por unicidad
+    if invitation.status != 'accepted':
+        # Eliminar registros previos con estado 'accepted' para este usuario y tablero si existían
+        BoardInvitation.objects.filter(
+            board=invitation.board,
+            receiver=request.user,
+            status='accepted'
+        ).exclude(id=invitation.id).delete()
+        
+        invitation.status = 'accepted'
+        invitation.save()
     
-    # 3. Marcar la notificación correspondiente como leída
+    # 3. Marcar las notificaciones asociadas como leídas
     Notification.objects.filter(invitation=invitation).update(is_read=True)
     
     messages.success(request, f"Te has unido al tablero '{invitation.board.title}'.")
-    return redirect('board_detail', board_id=invitation.board.id)
+    return redirect('dashboard_board', board_id=invitation.board.id)
 
 
 @login_required
 def reject_invitation(request, invitation_id):
+    invitation = get_object_or_404(BoardInvitation, id=invitation_id, receiver=request.user)
+    
+    # 1. Manejo seguro del rechazo
+    if invitation.status != 'rejected':
+        BoardInvitation.objects.filter(
+            board=invitation.board,
+            receiver=request.user,
+            status='rejected'
+        ).exclude(id=invitation.id).delete()
+        
+        invitation.status = 'rejected'
+        invitation.save()
+    
+    # 2. Marcar las notificaciones asociadas como leídas
+    Notification.objects.filter(invitation=invitation).update(is_read=True)
+    
+    messages.info(request, f"Has rechazado la invitación al tablero '{invitation.board.title}'.")
+    return redirect('dashboard')
     invitation = get_object_or_404(BoardInvitation, id=invitation_id, receiver=request.user, status='pending')
     
     # 1. Marcar como rechazada
@@ -289,3 +375,12 @@ def reject_invitation(request, invitation_id):
     
     messages.info(request, f"Has rechazado la invitación al tablero '{invitation.board.title}'.")
     return redirect('dashboard')  # O la vista principal donde esté el usuario
+
+
+# boards/views.py
+@login_required
+def delete_notification(request, notification_id):
+    if request.method == 'POST':
+        notification = get_object_or_404(Notification, id=notification_id, recipient=request.user)
+        notification.delete()
+    return redirect(request.META.get('HTTP_REFERER', 'dashboard'))

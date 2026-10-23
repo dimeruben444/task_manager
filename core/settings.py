@@ -79,6 +79,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 #Context processor de notificaciones:
                 'boards.context_processors.notifications_context',
+                'boards.context_processors.frequent_collaborators_context',
             ],
         },
     },

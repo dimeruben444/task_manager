@@ -255,3 +255,39 @@
     background-color: rgba(255, 255, 255, 0.1) !important;
 }
 
+
+/* Previene el lag y el freno durante el drag de SortableJS */
+.sortable-drag {
+    opacity: 0.8 !important;
+    cursor: grabbing !important;
+    transition: none !important; /* CRÍTICO: Quita animaciones CSS durante el arrastre */
+}
+
+.sortable-ghost {
+    opacity: 0.3 !important;
+    transition: none !important;
+}
+
+/* Desactiva pointer-events en hijos para acelerar el cálculo de posición */
+.sortable-drag * {
+    pointer-events: none !important;
+}
+
+/* Corrección para que el scroll responda a pantalla completa */
+.matrix-container-wrapper {
+    height: calc(100vh - 120px); /* Ajusta a la altura visible restando el header/navbar */
+    overflow-y: auto !important; /* Fuerza a que el scroll sea interno y conocido */
+    position: relative;
+}
+
+/* Evita que las animaciones de las tarjetas ahoguen el hilo de UI durante el arrastre */
+.sortable-drag {
+    opacity: 0.85 !important;
+    cursor: grabbing !important;
+    transition: none !important;
+}
+
+.sortable-ghost {
+    opacity: 0.3 !important;
+    transition: none !important;
+}
