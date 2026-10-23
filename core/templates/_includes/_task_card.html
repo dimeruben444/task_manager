@@ -18,7 +18,7 @@
         <div class="task-card-header d-flex align-items-center justify-content-between position-relative w-100 gap-2" style="min-height: 24px;">
             
             <!-- Checkbox flotante/interactivo -->
-            <div class="task-checkbox-wrapper flex-shrink-0">
+            <div class="task-checkbox-wrapper flex-shrink-0 ">
                 <label class="task-checkbox-container m-0" onclick="event.stopPropagation();">
                     <input type="checkbox" 
                         class="task-completion-check" 
@@ -44,10 +44,11 @@
         </div>
 
         {% with first_assignee=task.assigned_to.first total_assignees=task.assigned_to.count %}
-            {% if task.due_date or task.description or task.assigned_to.exists and total_assignees > 1 or task.assigned_to.exists and first_assignee != task.created_by %}
+            <!-- MOSTRAR METADATOS SI TIENE FECHA, DESCRIPCIÓN, ASIGNADOS O SI ES UN TABLERO COMPARTIDO FUERA DE SU VISTA -->
+            {% if task.due_date or task.description or task.assigned_to.exists or task.board.members.exists and not current_board %}
                 
-                <!-- METADATOS COMPACTOS (SOLO CUANDO EXISTEN) -->
-                <div class="d-flex align-items-center justify-content-between text-muted" 
+                <!-- METADATOS COMPACTOS -->
+                <div class="d-flex align-items-center justify-content-between text-muted mt-0" 
                      style="font-size: 0.7rem;" 
                      data-bs-toggle="modal" 
                      data-bs-target="#viewTaskModal{{ task.id }}">
@@ -55,29 +56,35 @@
                     <div class="d-flex align-items-center gap-1.5 flex-wrap">
                         <!-- Fecha vencimiento -->
                         {% if task.due_date %}
-                            <span class="badge border d-inline-flex align-items-center gap-1 px-1.5 py-0.5 rounded-md task-date-badge" 
+                            <span class="badge border d-inline-flex align-items-center gap-1 px-1.5 py-0.5 me-2 rounded-md task-date-badge" 
                                 style="font-size: 0.65rem; background-color: #FFE4E6 !important; color: #dc2626 !important; border-color: #fecdd3 !important;">
                                 <i class="bi bi-calendar3" style="color: #dc2626 !important;"></i>
                                 {{ task.due_date|date:"d M" }}
                             </span>
                         {% endif %}
-                            <!-- descripcion -->
+
+                        <!-- Descripción -->
                         {% if task.description %}
-                            <span class="badge  text-secondary  px-1.5 py-0.5 rounded-md" title="{% translate 'Tiene descripción' %}" style="font-size: 0.98rem;">
-                                <i class="bi bi-card-text" style="color: #5cbcf3; !important"></i> 
+                            <span class="badge text-secondary px-1 py-0.5 me-1 rounded-md" title="{% translate 'Tiene descripción' %}" style="font-size: 0.98rem;">
+                                <i class="bi bi-card-text" style="color: #5cbcf3 !important;"></i> 
                             </span>
                         {% endif %}
-                        <!-- Tarea asignada -->
-                        {% if task.assigned_to.exists or task.board.members.exists %}
-                            <span class="badge text-warning px-1.5 py-0.5 rounded-md" 
-                                title="{% translate 'Tarea compartida / asignada' %}" 
-                                style="font-size: 0.85rem;">
-                                <i class="bi bi-people-fill" style="color: #fbbf24 !important;"></i>
-                            </span>
+
+                        <!-- Icono Tarea Compartida / Miembros:
+                             REGLA 1: Se muestra siempre si el tablero tiene miembros o está asignada.
+                             REGLA 2: Se oculta si estamos dentro del propio tablero (not current_board). -->
+                        {% if not current_board %}
+                            {% if task.board and task.board.members.exists or task.assigned_to.exists %}
+                                <span class="badge text-warning px-1 py-0.5 me-1 rounded-md" 
+                                    title="{% translate 'Tarea compartida / asignada' %}" 
+                                    style="font-size: 0.85rem;">
+                                    <i class="bi bi-people-fill" style="color: #fbbf24 !important;"></i>
+                                </span>
+                            {% endif %}
                         {% endif %}
                     </div>
 
-                    <!-- ASIGNADOS COMPACTOS -->
+                    <!-- ASIGNADOS COMPACTOS (Avatares de usuarios) -->
                     <div class="ms-auto d-flex align-items-center gap-1">
                         {% if task.assigned_to.exists %}
                             <div class="position-relative d-inline-flex align-items-center">

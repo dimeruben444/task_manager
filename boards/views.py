@@ -10,7 +10,12 @@ from tasks.forms import TaskForm
 from tasks.models import Task
 
 from .forms import BoardForm
-from .models import Board
+from .models import Board, BoardInvitation, Notification
+
+from django.utils import timezone
+from datetime import timedelta
+
+from django.contrib import messages
 
 User = get_user_model()
 
@@ -19,6 +24,14 @@ User = get_user_model()
 
 @login_required
 def dashboard_view(request, board_id=None):
+
+    # Mantenimiento para el despliegue Limpia tareas completadas hace más de 30 días del usuario 
+    limite = timezone.now() - timedelta(days=30)
+    Task.objects.filter(
+        created_by=request.user, 
+        is_completed=True, 
+        updated_at__lte=limite
+    ).delete()
 
     # 1. Tableros propios del usuario
     user_boards = Board.objects.filter(owner=request.user).order_by('-is_default', 'id')
@@ -46,16 +59,26 @@ def dashboard_view(request, board_id=None):
         task_filter = request.GET.get('filter', 'all')
         
         if task_filter == 'mine':
-            # 👤 Mis tareas: Creadas por el usuario actual
-            base_tasks = base_tasks.filter(created_by=request.user)
+            # 👤 Mis tareas: 
+            # 1. Tareas asignadas explícitamente al usuario actual (en cualquier tablero)
+            # 2. O tareas creadas por él EN TABLEROS PRIVADOS/PERSONALES (sin más miembros) donde no esté asignado a otra persona
+            base_tasks = base_tasks.filter(
+                Q(assigned_to=request.user) |
+                (
+                    Q(created_by=request.user) & 
+                    (Q(board__isnull=True) | Q(board__members__isnull=True)) &
+                    (Q(assigned_to__isnull=True) | Q(assigned_to=request.user))
+                )
+            ).distinct()
+
         elif task_filter == 'shared':
-            # 🤝 Asignadas: Tareas asignadas directamente O pertenecientes a tableros compartidos (excluyendo creadas por él)
+            # 🤝 Compartidas / Equipo: Tareas en tableros con miembros o asignadas
             base_tasks = base_tasks.filter(
                 Q(assigned_to=request.user) |
                 Q(board__members=request.user) |
                 (Q(board__owner=request.user) & Q(board__members__isnull=False))
             ).distinct()
-        # Si es 'all', muestra todas sin aplicar exclusiones adicionales
+        # Si es 'all', muestra todas las tareas accesibles
 
     has_shared_tasks = base_tasks.filter(~Q(created_by=request.user)).exists()
 
@@ -181,3 +204,88 @@ class BoardDeleteView(LoginRequiredMixin, DeleteView):
 
     def get_queryset(self):
         return Board.objects.filter(owner=self.request.user, is_default=False)
+
+
+
+
+#invitacxiones
+@login_required
+def invite_to_board(request, board_id):
+    board = get_object_or_404(Board, id=board_id)
+    
+    # Solo el dueño o miembros actuales pueden invitar
+    if board.owner != request.user and request.user not in board.members.all():
+        messages.error(request, "No tienes permiso para invitar a este tablero.")
+        return redirect('board_detail', board_id=board.id)
+
+    if request.method == 'POST':
+        identifier = request.POST.get('identifier', '').strip()
+
+        # Buscar usuario por username o email exacto
+        receiver = User.objects.filter(
+            Q(username__iexact=identifier) | Q(email__iexact=identifier)
+        ).first()
+
+        if not receiver:
+            messages.error(request, "No se encontró ningún usuario con ese nombre o correo.")
+        elif receiver == request.user:
+            messages.warning(request, "No puedes invitarte a ti mismo.")
+        elif receiver in board.members.all() or receiver == board.owner:
+            messages.info(request, "Este usuario ya pertenece al tablero.")
+        else:
+            # Crear la invitación (o recuperarla si ya existía una pendiente)
+            invitation, created = BoardInvitation.objects.get_or_create(
+                board=board,
+                receiver=receiver,
+                status='pending',
+                defaults={'sender': request.user}
+            )
+
+            if created:
+                # Crear la notificación para la persona invitada
+                Notification.objects.create(
+                    recipient=receiver,
+                    actor=request.user,
+                    notification_type='invitation',
+                    verb=f"te ha invitado a unirte al tablero '{board.title}'",
+                    target_board=board,
+                    invitation=invitation
+                )
+                messages.success(request, f"Invitación enviada a {receiver.username}.")
+            else:
+                messages.info(request, f"Ya hay una invitación pendiente para {receiver.username}.")
+
+    return redirect('board_detail', board_id=board.id)
+
+
+@login_required
+def accept_invitation(request, invitation_id):
+    invitation = get_object_or_404(BoardInvitation, id=invitation_id, receiver=request.user, status='pending')
+    
+    # 1. Añadir al usuario como miembro del tablero
+    invitation.board.members.add(request.user)
+    
+    # 2. Actualizar el estado de la invitación
+    invitation.status = 'accepted'
+    invitation.save()
+    
+    # 3. Marcar la notificación correspondiente como leída
+    Notification.objects.filter(invitation=invitation).update(is_read=True)
+    
+    messages.success(request, f"Te has unido al tablero '{invitation.board.title}'.")
+    return redirect('board_detail', board_id=invitation.board.id)
+
+
+@login_required
+def reject_invitation(request, invitation_id):
+    invitation = get_object_or_404(BoardInvitation, id=invitation_id, receiver=request.user, status='pending')
+    
+    # 1. Marcar como rechazada
+    invitation.status = 'rejected'
+    invitation.save()
+    
+    # 2. Marcar la notificación como leída
+    Notification.objects.filter(invitation=invitation).update(is_read=True)
+    
+    messages.info(request, f"Has rechazado la invitación al tablero '{invitation.board.title}'.")
+    return redirect('dashboard')  # O la vista principal donde esté el usuario

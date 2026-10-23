@@ -16,7 +16,7 @@
             
             <!-- SECCIÓN IZQUIERDA: ICONO + TÍTULO Y DESCRIPCIÓN (AGRUPADOS) -->
             <div class="d-flex align-items-center gap-3">
-                <!-- INSIGNIA CON ICONO Y DEGRADADO DINÁMICO INTENSO (2/3 OSCURO, 1/3 CLARO) -->
+                <!-- INSIGNIA CON ICONO Y DEGRADADO DINÁMICO INTENSO -->
                 <div class="d-flex align-items-center justify-content-center rounded-2xl flex-shrink-0" 
                     style="width: 52px; height: 52px; background-color: {% if current_board and current_board.color %}{{ current_board.color }}18{% else %}#d5e8fb{% endif %}; border-radius: 12px;">
                     
@@ -30,7 +30,7 @@
                                 font-size: 2.2rem;
                                 display: inline-block;"></i>
                     {% else %}
-                        <!-- DEGRADADO AZUL/MORADO AJUSTADO PARA GENERAL (35% BASE Y 1/3 AZUL CLARO) -->
+                        <!-- DEGRADADO AZUL/MORADO AJUSTADO PARA GENERAL -->
                         <i class="bi bi-grid-fill flex-shrink-0" 
                         style="background: linear-gradient(135deg, #6722fb 0%, #5f6cf7 35%, #42C6F6 100%);
                                 -webkit-background-clip: text;
@@ -41,11 +41,14 @@
                     {% endif %}
                 </div>
 
-                <!-- TÍTULO Y DESCRIPCIÓN -->
+                <!-- TÍTULO, BOTÓN DE INVITAR Y DESCRIPCIÓN -->
                 <div>
-                    <h2 class="h4 mb-0 fw-bold text-dark">
-                        {% if current_board %}{{ current_board.title }}{% else %}{% translate "General" %}{% endif %}
-                    </h2>
+                    <div class="d-flex align-items-center gap-2">
+                        <h2 class="h4 mb-0 fw-bold text-dark">
+                            {% if current_board %}{{ current_board.title }}{% else %}{% translate "General" %}{% endif %}
+                        </h2>
+                    </div>
+
                     <p class="text-muted small mb-0 mt-1" style="font-size: 0.88rem;">
                         {% if current_board and current_board.description %}
                             {{ current_board.description }}
@@ -98,32 +101,32 @@
         </div>
     </div>
 
-    <!-- TARJETA ALTA RÁPIDA (QUICK ADD BAR ESTILO STITCH) -->
+    <!-- TARJETA ALTA RÁPIDA (QUICK ADD BAR) -->
     <div class="card mb-4 quick-add-card dashboard-hero-section">
-        <div class="card-body p-4 ">
+        <div class="card-body p-4">
             <form id="quickTaskForm" method="POST" action="" novalidate autocomplete="off">
                 {% csrf_token %}
                 
                 <div class="row g-5 align-items-center mb-2">
-                    <div class="col-md-5 " style="margin-top: 52px;">
+                    <div class="col-md-5" style="margin-top: 52px;">
                         <div class="d-flex justify-content-between align-items-center mb-1">
-                            <label class="form-label text-uppercase fw-bold text-muted mb-1 " style="font-size: 0.7rem; letter-spacing: 0.05em;margin-left: 8px;">
+                            <label class="form-label text-uppercase fw-bold text-muted mb-1" style="font-size: 0.7rem; letter-spacing: 0.05em; margin-left: 8px;">
                                 {% translate "TÍTULO DE LA TAREA" %}
                             </label>
                             <span class="fw-bold small invisible"></span>
                         </div>
-                            {{ form.title }}
+                        {{ form.title }}
                     </div>
 
                     <!-- COLUMNA URGENCIA -->
                     <div class="col-md-3">
                         <div class="d-flex justify-content-between align-items-center mb-1" style="min-height: 20px;">
                             <span class="text-uppercase fw-bold text-muted quick-label" style="margin-left: 8px;">{% translate "URGENCIA" %}</span>
-                            <span class="fw-bold small quick-sublabel d-inline-block" style="margin-right: 16px;"  id="urgencyLabelQuick"></span>
+                            <span class="fw-bold small quick-sublabel d-inline-block" style="margin-right: 16px;" id="urgencyLabelQuick"></span>
                         </div>
                         <div class="rating-box-container urgency-box px-3 py-1.5 border rounded-3 d-flex justify-content-between align-items-center quick-input-box mt-2">
                             <span class="text-muted fw-bold rating-symbol">-</span>
-                            <div class="star-rating d-flex align-items-center ">
+                            <div class="star-rating d-flex align-items-center">
                                 <input type="radio" id="urgency-4" name="urgency" value="4" onchange="updateQuickTargetQuadrantDisplay()">
                                 <label for="urgency-4" title="4">★</label>
                                 <input type="radio" id="urgency-3" name="urgency" value="3" onchange="updateQuickTargetQuadrantDisplay()">
@@ -140,12 +143,12 @@
                     <!-- COLUMNA IMPORTANCIA -->
                     <div class="col-md-3">
                         <div class="d-flex justify-content-between align-items-center mb-1" style="min-height: 20px;">
-                            <span class="text-uppercase fw-bold text-muted quick-label " style="margin-left: 8px;">{% translate "IMPORTANCIA" %}</span>
-                            <span class="fw-bold small quick-sublabel  d-inline-block" style="margin-right: 16px;" id="importanceLabelQuick"></span>
+                            <span class="text-uppercase fw-bold text-muted quick-label" style="margin-left: 8px;">{% translate "IMPORTANCIA" %}</span>
+                            <span class="fw-bold small quick-sublabel d-inline-block" style="margin-right: 16px;" id="importanceLabelQuick"></span>
                         </div>
                         <div class="rating-box-container importance-box px-3 py-1.5 border rounded-3 d-flex justify-content-between align-items-center quick-input-box mt-2">
                             <span class="text-muted fw-bold rating-symbol">-</span>
-                            <div class="star-rating d-flex align-items-center ">
+                            <div class="star-rating d-flex align-items-center">
                                 <input type="radio" id="importance-4" name="importance" value="4" onchange="updateQuickTargetQuadrantDisplay()">
                                 <label for="importance-4" title="4">★</label>
                                 <input type="radio" id="importance-3" name="importance" value="3" onchange="updateQuickTargetQuadrantDisplay()">
@@ -159,17 +162,16 @@
                         </div>
                     </div>
 
-                    <!-- BOTÓN SUBMIT A LA DERECHA (COMPACTO) -->
-                    <div class="col-md-1 "style="align-self: flex-end;">
+                    <!-- BOTÓN SUBMIT -->
+                    <div class="col-md-1" style="align-self: flex-end;">
                         <button type="submit" class="btn btn-primary fw-bold rounded-3 shadow-sm w-100 d-flex align-items-center justify-content-center quick-action-btn">
                             <i class="bi bi-plus-lg fs-5"></i>
                         </button>
                     </div>
                 </div>
 
-                <!-- OPCIONES AVANZADAS Y DESTINO PREVISTO EN LA MISMA LÍNEA -->
+                <!-- OPCIONES AVANZADAS -->
                 <div class="d-flex justify-content-between align-items-center mt-3 pe-1">
-                    <!-- Botón de Opciones Avanzadas (Izquierda) -->
                     <button class="btn btn-link btn-sm text-decoration-none p-0 text-muted shadow-none d-inline-flex align-items-center gap-1" 
                             type="button" 
                             data-bs-toggle="collapse" 
@@ -179,14 +181,13 @@
                         <span style="font-size: 0.8rem;">{% translate "Opciones avanzadas (Tablero, fecha límite, notas...)" %} ▼</span>
                     </button>
 
-                    <!-- Destino previsto dinámico (Derecha) -->
                     <div style="font-size: 0.9rem; margin-right: 8rem;">
                         <span class="text-muted me-1">{% translate "Destino previsto:" %}</span>
                         <span id="quickTaskTargetQuadrant" class="fw-bold text-secondary">-</span>
                     </div>
                 </div>
 
-                <!-- CONTENEDOR COLLAPSE (Se despliega por debajo sin alterar la línea superior) -->
+                <!-- CONTENEDOR COLLAPSE -->
                 <div class="collapse mt-3" id="advancedOptions">
                     <div class="p-3 border rounded-3 bg-light-subtle shadow-sm">
                         <div class="row g-3 align-items-center">
@@ -205,7 +206,6 @@
                                         </span>
                                         <span class="d-flex align-items-center gap-2">
                                             {% if current_board and current_board.color %}
-                                                <!-- DEGRADADO DINÁMICO PARA EL TABLERO ACTUAL -->
                                                 <i class="bi bi-grid-fill flex-shrink-0" 
                                                 id="boardBadgeIconQuick"
                                                 style="background: linear-gradient(135deg, {{ current_board.color }} 0%, {{ current_board.color }} 35%, color-mix(in srgb, {{ current_board.color }} 10%, white) 100%);
@@ -215,7 +215,6 @@
                                                         font-size: 0.85rem;
                                                         display: inline-block;"></i>
                                             {% else %}
-                                                <!-- DEGRADADO AZUL/MORADO POR DEFECTO (GENERAL) -->
                                                 <i class="bi bi-grid-fill flex-shrink-0" 
                                                 id="boardBadgeIconQuick"
                                                 style="background: linear-gradient(135deg, #4f52f8 0%, #4f52f8 35%, #42C6F6 100%);
@@ -245,7 +244,6 @@
                                                         
                                                         <div class="d-flex align-items-center gap-2">
                                                             {% if b.color %}
-                                                                <!-- DEGRADADO DINÁMICO PARA TABLEROS CON COLOR -->
                                                                 <i class="bi bi-grid-fill flex-shrink-0" 
                                                                 style="background: linear-gradient(135deg, {{ b.color }} 0%, {{ b.color }} 35%, color-mix(in srgb, {{ b.color }} 10%, white) 100%);
                                                                         -webkit-background-clip: text;
@@ -254,7 +252,6 @@
                                                                         font-size: 0.85rem;
                                                                         display: inline-block;"></i>
                                                             {% else %}
-                                                                <!-- DEGRADADO POR DEFECTO PARA GENERAL -->
                                                                 <i class="bi bi-grid-fill flex-shrink-0" 
                                                                 style="background: linear-gradient(135deg, #4f52f8 0%, #4f52f8 35%, #42C6F6 100%);
                                                                         -webkit-background-clip: text;
@@ -311,7 +308,6 @@
                                             </div>
                                         </div>
 
-                                        <!-- NOTIFICACIÓN / RECORDATORIO POR CORREO -->
                                         <div class="form-check form-switch mt-2 mb-1 d-flex align-items-center gap-2 ps-0">
                                             <input class="form-check-input ms-0 me-2" 
                                                 type="checkbox" 
@@ -347,7 +343,7 @@
                                             data-bs-auto-close="outside" 
                                             aria-expanded="false">
                                         <span class="d-flex align-items-center gap-2 text-dark">
-                                            <i class="bi bi-people-fill" style="color: #fbbf24; !important"></i>
+                                            <i class="bi bi-people-fill" style="color: #fbbf24 !important;"></i>
                                             <span class="fw-medium text-dark">{% translate "Asignada a" %}</span>
                                         </span>
                                         <small class="text-muted fw-semibold" id="quickAssigneesCounter">+</small>
@@ -403,7 +399,7 @@
                                         data-bs-toggle="collapse" 
                                         data-bs-target="#collapseQuickDesc">
                                     <span class="d-flex align-items-center gap-2 text-dark">
-                                        <i class="bi bi-card-text" style="color: #5cbcf3; !important"></i>
+                                        <i class="bi bi-card-text" style="color: #5cbcf3 !important;"></i>
                                         <span class="fw-medium text-dark">{% translate "Descripción" %}</span>
                                     </span>
                                     <small class="text-muted fw-bold">+</small>
@@ -433,24 +429,22 @@
         </div>
     </div>
 
-    <!-- REJILLA PRINCIPAL: MATRIZ EISENHOWER + PANEL DERECHO COMPLETADAS (FLEXBOX SIN DESFASE) -->
+    <!-- REJILLA PRINCIPAL: MATRIZ EISENHOWER + PANEL COMPLETADAS -->
     <div class="d-flex flex-column flex-lg-row gap-5 align-items-start w-100">
         
-        <!-- SECCIÓN IZQUIERDA: LOS 4 CUADRANTES DE EISENHOWER (OCUPA EL ESPACIO RESTANTE) -->
+        <!-- MATRIZ DE 4 CUADRANTES -->
         <div class="matrix-container-wrapper flex-grow-1 min-w-0 w-100">
             <div class="row g-4">
                 
                 <!-- Q1: HACER AHORA -->
-                <div class="col-md-6 ">
-                    <div class="quadrant quadrant-q1 h-100 d-flex flex-column ">
+                <div class="col-md-6">
+                    <div class="quadrant quadrant-q1 h-100 d-flex flex-column">
                         <div class="d-flex align-items-center justify-content-between mb-3 px-1">
                             <div class="d-flex align-items-center gap-2">
-                                <!-- Icono a la izquierda -->
                                 <span class="quadrant-icon-box q1-bg flex-shrink-0">
                                     <img src="{% static 'img/fire.svg' %}" alt="Eliminar" width="16" height="16"> 
                                 </span>
                                 
-                                <!-- Contenedor con título arriba y texto secundario abajo -->
                                 <div class="d-flex flex-column gap-1">
                                     <h6 class="fw-bold mb-0 text-dark" style="font-size: 1.1rem; line-height: 1.2;">
                                         {% translate "Urgente - Importante" %}
@@ -461,7 +455,6 @@
                                 </div>
                             </div>
 
-                            <!-- Badge de contador -->
                             <span class="quadrant-header-badge bg-danger text-white">{{ q1_tasks|length }}</span>
                         </div>
                         
@@ -488,7 +481,6 @@
                                     <input type="hidden" name="urgency" value="4">
                                     <input type="hidden" name="importance" value="4">
                                     
-                                    <!-- Envía la ID del tablero actual tanto para el propietario como para los miembros -->
                                     {% if current_board %}
                                         <input type="hidden" name="board" value="{{ current_board.id }}">
                                     {% endif %}
@@ -519,12 +511,10 @@
                     <div class="quadrant quadrant-q2 h-100 d-flex flex-column">
                         <div class="d-flex align-items-center justify-content-between mb-3 px-1">
                             <div class="d-flex align-items-center gap-2">
-                                <!-- Icono a la izquierda -->
                                 <span class="quadrant-icon-box q2-bg flex-shrink-0">
                                     <img src="{% static 'img/calendar.svg' %}" alt="Eliminar" width="16" height="16"> 
                                 </span>
                                 
-                                <!-- Contenedor con título arriba y texto secundario abajo -->
                                 <div class="d-flex flex-column gap-1">
                                     <h6 class="fw-bold mb-0 text-dark" style="font-size: 1.1rem; line-height: 1.2;">
                                         {% translate "Importante - No Urgente" %}
@@ -535,7 +525,6 @@
                                 </div>
                             </div>
 
-                            <!-- Badge de contador -->
                             <span class="quadrant-header-badge bg-primary text-white">{{ q2_tasks|length }}</span>
                         </div>
                         
@@ -562,7 +551,6 @@
                                     <input type="hidden" name="urgency" value="1">
                                     <input type="hidden" name="importance" value="4">
                                     
-                                    <!-- Envía la ID del tablero actual tanto para el propietario como para los miembros -->
                                     {% if current_board %}
                                         <input type="hidden" name="board" value="{{ current_board.id }}">
                                     {% endif %}
@@ -593,12 +581,10 @@
                     <div class="quadrant quadrant-q3 h-100 d-flex flex-column">
                         <div class="d-flex align-items-center justify-content-between mb-3 px-1">
                             <div class="d-flex align-items-center gap-2">
-                                <!-- Icono a la izquierda -->
                                 <span class="quadrant-icon-box q3-bg flex-shrink-0">
                                     <img src="{% static 'img/group.svg' %}" alt="Eliminar" width="16" height="16"> 
                                 </span>
                                 
-                                <!-- Contenedor con título arriba y texto secundario abajo -->
                                 <div class="d-flex flex-column gap-1">
                                     <h6 class="fw-bold mb-0 text-dark" style="font-size: 1.1rem; line-height: 1.2;">
                                         {% translate "Urgente - No Importante" %}
@@ -609,7 +595,6 @@
                                 </div>
                             </div>
 
-                            <!-- Badge de contador -->
                             <span class="quadrant-header-badge bg-warning text-dark">{{ q3_tasks|length }}</span>
                         </div>
                         
@@ -636,7 +621,6 @@
                                     <input type="hidden" name="urgency" value="4">
                                     <input type="hidden" name="importance" value="1">
                                     
-                                    <!-- Envía la ID del tablero actual tanto para el propietario como para los miembros -->
                                     {% if current_board %}
                                         <input type="hidden" name="board" value="{{ current_board.id }}">
                                     {% endif %}
@@ -667,12 +651,10 @@
                     <div class="quadrant quadrant-q4 h-100 d-flex flex-column">
                         <div class="d-flex align-items-center justify-content-between mb-3 px-1">
                             <div class="d-flex align-items-center gap-2">
-                                <!-- Icono a la izquierda -->
                                 <span class="quadrant-icon-box q4-bg flex-shrink-0">
                                     <img src="{% static 'img/trash.svg' %}" alt="Eliminar" width="16" height="16"> 
                                 </span>
                                 
-                                <!-- Contenedor con título arriba y texto secundario abajo -->
                                 <div class="d-flex flex-column gap-1">
                                     <h6 class="fw-bold mb-0 text-dark" style="font-size: 1.1rem; line-height: 1.2;">
                                         {% translate "No Urgente - No Importante" %}
@@ -683,7 +665,6 @@
                                 </div>
                             </div>
 
-                            <!-- Badge de contador -->
                             <span class="quadrant-header-badge bg-secondary text-white">{{ q4_tasks|length }}</span>
                         </div>
                         
@@ -710,7 +691,6 @@
                                     <input type="hidden" name="urgency" value="1">
                                     <input type="hidden" name="importance" value="1">
                                     
-                                    <!-- Envía la ID del tablero actual tanto para el propietario como para los miembros -->
                                     {% if current_board %}
                                         <input type="hidden" name="board" value="{{ current_board.id }}">
                                     {% endif %}
@@ -739,7 +719,7 @@
             </div>
         </div>
 
-        <!-- SECCIÓN DERECHA: PANEL COMPLETADAS (ANCHO FIJO SIN DESFASE) -->
+        <!-- SECCIÓN DERECHA: PANEL COMPLETADAS -->
         <div class="completed-panel-wrapper w-100">
             <div class="completed-panel p-3 h-100 d-flex flex-column">
                 <div class="d-flex align-items-center justify-content-between pb-3 border-bottom mb-2">
@@ -814,7 +794,7 @@
 
     </div>
 
-    <!-- MODALES EXISTENTES INTACTOS -->
+    <!-- MODALES -->
     <div class="modal fade" id="createBoardModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
@@ -856,6 +836,7 @@
             </div>
         </div>
     </div>
+
 
 </div>
 

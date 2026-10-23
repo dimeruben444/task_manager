@@ -713,6 +713,29 @@ body,
   gap: 10px;
 }
 
+.notifications-list::-webkit-scrollbar {
+  width: 5px;
+}
+.notifications-list::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+}
+.notifications-list .border-primary {
+  border-left-color: #3b82f6 !important;
+}
+.notifications-list .border-info {
+  border-left-color: #06b6d4 !important;
+}
+
+#inviteMemberModal .modal-content {
+  background-color: #ffffff;
+  border-radius: 16px !important;
+}
+#inviteMemberModal .form-control:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
 .app-navbar {
   background-color: #0F172A !important;
   border-bottom: 1px solid #334155 !important;
@@ -793,18 +816,58 @@ body,
   user-select: none;
   pointer-events: none;
 }
+.app-navbar .navbar-user-wrapper {
+  display: flex;
+  align-items: center;
+}
+.app-navbar .navbar-user-wrapper .notification-btn {
+  width: 40px;
+  height: 40px;
+  background-color: transparent;
+  border-radius: 12px;
+  color: #ffffff;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+.app-navbar .navbar-user-wrapper .notification-btn:hover, .app-navbar .navbar-user-wrapper .notification-btn:focus, .app-navbar .navbar-user-wrapper .notification-btn.show {
+  background-color: #1e2638;
+  color: #ffffff;
+}
+.app-navbar .navbar-user-wrapper .notification-btn .notification-bell-icon {
+  color: #ffffff;
+}
+.app-navbar .navbar-user-wrapper .notification-btn .notification-red-dot {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  width: 11px;
+  height: 11px;
+  background-color: #ff4d4d;
+  border: 2px solid #0F172A;
+  border-radius: 50%;
+}
+.app-navbar .navbar-user-wrapper .navbar-divider {
+  width: 1px;
+  height: 26px;
+  background-color: rgba(255, 255, 255, 0.15);
+}
 .app-navbar .navbar-user-wrapper .user-avatar {
-  width: 32px;
-  height: 32px;
-  background-color: #60a5fa;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6366f1 0%, #3b82f6 100%);
   color: #ffffff;
   font-weight: 700;
-  font-size: 0.78rem;
-  border-radius: 50%;
+  font-size: 0.82rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.app-navbar .navbar-user-wrapper .user-avatar:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.45);
 }
 
 #searchDropdownResults {

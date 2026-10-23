@@ -306,4 +306,35 @@ body,
 
 
 
+// Estilos para la lista desplegable de notificaciones en el navbar
+.notifications-list {
+  &::-webkit-scrollbar {
+    width: 5px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.15);
+    border-radius: 4px;
+  }
 
+  .border-primary {
+    border-left-color: #3b82f6 !important;
+  }
+  .border-info {
+    border-left-color: #06b6d4 !important;
+  }
+}
+
+// Personalización ligera para el modal de invitación
+#inviteMemberModal {
+  .modal-content {
+    background-color: #ffffff;
+    border-radius: 16px !important;
+  }
+
+  .form-control {
+    &:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    }
+  }
+}

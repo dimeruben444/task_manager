@@ -960,3 +960,17 @@ window.addEventListener('wheel', function(e) {
         }, 950);
     }
 }, { passive: false });
+
+// Gestión de envíos de invitación desde los modals de tablero en el sidebar
+function sendBoardInvite(boardId) {
+    const input = document.getElementById('invite-input-' + boardId);
+    const hiddenInput = document.getElementById('hiddenIdentifierInput' + boardId);
+    const form = document.getElementById('inviteFormHidden' + boardId);
+
+    if (input && input.value.trim() !== '') {
+        hiddenInput.value = input.value.trim();
+        form.submit();
+    } else {
+        alert('Por favor, introduce un nombre de usuario o correo válido.');
+    }
+}

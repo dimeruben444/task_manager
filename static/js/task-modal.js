@@ -345,7 +345,19 @@ function saveTaskModal(taskId, event) {
         },
         body: formData
     })
-    .then(response => response.json())
+    .then(async response => {
+        let data;
+        try {
+            data = await response.json();
+        } catch (e) {
+            throw new Error(`Error en la respuesta del servidor (${response.status})`);
+        }
+
+        if (!response.ok) {
+            throw new Error(data.message || `Error del servidor (${response.status})`);
+        }
+        return data;
+    })
     .then(data => {
         if (data.status === 'success') {
             const dateBadgeDisplay = document.getElementById(`dateBadgeDisplay${taskId}`);
@@ -409,6 +421,11 @@ function saveTaskModal(taskId, event) {
             if (modalEl && typeof bootstrap !== 'undefined') {
                 const bsModal = bootstrap.Modal.getInstance(modalEl);
                 if (bsModal && modalEl.classList.contains('show')) {
+                    // Quitamos el foco del botón activo para evitar la advertencia de aria-hidden en la consola
+                    if (document.activeElement) {
+                        document.activeElement.blur();
+                    }
+
                     modalEl.addEventListener('hidden.bs.modal', function handler() {
                         applyCardUpdates();
                         modalEl.removeEventListener('hidden.bs.modal', handler);

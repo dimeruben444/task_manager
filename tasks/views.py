@@ -53,7 +53,6 @@ class ToggleTaskDoneView(LoginRequiredMixin, View):
             'task_id': task.id
         })
 
-    
 class TaskUpdateView(LoginRequiredMixin, UpdateView):
     model = Task
     form_class = TaskForm
@@ -66,7 +65,7 @@ class TaskUpdateView(LoginRequiredMixin, UpdateView):
             Q(created_by=self.request.user) |
             Q(assigned_to=self.request.user) |
             Q(board__owner=self.request.user) |
-            Q(board__members=self.request.user)  # <-- IMPORTANTE: Permite a Persona B abrir el modal de edición
+            Q(board__members=self.request.user)
         ).distinct()
 
     def get_form_kwargs(self):
@@ -94,12 +93,14 @@ class TaskUpdateView(LoginRequiredMixin, UpdateView):
                 self.object.urgency = int(urgency)
                 self.object.importance = int(importance)
 
+                # Mantener datos existentes para pasar la validación
                 data = {
                     'title': self.object.title,
                     'urgency': self.object.urgency,
                     'importance': self.object.importance,
                     'due_date': self.object.due_date,
                     'description': self.object.description or '',
+                    'board': self.object.board.id if self.object.board else '',
                 }
 
                 kwargs = self.get_form_kwargs()
@@ -112,11 +113,93 @@ class TaskUpdateView(LoginRequiredMixin, UpdateView):
                 else:
                     return self.form_invalid(form)
 
-        return super().post(request, *args, **kwargs)
+        # Para solicitudes normales de edición de formulario
+        kwargs = self.get_form_kwargs()
+        kwargs['data'] = request.POST
+        kwargs['files'] = request.FILES
+        kwargs['instance'] = self.object
+        form = self.get_form_class()(**kwargs)
 
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+        
     def form_valid(self, form):
         task = form.save(commit=False)
         
+        # Preservar el tablero original si venía vacío o bloqueado
+        if not task.board_id and self.object.board_id:
+            task.board_id = self.object.board_id
+
+        if form.cleaned_data.get('reminder_enabled'):
+            task.reminder_sent = False
+
+        # RESTRICCIÓN DE NEGOCIO POR FECHA
+        date_blocked = False
+        if task.due_date:
+            today = timezone.now().date()
+            due_date = task.due_date.date() if hasattr(task.due_date, 'date') else task.due_date
+            days_left = (due_date - today).days
+
+            if days_left <= 2 and int(task.urgency or 4) <= 2:
+                task.urgency = 3
+                date_blocked = True
+
+        urgency = int(task.urgency or 4)
+        importance = int(task.importance or 4)
+
+        if urgency >= 3 and importance >= 3:
+            task.quadrant = 'Q1'
+        elif urgency <= 2 and importance >= 3:
+            task.quadrant = 'Q2'
+        elif urgency >= 3 and importance <= 2:
+            task.quadrant = 'Q3'
+        else:
+            task.quadrant = 'Q4'
+
+        task.save()
+        form.save_m2m()
+
+        is_ajax = (
+            self.request.headers.get('x-requested-with') == 'XMLHttpRequest' or
+            self.request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest' or
+            self.request.accepts('application/json')
+        )
+
+        if is_ajax:
+            try:
+                card_html = render_to_string(
+                    '_includes/_task_card.html',
+                    {'task': task, 'request': self.request},
+                    request=self.request
+                )
+
+                return JsonResponse({
+                    'status': 'success',
+                    'task_id': task.id,
+                    'quadrant': task.quadrant,
+                    'card_html': card_html,
+                    'date_restriction_applied': date_blocked
+                })
+            except Exception as e:
+                # Captura el error exacto de Python y lo envía al JS en lugar de dar 500
+                import traceback
+                print("--- ERROR AL RENDERIZAR TARJETA PARA PERSONA B ---")
+                traceback.print_exc()
+                return JsonResponse({
+                    'status': 'error',
+                    'message': f"Error al renderizar tarjeta: {str(e)}"
+                }, status=400)
+
+        return super().form_valid(form)
+        task = form.save(commit=False)
+        
+        # SI PERSONA B (MIEMBRO) EDITA Y NO TIENE CAMPO BOARD EN EL POST,
+        # O SI VENÍA CON UN VALOR VACÍO, PRESERVAR EL TABLERO ORIGINAL DE LA TAREA
+        if not task.board_id and self.object.board_id:
+            task.board_id = self.object.board_id
+
         if form.cleaned_data.get('reminder_enabled'):
             task.reminder_sent = False
 
@@ -182,7 +265,7 @@ class TaskUpdateView(LoginRequiredMixin, UpdateView):
             }, status=400)
         return super().form_invalid(form)
 
-    
+
 # 3. Eliminar Tarea
 class TaskDeleteView(LoginRequiredMixin, DeleteView):
     model = Task

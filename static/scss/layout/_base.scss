@@ -114,20 +114,71 @@ $star-error: #dc2626;
     }
   }
 
-  // 3. AVATAR DE USUARIO
+  // 3. SECCIÓN DERECHA: NOTIFICACIONES Y USUARIO
   .navbar-user-wrapper {
+    display: flex;
+    align-items: center;
+
+    // Botón de notificaciones transparente que muestra caja en hover/open
+    .notification-btn {
+      width: 40px;
+      height: 40px;
+      background-color: transparent;
+      border-radius: 12px;
+      color: #ffffff;
+      transition: background-color 0.2s ease, transform 0.1s ease;
+
+      &:hover,
+      &:focus,
+      &.show {
+        background-color: #1e2638;
+        color: #ffffff;
+      }
+
+      .notification-bell-icon {
+        color: #ffffff;
+      }
+
+      // Puntito rojo dinámico
+      .notification-red-dot {
+        position: absolute;
+        top: 7px;
+        right: 7px;
+        width: 11px;
+        height: 11px;
+        background-color: #ff4d4d;
+        border: 2px solid $nav-bg; // Se acopla dinámicamente al fondo del nav
+        border-radius: 50%;
+      }
+    }
+
+    // Línea divisoria vertical entre campana y avatar
+    .navbar-divider {
+      width: 1px;
+      height: 26px;
+      background-color: rgba(255, 255, 255, 0.15);
+    }
+
+    // Avatar de usuario con el degradado de EisenhowerFlow
     .user-avatar {
-      width: 32px;
-      height: 32px;
-      background-color: $avatar-bg;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #6366f1 0%, #3b82f6 100%);
       color: #ffffff;
       font-weight: 700;
-      font-size: 0.78rem;
-      border-radius: 50%;
+      font-size: 0.82rem;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+      letter-spacing: 0.5px;
+      box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+      &:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.45);
+      }
     }
   }
 }
@@ -337,4 +388,5 @@ html {
     overflow-y: auto;           // Scroll interno si la lista de tableros es muy larga
     margin-top: 0;
 }
+
 

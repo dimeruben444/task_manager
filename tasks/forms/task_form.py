@@ -70,7 +70,6 @@ class TaskForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)
         current_board = kwargs.pop('current_board', None)
-        # Soportar actualización parcial (por ejemplo, peticiones AJAX de Drag & Drop)
         partial = kwargs.pop('partial', False)
         
         super().__init__(*args, **kwargs)
@@ -90,7 +89,6 @@ class TaskForm(forms.ModelForm):
         self.fields['reminder_enabled'].required = False
         self.fields['reminder_offset'].required = False
 
-        # Si se indica 'partial=True', relajamos la obligatoriedad de los demás campos
         if partial:
             for field in self.fields.values():
                 field.required = False
@@ -120,28 +118,32 @@ class TaskForm(forms.ModelForm):
                     person_a = board_owner or task_creator
 
                     if person_a:
-                        # Buscamos los tableros que A y B comparten
-                        shared_boards = Board.objects.filter(
+                        # Extraemos los IDs de los tableros compartidos a una lista limpia
+                        shared_board_ids = list(Board.objects.filter(
                             Q(owner=person_a, members=user) |
                             Q(owner=user, members=person_a) |
                             (Q(members=user) & Q(members=person_a))
-                        ).distinct()
+                        ).values_list('pk', flat=True))
 
-                        # Si la tarea ya tiene un tablero asignado, aseguramos que se incluya en el QuerySet
-                        if self.instance.board:
-                            shared_boards = (shared_boards | Board.objects.filter(pk=self.instance.board.pk)).distinct()
+                        if self.instance.board_id and self.instance.board_id not in shared_board_ids:
+                            shared_board_ids.append(self.instance.board_id)
 
+                        # Búsqueda usando pk__in
+                        shared_boards = Board.objects.filter(pk__in=shared_board_ids).distinct()
                         self.fields['board'].queryset = shared_boards
 
-                        # Si solo comparten este tablero, deshabilitamos el selector para que no la mueva a otro sitio
+                        # Bloqueo visual sin deshabilitar el POST
                         if shared_boards.count() <= 1:
-                            self.fields['board'].disabled = True
+                            self.fields['board'].widget.attrs['style'] = 'pointer-events: none; background-color: #e9ecef; opacity: 0.8;'
+                            self.fields['board'].widget.attrs['tabindex'] = '-1'
                     else:
-                        if self.instance.board:
-                            self.fields['board'].queryset = Board.objects.filter(pk=self.instance.board.pk)
+                        if self.instance.board_id:
+                            self.fields['board'].queryset = Board.objects.filter(pk=self.instance.board_id)
                         else:
                             self.fields['board'].queryset = Board.objects.none()
-                        self.fields['board'].disabled = True
+                        
+                        self.fields['board'].widget.attrs['style'] = 'pointer-events: none; background-color: #e9ecef; opacity: 0.8;'
+                        self.fields['board'].widget.attrs['tabindex'] = '-1'
 
             # 2. SI ES UNA CREACIÓN NUEVA DESDE CERO
             else:
