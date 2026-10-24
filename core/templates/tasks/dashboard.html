@@ -333,7 +333,8 @@
                                 </div>
                             </div>
 
-                            <!-- 3. ASIGNADA A -->
+                            
+                            <!-- 3. ASIGNADA A ( BÚSQUEDA HISTÓRICA Y GLOBAL) -->
                             <div class="col-md-3">
                                 <div class="dropdown">
                                     <button class="btn btn-outline-secondary btn-sm text-start w-100 d-flex justify-content-between align-items-center bg-white shadow-none py-2 px-3 border rounded-3" 
@@ -349,17 +350,29 @@
                                         <small class="text-muted fw-semibold" id="quickAssigneesCounter">+</small>
                                     </button>
 
-                                    <div class="dropdown-menu p-2 shadow-lg border-0 rounded-3 mt-1 bg-white" 
+                                    <div class="dropdown-menu p-3 shadow-lg border-0 rounded-4 mt-1 bg-white" 
                                         aria-labelledby="dropdownAssigneesQuick" 
-                                        style="width: 270px; z-index: 1055;">
-                                        <div class="d-flex justify-content-between align-items-center px-2 py-1 mb-2 border-bottom">
-                                            <span class="fw-bold small text-dark">{% translate "Miembros" %}</span>
+                                        style="width: 290px; z-index: 1055;">
+                                        
+                                        <div class="d-flex justify-content-between align-items-center mb-2 pb-1 border-bottom">
+                                            <span class="fw-bold small text-dark">{% translate "Asignar personas" %}</span>
                                             <button type="button" class="btn-close btn-sm" onclick="bootstrap.Dropdown.getInstance(document.getElementById('dropdownAssigneesQuick')).hide();"></button>
                                         </div>
 
-                                        <div class="d-flex flex-column gap-1">
-                                            {% for u in users %}
-                                                <div>
+                                        <!-- CAMPO DE BÚSQUEDA GLOBAL -->
+                                        <div class="position-relative mb-2">
+                                            <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-2.5 text-muted" style="font-size: 0.8rem;"></i>
+                                            <input type="text" 
+                                                id="userSearchInputQuick"
+                                                class="form-control form-control-sm ps-4 bg-light border-0 rounded-3" 
+                                                placeholder="{% translate 'Buscar persona o email...' %}"
+                                                oninput="handleLiveUserSearch(this, 'quickMembersList')">
+                                        </div>
+
+                                        <!-- LISTA DE CONTACTOS FOCALIZADA -->
+                                        <div class="d-flex flex-column gap-1 overflow-auto pe-1" id="quickMembersList" style="max-height: 220px;">
+                                            {% for u in board_members %}
+                                                <div class="member-search-item" data-username="{{ u.get_full_name|default:u.username|lower }}">
                                                     <input type="checkbox" 
                                                         name="assigned_to" 
                                                         value="{{ u.id }}" 
@@ -372,18 +385,20 @@
                                                         onchange="toggleMemberRow(this)">
                                                     
                                                     <label for="assign-user-Quick-{{ u.id }}" 
-                                                        class="custom-member-item d-flex align-items-center justify-content-between py-1.5 px-2 rounded-2 fw-semibold w-100 m-0"
+                                                        class="custom-member-item d-flex align-items-center justify-content-between py-2 px-2 rounded-3 fw-medium w-100 m-0"
                                                         style="cursor: pointer;">
                                                         
                                                         <div class="d-flex align-items-center gap-2">
-                                                            <span class="badge rounded-circle bg-info text-dark border-0 p-0 d-inline-flex align-items-center justify-content-center flex-shrink-0" 
-                                                                style="width: 24px; height: 24px; font-size: 0.7rem; font-weight: bold;">
+                                                            <span class="badge rounded-circle bg-dark text-white border-0 p-0 d-inline-flex align-items-center justify-content-center flex-shrink-0" 
+                                                                style="width: 26px; height: 26px; font-size: 0.72rem; font-weight: 600;">
                                                                 {{ u.username|slice:":2"|upper }}
                                                             </span>
-                                                            <span style="font-size: 0.85rem;">
+                                                            <span class="member-name text-dark" style="font-size: 0.85rem;">
                                                                 {{ u.get_full_name|default:u.username }}
                                                             </span>
                                                         </div>
+
+                                                        <i class="bi bi-check2 text-primary fw-bold member-check-icon d-none" style="font-size: 1rem;"></i>
                                                     </label>
                                                 </div>
                                             {% endfor %}

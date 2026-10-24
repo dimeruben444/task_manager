@@ -18,6 +18,8 @@ from datetime import timedelta
 from django.contrib import messages
 from django.db.models import Case, When, Value, IntegerField, Count
 
+from django.http import JsonResponse
+
 User = get_user_model()
 
 
@@ -145,13 +147,36 @@ def dashboard_view(request, board_id=None):
     q3_list = list(active_tasks.filter(urgency__gte=3, importance__lt=3))
     q4_list = list(active_tasks.filter(urgency__lt=3, importance__lt=3))
 
+    
+    # FILTRADO DE MIEMBROS PARA ASIGNACIÓN DE TAREAS
+   
+    # Obtiene usuarios con los que has compartido tablero o tareas alguna vez
+    collaborator_ids = set(
+        User.objects.filter(
+            Q(shared_boards__owner=request.user) |        # Miembros de mis tableros
+            Q(boards__members=request.user) |             # Dueños de tableros donde soy miembro
+            Q(assigned_tasks__created_by=request.user) |  # Personas a las que les he creado/asignado tareas
+            Q(created_tasks__assigned_to=request.user)    # Personas que me han asignado tareas a mí
+        ).values_list('id', flat=True)
+    )
+
+    # Añadimos al propio usuario activo
+    collaborator_ids.add(request.user.id)
+
+    # Cargar los objetos User de la red de contactos
+    board_members = User.objects.filter(id__in=collaborator_ids).distinct()
+
     context = {
         'form': form,
         'board_form': BoardForm(),
         'boards': all_boards,          # Lista unificada y ordenada (Personales -> Compartidos)
         'user_boards': user_boards,    # Mapeo retrocompatible para tableros propios
         'shared_boards': shared_boards,# Mapeo retrocompatible para tableros compartidos
-        'users': User.objects.all(),
+        
+        # 🚀 Filtro de miembros aplicado manteniendo compatibilidad con ambos nombres
+        'board_members': board_members,
+        'users': board_members,        
+        
         'current_board': current_board,
         'default_board': default_board,
         'has_shared_tasks': has_shared_tasks,
@@ -364,18 +389,7 @@ def reject_invitation(request, invitation_id):
     
     messages.info(request, f"Has rechazado la invitación al tablero '{invitation.board.title}'.")
     return redirect('dashboard')
-    invitation = get_object_or_404(BoardInvitation, id=invitation_id, receiver=request.user, status='pending')
     
-    # 1. Marcar como rechazada
-    invitation.status = 'rejected'
-    invitation.save()
-    
-    # 2. Marcar la notificación como leída
-    Notification.objects.filter(invitation=invitation).update(is_read=True)
-    
-    messages.info(request, f"Has rechazado la invitación al tablero '{invitation.board.title}'.")
-    return redirect('dashboard')  # O la vista principal donde esté el usuario
-
 
 # boards/views.py
 @login_required
@@ -384,3 +398,31 @@ def delete_notification(request, notification_id):
         notification = get_object_or_404(Notification, id=notification_id, recipient=request.user)
         notification.delete()
     return redirect(request.META.get('HTTP_REFERER', 'dashboard'))
+
+
+
+@login_required
+def search_users_api(request):
+    """Endpoint AJAX para buscar usuarios globales al asignar tareas."""
+    query = request.GET.get('q', '').strip()
+    if len(query) < 2:
+        return JsonResponse({'users': []})
+
+    users = User.objects.filter(
+        Q(username__icontains=query) | 
+        Q(first_name__icontains=query) | 
+        Q(last_name__icontains=query) | 
+        Q(email__icontains=query)
+    ).exclude(id=request.user.id)[:10]
+
+    users_data = [
+        {
+            'id': u.id,
+            'username': u.username,
+            'full_name': u.get_full_name() or u.username,
+            'initials': (u.username[:2]).upper()
+        }
+        for u in users
+    ]
+
+    return JsonResponse({'users': users_data})

@@ -291,3 +291,20 @@
     opacity: 0.3 !important;
     transition: none !important;
 }
+
+
+.custom-member-item {
+    transition: background-color 0.15s ease;
+}
+
+.custom-member-item:hover {
+    background-color: #f3f4f6 !important;
+}
+
+.member-check-input:checked + .custom-member-item {
+    background-color: #eff6ff !important;
+}
+
+.member-check-input:checked + .custom-member-item .member-check-icon {
+    display: inline-block !important;
+}

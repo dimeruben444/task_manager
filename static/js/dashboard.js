@@ -978,3 +978,75 @@ function sendBoardInvite(boardId) {
         alert('Por favor, introduce un nombre de usuario o correo válido.');
     }
 }
+
+
+// Filtrado interactivo de personas en el desplegable
+let userSearchTimeout = null;
+
+function handleLiveUserSearch(input, containerId) {
+    const query = input.value.toLowerCase().trim();
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    const items = container.querySelectorAll('.member-search-item');
+    let localMatches = 0;
+
+    // 1. Filtrar lista histórica local
+    items.forEach(item => {
+        const name = item.getAttribute('data-username') || '';
+        if (name.includes(query)) {
+            item.classList.remove('d-none');
+            localMatches++;
+        } else {
+            item.classList.add('d-none');
+        }
+    });
+
+    // 2. Si hay texto y no hay coincidencias locales, consultar la API global
+    clearTimeout(userSearchTimeout);
+    if (query.length >= 2 && localMatches === 0) {
+        userSearchTimeout = setTimeout(() => {
+            fetch(`/api/search-users/?q=${encodeURIComponent(query)}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.users && data.users.length > 0) {
+                        data.users.forEach(user => {
+                            // Evitar duplicar si ya existe en el DOM
+                            if (!document.getElementById(`assign-user-Quick-${user.id}`)) {
+                                const userHtml = `
+                                    <div class="member-search-item" data-username="${user.full_name.toLowerCase()}">
+                                        <input type="checkbox" 
+                                            name="assigned_to" 
+                                            value="${user.id}" 
+                                            id="assign-user-Quick-${user.id}" 
+                                            class="d-none member-check-input" 
+                                            data-username="${user.full_name}"
+                                            data-initials="${user.initials}"
+                                            data-task-id="Quick"
+                                            data-user-id="${user.id}"
+                                            onchange="toggleMemberRow(this)">
+                                        
+                                        <label for="assign-user-Quick-${user.id}" 
+                                            class="custom-member-item d-flex align-items-center justify-content-between py-2 px-2 rounded-3 fw-medium w-100 m-0"
+                                            style="cursor: pointer;">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <span class="badge rounded-circle bg-dark text-white border-0 p-0 d-inline-flex align-items-center justify-content-center flex-shrink-0" 
+                                                    style="width: 26px; height: 26px; font-size: 0.72rem; font-weight: 600;">
+                                                    ${user.initials}
+                                                </span>
+                                                <span class="member-name text-dark" style="font-size: 0.85rem;">
+                                                    ${user.full_name}
+                                                </span>
+                                            </div>
+                                            <i class="bi bi-check2 text-primary fw-bold member-check-icon d-none" style="font-size: 1rem;"></i>
+                                        </label>
+                                    </div>
+                                `;
+                                container.insertAdjacentHTML('beforeend', userHtml);
+                            }
+                        });
+                    }
+                });
+        }, 250);
+    }
+}

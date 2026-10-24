@@ -12,4 +12,5 @@ urlpatterns = [
     path('invitation/<int:invitation_id>/accept/', views.accept_invitation, name='accept_invitation'),
     path('invitation/<int:invitation_id>/reject/', views.reject_invitation, name='reject_invitation'),
     path('notification/<int:notification_id>/delete/', views.delete_notification, name='delete_notification'),
+    path('api/search-users/', views.search_users_api, name='search_users_api'),
 ]
