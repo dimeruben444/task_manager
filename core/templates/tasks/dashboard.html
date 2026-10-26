@@ -366,13 +366,14 @@
                                                 id="userSearchInputQuick"
                                                 class="form-control form-control-sm ps-4 bg-light border-0 rounded-3" 
                                                 placeholder="{% translate 'Buscar persona o email...' %}"
-                                                oninput="handleLiveUserSearch(this, 'quickMembersList')">
+                                                data-search-url="{% url 'search_users_api' %}"
+                                                oninput="handleLiveUserSearch(this)">
                                         </div>
 
                                         <!-- LISTA DE CONTACTOS FOCALIZADA -->
                                         <div class="d-flex flex-column gap-1 overflow-auto pe-1" id="quickMembersList" style="max-height: 220px;">
                                             {% for u in board_members %}
-                                                <div class="member-search-item" data-username="{{ u.get_full_name|default:u.username|lower }}">
+                                                <div class="member-search-item" data-search-key="{{ u.get_full_name|default:u.username|lower }} {{ u.username|lower }} {{ u.email|lower }}">
                                                     <input type="checkbox" 
                                                         name="assigned_to" 
                                                         value="{{ u.id }}" 
@@ -388,17 +389,23 @@
                                                         class="custom-member-item d-flex align-items-center justify-content-between py-2 px-2 rounded-3 fw-medium w-100 m-0"
                                                         style="cursor: pointer;">
                                                         
-                                                        <div class="d-flex align-items-center gap-2">
-                                                            <span class="badge rounded-circle bg-dark text-white border-0 p-0 d-inline-flex align-items-center justify-content-center flex-shrink-0" 
-                                                                style="width: 26px; height: 26px; font-size: 0.72rem; font-weight: 600;">
+                                                        <div class="d-flex align-items-center gap-2 overflow-hidden">
+                                                            <!-- 🚀 AVATAR CON DEGRADADO Y FALLBACK COMPATIBLE -->
+                                                            <span class="rounded-circle text-white d-inline-flex align-items-center justify-content-center flex-shrink-0" 
+                                                                style="width: 26px; height: 26px; font-size: 0.72rem; font-weight: 600; background: linear-gradient(135deg, #497BF6 0%, #7855f7 50%, #9f48ec 100%);">
                                                                 {{ u.username|slice:":2"|upper }}
                                                             </span>
-                                                            <span class="member-name text-dark" style="font-size: 0.85rem;">
-                                                                {{ u.get_full_name|default:u.username }}
-                                                            </span>
+                                                            <div class="d-flex flex-column text-truncate">
+                                                                <span class="member-name text-dark text-truncate" style="font-size: 0.83rem; line-height: 1.2;">
+                                                                    {{ u.get_full_name|default:u.username }}
+                                                                </span>
+                                                                <small class="text-muted text-truncate" style="font-size: 0.72rem;">
+                                                                    {% if u.email %}{{ u.email }}{% else %}@{{ u.username }}{% endif %}
+                                                                </small>
+                                                            </div>
                                                         </div>
 
-                                                        <i class="bi bi-check2 text-primary fw-bold member-check-icon d-none" style="font-size: 1rem;"></i>
+                                                        <i class="bi bi-check2 text-primary fw-bold member-check-icon d-none ms-2" style="font-size: 1rem;"></i>
                                                     </label>
                                                 </div>
                                             {% endfor %}

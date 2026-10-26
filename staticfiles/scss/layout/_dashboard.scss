@@ -308,3 +308,19 @@
 .member-check-input:checked + .custom-member-item .member-check-icon {
     display: inline-block !important;
 }
+
+
+/* Avatar circular con el degradado distintivo de la app */
+/* Avatar circular con el degradado distintivo de la app */
+.avatar-gradient {
+    background-color: #6366f1 !important; /* Fallback si no carga el gradient */
+    background: linear-gradient(135deg, #815FF4 0%, #3b82f6 100%);
+    color: #ffffff !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 26px !important;
+    height: 26px !important;
+    min-width: 26px !important;
+    min-height: 26px !important;
+}

@@ -408,6 +408,7 @@ def search_users_api(request):
     if len(query) < 2:
         return JsonResponse({'users': []})
 
+    # Búsqueda global por username, nombre, apellidos o email
     users = User.objects.filter(
         Q(username__icontains=query) | 
         Q(first_name__icontains=query) | 
@@ -419,6 +420,7 @@ def search_users_api(request):
         {
             'id': u.id,
             'username': u.username,
+            'email': u.email,
             'full_name': u.get_full_name() or u.username,
             'initials': (u.username[:2]).upper()
         }

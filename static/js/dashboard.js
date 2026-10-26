@@ -983,18 +983,20 @@ function sendBoardInvite(boardId) {
 // Filtrado interactivo de personas en el desplegable
 let userSearchTimeout = null;
 
-function handleLiveUserSearch(input, containerId) {
-    const query = input.value.toLowerCase().trim();
-    const container = document.getElementById(containerId);
-    if (!container) return;
+function handleLiveUserSearch(inputElement) {
+    const query = inputElement.value.toLowerCase().trim();
+    
+    const dropdownMenu = inputElement.closest('.dropdown-menu');
+    if (!dropdownMenu) return;
 
+    const container = dropdownMenu.querySelector('.d-flex.flex-column.overflow-auto') || dropdownMenu;
     const items = container.querySelectorAll('.member-search-item');
     let localMatches = 0;
 
-    // 1. Filtrar lista histórica local
+    // 1. Filtrar coincidencias locales (busca en nombre, username y email)
     items.forEach(item => {
-        const name = item.getAttribute('data-username') || '';
-        if (name.includes(query)) {
+        const text = (item.getAttribute('data-search-key') || item.textContent || '').toLowerCase();
+        if (query === '' || text.includes(query)) {
             item.classList.remove('d-none');
             localMatches++;
         } else {
@@ -1002,51 +1004,73 @@ function handleLiveUserSearch(input, containerId) {
         }
     });
 
-    // 2. Si hay texto y no hay coincidencias locales, consultar la API global
+    // 2. Búsqueda global si hay al menos 2 caracteres y no está en la lista local
     clearTimeout(userSearchTimeout);
     if (query.length >= 2 && localMatches === 0) {
         userSearchTimeout = setTimeout(() => {
-            fetch(`/api/search-users/?q=${encodeURIComponent(query)}`)
-                .then(res => res.json())
-                .then(data => {
-                    if (data.users && data.users.length > 0) {
-                        data.users.forEach(user => {
-                            // Evitar duplicar si ya existe en el DOM
-                            if (!document.getElementById(`assign-user-Quick-${user.id}`)) {
-                                const userHtml = `
-                                    <div class="member-search-item" data-username="${user.full_name.toLowerCase()}">
-                                        <input type="checkbox" 
-                                            name="assigned_to" 
-                                            value="${user.id}" 
-                                            id="assign-user-Quick-${user.id}" 
-                                            class="d-none member-check-input" 
-                                            data-username="${user.full_name}"
-                                            data-initials="${user.initials}"
-                                            data-task-id="Quick"
-                                            data-user-id="${user.id}"
-                                            onchange="toggleMemberRow(this)">
+            const searchUrl = `/api/search-users/?q=${encodeURIComponent(query)}`;
+
+            fetch(searchUrl, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(res => {
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                return res.json();
+            })
+            .then(data => {
+                if (data.users && data.users.length > 0) {
+                    data.users.forEach(user => {
+                        const existingCheck = container.querySelector(`input[value="${user.id}"]`);
+                        if (!existingCheck) {
+                            // Clave única combinada para búsqueda rápida: nombre + username + email
+                            const searchKey = `${user.full_name} ${user.username} ${user.email}`.toLowerCase();
+                            const secondaryInfo = user.email ? user.email : `@${user.username}`;
+
+                            const userHtml = `
+                                <div class="member-search-item" data-search-key="${searchKey}">
+                                    <input type="checkbox" 
+                                        name="assigned_to" 
+                                        value="${user.id}" 
+                                        id="assign-user-Quick-${user.id}" 
+                                        class="d-none member-check-input" 
+                                        data-username="${user.full_name}"
+                                        data-initials="${user.initials}"
+                                        data-task-id="Quick"
+                                        data-user-id="${user.id}"
+                                        onchange="toggleMemberRow(this)">
+                                    
+                                    <label for="assign-user-Quick-${user.id}" 
+                                        class="custom-member-item d-flex align-items-center justify-content-between py-2 px-2 rounded-3 fw-medium w-100 m-0"
+                                        style="cursor: pointer;">
                                         
-                                        <label for="assign-user-Quick-${user.id}" 
-                                            class="custom-member-item d-flex align-items-center justify-content-between py-2 px-2 rounded-3 fw-medium w-100 m-0"
-                                            style="cursor: pointer;">
-                                            <div class="d-flex align-items-center gap-2">
-                                                <span class="badge rounded-circle bg-dark text-white border-0 p-0 d-inline-flex align-items-center justify-content-center flex-shrink-0" 
-                                                    style="width: 26px; height: 26px; font-size: 0.72rem; font-weight: 600;">
-                                                    ${user.initials}
-                                                </span>
-                                                <span class="member-name text-dark" style="font-size: 0.85rem;">
+                                        <div class="d-flex align-items-center gap-2 overflow-hidden">
+                                            <span class="rounded-circle text-white d-inline-flex align-items-center justify-content-center flex-shrink-0" 
+                                                style="width: 26px; height: 26px; font-size: 0.72rem; font-weight: 600; background: linear-gradient(135deg, #497BF6 0%, #7855f7 50%, #9f48ec 100%);">
+                                                ${user.initials}
+                                            </span>
+                                            <div class="d-flex flex-column text-truncate">
+                                                <span class="member-name text-dark text-truncate" style="font-size: 0.83rem; line-height: 1.2;">
                                                     ${user.full_name}
                                                 </span>
+                                                <small class="text-muted text-truncate" style="font-size: 0.72rem;">
+                                                    ${secondaryInfo}
+                                                </small>
                                             </div>
-                                            <i class="bi bi-check2 text-primary fw-bold member-check-icon d-none" style="font-size: 1rem;"></i>
-                                        </label>
-                                    </div>
-                                `;
-                                container.insertAdjacentHTML('beforeend', userHtml);
-                            }
-                        });
-                    }
-                });
+                                        </div>
+
+                                        <i class="bi bi-check2 text-primary fw-bold member-check-icon d-none ms-2" style="font-size: 1rem;"></i>
+                                    </label>
+                                </div>
+                            `;
+                            container.insertAdjacentHTML('beforeend', userHtml);
+                        }
+                    });
+                }
+            })
+            .catch(err => console.error("Error buscando usuario global:", err));
         }, 250);
     }
 }

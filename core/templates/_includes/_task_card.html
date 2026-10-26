@@ -486,116 +486,84 @@
                         </div>
 
                         <!-- COLUMNA DERECHA -->
-                        <div class="col-md-5 d-flex flex-column justify-content-between">
-                            <div>
-                                <div class="d-flex align-items-center gap-3 mb-3">
-                                    <span class="rounded-circle bg-danger text-white fw-bold d-inline-flex align-items-center justify-content-center flex-shrink-0 shadow-sm" 
-                                        style="width: 36px; height: 36px; font-size: 0.85rem;" 
-                                        title="{{ task.created_by.get_full_name|default:task.created_by.username }}">
-                                        {{ task.created_by.username|slice:":2"|upper }}
+                        <!-- 3. ASIGNADA A ( BÚSQUEDA HISTÓRICA Y GLOBAL EN EDICIÓN) -->
+                        <div class="col-md-3">
+                            <div class="dropdown">
+                                <button class="btn btn-outline-secondary btn-sm text-start w-100 d-flex justify-content-between align-items-center bg-white shadow-none py-2 px-3 border rounded-3" 
+                                        type="button" 
+                                        id="dropdownAssigneesEdit{{ task.id }}" 
+                                        data-bs-toggle="dropdown" 
+                                        data-bs-auto-close="outside" 
+                                        aria-expanded="false">
+                                    <span class="d-flex align-items-center gap-2 text-dark">
+                                        <i class="bi bi-people-fill" style="color: #fbbf24 !important;"></i>
+                                        <span class="fw-medium text-dark">{% translate "Asignada a" %}</span>
                                     </span>
+                                    <small class="text-muted fw-semibold" id="editAssigneesCounter{{ task.id }}">+</small>
+                                </button>
 
-                                    <div style="font-size: 0.82rem; line-height: 1.35;">
-                                        <div>
-                                            <strong class="text-dark">{{ task.created_by.get_full_name|default:task.created_by.username }}</strong> 
-                                            <span class="text-muted">{% translate "ha añadido esta tarjeta a" %}</span> 
-                                            <strong class="text-dark">{% if task.board %}{{ task.board.title }}{% else %}General{% endif %}</strong>
-                                        </div>
-                                        <small class="text-muted" style="font-size: 0.75rem;">
-                                            {{ task.created_at|date:"d M Y, H:i" }}
-                                        </small>
+                                <div class="dropdown-menu p-3 shadow-lg border-0 rounded-4 mt-1 bg-white" 
+                                    aria-labelledby="dropdownAssigneesEdit{{ task.id }}" 
+                                    style="width: 290px; z-index: 1055;">
+                                    
+                                    <div class="d-flex justify-content-between align-items-center mb-2 pb-1 border-bottom">
+                                        <span class="fw-bold small text-dark">{% translate "Asignar personas" %}</span>
+                                        <button type="button" class="btn-close btn-sm" onclick="bootstrap.Dropdown.getInstance(document.getElementById('dropdownAssigneesEdit{{ task.id }}')).hide();"></button>
                                     </div>
-                                </div>
 
-                                <div class="pt-3 border-top">
-                                    <small class="text-muted fw-bold d-block mb-2" style="font-size: 0.92rem;">
-                                        <i class="bi bi-people-fill" style="color: #fbbf24; !important"></i>
-                                        {% translate "Asignada a" %}
-                                    </small>
+                                    <!-- CAMPO DE BÚSQUEDA GLOBAL -->
+                                    <div class="position-relative mb-2">
+                                        <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-2.5 text-muted" style="font-size: 0.8rem;"></i>
+                                        <input type="text" 
+                                            id="userSearchInputEdit{{ task.id }}"
+                                            class="form-control form-control-sm ps-4 bg-light border-0 rounded-3" 
+                                            placeholder="{% translate 'Buscar persona o email...' %}"
+                                            data-search-url="{% url 'search_users_api' %}"
+                                            oninput="handleLiveUserSearch(this)">
+                                    </div>
 
-                                    <div class="d-flex flex-wrap gap-2 align-items-center">
-                                        
-                                        <div class="dropdown">
-                                            <button class="btn btn-light btn-sm rounded-circle border shadow-sm d-flex align-items-center justify-content-center p-0" 
-                                                    type="button" 
-                                                    id="dropdownAssignees{{ task.id }}" 
-                                                    data-bs-toggle="dropdown" 
-                                                    data-bs-auto-close="outside" 
-                                                    data-bs-display="static" 
-                                                    aria-expanded="false" 
-                                                    style="width: 32px; height: 32px; font-weight: bold; background-color: #f8fafc;">
-                                                +
-                                            </button>
-
-                                            <div class="dropdown-menu p-2 shadow-lg border-0 rounded-2xl mt-1 bg-white" 
-                                                aria-labelledby="dropdownAssignees{{ task.id }}" 
-                                                style="width: 270px; z-index: 1055; border-radius: 14px;">
+                                    <!-- LISTA DE CONTACTOS FOCALIZADA PARA EDICIÓN DE TAREA -->
+                                    <div class="d-flex flex-column gap-1 overflow-auto pe-1" id="editMembersList{{ task.id }}" style="max-height: 220px;">
+                                        {% for u in board_members %}
+                                            <div class="member-search-item" data-search-key="{{ u.get_full_name|default:u.username|lower }} {{ u.username|lower }} {{ u.email|lower }}">
+                                                <input type="checkbox" 
+                                                    name="assigned_to" 
+                                                    value="{{ u.id }}" 
+                                                    id="assign-user-Edit-{{ task.id }}-{{ u.id }}" 
+                                                    class="d-none member-check-input" 
+                                                    {% if u in task.assigned_to.all %}checked{% endif %}
+                                                    data-username="{{ u.get_full_name|default:u.username }}"
+                                                    data-initials="{{ u.username|slice:':2'|upper }}"
+                                                    data-task-id="{{ task.id }}"
+                                                    data-user-id="{{ u.id }}"
+                                                    onchange="toggleMemberRow(this)">
                                                 
-                                                <div class="d-flex justify-content-between align-items-center px-2 py-1 mb-2 border-bottom">
-                                                    <span class="fw-bold small text-dark">{% translate "Miembros" %}</span>
-                                                    <button type="button" class="btn-close btn-sm" onclick="bootstrap.Dropdown.getInstance(document.getElementById('dropdownAssignees{{ task.id }}')).hide();"></button>
-                                                </div>
-
-                                                <div class="d-flex flex-column gap-1">
-                                                    {% for u in users %}
-                                                        <div>
-                                                            <input type="checkbox" 
-                                                                name="assigned_to" 
-                                                                value="{{ u.id }}" 
-                                                                id="assign-user-{{ task.id }}-{{ u.id }}" 
-                                                                class="d-none member-check-input" 
-                                                                data-username="{{ u.get_full_name|default:u.username }}"
-                                                                data-initials="{{ u.username|slice:':2'|upper }}"
-                                                                data-task-id="{{ task.id }}"
-                                                                data-user-id="{{ u.id }}"
-                                                                {% if u in task.assigned_to.all %}checked{% endif %}
-                                                                onchange="toggleMemberRow(this)">
-                                                            
-                                                            <label for="assign-user-{{ task.id }}-{{ u.id }}" 
-                                                                class="custom-member-item d-flex align-items-center justify-content-between py-1.5 px-2 rounded-lg fw-semibold w-100 m-0"
-                                                                style="cursor: pointer; background-color: {% if u in task.assigned_to.all %}#e5e7eb{% else %}transparent{% endif %};">
-                                                                
-                                                                <div class="d-flex align-items-center gap-2">
-                                                                    <span class="badge rounded-circle bg-info text-dark border-0 p-0 d-inline-flex align-items-center justify-content-center flex-shrink-0" 
-                                                                        style="width: 24px; height: 24px; font-size: 0.7rem; font-weight: bold;">
-                                                                        {{ u.username|slice:":2"|upper }}
-                                                                    </span>
-                                                                    <span style="font-size: 0.85rem;">
-                                                                        {{ u.get_full_name|default:u.username }}
-                                                                    </span>
-                                                                </div>
-
-                                                                <div class="member-check-indicator d-flex align-items-center justify-content-center rounded-circle border"
-                                                                    style="width: 18px; height: 18px; border-color: {% if u in task.assigned_to.all %}#0d6efd{% else %}#d1d5db{% endif %} !important; background-color: {% if u in task.assigned_to.all %}#0d6efd{% else %}#ffffff{% endif %};">
-                                                                    {% if u in task.assigned_to.all %}
-                                                                        <i class="bi bi-check-lg text-white" style="font-size: 0.65rem;"></i>
-                                                                    {% endif %}
-                                                                </div>
-                                                            </label>
+                                                <label for="assign-user-Edit-{{ task.id }}-{{ u.id }}" 
+                                                    class="custom-member-item d-flex align-items-center justify-content-between py-2 px-2 rounded-3 fw-medium w-100 m-0"
+                                                    style="cursor: pointer;">
+                                                    
+                                                    <div class="d-flex align-items-center gap-2 overflow-hidden">
+                                                        <!-- 🚀 AVATAR CON DEGRADADO CORPORATIVO -->
+                                                        <span class="rounded-circle text-white d-inline-flex align-items-center justify-content-center flex-shrink-0" 
+                                                            style="width: 26px; height: 26px; font-size: 0.72rem; font-weight: 600; background: linear-gradient(135deg, #497BF6 0%, #7855f7 50%, #9f48ec 100%);">
+                                                            {{ u.username|slice:":2"|upper }}
+                                                        </span>
+                                                        <div class="d-flex flex-column text-truncate">
+                                                            <span class="member-name text-dark text-truncate" style="font-size: 0.83rem; line-height: 1.2;">
+                                                                {{ u.get_full_name|default:u.username }}
+                                                            </span>
+                                                            <small class="text-muted text-truncate" style="font-size: 0.72rem;">
+                                                                {% if u.email %}{{ u.email }}{% else %}@{{ u.username }}{% endif %}
+                                                            </small>
                                                         </div>
-                                                    {% endfor %}
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div id="assignedBadgesContainer{{ task.id }}" class="d-flex flex-wrap gap-2 align-items-center">
-                                            {% for user_assigned in task.assigned_to.all %}
-                                                <div class="d-flex align-items-center gap-2 bg-light pe-2.5 rounded-pill border shadow-xs" id="badge-user-{{ task.id }}-{{ user_assigned.id }}">
-                                                    <div class="rounded-circle bg-info text-dark fw-bold d-flex align-items-center justify-content-center flex-shrink-0" 
-                                                        style="width: 28px; height: 28px; font-size: 0.75rem;" 
-                                                        title="{{ user_assigned.get_full_name|default:user_assigned.username }}">
-                                                        {{ user_assigned.username|slice:":2"|upper }}
                                                     </div>
-                                                    <span class="small text-dark fw-semibold" style="font-size: 0.78rem;">
-                                                        {{ user_assigned.get_full_name|default:user_assigned.username }}
-                                                    </span>
-                                                </div>
-                                            {% endfor %}
-                                        </div>
 
+                                                    <i class="bi bi-check2 text-primary fw-bold member-check-icon {% if u not in task.assigned_to.all %}d-none{% endif %} ms-2" style="font-size: 1rem;"></i>
+                                                </label>
+                                            </div>
+                                        {% endfor %}
                                     </div>
                                 </div>
-
                             </div>
                         </div>
 

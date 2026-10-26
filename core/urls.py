@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.contrib.auth.views import LoginView, LogoutView
 from users.views import register_view
+from boards.views import search_users_api
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -29,4 +30,6 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(next_page='login'), name='logout'),
     path('login/', LoginView.as_view(template_name='registration/login.html'), name='login'),
     path('register/', register_view, name='register'),
+
+    path('api/search-users/', search_users_api, name='search_users_api'),
 ]
