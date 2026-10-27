@@ -694,6 +694,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                 finalContainer.appendChild(inlineWrapper);
                             }
                         }
+                        updateMatrixAndSidebarCounts();
                     } else {
                         sourceContainer.appendChild(itemEl);
                     }
@@ -910,8 +911,40 @@ document.addEventListener('keydown', function(e) {
     }
 });
 
+// Oculta o muestra el letrero "No hay tareas..." en cada cuadrante dinámicamente
+
+function checkEmptyQuadrants() {
+    ['Q1', 'Q2', 'Q3', 'Q4'].forEach(quadCode => {
+        const container = document.querySelector(`.quadrant-container[data-quadrant="${quadCode}"]`);
+        if (!container) return;
+
+        // Contamos las tarjetas de tarea reales en este contenedor
+        const realTasks = container.querySelectorAll('.task-card:not(.completed-task-item)');
+        const emptyMsg = container.querySelector('.empty-msg-box, .empty-msg');
+
+        if (emptyMsg) {
+            if (realTasks.length > 0) {
+                // Si hay tarjetas realmentes en el DOM, forzamos ocultar
+                emptyMsg.classList.add('d-none');
+                emptyMsg.style.setProperty('display', 'none', 'important');
+            } else {
+                // Si está a cero, mostramos
+                emptyMsg.classList.remove('d-none');
+                emptyMsg.style.removeProperty('display');
+            }
+        }
+    });
+}
+
+// Ejecutar automáticamente al cargar la página para corregir cualquier fallo del servidor
+document.addEventListener('DOMContentLoaded', function () {
+    checkEmptyQuadrants();
+});
+
 //actualiza tanto el número de cada cuadrante
 function updateMatrixAndSidebarCounts() {
+    // Verificación e invisibilidad inmediata del letrero "No hay tareas"
+    checkEmptyQuadrants();
     // 1. Recalcular cada cuadrante de la Matriz (Q1, Q2, Q3, Q4)
     ['Q1', 'Q2', 'Q3', 'Q4'].forEach(quadCode => {
         const container = document.querySelector(`.quadrant-container[data-quadrant="${quadCode}"]`);
@@ -966,111 +999,273 @@ window.addEventListener('wheel', function(e) {
 }, { passive: false });
 
 // Gestión de envíos de invitación desde los modals de tablero en el sidebar
+// Envía las invitaciones acumuladas haciendo submit del formulario principal del tablero
 function sendBoardInvite(boardId) {
-    const input = document.getElementById('invite-input-' + boardId);
-    const hiddenInput = document.getElementById('hiddenIdentifierInput' + boardId);
-    const form = document.getElementById('inviteFormHidden' + boardId);
+    const users = selectedUsersMap[boardId] || [];
+    const feedbackEl = document.getElementById(`invite-feedback-${boardId}`);
 
-    if (input && input.value.trim() !== '') {
-        hiddenInput.value = input.value.trim();
+    if (users.length === 0) {
+        if (feedbackEl) {
+            feedbackEl.className = "text-danger fw-bold";
+            feedbackEl.textContent = "Selecciona al menos una persona de la lista primero.";
+        }
+        return;
+    }
+
+    // Buscar el formulario principal del modal
+    const inputEl = document.getElementById(`invite-input-${boardId}`);
+    const form = inputEl ? inputEl.closest('form') : null;
+
+    if (form) {
+        // Asegurar que renderSelectedUsers ha volcado los datos al input oculto antes de enviar
+        renderSelectedUsers(boardId);
+        
+        if (feedbackEl) {
+            feedbackEl.className = "text-success fw-bold";
+            feedbackEl.textContent = `Enviando invitación a ${users.length} persona(s)...`;
+        }
+        
         form.submit();
     } else {
-        alert('Por favor, introduce un nombre de usuario o correo válido.');
+        console.error("No se encontró el formulario para el tablero:", boardId);
     }
 }
 
+// ==========================================
+// BUSCADOR EN VIVO DE INVITADOS PARA TABLEROS (MÚLTIPLES SELECCIONES)
+// ==========================================
+let boardInviteTimeout = null;
+const selectedUsersMap = {}; // Guarda un array de objetos por boardId: { username, displayName }
 
-// Filtrado interactivo de personas en el desplegable
-let userSearchTimeout = null;
+function handleBoardInviteSearch(inputEl, boardId) {
+    const query = inputEl.value.toLowerCase().trim();
+    const resultsMenu = document.getElementById(`invite-results-${boardId}`);
+    const container = document.getElementById(`invite-list-container-${boardId}`);
+    const noResultsEl = document.getElementById(`invite-no-results-${boardId}`);
+    if (!resultsMenu || !container) return;
 
-function handleLiveUserSearch(inputElement) {
-    const query = inputElement.value.toLowerCase().trim();
-    
-    const dropdownMenu = inputElement.closest('.dropdown-menu');
-    if (!dropdownMenu) return;
+    if (query.length === 0) {
+        resultsMenu.classList.add('d-none');
+        resultsMenu.style.display = 'none';
+        if (noResultsEl) noResultsEl.classList.add('d-none');
+        return;
+    }
 
-    const container = dropdownMenu.querySelector('.d-flex.flex-column.overflow-auto') || dropdownMenu;
+    // 1. Mostrar menú forzando la visibilidad estructural
+    resultsMenu.classList.remove('d-none');
+    resultsMenu.style.display = 'block';
+
+    // 2. Filtrado dinámico de coincidencias locales
     const items = container.querySelectorAll('.member-search-item');
     let localMatches = 0;
 
-    // 1. Filtrar coincidencias locales (busca en nombre, username y email)
     items.forEach(item => {
         const text = (item.getAttribute('data-search-key') || item.textContent || '').toLowerCase();
-        if (query === '' || text.includes(query)) {
+        if (text.includes(query)) {
             item.classList.remove('d-none');
+            item.style.display = 'block';
             localMatches++;
         } else {
             item.classList.add('d-none');
+            item.style.display = 'none';
         }
     });
 
-    // 2. Búsqueda global si hay al menos 2 caracteres y no está en la lista local
-    clearTimeout(userSearchTimeout);
-    if (query.length >= 2 && localMatches === 0) {
-        userSearchTimeout = setTimeout(() => {
-            const searchUrl = `/api/search-users/?q=${encodeURIComponent(query)}`;
+    if (localMatches > 0 && noResultsEl) {
+        noResultsEl.classList.add('d-none');
+    }
 
-            fetch(searchUrl, {
+    // 3. Consulta AJAX para usuarios del servidor
+    clearTimeout(boardInviteTimeout);
+    if (query.length >= 2) {
+        boardInviteTimeout = setTimeout(() => {
+            fetch(`/api/search-users/?q=${encodeURIComponent(query)}`, {
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
                     'Accept': 'application/json'
                 }
             })
-            .then(res => {
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                return res.json();
-            })
+            .then(res => res.ok ? res.json() : Promise.reject(res.status))
             .then(data => {
                 if (data.users && data.users.length > 0) {
                     data.users.forEach(user => {
-                        const existingCheck = container.querySelector(`input[value="${user.id}"]`);
-                        if (!existingCheck) {
-                            // Clave única combinada para búsqueda rápida: nombre + username + email
-                            const searchKey = `${user.full_name} ${user.username} ${user.email}`.toLowerCase();
-                            const secondaryInfo = user.email ? user.email : `@${user.username}`;
+                        const userKey = `${user.full_name || ''} ${user.username} ${user.email || ''}`.toLowerCase();
+                        const existing = container.querySelector(`[data-search-key*="${user.username.toLowerCase()}"]`);
 
-                            const userHtml = `
-                                <div class="member-search-item" data-search-key="${searchKey}">
-                                    <input type="checkbox" 
-                                        name="assigned_to" 
-                                        value="${user.id}" 
-                                        id="assign-user-Quick-${user.id}" 
-                                        class="d-none member-check-input" 
-                                        data-username="${user.full_name}"
-                                        data-initials="${user.initials}"
-                                        data-task-id="Quick"
-                                        data-user-id="${user.id}"
-                                        onchange="toggleMemberRow(this)">
-                                    
-                                    <label for="assign-user-Quick-${user.id}" 
-                                        class="custom-member-item d-flex align-items-center justify-content-between py-2 px-2 rounded-3 fw-medium w-100 m-0"
-                                        style="cursor: pointer;">
-                                        
+                        if (!existing) {
+                            const initials = user.initials || (user.full_name ? user.full_name.substring(0, 2).toUpperCase() : user.username.substring(0, 2).toUpperCase());
+                            const displayName = user.full_name || user.username;
+                            const subText = user.email || `@${user.username}`;
+
+                            const itemHtml = `
+                                <div class="member-search-item" data-search-key="${userKey}">
+                                    <button type="button" 
+                                            class="btn btn-light btn-sm w-100 text-start border-0 d-flex align-items-center justify-content-between p-2 rounded-3"
+                                            onmousedown="selectBoardCollaborator('${boardId}', '${user.username}', '${displayName}')">
                                         <div class="d-flex align-items-center gap-2 overflow-hidden">
                                             <span class="rounded-circle text-white d-inline-flex align-items-center justify-content-center flex-shrink-0" 
-                                                style="width: 26px; height: 26px; font-size: 0.72rem; font-weight: 600; background: linear-gradient(135deg, #497BF6 0%, #7855f7 50%, #9f48ec 100%);">
-                                                ${user.initials}
+                                                  style="width: 32px; height: 32px; font-size: 0.75rem; font-weight: 700; background: linear-gradient(135deg, #497BF6 0%, #7855f7 50%, #9f48ec 100%);">
+                                                ${initials}
                                             </span>
                                             <div class="d-flex flex-column text-truncate">
-                                                <span class="member-name text-dark text-truncate" style="font-size: 0.83rem; line-height: 1.2;">
-                                                    ${user.full_name}
+                                                <span class="text-dark fw-bold text-truncate" style="font-size: 0.85rem; line-height: 1.2;">
+                                                    ${displayName}
                                                 </span>
                                                 <small class="text-muted text-truncate" style="font-size: 0.72rem;">
-                                                    ${secondaryInfo}
+                                                    ${subText}
                                                 </small>
                                             </div>
                                         </div>
-
-                                        <i class="bi bi-check2 text-primary fw-bold member-check-icon d-none ms-2" style="font-size: 1rem;"></i>
-                                    </label>
+                                    </button>
                                 </div>
                             `;
-                            container.insertAdjacentHTML('beforeend', userHtml);
+                            container.insertAdjacentHTML('beforeend', itemHtml);
                         }
                     });
                 }
+
+                const visibleItems = container.querySelectorAll('.member-search-item:not(.d-none)');
+                if (visibleItems.length === 0 && noResultsEl) {
+                    noResultsEl.classList.remove('d-none');
+                } else if (noResultsEl) {
+                    noResultsEl.classList.add('d-none');
+                }
             })
-            .catch(err => console.error("Error buscando usuario global:", err));
-        }, 250);
+            .catch(err => console.error("Error al buscar usuarios:", err));
+        }, 200);
+    } else if (localMatches === 0 && noResultsEl) {
+        noResultsEl.classList.remove('d-none');
     }
 }
+
+// Al seleccionar un usuario de la lista flotante (Soporta múltiples)
+function selectBoardCollaborator(boardId, username, displayName) {
+    const inputEl = document.getElementById(`invite-input-${boardId}`);
+    const resultsMenu = document.getElementById(`invite-results-${boardId}`);
+
+    if (!selectedUsersMap[boardId]) {
+        selectedUsersMap[boardId] = [];
+    }
+
+    // Evita duplicados en el array local
+    const exists = selectedUsersMap[boardId].some(u => u.username === username);
+    if (!exists) {
+        selectedUsersMap[boardId].push({ username, displayName });
+    }
+
+    // Limpiar buscador y ocultar desplegable
+    if (inputEl) inputEl.value = '';
+    if (resultsMenu) {
+        resultsMenu.classList.add('d-none');
+        resultsMenu.style.display = 'none';
+    }
+
+    // Renderizar la lista actualizada de personas
+    renderSelectedUsers(boardId);
+}
+
+// Renderiza los badges individuales Y sincroniza los inputs ocultos para Django
+function renderSelectedUsers(boardId) {
+    const boxEl = document.getElementById(`invite-selected-box-${boardId}`);
+    const listContainer = document.getElementById(`selected-users-list-${boardId}`);
+    const users = selectedUsersMap[boardId] || [];
+
+    // 1. Localizar o crear el contenedor dinámico para inputs ocultos múltiples
+    let hiddenContainer = document.getElementById(`hidden-inputs-container-${boardId}`);
+    if (!hiddenContainer && boxEl) {
+        hiddenContainer = document.createElement('div');
+        hiddenContainer.id = `hidden-inputs-container-${boardId}`;
+        boxEl.parentNode.appendChild(hiddenContainer);
+    }
+
+    // 2. Buscar las distintas variaciones de ID para la compatibilidad con la plantilla
+    const legacyInput = document.getElementById(`hiddenIdentifierInput${boardId}`) || 
+                        document.getElementById(`hiddenIdentifierInput-${boardId}`);
+
+    if (!boxEl) return;
+
+    if (users.length === 0) {
+        boxEl.classList.add('d-none');
+        if (listContainer) listContainer.innerHTML = '';
+        if (hiddenContainer) hiddenContainer.innerHTML = '';
+        if (legacyInput) legacyInput.value = '';
+        return;
+    }
+
+    boxEl.classList.remove('d-none');
+
+    // 3. Renderizar badges visuales
+    if (listContainer) {
+        listContainer.innerHTML = users.map(user => `
+            <div class="d-inline-flex align-items-center gap-1.5 bg-white px-2.5 py-1 rounded-pill border shadow-sm" style="font-size: 0.78rem;">
+                <span class="fw-bold text-dark">${user.displayName}</span>
+                <button type="button" class="btn-close ms-1" style="font-size: 0.6rem;" onclick="removeSelectedCollaborator('${boardId}', '${user.username}')"></button>
+            </div>
+        `).join('');
+    }
+
+    // 4. Crear inputs ocultos múltiples para request.POST.getlist('invited_users')
+    if (hiddenContainer) {
+        hiddenContainer.innerHTML = users.map(user => `
+            <input type="hidden" name="invited_users" value="${user.username}">
+        `).join('');
+    }
+
+    // 5. Asignar usernames separados por comas al input legacy para request.POST.get('invite_identifier')
+    if (legacyInput) {
+        legacyInput.value = users.map(u => u.username).join(',');
+    }
+}
+
+// Elimina un usuario específico del listado acumulado
+function removeSelectedCollaborator(boardId, username) {
+    if (selectedUsersMap[boardId]) {
+        selectedUsersMap[boardId] = selectedUsersMap[boardId].filter(u => u.username !== username);
+        renderSelectedUsers(boardId);
+    }
+}
+
+// Limpia toda la lista de usuarios seleccionados
+function clearSelectedCollaborator(boardId) {
+    selectedUsersMap[boardId] = [];
+    renderSelectedUsers(boardId);
+}
+
+// Envía las invitaciones asociándolas antes del submit del formulario
+function sendBoardInvite(boardId) {
+    const users = selectedUsersMap[boardId] || [];
+    const hiddenInput = document.getElementById(`hiddenIdentifierInput${boardId}`);
+    const form = document.getElementById(`inviteFormHidden${boardId}`) || document.getElementById('createBoardForm');
+    const feedbackEl = document.getElementById(`invite-feedback-${boardId}`);
+
+    if (users.length === 0) {
+        if (feedbackEl) {
+            feedbackEl.className = "text-danger fw-bold";
+            feedbackEl.textContent = "Selecciona al menos una persona de la lista primero.";
+        }
+        return;
+    }
+
+    if (hiddenInput) {
+        hiddenInput.value = users.map(u => u.username).join(',');
+    }
+
+    if (feedbackEl) {
+        feedbackEl.className = "text-success fw-bold";
+        feedbackEl.textContent = `Enviando invitaciones a ${users.length} persona(s)...`;
+    }
+
+    if (form) {
+        form.submit();
+    }
+}
+
+// Ocultar el desplegable si el usuario hace clic fuera de la zona del buscador
+document.addEventListener('click', function (e) {
+    if (!e.target.closest('.position-relative')) {
+        document.querySelectorAll('[id^="invite-results-"]').forEach(menu => {
+            menu.classList.add('d-none');
+            menu.style.display = 'none';
+        });
+    }
+});

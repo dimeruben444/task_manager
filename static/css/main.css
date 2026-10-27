@@ -1030,4 +1030,11 @@ html {
   margin-top: 0;
 }
 
+[id^=invite-results-] {
+  z-index: 2100 !important;
+  background-color: #ffffff !important;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.25) !important;
+  border: 1px solid #e2e8f0 !important;
+}
+
 /*# sourceMappingURL=main.css.map */

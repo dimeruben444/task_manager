@@ -14,6 +14,15 @@ document.addEventListener('change', function (e) {
 
             if (card) {
                 card.classList.add('task-completing');
+                
+                card.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
+                card.style.opacity = '0';
+                card.style.transform = 'scale(0.9)';
+                
+                setTimeout(() => {
+                    card.remove(); // Se quita del DOM
+                    
+                }, 200);
 
                 // 1. ORIGEN EXACTO (Centro de la casilla pulsada)
                 const rect = checkbox.getBoundingClientRect();
@@ -116,6 +125,9 @@ document.addEventListener('change', function (e) {
                         particle.remove();
                         if (typeof sendToggleRequest === 'function') {
                             sendToggleRequest(taskId, isCompleted, checkbox);
+                        }
+                        if (typeof updateMatrixAndSidebarCounts === 'function') {
+                            updateMatrixAndSidebarCounts();
                         }
                     }
                 }

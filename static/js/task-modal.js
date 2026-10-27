@@ -27,16 +27,16 @@ function selectQuadrant(quadrantCode, taskId, labelText) {
 
     if (quadrantCode === 'Q1') {
         urgency = 4; importance = 4;
-        svgIcon = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="1" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="9" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/></svg>`;
+        svgIcon = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="flex-shrink-0"><rect x="1" y="1" width="6" height="6" rx="1" fill="#ef4444"/><rect x="9" y="1" width="6" height="6" rx="1" stroke="#94a3b8" stroke-width="1.2"/><rect x="1" y="9" width="6" height="6" rx="1" stroke="#94a3b8" stroke-width="1.2"/><rect x="9" y="9" width="6" height="6" rx="1" stroke="#94a3b8" stroke-width="1.2"/></svg>`;
     } else if (quadrantCode === 'Q2') {
         urgency = 1; importance = 4;
-        svgIcon = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="9" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="1" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="9" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/></svg>`;
+        svgIcon = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="flex-shrink-0"><rect x="1" y="1" width="6" height="6" rx="1" stroke="#94a3b8" stroke-width="1.2"/><rect x="9" y="1" width="6" height="6" rx="1" fill="#3b82f6"/><rect x="1" y="9" width="6" height="6" rx="1" stroke="#94a3b8" stroke-width="1.2"/><rect x="9" y="9" width="6" height="6" rx="1" stroke="#94a3b8" stroke-width="1.2"/></svg>`;
     } else if (quadrantCode === 'Q3') {
         urgency = 4; importance = 1;
-        svgIcon = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="9" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="1" y="9" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/></svg>`;
+        svgIcon = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="flex-shrink-0"><rect x="1" y="1" width="6" height="6" rx="1" stroke="#94a3b8" stroke-width="1.2"/><rect x="9" y="1" width="6" height="6" rx="1" stroke="#94a3b8" stroke-width="1.2"/><rect x="1" y="9" width="6" height="6" rx="1" fill="#f59e0b"/><rect x="9" y="9" width="6" height="6" rx="1" stroke="#94a3b8" stroke-width="1.2"/></svg>`;
     } else if (quadrantCode === 'Q4') {
         urgency = 1; importance = 1;
-        svgIcon = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="9" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="1" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="9" y="9" width="6" height="6" rx="1" fill="currentColor"/></svg>`;
+        svgIcon = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="flex-shrink-0"><rect x="1" y="1" width="6" height="6" rx="1" stroke="#94a3b8" stroke-width="1.2"/><rect x="9" y="1" width="6" height="6" rx="1" stroke="#94a3b8" stroke-width="1.2"/><rect x="1" y="9" width="6" height="6" rx="1" stroke="#94a3b8" stroke-width="1.2"/><rect x="9" y="9" width="6" height="6" rx="1" fill="#64748b"/></svg>`;
     }
 
     const displayContainer = document.getElementById(`quadrantDropdownSelected${taskId}`);
@@ -50,7 +50,6 @@ function selectQuadrant(quadrantCode, taskId, labelText) {
     if (urgencyRadio) urgencyRadio.checked = true;
     if (importanceRadio) importanceRadio.checked = true;
 }
-
 // 3. FUNCIONES AUXILIARES PARA EL DROPDOWN DE FECHAS EN MODALES
 function syncHiddenDueDate(taskId) {
   const displayDate = document.getElementById(`displayDate${taskId}`);
@@ -385,6 +384,11 @@ function saveTaskModal(taskId, event) {
                             targetContainer.appendChild(newCard);
                         }
 
+                        //ocultar mensaje no hay tareas
+                        if (typeof updateMatrixAndSidebarCounts === 'function') {
+                            updateMatrixAndSidebarCounts();
+                        }
+
                         const lastRect = newCard.getBoundingClientRect();
                         const deltaX = firstRect.left - lastRect.left;
                         const deltaY = firstRect.top - lastRect.top;
@@ -571,7 +575,9 @@ function toggleMemberRow(checkboxEl) {
       badgeDiv.id = `badge-user-${taskId}-${userId}`;
       badgeDiv.className = 'd-flex align-items-center gap-2 bg-white pe-2 rounded-pill border shadow-sm';
       badgeDiv.innerHTML = `
-        <div class="rounded-circle bg-info text-dark fw-bold d-flex align-items-center justify-content-center flex-shrink-0" style="width: 28px; height: 28px; font-size: 0.75rem;" title="${username}">
+        <div class="rounded-circle text-white fw-bold d-flex align-items-center justify-content-center flex-shrink-0" 
+            style="width: 28px; height: 28px; font-size: 0.75rem; background: linear-gradient(135deg, #497BF6 0%, #7855f7 50%, #9f48ec 100%) !important;" 
+            title="${username}">
             ${initials}
         </div>
         <span class="small text-dark fw-semibold" style="font-size: 0.8rem;">${username}</span>

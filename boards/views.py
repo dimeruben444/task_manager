@@ -218,36 +218,43 @@ class BoardCreateView(LoginRequiredMixin, CreateView):
         response = super().form_valid(form)
         board = self.object
 
-        # 2. Procesar la invitación usando 'receiver' para BoardInvitation
-        invite_identifier = self.request.POST.get('invite_identifier', '').strip()
-        if invite_identifier:
-            target_user = User.objects.filter(
-                Q(username=invite_identifier) | Q(email=invite_identifier)
-            ).exclude(id=self.request.user.id).first()
+        # 2. Obtener lista de usuarios invitados (soporta array de inputs o lista separada por comas)
+        invited_list = self.request.POST.getlist('invited_users')
+        
+        raw_identifier = self.request.POST.get('invite_identifier', '').strip()
+        if not invited_list and raw_identifier:
+            invited_list = [item.strip() for item in raw_identifier.split(',') if item.strip()]
 
-            if target_user:
-                # Crear la invitación usando 'receiver'
-                invitation, created = BoardInvitation.objects.get_or_create(
-                    board=board,
-                    sender=self.request.user,
-                    receiver=target_user,
-                    defaults={'status': 'pending'}
-                )
+        # 3. Procesar invitaciones para cada usuario seleccionado
+        if invited_list:
+            for identifier in invited_list:
+                target_user = User.objects.filter(
+                    Q(username=identifier) | Q(email=identifier)
+                ).exclude(id=self.request.user.id).first()
 
-                # Notificación para el invitado usando 'recipient'
-                Notification.objects.create(
-                    recipient=target_user,
-                    actor=self.request.user,
-                    notification_type='invitation',
-                    verb=f"te ha invitado a unirte al tablero '{board.title}'",
-                    target_board=board,
-                    invitation=invitation
-                )
-            else:
-                messages.warning(
-                    self.request, 
-                    f"El tablero fue creado, pero no se encontró al usuario '{invite_identifier}'."
-                )
+                if target_user:
+                    # Crear la invitación usando 'receiver'
+                    invitation, created = BoardInvitation.objects.get_or_create(
+                        board=board,
+                        sender=self.request.user,
+                        receiver=target_user,
+                        defaults={'status': 'pending'}
+                    )
+
+                    # Notificación para el invitado usando 'recipient'
+                    Notification.objects.create(
+                        recipient=target_user,
+                        actor=self.request.user,
+                        notification_type='invitation',
+                        verb=f"te ha invitado a unirte al tablero '{board.title}'",
+                        target_board=board,
+                        invitation=invitation
+                    )
+                else:
+                    messages.warning(
+                        self.request, 
+                        f"No se pudo enviar invitación a '{identifier}': usuario no encontrado."
+                    )
 
         return response
 
@@ -256,8 +263,8 @@ class BoardCreateView(LoginRequiredMixin, CreateView):
         return redirect('dashboard')
 
     def get_success_url(self):
-        return reverse_lazy('dashboard_board', kwargs={'board_id': self.object.id})
-    
+        return reverse_lazy('dashboard_board', kwargs={'board_id': self.object.id}) 
+
 class BoardUpdateView(LoginRequiredMixin, UpdateView):
     model = Board
     form_class = BoardForm
@@ -279,12 +286,45 @@ class BoardUpdateView(LoginRequiredMixin, UpdateView):
             board.description = description
             board.save()
 
+        # 1. Gestionar lista de miembros activos en los checkboxes
         members_ids = request.POST.getlist('members')
         board.members.set(members_ids)
 
+        # 2. Capturar invitaciones (soporta array 'invited_users' o string por comas 'invite_identifier')
+        invited_list = request.POST.getlist('invited_users')
+        raw_identifier = request.POST.get('invite_identifier', '').strip()
+
+        if not invited_list and raw_identifier:
+            invited_list = [item.strip() for item in raw_identifier.split(',') if item.strip()]
+
+        if invited_list:
+            for identifier in invited_list:
+                # Buscar usuario por username o email exacto
+                target_user = User.objects.filter(
+                    Q(username__iexact=identifier) | Q(email__iexact=identifier)
+                ).exclude(id=request.user.id).first()
+
+                if target_user and target_user not in board.members.all() and target_user != board.owner:
+                    invitation, created = BoardInvitation.objects.get_or_create(
+                        board=board,
+                        sender=request.user,
+                        receiver=target_user,
+                        defaults={'status': 'pending'}
+                    )
+
+                    if created:
+                        Notification.objects.create(
+                            recipient=target_user,
+                            actor=request.user,
+                            notification_type='invitation',
+                            verb=f"te ha invitado a unirte al tablero '{board.title}'",
+                            target_board=board,
+                            invitation=invitation
+                        )
+
         return redirect('dashboard_board', board_id=board.id)
 
-
+    
 class BoardDeleteView(LoginRequiredMixin, DeleteView):
     model = Board
     pk_url_kwarg = 'board_id'

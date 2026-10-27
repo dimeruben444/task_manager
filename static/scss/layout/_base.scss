@@ -390,3 +390,12 @@ html {
 }
 
 
+// ==========================================
+// FIX BUSCADOR FLOTANTE EN MODALES DE TABLERO
+// ==========================================
+[id^="invite-results-"] {
+  z-index: 2100 !important; // Fuerza a estar por encima de la capa 2050 del modal
+  background-color: #ffffff !important;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.25) !important;
+  border: 1px solid #e2e8f0 !important;
+}

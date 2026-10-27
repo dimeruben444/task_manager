@@ -121,7 +121,7 @@
             <form method="POST" action="{% url 'edit_task' task.id %}" id="editTaskForm{{ task.id }}" onsubmit="saveTaskModal('{{ task.id }}', event); return false;">
                 {% csrf_token %}
                 
-                <!-- CABECERA -->
+                <!-- CABECERA DE SELECCIÓN DE CUADRANTE -->
                 <div class="modal-header border-bottom-0 pb-1 pt-4 px-4 d-flex justify-content-between align-items-center">
                     <div class="dropdown">
                         <button class="btn btn-light btn-sm rounded-lg border text-start d-flex align-items-center gap-2 shadow-none px-3 py-1.5" 
@@ -131,16 +131,23 @@
                                 aria-expanded="false" 
                                 style="font-size: 0.85rem; background-color: #f8fafc; border-color: #e2e8f0;">
                             
-                            <i class="bi bi-grid-fill text-muted"></i>
                             <span id="quadrantDropdownSelected{{ task.id }}" class="d-flex align-items-center gap-2 text-dark fw-semibold">
                                 {% if task.urgency >= 3 and task.importance >= 3 %}
-                                    {% translate "Urgente e Importante (Hacer ahora)" %}
+                                    <!-- Q1: Solo cuadro superior-izq relleno de Rojo (#ef4444) -->
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="flex-shrink-0"><rect x="1" y="1" width="6" height="6" rx="1" fill="#ef4444"/><rect x="9" y="1" width="6" height="6" rx="1" stroke="#94a3b8" stroke-width="1.2"/><rect x="1" y="9" width="6" height="6" rx="1" stroke="#94a3b8" stroke-width="1.2"/><rect x="9" y="9" width="6" height="6" rx="1" stroke="#94a3b8" stroke-width="1.2"/></svg>
+                                    <span>{% translate "Urgente e Importante (Hacer ahora)" %}</span>
                                 {% elif task.urgency <= 2 and task.importance >= 3 %}
-                                    {% translate "Importante - No Urgente (Planificar)" %}
+                                    <!-- Q2: Solo cuadro superior-der relleno de Azul (#3b82f6) -->
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="flex-shrink-0"><rect x="1" y="1" width="6" height="6" rx="1" stroke="#94a3b8" stroke-width="1.2"/><rect x="9" y="1" width="6" height="6" rx="1" fill="#3b82f6"/><rect x="1" y="9" width="6" height="6" rx="1" stroke="#94a3b8" stroke-width="1.2"/><rect x="9" y="9" width="6" height="6" rx="1" stroke="#94a3b8" stroke-width="1.2"/></svg>
+                                    <span>{% translate "Importante - No Urgente (Planificar)" %}</span>
                                 {% elif task.urgency >= 3 and task.importance <= 2 %}
-                                    {% translate "Urgente - No Importante (Delegar)" %}
+                                    <!-- Q3: Solo cuadro inferior-izq relleno de Amarillo (#f59e0b) -->
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="flex-shrink-0"><rect x="1" y="1" width="6" height="6" rx="1" stroke="#94a3b8" stroke-width="1.2"/><rect x="9" y="1" width="6" height="6" rx="1" stroke="#94a3b8" stroke-width="1.2"/><rect x="1" y="9" width="6" height="6" rx="1" fill="#f59e0b"/><rect x="9" y="9" width="6" height="6" rx="1" stroke="#94a3b8" stroke-width="1.2"/></svg>
+                                    <span>{% translate "Urgente - No Importante (Delegar)" %}</span>
                                 {% else %}
-                                    {% translate "No Urgente - No Importante (Eliminar)" %}
+                                    <!-- Q4: Solo cuadro inferior-der relleno de Gris (#64748b) -->
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="flex-shrink-0"><rect x="1" y="1" width="6" height="6" rx="1" stroke="#94a3b8" stroke-width="1.2"/><rect x="9" y="1" width="6" height="6" rx="1" stroke="#94a3b8" stroke-width="1.2"/><rect x="1" y="9" width="6" height="6" rx="1" stroke="#94a3b8" stroke-width="1.2"/><rect x="9" y="9" width="6" height="6" rx="1" fill="#64748b"/></svg>
+                                    <span>{% translate "No Urgente - No Importante (Eliminar)" %}</span>
                                 {% endif %}
                             </span>
                             <i class="bi bi-chevron-down text-muted ms-1" style="font-size: 0.75rem;"></i>
@@ -149,25 +156,25 @@
                         <ul class="dropdown-menu shadow-lg border-0 rounded-2xl mt-1 p-2" aria-labelledby="quadrantDropdown{{ task.id }}" style="border-radius: 12px; min-width: 280px;">
                             <li>
                                 <button type="button" class="dropdown-item d-flex align-items-center gap-2 small py-2 rounded-lg" onclick="selectQuadrant('Q1', '{{ task.id }}', '{% translate "Urgente e Importante (Hacer ahora)" %}')">
-                                    <span class="color-dot d-inline-block flex-shrink-0" style="width: 13px; height: 13px; background-color: #ef4444 ; border-radius: 3px;"></span>
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="flex-shrink-0"><rect x="1" y="1" width="6" height="6" rx="1" fill="#ef4444"/><rect x="9" y="1" width="6" height="6" rx="1" stroke="#94a3b8" stroke-width="1.2"/><rect x="1" y="9" width="6" height="6" rx="1" stroke="#94a3b8" stroke-width="1.2"/><rect x="9" y="9" width="6" height="6" rx="1" stroke="#94a3b8" stroke-width="1.2"/></svg>
                                     <span>{% translate "Urgente e Importante (Hacer ahora)" %}</span>
                                 </button>
                             </li>
                             <li>
                                 <button type="button" class="dropdown-item d-flex align-items-center gap-2 small py-2 rounded-lg" onclick="selectQuadrant('Q2', '{{ task.id }}', '{% translate "Importante - No Urgente (Planificar)" %}')">
-                                    <span class="color-dot d-inline-block flex-shrink-0" style="width: 13px; height: 13px; background-color: #3b82f6 ; border-radius: 3px;"></span>
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="flex-shrink-0"><rect x="1" y="1" width="6" height="6" rx="1" stroke="#94a3b8" stroke-width="1.2"/><rect x="9" y="1" width="6" height="6" rx="1" fill="#3b82f6"/><rect x="1" y="9" width="6" height="6" rx="1" stroke="#94a3b8" stroke-width="1.2"/><rect x="9" y="9" width="6" height="6" rx="1" stroke="#94a3b8" stroke-width="1.2"/></svg>
                                     <span>{% translate "Importante - No Urgente (Planificar)" %}</span>
                                 </button>
                             </li>
                             <li>
                                 <button type="button" class="dropdown-item d-flex align-items-center gap-2 small py-2 rounded-lg" onclick="selectQuadrant('Q3', '{{ task.id }}', '{% translate "Urgente - No Importante (Delegar)" %}')">
-                                    <span class="color-dot d-inline-block flex-shrink-0" style="width: 13px; height: 13px; background-color: #f59e0b; border-radius: 3px;"></span>
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="flex-shrink-0"><rect x="1" y="1" width="6" height="6" rx="1" stroke="#94a3b8" stroke-width="1.2"/><rect x="9" y="1" width="6" height="6" rx="1" stroke="#94a3b8" stroke-width="1.2"/><rect x="1" y="9" width="6" height="6" rx="1" fill="#f59e0b"/><rect x="9" y="9" width="6" height="6" rx="1" stroke="#94a3b8" stroke-width="1.2"/></svg>
                                     <span>{% translate "Urgente - No Importante (Delegar)" %}</span>
                                 </button>
                             </li>
                             <li>
                                 <button type="button" class="dropdown-item d-flex align-items-center gap-2 small py-2 rounded-lg" onclick="selectQuadrant('Q4', '{{ task.id }}', '{% translate "No Urgente - No Importante (Eliminar)" %}')">
-                                    <span class="color-dot d-inline-block flex-shrink-0" style="width: 13px; height: 13px; background-color: #9ca3af; border-radius: 3px;"></span>
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="flex-shrink-0"><rect x="1" y="1" width="6" height="6" rx="1" stroke="#94a3b8" stroke-width="1.2"/><rect x="9" y="1" width="6" height="6" rx="1" stroke="#94a3b8" stroke-width="1.2"/><rect x="1" y="9" width="6" height="6" rx="1" stroke="#94a3b8" stroke-width="1.2"/><rect x="9" y="9" width="6" height="6" rx="1" fill="#64748b"/></svg>
                                     <span>{% translate "No Urgente - No Importante (Eliminar)" %}</span>
                                 </button>
                             </li>
@@ -486,84 +493,130 @@
                         </div>
 
                         <!-- COLUMNA DERECHA -->
-                        <!-- 3. ASIGNADA A ( BÚSQUEDA HISTÓRICA Y GLOBAL EN EDICIÓN) -->
-                        <div class="col-md-3">
-                            <div class="dropdown">
-                                <button class="btn btn-outline-secondary btn-sm text-start w-100 d-flex justify-content-between align-items-center bg-white shadow-none py-2 px-3 border rounded-3" 
-                                        type="button" 
-                                        id="dropdownAssigneesEdit{{ task.id }}" 
-                                        data-bs-toggle="dropdown" 
-                                        data-bs-auto-close="outside" 
-                                        aria-expanded="false">
-                                    <span class="d-flex align-items-center gap-2 text-dark">
-                                        <i class="bi bi-people-fill" style="color: #fbbf24 !important;"></i>
-                                        <span class="fw-medium text-dark">{% translate "Asignada a" %}</span>
+                        <div class="col-md-5 d-flex flex-column justify-content-between">
+                            <div>
+                                <div class="d-flex align-items-center gap-3 mb-3">
+                                    <span class="rounded-circle text-white fw-bold d-inline-flex align-items-center justify-content-center flex-shrink-0 shadow-sm" 
+                                        style="width: 36px; height: 36px; font-size: 0.85rem; background-color: #a2aabb" 
+                                        title="{{ task.created_by.get_full_name|default:task.created_by.username }}">
+                                        {{ task.created_by.username|slice:":2"|upper }}
                                     </span>
-                                    <small class="text-muted fw-semibold" id="editAssigneesCounter{{ task.id }}">+</small>
-                                </button>
 
-                                <div class="dropdown-menu p-3 shadow-lg border-0 rounded-4 mt-1 bg-white" 
-                                    aria-labelledby="dropdownAssigneesEdit{{ task.id }}" 
-                                    style="width: 290px; z-index: 1055;">
-                                    
-                                    <div class="d-flex justify-content-between align-items-center mb-2 pb-1 border-bottom">
-                                        <span class="fw-bold small text-dark">{% translate "Asignar personas" %}</span>
-                                        <button type="button" class="btn-close btn-sm" onclick="bootstrap.Dropdown.getInstance(document.getElementById('dropdownAssigneesEdit{{ task.id }}')).hide();"></button>
-                                    </div>
-
-                                    <!-- CAMPO DE BÚSQUEDA GLOBAL -->
-                                    <div class="position-relative mb-2">
-                                        <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-2.5 text-muted" style="font-size: 0.8rem;"></i>
-                                        <input type="text" 
-                                            id="userSearchInputEdit{{ task.id }}"
-                                            class="form-control form-control-sm ps-4 bg-light border-0 rounded-3" 
-                                            placeholder="{% translate 'Buscar persona o email...' %}"
-                                            data-search-url="{% url 'search_users_api' %}"
-                                            oninput="handleLiveUserSearch(this)">
-                                    </div>
-
-                                    <!-- LISTA DE CONTACTOS FOCALIZADA PARA EDICIÓN DE TAREA -->
-                                    <div class="d-flex flex-column gap-1 overflow-auto pe-1" id="editMembersList{{ task.id }}" style="max-height: 220px;">
-                                        {% for u in board_members %}
-                                            <div class="member-search-item" data-search-key="{{ u.get_full_name|default:u.username|lower }} {{ u.username|lower }} {{ u.email|lower }}">
-                                                <input type="checkbox" 
-                                                    name="assigned_to" 
-                                                    value="{{ u.id }}" 
-                                                    id="assign-user-Edit-{{ task.id }}-{{ u.id }}" 
-                                                    class="d-none member-check-input" 
-                                                    {% if u in task.assigned_to.all %}checked{% endif %}
-                                                    data-username="{{ u.get_full_name|default:u.username }}"
-                                                    data-initials="{{ u.username|slice:':2'|upper }}"
-                                                    data-task-id="{{ task.id }}"
-                                                    data-user-id="{{ u.id }}"
-                                                    onchange="toggleMemberRow(this)">
-                                                
-                                                <label for="assign-user-Edit-{{ task.id }}-{{ u.id }}" 
-                                                    class="custom-member-item d-flex align-items-center justify-content-between py-2 px-2 rounded-3 fw-medium w-100 m-0"
-                                                    style="cursor: pointer;">
-                                                    
-                                                    <div class="d-flex align-items-center gap-2 overflow-hidden">
-                                                        <!-- 🚀 AVATAR CON DEGRADADO CORPORATIVO -->
-                                                        <span class="rounded-circle text-white d-inline-flex align-items-center justify-content-center flex-shrink-0" 
-                                                            style="width: 26px; height: 26px; font-size: 0.72rem; font-weight: 600; background: linear-gradient(135deg, #497BF6 0%, #7855f7 50%, #9f48ec 100%);">
-                                                            {{ u.username|slice:":2"|upper }}
-                                                        </span>
-                                                        <div class="d-flex flex-column text-truncate">
-                                                            <span class="member-name text-dark text-truncate" style="font-size: 0.83rem; line-height: 1.2;">
-                                                                {{ u.get_full_name|default:u.username }}
-                                                            </span>
-                                                            <small class="text-muted text-truncate" style="font-size: 0.72rem;">
-                                                                {% if u.email %}{{ u.email }}{% else %}@{{ u.username }}{% endif %}
-                                                            </small>
-                                                        </div>
-                                                    </div>
-
-                                                    <i class="bi bi-check2 text-primary fw-bold member-check-icon {% if u not in task.assigned_to.all %}d-none{% endif %} ms-2" style="font-size: 1rem;"></i>
-                                                </label>
-                                            </div>
-                                        {% endfor %}
+                                    <div style="font-size: 0.82rem; line-height: 1.35;">
+                                        <div>
+                                            <strong class="text-dark">{{ task.created_by.get_full_name|default:task.created_by.username }}</strong> 
+                                            <span class="text-muted">{% translate "ha añadido esta tarjeta a" %}</span> 
+                                            <strong class="text-dark">{% if task.board %}{{ task.board.title }}{% else %}General{% endif %}</strong>
+                                        </div>
+                                        <small class="text-muted" style="font-size: 0.75rem;">
+                                            {{ task.created_at|date:"d M Y, H:i" }}
+                                        </small>
                                     </div>
                                 </div>
+                                <div class="pt-3 border-top">
+                                    <small class="text-muted fw-bold d-block mb-2" style="font-size: 0.92rem;">
+                                        <i class="bi bi-people-fill" style="color: #fbbf24 !important;"></i>
+                                        {% translate "Asignada a" %}
+                                    </small>
+
+                                    <div class="d-flex flex-wrap gap-2 align-items-center">
+                                        
+                                        <!-- BOTÓN + CON DESPLEGABLE DE BÚSQUEDA GLOBAL -->
+                                        <div class="dropdown">
+                                            <button class="btn btn-light btn-sm rounded-circle border shadow-sm d-flex align-items-center justify-content-center p-0" 
+                                                    type="button" 
+                                                    id="dropdownAssignees{{ task.id }}" 
+                                                    data-bs-toggle="dropdown" 
+                                                    data-bs-auto-close="outside" 
+                                                    data-bs-display="static" 
+                                                    aria-expanded="false" 
+                                                    style="width: 32px; height: 32px; font-weight: bold; background-color: #f8fafc;">
+                                                +
+                                            </button>
+
+                                            <div class="dropdown-menu p-3 shadow-lg border-0 rounded-4 mt-1 bg-white" 
+                                                aria-labelledby="dropdownAssignees{{ task.id }}" 
+                                                style="width: 290px; z-index: 1055;">
+                                                
+                                                <div class="d-flex justify-content-between align-items-center mb-2 pb-1 border-bottom">
+                                                    <span class="fw-bold small text-dark">{% translate "Asignar personas" %}</span>
+                                                    <button type="button" class="btn-close btn-sm" onclick="bootstrap.Dropdown.getInstance(document.getElementById('dropdownAssignees{{ task.id }}')).hide();"></button>
+                                                </div>
+
+                                                <!-- CAMPO DE BÚSQUEDA GLOBAL CON ENLACE A LA API -->
+                                                <div class="position-relative mb-2">
+                                                    <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-2.5 text-muted" style="font-size: 0.8rem;"></i>
+                                                    <input type="text" 
+                                                        id="userSearchInputEdit{{ task.id }}"
+                                                        class="form-control form-control-sm ps-4 bg-light border-0 rounded-3" 
+                                                        placeholder="{% translate 'Buscar persona o email...' %}"
+                                                        data-search-url="{% url 'search_users_api' %}"
+                                                        oninput="handleLiveUserSearch(this)">
+                                                </div>
+
+                                                <!-- LISTA DE COLABORADORES CON FILTRO LOCAL/GLOBAL -->
+                                                <div class="d-flex flex-column gap-1 overflow-auto pe-1" id="editMembersList{{ task.id }}" style="max-height: 220px;">
+                                                    {% for u in users %}
+                                                        <div class="member-search-item" data-search-key="{{ u.get_full_name|default:u.username|lower }} {{ u.username|lower }} {{ u.email|lower }}">
+                                                            <input type="checkbox" 
+                                                                name="assigned_to" 
+                                                                value="{{ u.id }}" 
+                                                                id="assign-user-{{ task.id }}-{{ u.id }}" 
+                                                                class="d-none member-check-input" 
+                                                                {% if u in task.assigned_to.all %}checked{% endif %}
+                                                                data-username="{{ u.get_full_name|default:u.username }}"
+                                                                data-initials="{{ u.username|slice:':2'|upper }}"
+                                                                data-task-id="{{ task.id }}"
+                                                                data-user-id="{{ u.id }}"
+                                                                onchange="toggleMemberRow(this)">
+                                                            
+                                                            <label for="assign-user-{{ task.id }}-{{ u.id }}" 
+                                                                class="custom-member-item d-flex align-items-center justify-content-between py-2 px-2 rounded-3 fw-medium w-100 m-0"
+                                                                style="cursor: pointer;">
+                                                                
+                                                                <div class="d-flex align-items-center gap-2 overflow-hidden">
+                                                                    <!-- AVATAR CON EL DEGRADADO CORPORATIVO DE LA APP -->
+                                                                    <span class="rounded-circle text-white d-inline-flex align-items-center justify-content-center flex-shrink-0" 
+                                                                        style="width: 26px; height: 26px; font-size: 0.72rem; font-weight: 600; background: linear-gradient(135deg, #497BF6 0%, #7855f7 50%, #9f48ec 100%);">
+                                                                        {{ u.username|slice:":2"|upper }}
+                                                                    </span>
+                                                                    <div class="d-flex flex-column text-truncate">
+                                                                        <span class="member-name text-dark text-truncate" style="font-size: 0.83rem; line-height: 1.2;">
+                                                                            {{ u.get_full_name|default:u.username }}
+                                                                        </span>
+                                                                        <small class="text-muted text-truncate" style="font-size: 0.72rem;">
+                                                                            {% if u.email %}{{ u.email }}{% else %}@{{ u.username }}{% endif %}
+                                                                        </small>
+                                                                    </div>
+                                                                </div>
+
+                                                                <i class="bi bi-check2 text-primary fw-bold member-check-icon {% if u not in task.assigned_to.all %}d-none{% endif %} ms-2" style="font-size: 1rem;"></i>
+                                                            </label>
+                                                        </div>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- CONTENEDOR DE BADGES DE USUARIOS ASIGNADOS -->
+                                        <div id="assignedBadgesContainer{{ task.id }}" class="d-flex flex-wrap gap-2 align-items-center">
+                                            {% for user_assigned in task.assigned_to.all %}
+                                                <div class="d-flex align-items-center gap-2 bg-light pe-2.5 rounded-pill border shadow-xs" id="badge-user-{{ task.id }}-{{ user_assigned.id }}">
+                                                    <div class="rounded-circle text-white fw-bold d-flex align-items-center justify-content-center flex-shrink-0" 
+                                                        style="width: 28px; height: 28px; font-size: 0.75rem; background: linear-gradient(135deg, #497BF6 0%, #7855f7 50%, #9f48ec 100%);" 
+                                                        title="{{ user_assigned.get_full_name|default:user_assigned.username }}">
+                                                        {{ user_assigned.username|slice:":2"|upper }}
+                                                    </div>
+                                                    <span class="small text-dark fw-semibold" style="font-size: 0.78rem;">
+                                                        {{ user_assigned.get_full_name|default:user_assigned.username }}
+                                                    </span>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
 

@@ -483,7 +483,7 @@
                         <div class="flex-grow-1 d-flex flex-column quadrant-container" data-quadrant="Q1" style="min-height: 120px;">
                             {% for task in q1_tasks %}
                                 {% include '_includes/_task_card.html' with task=task %}
-                            {% empty %}
+                            {% endfor %}
                                 <div class="empty-msg-box text-center my-auto empty-msg">
                                     <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center p-2 mb-2" style="width: 36px; height: 36px;">
                                         <i class="bi bi-check2 text-muted fs-5"></i>
@@ -491,7 +491,7 @@
                                     <p class="text-dark fw-bold small mb-0">{% translate "No hay tareas críticas" %}</p>
                                     <small class="text-muted d-block" style="font-size: 0.75rem;">{% translate "Mantén el control y reacciona solo a lo imprescindible." %}</small>
                                 </div>
-                            {% endfor %}
+                            
 
                             <div class="add-task-inline-wrapper mt-auto pt-2">
                                 <button type="button" class="btn btn-add-inline d-flex align-items-center justify-content-center gap-2" onclick="showInlineForm(this)">
@@ -553,7 +553,7 @@
                         <div class="flex-grow-1 d-flex flex-column quadrant-container" data-quadrant="Q2" style="min-height: 120px;">
                             {% for task in q2_tasks %}
                                 {% include '_includes/_task_card.html' with task=task %}
-                            {% empty %}
+                            {% endfor %}
                                 <div class="empty-msg-box text-center my-auto empty-msg">
                                     <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center p-2 mb-2" style="width: 36px; height: 36px;">
                                         <i class="bi bi-check2 text-muted fs-5"></i>
@@ -561,7 +561,7 @@
                                     <p class="text-dark fw-bold small mb-0">{% translate "No hay tareas estratégicas" %}</p>
                                     <small class="text-muted d-block" style="font-size: 0.75rem;">{% translate "Dedica tiempo a proyectar tus metas a largo plazo." %}</small>
                                 </div>
-                            {% endfor %}
+                            
 
                             <div class="add-task-inline-wrapper mt-auto pt-2">
                                 <button type="button" class="btn btn-add-inline d-flex align-items-center justify-content-center gap-2" onclick="showInlineForm(this)">
@@ -623,7 +623,7 @@
                         <div class="flex-grow-1 d-flex flex-column quadrant-container" data-quadrant="Q3" style="min-height: 120px;">
                             {% for task in q3_tasks %}
                                 {% include '_includes/_task_card.html' with task=task %}
-                            {% empty %}
+                            {% endfor %}
                                 <div class="empty-msg-box text-center my-auto empty-msg">
                                     <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center p-2 mb-2" style="width: 36px; height: 36px;">
                                         <i class="bi bi-check2 text-muted fs-5"></i>
@@ -631,7 +631,7 @@
                                     <p class="text-dark fw-bold small mb-0">{% translate "No hay tareas operativas" %}</p>
                                     <small class="text-muted d-block" style="font-size: 0.75rem;">{% translate "Libera tu agenda de interrupciones no esenciales." %}</small>
                                 </div>
-                            {% endfor %}
+                            
 
                             <div class="add-task-inline-wrapper mt-auto pt-2">
                                 <button type="button" class="btn btn-add-inline d-flex align-items-center justify-content-center gap-2" onclick="showInlineForm(this)">
@@ -693,7 +693,7 @@
                         <div class="flex-grow-1 d-flex flex-column quadrant-container" data-quadrant="Q4" style="min-height: 120px;">
                             {% for task in q4_tasks %}
                                 {% include '_includes/_task_card.html' with task=task %}
-                            {% empty %}
+                            {% endfor %}
                                 <div class="empty-msg-box text-center my-auto empty-msg">
                                     <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center p-2 mb-2" style="width: 36px; height: 36px;">
                                         <i class="bi bi-check2 text-muted fs-5"></i>
@@ -701,7 +701,7 @@
                                     <p class="text-dark fw-bold small mb-0">{% translate "No hay tareas irrelevantes" %}</p>
                                     <small class="text-muted d-block" style="font-size: 0.75rem;">{% translate "Mantén tu foco libre de ruido innecesario" %}</small>
                                 </div>
-                            {% endfor %}
+                            
 
                             <div class="add-task-inline-wrapper mt-auto pt-2">
                                 <button type="button" class="btn btn-add-inline d-flex align-items-center justify-content-center gap-2" onclick="showInlineForm(this)">
@@ -861,34 +861,77 @@
 
                         <hr class="my-3 text-muted opacity-25">
 
-                        <!-- SECCIÓN: INVITAR NUEVO MIEMBRO CON SUGERENCIAS AUTOMÁTICAS -->
-                        <div class="mb-3">
+                        <!-- SECCIÓN: INVITAR NUEVO MIEMBRO CON BUSCADOR DINÁMICO (CREAR TABLERO) -->
+                        <div class="mb-3 position-relative" style="z-index: 3000 !important; overflow: visible !important;">
                             <label class="form-label small fw-bold text-dark d-flex align-items-center gap-1">
                                 <i class="bi bi-person-plus text-primary"></i> {% translate "Invitar a un nuevo miembro" %}
                             </label>
-                            
-                            <div class="input-group">
+
+                            <div class="input-group input-group-sm border rounded-3 overflow-hidden bg-light align-items-center">
+                                <span class="input-group-text bg-transparent border-0 pe-1">
+                                    <i class="bi bi-search text-muted" style="font-size: 0.8rem;"></i>
+                                </span>
                                 <input type="text" 
-                                    name="invite_identifier"
-                                    id="create-invite-input" 
-                                    class="form-control form-control-sm rounded-start-3" 
-                                    list="collaboratorsListNewBoard"
-                                    placeholder="{% translate 'Escribe usuario, email o selecciona...' %}"
-                                    autocomplete="off">
+                                    id="invite-input-newboard" 
+                                    class="form-control border-0 bg-transparent shadow-none small text-dark" 
+                                    placeholder="{% translate 'Escribe usuario, email o nombre...' %}" 
+                                    autocomplete="off"
+                                    oninput="handleBoardInviteSearch(this, 'newboard')"
+                                    onfocus="handleBoardInviteSearch(this, 'newboard')">
                             </div>
 
-                            <!-- DESPLEGABLE DE SUGERENCIAS AUTOMÁTICAS -->
-                            <datalist id="collaboratorsListNewBoard">
-                                {% for collaborator in frequent_collaborators %}
-                                    <option value="{{ collaborator.username }}">{{ collaborator.get_full_name|default:collaborator.username }} ({{ collaborator.email }})</option>
-                                {% endfor %}
-                            </datalist>
+                            <!-- MENÚ FLOTANTE DE RESULTADOS -->
+                            <div id="invite-results-newboard" 
+                                class="shadow-lg border rounded-4 p-2 w-100 mt-1 d-none position-absolute" 
+                                style="max-height: 220px; overflow-y: auto; z-index: 99999 !important; top: 100%; left: 0; background-color: #ffffff !important;">
+                                
+                                <div class="d-flex flex-column gap-1" id="invite-list-container-newboard">
+                                    {% for collaborator in frequent_collaborators %}
+                                        <div class="member-search-item" data-search-key="{{ collaborator.get_full_name|lower }} {{ collaborator.username|lower }} {{ collaborator.email|lower }}">
+                                            <button type="button" 
+                                                    class="btn btn-light btn-sm w-100 text-start border-0 d-flex align-items-center justify-content-between p-2 rounded-3"
+                                                    onmousedown="selectBoardCollaborator('newboard', '{{ collaborator.username }}', '{{ collaborator.get_full_name|default:collaborator.username }}')">
+                                                
+                                                <div class="d-flex align-items-center gap-2 overflow-hidden">
+                                                    <span class="rounded-circle text-white d-inline-flex align-items-center justify-content-center flex-shrink-0" 
+                                                        style="width: 32px; height: 32px; font-size: 0.75rem; font-weight: 700; background: linear-gradient(135deg, #497BF6 0%, #7855f7 50%, #9f48ec 100%);">
+                                                        {{ collaborator.username|slice:":2"|upper }}
+                                                    </span>
+                                                    <div class="d-flex flex-column text-truncate">
+                                                        <span class="text-dark fw-bold text-truncate" style="font-size: 0.85rem; line-height: 1.2;">
+                                                            {{ collaborator.get_full_name|default:collaborator.username }}
+                                                        </span>
+                                                        <small class="text-muted text-truncate" style="font-size: 0.72rem;">
+                                                            {{ collaborator.email }}
+                                                        </small>
+                                                    </div>
+                                                </div>
+                                            </button>
+                                        </div>
+                                    {% endfor %}
+                                </div>
 
-                            <small class="text-muted" style="font-size: 0.72rem;">
+                                <div id="invite-no-results-newboard" class="text-center py-3 text-muted small d-none">
+                                    <i class="bi bi-person-x d-block fs-5 mb-1 text-secondary opacity-50"></i>
+                                    {% translate "No se encontró ningún usuario registrado." %}
+                                </div>
+                            </div>
+
+                            <!-- CAJA ACUMULATIVA DE PERSONAS SELECCIONADAS -->
+                            <div id="invite-selected-box-newboard" class="mt-3 p-2.5 bg-primary-subtle border border-primary-subtle rounded-3 d-none">
+                                <span class="d-block small text-primary-emphasis fw-semibold mb-1.5" style="font-size: 0.75rem;">
+                                    Se enviará una invitación para participar en el tablero a:
+                                </span>
+                                <div id="selected-users-list-newboard" class="d-flex flex-wrap gap-1.5"></div>
+                            </div>
+
+                            <!-- CAMPO OCULTO PARA ENVIAR LOS USUARIOS AL GUARDAR EL FORMULARIO -->
+                            <div id="hidden-inputs-container-newboard"></div>
+
+                            <small class="text-muted d-block mt-2" style="font-size: 0.72rem;">
                                 {% translate "Le llegará una notificación inmediata para unirse al guardar." %}
                             </small>
                         </div>
-
                     </div>
                     
                     <!-- BOTONES DE ACCIÓN -->

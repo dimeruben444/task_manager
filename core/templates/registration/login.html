@@ -9,7 +9,7 @@
         <div class="col-md-5 col-lg-4">
             <div class="card shadow-sm border-0">
                 <div class="card-body p-4">
-                    <h3 class="fw-bold text-center mb-4">🔑 {% translate "Iniciar Sesión" %}</h3>
+                    <h3 class="fw-bold text-center mb-4"> {% translate "Iniciar Sesión" %}</h3>
                     
                     <!-- ALERTA DE ERROR VISUAL SI FALLA LA AUTENTICACIÓN -->
                     {% if form.errors or form.non_field_errors %}
@@ -26,10 +26,12 @@
 
                     {% if messages %}
                         {% for message in messages %}
-                            <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show small mb-3" role="alert">
+                            {% if 'login_error' in message.tags or message.tags == 'error' %}
+                                <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show small mb-3" role="alert">
                                 {{ message }}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            </div>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endif%}
                         {% endfor %}
                     {% endif %}
 

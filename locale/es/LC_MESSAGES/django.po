@@ -1,0 +1,943 @@
+# Spanish translation catalog for EisenhowerFlow
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-26 19:26+0100\n"
+"PO-Revision-Date: 2026-10-26 19:35+0100\n"
+"Last-Translator: EisenhowerFlow <dev@eisenhowerflow.local>\n"
+"Language-Team: Spanish <es@li.org>\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: boards/models.py:11 core/templates/base/base.html:461
+#: core/templates/tasks/dashboard.html:848 dashboard_antiguo.txt:559
+msgid "Azul"
+msgstr "Azul"
+
+#: boards/models.py:12 core/templates/base/base.html:462
+#: core/templates/tasks/dashboard.html:849 dashboard_antiguo.txt:560
+msgid "Verde"
+msgstr "Verde"
+
+#: boards/models.py:13 core/templates/base/base.html:463
+#: core/templates/tasks/dashboard.html:850 dashboard_antiguo.txt:561
+msgid "Rojo"
+msgstr "Rojo"
+
+#: boards/models.py:14 core/templates/base/base.html:464
+#: core/templates/tasks/dashboard.html:851 dashboard_antiguo.txt:562
+msgid "Naranja"
+msgstr "Naranja"
+
+#: boards/models.py:15 core/templates/base/base.html:465
+#: core/templates/tasks/dashboard.html:852 dashboard_antiguo.txt:563
+msgid "Púrpura"
+msgstr "Púrpura"
+
+#: boards/models.py:16 core/templates/base/base.html:466
+#: core/templates/tasks/dashboard.html:853 dashboard_antiguo.txt:564
+msgid "Gris"
+msgstr "Gris"
+
+#: boards/models.py:19
+msgid "Título"
+msgstr "Título"
+
+#: boards/models.py:20 core/templates/_includes/_task_card.html:480
+#: core/templates/base/base.html:470 core/templates/tasks/dashboard.html:425
+#: core/templates/tasks/dashboard.html:857 dashboard_antiguo.txt:278
+msgid "Descripción"
+msgstr "Descripción"
+
+#: boards/models.py:21 core/templates/base/base.html:459
+#: core/templates/tasks/dashboard.html:846
+msgid "Color"
+msgstr "Color"
+
+#: boards/models.py:23
+msgid "¿Tablero general?"
+msgstr "¿Tablero general?"
+
+#: boards/models.py:29 core/templates/base/base.html:564
+msgid "Propietario"
+msgstr "Propietario"
+
+#: boards/models.py:36
+msgid "Miembros compartidos"
+msgstr "Miembros compartidos"
+
+#: boards/models.py:39
+msgid "Fecha límite del tablero"
+msgstr "Fecha límite del tablero"
+
+#: boards/models.py:40 tasks/models.py:111
+msgid "Notificación enviada"
+msgstr "Notificación enviada"
+
+#: boards/models.py:42 tasks/models.py:115
+msgid "Fecha de creación"
+msgstr "Fecha de creación"
+
+#: boards/models.py:45 core/templates/_includes/_task_card.html:337
+#: core/templates/_includes/_task_card.html:373
+#: core/templates/tasks/dashboard.html:205 dashboard_antiguo.txt:126
+#: tasks/models.py:96
+msgid "Tablero"
+msgstr "Tablero"
+
+#: boards/models.py:46 core/templates/base/base.html:275
+msgid "Tableros"
+msgstr "Tableros"
+
+#: boards/models.py:58 core/templates/base/base.html:289
+#: core/templates/tasks/dashboard.html:7 core/templates/tasks/dashboard.html:48
+#: dashboard_antiguo.txt:7 dashboard_antiguo.txt:17 dashboard_antiguo.txt:128
+msgid "General"
+msgstr "General"
+
+#: boards/models.py:58
+msgid "Personalizado"
+msgstr "Personalizado"
+
+#: core/settings.py:139
+msgid "Español"
+msgstr "Español"
+
+#: core/settings.py:140
+msgid "English"
+msgstr "English"
+
+#: core/templates/_includes/_task_card.html:68
+msgid "Tiene descripción"
+msgstr "Tiene descripción"
+
+#: core/templates/_includes/_task_card.html:79
+msgid "Tarea compartida / asignada"
+msgstr "Tarea compartida / asignada"
+
+#: core/templates/_includes/_task_card.html:93
+msgid "Asignado a:"
+msgstr "Asignado a:"
+
+#: core/templates/_includes/_task_card.html:100
+msgid "Total de asignados:"
+msgstr "Total de asignados:"
+
+#: core/templates/_includes/_task_card.html:138
+#: core/templates/_includes/_task_card.html:158
+#: core/templates/_includes/_task_card.html:160
+msgid "Urgente e Importante (Hacer ahora)"
+msgstr "Urgente e Importante (Hacer ahora)"
+
+#: core/templates/_includes/_task_card.html:142
+#: core/templates/_includes/_task_card.html:164
+#: core/templates/_includes/_task_card.html:166 dashboard_antiguo.txt:350
+msgid "Importante - No Urgente (Planificar)"
+msgstr "Importante - No Urgente (Planificar)"
+
+#: core/templates/_includes/_task_card.html:146
+#: core/templates/_includes/_task_card.html:170
+#: core/templates/_includes/_task_card.html:172 dashboard_antiguo.txt:390
+msgid "Urgente - No Importante (Delegar)"
+msgstr "Urgente - No Importante (Delegar)"
+
+#: core/templates/_includes/_task_card.html:150
+#: core/templates/_includes/_task_card.html:176
+#: core/templates/_includes/_task_card.html:178 dashboard_antiguo.txt:430
+msgid "No Urgente - No Importante (Eliminar)"
+msgstr "No Urgente - No Importante (Eliminar)"
+
+#: core/templates/_includes/_task_card.html:213
+msgid "Urgencia"
+msgstr "Urgencia"
+
+#: core/templates/_includes/_task_card.html:235
+msgid "Importancia"
+msgstr "Importancia"
+
+#: core/templates/_includes/_task_card.html:269
+#: core/templates/_includes/_task_card.html:280
+#: core/templates/tasks/dashboard.html:286
+#: core/templates/tasks/dashboard.html:293 dashboard_antiguo.txt:160
+#: dashboard_antiguo.txt:167
+msgid "Fechas"
+msgstr "Fechas"
+
+#: core/templates/_includes/_task_card.html:289
+#: core/templates/tasks/dashboard.html:300 dashboard_antiguo.txt:175
+msgid "Fecha de vencimiento"
+msgstr "Fecha de vencimiento"
+
+#: core/templates/_includes/_task_card.html:309
+#: core/templates/tasks/dashboard.html:318
+msgid "Recibir recordatorio por correo"
+msgstr "Recibir recordatorio por correo"
+
+#: core/templates/_includes/_task_card.html:318
+#: core/templates/tasks/dashboard.html:329 dashboard_antiguo.txt:217
+msgid "Quitar"
+msgstr "Quitar"
+
+#: core/templates/_includes/_task_card.html:321
+#: core/templates/_includes/_task_card.html:655
+#: core/templates/tasks/dashboard.html:326 dashboard_antiguo.txt:214
+msgid "Guardar"
+msgstr "Guardar"
+
+#: core/templates/_includes/_task_card.html:404
+#: core/templates/tasks/dashboard.html:235 dashboard_antiguo.txt:133
+msgid "Seleccionar Tablero"
+msgstr "Seleccionar Tablero"
+
+#: core/templates/_includes/_task_card.html:487
+#: core/templates/tasks/dashboard.html:440
+msgid "Escribe una descripción más detallada..."
+msgstr "Escribe una descripción más detallada..."
+
+#: core/templates/_includes/_task_card.html:508
+msgid "ha añadido esta tarjeta a"
+msgstr "ha añadido esta tarjeta a"
+
+#: core/templates/_includes/_task_card.html:519
+#: core/templates/tasks/dashboard.html:348 dashboard_antiguo.txt:235
+msgid "Asignada a"
+msgstr "Asignada a"
+
+#: core/templates/_includes/_task_card.html:542
+#: core/templates/tasks/dashboard.html:358
+msgid "Asignar personas"
+msgstr "Asignar personas"
+
+#: core/templates/_includes/_task_card.html:552
+#: core/templates/tasks/dashboard.html:368
+msgid "Buscar persona o email..."
+msgstr "Buscar persona o email..."
+
+#: core/templates/_includes/_task_card.html:635
+msgid "¿Seguro que quieres eliminar esta tarea?"
+msgstr "¿Seguro que quieres eliminar esta tarea?"
+
+#: core/templates/_includes/_task_card.html:636
+#: core/templates/_includes/_task_card.html:646
+msgid "Eliminar Tarea"
+msgstr "Eliminar Tarea"
+
+#: core/templates/_includes/_task_card.html:645
+msgid "Solo el creador o el propietario del tablero pueden eliminar esta tarea"
+msgstr "Solo el creador o el propietario del tablero pueden eliminar esta tarea"
+
+#: core/templates/_includes/_task_card.html:652
+#: core/templates/base/base.html:606 core/templates/base/base.html:730
+#: core/templates/base/base.html:757 core/templates/tasks/dashboard.html:939
+#: dashboard_antiguo.txt:574 dashboard_antiguo.txt:593
+msgid "Cancelar"
+msgstr "Cancelar"
+
+#: core/templates/base/base.html:9
+msgid "EisenhowerFlow"
+msgstr "EisenhowerFlow"
+
+#: core/templates/base/base.html:88
+msgid "NOTIFICACIONES"
+msgstr "NOTIFICACIONES"
+
+#: core/templates/base/base.html:92
+msgid "nueva"
+msgstr "nueva"
+
+#: core/templates/base/base.html:110
+msgid "Descartar notificación"
+msgstr "Descartar notificación"
+
+#: core/templates/base/base.html:125 core/templates/base/base.html:352
+msgid "Tablero compartido"
+msgstr "Tablero compartido"
+
+#: core/templates/base/base.html:151
+msgid "Aceptar"
+msgstr "Aceptar"
+
+#: core/templates/base/base.html:154
+msgid "Rechazar"
+msgstr "Rechazar"
+
+#: core/templates/base/base.html:159
+msgid "Ver en el tablero"
+msgstr "Ver en el tablero"
+
+#: core/templates/base/base.html:163
+msgid "Ver en General"
+msgstr "Ver en General"
+
+#: core/templates/base/base.html:170
+msgid "No tienes notificaciones pendientes."
+msgstr "No tienes notificaciones pendientes."
+
+#: core/templates/base/base.html:206
+msgid "CUENTA"
+msgstr "CUENTA"
+
+#: core/templates/base/base.html:242
+msgid "Ajustes de cuenta"
+msgstr "Ajustes de cuenta"
+
+#: core/templates/base/base.html:249
+msgid "Cerrar sesión"
+msgstr "Cerrar sesión"
+
+#: core/templates/base/base.html:257
+msgid "Iniciar sesión"
+msgstr "Iniciar sesión"
+
+#: core/templates/base/base.html:260
+#: core/templates/registration/register.html:104
+msgid "Registrarse"
+msgstr "Registrarse"
+
+#: core/templates/base/base.html:315 core/templates/base/base.html:358
+msgid "Editar tablero"
+msgstr "Editar tablero"
+
+#: core/templates/base/base.html:370
+msgid "Nuevo Tablero"
+msgstr "Nuevo Tablero"
+
+#: core/templates/base/base.html:378
+msgid "DISTRIBUCIÓN ACTUAL"
+msgstr "DISTRIBUCIÓN ACTUAL"
+
+#: core/templates/base/base.html:390 core/templates/base/base.html:400
+#: core/templates/base/base.html:410 core/templates/base/base.html:420
+msgid "tarea"
+msgstr "tarea"
+
+#: core/templates/base/base.html:390 core/templates/base/base.html:400
+#: core/templates/base/base.html:410 core/templates/base/base.html:420
+msgid "tareas"
+msgstr "tareas"
+
+#: core/templates/base/base.html:443
+msgid "Ajustes del Tablero"
+msgstr "Ajustes del Tablero"
+
+#: core/templates/base/base.html:445 core/templates/base/base.html:794
+#: core/templates/tasks/dashboard.html:832
+msgid "Cerrar"
+msgstr "Cerrar"
+
+#: core/templates/base/base.html:452 core/templates/tasks/dashboard.html:839
+#: dashboard_antiguo.txt:552
+msgid "Nombre del tablero"
+msgstr "Nombre del tablero"
+
+#: core/templates/base/base.html:471 core/templates/tasks/dashboard.html:858
+msgid "Opcional"
+msgstr "Opcional"
+
+#: core/templates/base/base.html:480 core/templates/tasks/dashboard.html:867
+msgid "Invitar a un nuevo miembro"
+msgstr "Invitar a un nuevo miembro"
+
+#: core/templates/base/base.html:490 core/templates/tasks/dashboard.html:877
+msgid "Escribe usuario, email o nombre..."
+msgstr "Escribe usuario, email o nombre..."
+
+#: core/templates/base/base.html:528 core/templates/tasks/dashboard.html:916
+msgid "No se encontró ningún usuario registrado."
+msgstr "No se encontró ningún usuario registrado."
+
+#: core/templates/base/base.html:541
+msgid "Le llegará una notificación inmediata para unirse."
+msgstr "Le llegará una notificación inmediata para unirse."
+
+#: core/templates/base/base.html:546
+msgid "Enviar Invitación"
+msgstr "Enviar Invitación"
+
+#: core/templates/base/base.html:553
+msgid "Miembros actuales"
+msgstr "Miembros actuales"
+
+#: core/templates/base/base.html:579
+msgid "Desmarca para quitar miembro"
+msgstr "Desmarca para quitar miembro"
+
+#: core/templates/base/base.html:585
+msgid "Sin miembros colaboradores adicionales."
+msgstr "Sin miembros colaboradores adicionales."
+
+#: core/templates/base/base.html:598
+msgid "¿Seguro que quieres eliminar el tablero"
+msgstr "¿Seguro que quieres eliminar el tablero"
+
+#: core/templates/base/base.html:599
+msgid "Eliminar Tablero"
+msgstr "Eliminar Tablero"
+
+#: core/templates/base/base.html:607
+msgid "Guardar Cambios"
+msgstr "Guardar Cambios"
+
+#: core/templates/base/base.html:641
+msgid "Ajustes de Cuenta"
+msgstr "Ajustes de Cuenta"
+
+#: core/templates/base/base.html:673
+msgid "Perfil"
+msgstr "Perfil"
+
+#: core/templates/base/base.html:683
+msgid "Seguridad"
+msgstr "Seguridad"
+
+#: core/templates/base/base.html:693
+msgid "Idioma"
+msgstr "Idioma"
+
+#: core/templates/base/base.html:706
+msgid "Nombre de usuario"
+msgstr "Nombre de usuario"
+
+#: core/templates/base/base.html:715 users/forms/user_form.py:12
+msgid "Nombre"
+msgstr "Nombre"
+
+#: core/templates/base/base.html:719 users/forms/user_form.py:21
+msgid "Apellidos"
+msgstr "Apellidos"
+
+#: core/templates/base/base.html:725 users/forms/user_form.py:48
+msgid "Correo electrónico"
+msgstr "Correo electrónico"
+
+#: core/templates/base/base.html:731
+msgid "Guardar Perfil"
+msgstr "Guardar Perfil"
+
+#: core/templates/base/base.html:742
+msgid "Contraseña actual"
+msgstr "Contraseña actual"
+
+#: core/templates/base/base.html:747
+msgid "Nueva contraseña"
+msgstr "Nueva contraseña"
+
+#: core/templates/base/base.html:752
+msgid "Confirmar nueva contraseña"
+msgstr "Confirmar nueva contraseña"
+
+#: core/templates/base/base.html:758
+msgid "Actualizar Contraseña"
+msgstr "Actualizar Contraseña"
+
+#: core/templates/base/base.html:771
+msgid "Selecciona el idioma de la aplicación"
+msgstr "Selecciona el idioma de la aplicación"
+
+#: core/templates/registration/login.html:4
+#: core/templates/registration/login.html:12
+msgid "Iniciar Sesión"
+msgstr "Iniciar Sesión"
+
+#: core/templates/registration/login.html:20
+msgid "Usuario o contraseña incorrectos. Por favor, inténtalo de nuevo."
+msgstr "Usuario o contraseña incorrectos. Por favor, inténtalo de nuevo."
+
+#: core/templates/registration/login.html:41 users/forms/user_form.py:47
+#: users/models.py:10
+msgid "Usuario"
+msgstr "Usuario"
+
+#: core/templates/registration/login.html:45 users/forms/user_form.py:49
+msgid "Contraseña"
+msgstr "Contraseña"
+
+#: core/templates/registration/login.html:50
+msgid "Entrar"
+msgstr "Entrar"
+
+#: core/templates/registration/login.html:56
+msgid "¿No tienes cuenta?"
+msgstr "¿No tienes cuenta?"
+
+#: core/templates/registration/login.html:57
+msgid "Regístrate aquí"
+msgstr "Regístrate aquí"
+
+#: core/templates/registration/register.html:4
+msgid "Registro"
+msgstr "Registro"
+
+#: core/templates/registration/register.html:18
+msgid "Crear Cuenta"
+msgstr "Crear Cuenta"
+
+#: core/templates/registration/register.html:19
+msgid "Únete para gestionar tus tareas con la Matriz Eisenhower"
+msgstr "Únete para gestionar tus tareas con la Matriz Eisenhower"
+
+#: core/templates/registration/register.html:112
+msgid "¿Ya tienes cuenta?"
+msgstr "¿Ya tienes cuenta?"
+
+#: core/templates/registration/register.html:114
+msgid "Inicia sesión aquí"
+msgstr "Inicia sesión aquí"
+
+#: core/templates/tasks/dashboard.html:56
+msgid "Matriz de Eisenhower interactiva para priorización estratégica"
+msgstr "Matriz de Eisenhower interactiva para priorización estratégica"
+
+#: core/templates/tasks/dashboard.html:80
+#: core/templates/tasks/dashboard.html:762 dashboard_antiguo.txt:23
+#: dashboard_antiguo.txt:483
+msgid "Todas"
+msgstr "Todas"
+
+#: core/templates/tasks/dashboard.html:88 dashboard_antiguo.txt:26
+msgid "Mis tareas"
+msgstr "Mis tareas"
+
+#: core/templates/tasks/dashboard.html:96
+msgid "Compartidas"
+msgstr "Compartidas"
+
+#: core/templates/tasks/dashboard.html:114
+msgid "TÍTULO DE LA TAREA"
+msgstr "TÍTULO DE LA TAREA"
+
+#: core/templates/tasks/dashboard.html:124
+msgid "URGENCIA"
+msgstr "URGENCIA"
+
+#: core/templates/tasks/dashboard.html:146
+msgid "IMPORTANCIA"
+msgstr "IMPORTANCIA"
+
+#: core/templates/tasks/dashboard.html:181 dashboard_antiguo.txt:108
+msgid "Opciones avanzadas (Tablero, fecha límite, notas...)"
+msgstr "Opciones avanzadas (Tablero, fecha límite, notas...)"
+
+#: core/templates/tasks/dashboard.html:185
+msgid "Destino previsto:"
+msgstr "Destino previsto:"
+
+#: core/templates/tasks/dashboard.html:443
+msgid "caracteres"
+msgstr "caracteres"
+
+#: core/templates/tasks/dashboard.html:472
+msgid "Urgente - Importante"
+msgstr "Urgente - Importante"
+
+#: core/templates/tasks/dashboard.html:475
+msgid "Hacer ahora • Crisis y plazos clave"
+msgstr "Hacer ahora • Crisis y plazos clave"
+
+#: core/templates/tasks/dashboard.html:491
+msgid "No hay tareas críticas"
+msgstr "No hay tareas críticas"
+
+#: core/templates/tasks/dashboard.html:492
+msgid "Mantén el control y reacciona solo a lo imprescindible."
+msgstr "Mantén el control y reacciona solo a lo imprescindible."
+
+#: core/templates/tasks/dashboard.html:499
+msgid "Añadir tarea a Q1"
+msgstr "Añadir tarea a Q1"
+
+#: core/templates/tasks/dashboard.html:514
+#: core/templates/tasks/dashboard.html:584
+#: core/templates/tasks/dashboard.html:654
+#: core/templates/tasks/dashboard.html:724 dashboard_antiguo.txt:334
+#: dashboard_antiguo.txt:374 dashboard_antiguo.txt:414
+#: dashboard_antiguo.txt:454
+msgid "Introduce un título para esta tarjeta..."
+msgstr "Introduce un título para esta tarjeta..."
+
+#: core/templates/tasks/dashboard.html:521
+#: core/templates/tasks/dashboard.html:591
+#: core/templates/tasks/dashboard.html:661
+#: core/templates/tasks/dashboard.html:731 dashboard_antiguo.txt:337
+#: dashboard_antiguo.txt:377 dashboard_antiguo.txt:417
+#: dashboard_antiguo.txt:457
+msgid "Añadir tarea"
+msgstr "Añadir tarea"
+
+#: core/templates/tasks/dashboard.html:542
+msgid "Importante - No Urgente"
+msgstr "Importante - No Urgente"
+
+#: core/templates/tasks/dashboard.html:545
+msgid "Planificar • Metas a medio plazo"
+msgstr "Planificar • Metas a medio plazo"
+
+#: core/templates/tasks/dashboard.html:561
+msgid "No hay tareas estratégicas"
+msgstr "No hay tareas estratégicas"
+
+#: core/templates/tasks/dashboard.html:562
+msgid "Dedica tiempo a proyectar tus metas a largo plazo."
+msgstr "Dedica tiempo a proyectar tus metas a largo plazo."
+
+#: core/templates/tasks/dashboard.html:569
+msgid "Añadir tarea a Q2"
+msgstr "Añadir tarea a Q2"
+
+#: core/templates/tasks/dashboard.html:612
+msgid "Urgente - No Importante"
+msgstr "Urgente - No Importante"
+
+#: core/templates/tasks/dashboard.html:615
+msgid "Delegar • Interrupciones y tareas operativas"
+msgstr "Delegar • Interrupciones y tareas operativas"
+
+#: core/templates/tasks/dashboard.html:631
+msgid "No hay tareas operativas"
+msgstr "No hay tareas operativas"
+
+#: core/templates/tasks/dashboard.html:632
+msgid "Libera tu agenda de interrupciones no esenciales."
+msgstr "Libera tu agenda de interrupciones no esenciales."
+
+#: core/templates/tasks/dashboard.html:639
+msgid "Añadir tarea a Q3"
+msgstr "Añadir tarea a Q3"
+
+#: core/templates/tasks/dashboard.html:682
+msgid "No Urgente - No Importante"
+msgstr "No Urgente - No Importante"
+
+#: core/templates/tasks/dashboard.html:685
+msgid "Eliminar • Distracciones e irrelevantes"
+msgstr "Eliminar • Distracciones e irrelevantes"
+
+#: core/templates/tasks/dashboard.html:701
+msgid "No hay tareas irrelevantes"
+msgstr "No hay tareas irrelevantes"
+
+#: core/templates/tasks/dashboard.html:702
+msgid "Mantén tu foco libre de ruido innecesario"
+msgstr "Mantén tu foco libre de ruido innecesario"
+
+#: core/templates/tasks/dashboard.html:709
+msgid "Añadir tarea a Q4"
+msgstr "Añadir tarea a Q4"
+
+#: core/templates/tasks/dashboard.html:753 dashboard_antiguo.txt:474
+msgid "Completadas"
+msgstr "Completadas"
+
+#: core/templates/tasks/dashboard.html:763 dashboard_antiguo.txt:484
+msgid "Hoy"
+msgstr "Hoy"
+
+#: core/templates/tasks/dashboard.html:764 dashboard_antiguo.txt:485
+msgid "Esta semana"
+msgstr "Esta semana"
+
+#: core/templates/tasks/dashboard.html:767
+#: core/templates/tasks/dashboard.html:951 dashboard_antiguo.txt:488
+msgid "Vaciar completadas"
+msgstr "Vaciar completadas"
+
+#: core/templates/tasks/dashboard.html:810 dashboard_antiguo.txt:531
+msgid "No hay tareas completadas."
+msgstr "No hay tareas completadas."
+
+#: core/templates/tasks/dashboard.html:830 dashboard_antiguo.txt:547
+msgid "Crear nuevo tablero"
+msgstr "Crear nuevo tablero"
+
+#: core/templates/tasks/dashboard.html:840
+msgid "Nombre del tablero..."
+msgstr "Nombre del tablero..."
+
+#: core/templates/tasks/dashboard.html:932
+msgid "Le llegará una notificación inmediata para unirse al guardar."
+msgstr "Le llegará una notificación inmediata para unirse al guardar."
+
+#: core/templates/tasks/dashboard.html:940 dashboard_antiguo.txt:575
+msgid "Guardar Tablero"
+msgstr "Guardar Tablero"
+
+#: core/templates/tasks/dashboard.html:952
+msgid "¿Deseas eliminar permanentemente las tareas completadas?"
+msgstr "¿Deseas eliminar permanentemente las tareas completadas?"
+
+#: core/templates/tasks/dashboard.html:956 dashboard_antiguo.txt:597
+msgid "Eliminar definitivamente"
+msgstr "Eliminar definitivamente"
+
+#: dashboard_antiguo.txt:29
+msgid "Asignadas"
+msgstr "Asignadas"
+
+#: dashboard_antiguo.txt:44 tasks/models.py:38
+msgid "Título de la tarea"
+msgstr "Título de la tarea"
+
+#: dashboard_antiguo.txt:52
+msgid "Urgente"
+msgstr "Urgente"
+
+#: dashboard_antiguo.txt:75
+msgid "Importante"
+msgstr "Importante"
+
+#: dashboard_antiguo.txt:143
+msgid "Aplicar"
+msgstr "Aplicar"
+
+#: dashboard_antiguo.txt:193
+msgid "Crear recordatorio"
+msgstr "Crear recordatorio"
+
+#: dashboard_antiguo.txt:200 tasks/models.py:25
+msgid "A la hora del vencimiento"
+msgstr "A la hora del vencimiento"
+
+#: dashboard_antiguo.txt:201 tasks/models.py:26
+msgid "5 minutos antes"
+msgstr "5 minutos antes"
+
+#: dashboard_antiguo.txt:202 tasks/models.py:27
+msgid "15 minutos antes"
+msgstr "15 minutos antes"
+
+#: dashboard_antiguo.txt:203 tasks/models.py:28
+msgid "1 hora antes"
+msgstr "1 hora antes"
+
+#: dashboard_antiguo.txt:204 tasks/models.py:29
+msgid "2 horas antes"
+msgstr "2 horas antes"
+
+#: dashboard_antiguo.txt:205 tasks/models.py:30
+msgid "1 día antes"
+msgstr "1 día antes"
+
+#: dashboard_antiguo.txt:206 tasks/models.py:31
+msgid "2 días antes"
+msgstr "2 días antes"
+
+#: dashboard_antiguo.txt:207 tasks/models.py:32
+msgid "1 semana antes"
+msgstr "1 semana antes"
+
+#: dashboard_antiguo.txt:208 tasks/models.py:33
+msgid "2 semanas antes"
+msgstr "2 semanas antes"
+
+#: dashboard_antiguo.txt:242
+msgid "Miembros"
+msgstr "Miembros"
+
+#: dashboard_antiguo.txt:286
+msgid "Escribe notas o una descripción más detallada..."
+msgstr "Escribe notas o una descripción más detallada..."
+
+#: dashboard_antiguo.txt:310
+msgid "Urgente - Importante (Hacer ahora)"
+msgstr "Urgente - Importante (Hacer ahora)"
+
+#: dashboard_antiguo.txt:319
+msgid "No hay tareas urgentes e importantes."
+msgstr "No hay tareas urgentes e importantes."
+
+#: dashboard_antiguo.txt:326 dashboard_antiguo.txt:366
+#: dashboard_antiguo.txt:406 dashboard_antiguo.txt:446
+msgid "Añadir una tarea"
+msgstr "Añadir una tarea"
+
+#: dashboard_antiguo.txt:359
+msgid "No hay tareas de planificación pendientes."
+msgstr "No hay tareas de planificación pendientes."
+
+#: dashboard_antiguo.txt:399
+msgid "No hay tareas por delegar."
+msgstr "No hay tareas por delegar."
+
+#: dashboard_antiguo.txt:439
+msgid "No hay tareas irrelevantes."
+msgstr "No hay tareas irrelevantes."
+
+#: dashboard_antiguo.txt:489
+msgid "Limpiar"
+msgstr "Limpiar"
+
+#: dashboard_antiguo.txt:557
+msgid "Color del tablero"
+msgstr "Color del tablero"
+
+#: dashboard_antiguo.txt:569
+msgid "Descripción (opcional)"
+msgstr "Descripción (opcional)"
+
+#: dashboard_antiguo.txt:586
+msgid "Vaciar tareas completadas"
+msgstr "Vaciar tareas completadas"
+
+#: dashboard_antiguo.txt:590
+msgid ""
+"¿Estás seguro de que deseas eliminar permanentemente las tareas completadas "
+"visibles según el filtro seleccionado?"
+msgstr ""
+"¿Estás seguro de que deseas eliminar permanentemente las tareas completadas "
+"visibles según el filtro seleccionado?"
+
+#: tasks/forms/task_form.py:29
+msgid "¿Qué hay que hacer?"
+msgstr "¿Qué hay que hacer?"
+
+#: tasks/forms/task_form.py:36 tasks/models.py:42
+msgid "Urgencia (1-4)"
+msgstr "Urgencia (1-4)"
+
+#: tasks/forms/task_form.py:42 tasks/models.py:49
+msgid "Importancia (1-4)"
+msgstr "Importancia (1-4)"
+
+#: tasks/forms/task_form.py:52
+msgid "Notas ..."
+msgstr "Notas ..."
+
+#: tasks/forms/task_form.py:58 tasks/models.py:62
+msgid "Fecha límite"
+msgstr "Fecha límite"
+
+#: tasks/models.py:17
+msgid "Q1: Urgente e Importante"
+msgstr "Q1: Urgente e Importante"
+
+#: tasks/models.py:18
+msgid "Q2: No Urgente pero Importante"
+msgstr "Q2: No Urgente pero Importante"
+
+#: tasks/models.py:19
+msgid "Q3: Urgente pero No Importante"
+msgstr "Q3: Urgente pero No Importante"
+
+#: tasks/models.py:20
+msgid "Q4: No Urgente y No Importante"
+msgstr "Q4: No Urgente y No Importante"
+
+#: tasks/models.py:21
+msgid "Completada"
+msgstr "Completada"
+
+#: tasks/models.py:44
+msgid "La urgencia mínima es 1"
+msgstr "La urgencia mínima es 1"
+
+#: tasks/models.py:45
+msgid "La urgencia máxima es 4"
+msgstr "La urgencia máxima es 4"
+
+#: tasks/models.py:51
+msgid "La importancia mínima es 1"
+msgstr "La importancia mínima es 1"
+
+#: tasks/models.py:52
+msgid "La importancia máxima es 4"
+msgstr "La importancia máxima es 4"
+
+#: tasks/models.py:58
+msgid "Descripción / Notas"
+msgstr "Descripción / Notas"
+
+#: tasks/models.py:67
+msgid "Activar recordatorio"
+msgstr "Activar recordatorio"
+
+#: tasks/models.py:71
+msgid "Antelación del recordatorio"
+msgstr "Antelación del recordatorio"
+
+#: tasks/models.py:82
+msgid "Creado por"
+msgstr "Creado por"
+
+#: tasks/models.py:88
+msgid "Asignado a"
+msgstr "Asignado a"
+
+#: tasks/models.py:101
+msgid "Cuadrante"
+msgstr "Cuadrante"
+
+#: tasks/models.py:107
+msgid "¿Completada?"
+msgstr "¿Completada?"
+
+#: tasks/models.py:119
+msgid "Última modificación"
+msgstr "Última modificación"
+
+#: tasks/models.py:124
+msgid "Tarea"
+msgstr "Tarea"
+
+#: tasks/models.py:125
+msgid "Tareas"
+msgstr "Tareas"
+
+#: users/forms/user_form.py:17
+msgid "Ej. Ruben"
+msgstr "Ej. Ruben"
+
+#: users/forms/user_form.py:26
+msgid "Ej. García Pérez"
+msgstr "Ej. García Pérez"
+
+#: users/forms/user_form.py:39
+msgid "tu_usuario"
+msgstr "tu_usuario"
+
+#: users/forms/user_form.py:40
+msgid "tu@email.com"
+msgstr "tu@email.com"
+
+#: users/forms/user_form.py:41
+msgid "Crea una contraseña segura"
+msgstr "Crea una contraseña segura"
+
+#: users/forms/user_form.py:42
+msgid "Repite la contraseña"
+msgstr "Repite la contraseña"
+
+#: users/forms/user_form.py:50
+msgid "Confirmar contraseña"
+msgstr "Confirmar contraseña"
+
+#: users/models.py:11
+msgid "Usuarios"
+msgstr "Usuarios"
+
+#: users/views.py:41
+msgid "Tu perfil se ha actualizado correctamente."
+msgstr "Tu perfil se ha actualizado correctamente."
+
+#: users/views.py:43
+msgid "Por favor, rellena todos los campos obligatorios."
+msgstr "Por favor, rellena todos los campos obligatorios."
+
+#: users/views.py:59
+msgid "La contraseña actual no es correcta."
+msgstr "La contraseña actual no es correcta."
+
+#: users/views.py:61
+msgid "Las nuevas contraseñas no coinciden."
+msgstr "Las nuevas contraseñas no coinciden."
+
+#: users/views.py:63
+msgid "La nueva contraseña debe tener al menos 6 caracteres."
+msgstr "La nueva contraseña debe tener al menos 6 caracteres."
+
+#: users/views.py:69
+msgid "Tu contraseña ha sido actualizada con éxito."
+msgstr "Tu contraseña ha sido actualizada con éxito."

@@ -22,6 +22,9 @@ from boards.views import search_users_api
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+
+    path('i18n/', include('django.conf.urls.i18n')),
+    path('users/', include('users.urls')),
     # Rutas de tus apps
     path('', include('tasks.urls')),
     path('boards/', include('boards.urls')),
@@ -32,4 +35,6 @@ urlpatterns = [
     path('register/', register_view, name='register'),
 
     path('api/search-users/', search_users_api, name='search_users_api'),
+
+    
 ]

@@ -105,5 +105,10 @@ class Notification(models.Model):
     class Meta:
         ordering = ['-created_at']
 
+    def save(self, *args, **kwargs):
+        if self.recipient == self.actor:
+            return  # No guarda la notificación en la BBDD si es para uno mismo
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return f"Notificación para {self.recipient.username}: {self.verb}"
