@@ -24,42 +24,98 @@
 </head>
 <body class="bg-light">
 
-    <!-- BARRA DE NAVEGACIÓN SUPERIOR (CLARITY / EISENHOWER FLOW STYLE) -->
+    <!-- BARRA DE NAVEGACIÓN SUPERIOR ADAPTABLE -->
     <nav class="app-navbar">
-        <div class="nav-fluid d-flex justify-content-between align-items-center h-100" style="padding-left: 1.8rem; padding-right: 2.2rem">
+        <div class="nav-fluid d-flex justify-content-between align-items-center h-100 px-3 ">
             
-            <!-- BRANDING Y LOGO (IZQUIERDA) -->
-            <div class="navbar-brand-wrapper d-flex align-items-center gap-2">
-                <a href="{% url 'dashboard' %}" class="text-decoration-none d-flex align-items-center gap-2">
-                    <img src="{% static 'img/eisenhowerFlow.svg' %}" alt="Logo" style="height: 30px; width: auto;">
-                    <h1 class="brand-title m-0">
-                        Eisenhower<span class="brand-accent">Flow</span>
-                    </h1>
-                </a>
-                <span class="badge-workspace align-self-center">Workspace</span>
-            </div>
-            
-            <!-- BUSCADOR GLOBAL (CENTRO) -->
-            {% if request.resolver_match.url_name != 'login' and request.resolver_match.url_name != 'register' %}
-                <div id="globalTaskSearchWrapper" class="navbar-search-wrapper position-relative d-none d-md-block mx-3">
-                    <div class="position-relative">
-                        <i class="bi bi-search search-icon"></i>
-                        <input type="text" 
-                            id="globalTaskSearchInput" 
-                            class="form-control search-input" 
-                            placeholder="Buscar tareas..." 
-                            autocomplete="off"
-                            oninput="handleTaskSearchInput(this.value)"
-                            onfocus="handleTaskSearchInput(this.value)">
-                        <kbd class="shortcut-badge">⌘K</kbd>
-                    </div>
-                </div>
-            {% endif %}
+            <!-- 1. BLOQUE IZQUIERDA: HAMBURGUESA (MÓVIL/TABLET) + LOGO EN ESCRITORIO -->
+            <div class="d-flex align-items-center gap-2">
+                {% if user.is_authenticated %}
+                    <!-- BOTÓN HAMBURGUESA PARA VER TABLEROS EN TABLET Y MÓVIL (< 992px) -->
+                    <button class="btn btn-link text-white p-1 border-0 d-layout-mobile shadow-none text-decoration-none" 
+                            type="button" 
+                            data-bs-toggle="offcanvas" 
+                            data-bs-target="#offcanvasBoards" 
+                            aria-controls="offcanvasBoards"
+                            title="{% translate 'Ver tableros' %}">
+                        <i class="bi bi-list fs-2"></i>
+                    </button>
+                {% endif %}
 
-            <!-- MENÚ DE USUARIO Y NOTIFICACIONES (DERECHA) -->
-            <div class="navbar-user-wrapper d-flex align-items-center">
+                <!-- BRANDING Y LOGO (Visible a la izquierda en ESCRITORIO >= 992px) -->
+                <div class="navbar-brand-wrapper d-none d-lg-flex align-items-center gap-2">
+                    <a href="{% url 'dashboard' %}" class="text-decoration-none d-flex align-items-center gap-2">
+                        <img src="{% static 'img/eisenhowerFlow.svg' %}" alt="Logo" style="height: 30px; width: auto;">
+                        <h1 class="brand-title m-0 fs-5">
+                            <span class="brand-name-mobile">Eisen</span><span class="brand-name-desktop">Eisenhower</span><span class="brand-accent">Flow</span>
+                        </h1>
+                    </a>
+                    <span class="badge-workspace align-self-center">Workspace</span>
+                </div>
+            </div>
+
+            <!-- 2. BLOQUE CENTRO: LOGO CENTRADO EN TABLET/MÓVIL Y BUSCADOR COMPLETO EN ESCRITORIO -->
+            <div class="d-flex align-items-center justify-content-center flex-grow-1 mx-2">
+                <!-- LOGO CENTRADO SOLO EN TABLET / MÓVIL (< 992px) -->
+                <a href="{% url 'dashboard' %}" class="text-decoration-none d-flex d-lg-none align-items-center gap-2">
+                    <img src="{% static 'img/eisenhowerFlow.svg' %}" alt="Logo" style="height: 28px; width: auto;">
+                    <h1 class="brand-title m-0 fs-5">
+                            <span class="brand-name-mobile">Eisen</span><span class="brand-name-desktop">Eisenhower</span><span class="brand-accent">Flow</span>
+                        </h1>
+                </a>
+
+                <!-- BUSCADOR GLOBAL COMPLETO (ESCRITORIO >= 992px) -->
+                {% if request.resolver_match.url_name != 'login' and request.resolver_match.url_name != 'register' %}
+                    <div id="globalTaskSearchWrapper" class="navbar-search-wrapper position-relative d-none d-lg-block mx-3 w-100" style="max-width: 420px;">
+                        <div class="position-relative">
+                            <i class="bi bi-search search-icon"></i>
+                            <input type="text" 
+                                id="globalTaskSearchInput" 
+                                class="form-control search-input" 
+                                placeholder="Buscar tareas..." 
+                                autocomplete="off"
+                                oninput="handleTaskSearchInput(this.value)"
+                                onfocus="handleTaskSearchInput(this.value)">
+                            <kbd class="shortcut-badge">⌘K</kbd>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- 3. BLOQUE DERECHA: BOTÓN LUPA DE BÚSQUEDA (TABLET) + NOTIFICACIONES + USUARIO -->
+            <div class="navbar-user-wrapper d-flex align-items-center gap-1 gap-md-2 gap-sm-2 flex-shrink-0">
                 {% if user.is_authenticated %}
                     
+                    <!-- LUPA DE BÚSQUEDA DESPLEGABLE EN TABLET Y MÓVIL (< 992px) -->
+                    {% if request.resolver_match.url_name != 'login' and request.resolver_match.url_name != 'register' %}
+                        <div class="dropdown d-lg-none">
+                            <button class="btn btn-link text-white p-2 border-0 shadow-none" 
+                                    type="button" 
+                                    id="mobileSearchDropdown" 
+                                    data-bs-toggle="dropdown" 
+                                    data-bs-auto-close="outside"
+                                    aria-expanded="false"
+                                    title="{% translate 'Buscar tareas' %}">
+                                <i class="bi bi-search fs-5"></i>
+                            </button>
+                            
+                            <!-- MENÚ DESPLEGABLE DEL BUSCADOR MÓVIL (TEMA OSCURO SLATE) -->
+                            <div class="dropdown-menu mobile-search-dropdown-container shadow-lg border-0 rounded-4 p-3 mt-2" 
+                                aria-labelledby="mobileSearchDropdown">
+                                <div class="position-relative">
+                                    <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted-slate"></i>
+                                    <input type="text" 
+                                        id="globalTaskSearchInputMobile" 
+                                        class="form-control search-input ps-5" 
+                                        placeholder="Buscar tareas..." 
+                                        autocomplete="off"
+                                        oninput="handleTaskSearchInput(this.value)"
+                                        onfocus="handleTaskSearchInput(this.value)">
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+
                     <!-- BOTÓN DE NOTIFICACIONES -->
                     <div class="dropdown">
                         <button class="btn notification-btn position-relative d-flex align-items-center justify-content-center p-0 border-0" 
@@ -174,7 +230,7 @@
                         </div>
                     </div>
 
-                    <div class="navbar-divider mx-3"></div>
+                    <div class="navbar-divider mx-2 mx-md-3"></div>
 
                     <!-- BOTÓN Y MENÚ DEL USUARIO (AVATAR) -->
                     <div class="dropdown">
@@ -195,7 +251,7 @@
                             <span class="fw-semibold text-white d-none d-sm-inline ms-1" style="font-size: 0.95rem;">
                                 {{ user.username }}
                             </span>
-                            <i class="bi bi-chevron-down text-secondary ms-1" style="font-size: 0.75rem;"></i>
+                            <i class="bi bi-chevron-down text-secondary ms-1 d-none d-sm-inline-block" style="font-size: 0.75rem;"></i>
                         </button>
                         
                         <div class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-3 p-3 mt-2" 
@@ -231,8 +287,6 @@
 
                             <hr class="my-2 text-muted opacity-25">
 
-                            
-
                             <!-- ENLACE AL MODAL DE AJUSTES DE USUARIO -->
                             <button type="button" 
                                     class="dropdown-item fw-semibold rounded-2 py-1.5 px-2 d-flex align-items-center gap-2 small text-dark mb-1"
@@ -265,74 +319,32 @@
         </div>
     </nav>
 
-    <!-- ESTRUCTURA PRINCIPAL DE 3 COLUMNAS -->
-    <div class="app-dashboard-layout d-flex" style="min-height: calc(100vh - 60px);">
+    <!-- ESTRUCTURA PRINCIPAL RESPONSIVE -->
+    <div class="app-dashboard-layout d-flex flex-column flex-lg-row" style="min-height: calc(100vh - 60px);">
         
         {% if user.is_authenticated %}
-            <!-- 1. COLUMNA IZQUIERDA: LISTA DE TABLEROS MINIMALISTA -->
-            <aside class="sidebar-boards p-3 bg-white border-end d-flex flex-column" style="width: 240px; flex-shrink: 0;">
+            <!-- 1. COLUMNA IZQUIERDA: VISIBLE SOLO EN ESCRITORIO (>= 992px) -->
+            <aside class="sidebar-boards p-3 bg-white border-end d-none d-layout-desktop flex-column" style="width: 240px; flex-shrink: 0;">
                 <div class="d-flex justify-content-between align-items-center mb-3 px-1">
                     <span class="text-muted fw-bold small text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.05em;">{% translate "Tableros" %}</span>
                 </div>
                 
-            
-            <div class="boards-stack flex-grow-1 overflow-auto">
-                <!-- ENLACE GENERAL -->
-                <a href="{% url 'dashboard' %}" 
-                class="board-chip d-flex text-decoration-none mb-1 p-2 gap-2 rounded small {% if not current_board %}active{% endif %}">
-                    <i class="bi bi-grid-fill flex-shrink-0" 
-                    style="background: linear-gradient(135deg, #6722fb 0%, #5f6cf7 35%, #42C6F6 100%);
-                            -webkit-background-clip: text;
-                            -webkit-text-fill-color: transparent;
-                            color: transparent !important;
-                            font-size: 0.9rem;
-                            display: inline-block;"></i> {% translate "General" %}
-                </a>
+                <div class="boards-stack flex-grow-1 overflow-auto">
+                    <!-- ENLACE GENERAL -->
+                    <a href="{% url 'dashboard' %}" 
+                    class="board-chip d-flex text-decoration-none mb-1 p-2 gap-2 rounded small {% if not current_board %}active{% endif %}">
+                        <i class="bi bi-grid-fill flex-shrink-0" 
+                        style="background: linear-gradient(135deg, #6722fb 0%, #5f6cf7 35%, #42C6F6 100%);
+                                -webkit-background-clip: text;
+                                -webkit-text-fill-color: transparent;
+                                color: transparent !important;
+                                font-size: 0.9rem;
+                                display: inline-block;"></i> {% translate "General" %}
+                    </a>
 
-                <!-- 1. TABLEROS PERSONALES -->
-                {% for b in boards %}
-                    {% if not b.is_default and b.owner == request.user and not b.members.exists %}
-                        <div class="board-item d-flex align-items-center justify-content-between mb-1 p-2 rounded {% if current_board.id == b.id %}active{% endif %}"
-                            style="--board-color: {{ b.color|default:'#6c757d' }};">
-                            
-                            <a href="{% url 'dashboard_board' b.id %}" 
-                            class="text-decoration-none text-truncate flex-grow-1 d-flex align-items-center gap-2 small" style="color: inherit;">
-                                <i class="bi bi-grid-fill flex-shrink-0" 
-                                style="background: linear-gradient(135deg, var(--board-color) 0%, var(--board-color) 35%, color-mix(in srgb, var(--board-color) 10%, white) 100%);
-                                        -webkit-background-clip: text;
-                                        -webkit-text-fill-color: transparent;
-                                        color: transparent !important;
-                                        font-size: 0.9rem;
-                                        display: inline-block;"></i>
-                                <span class="board-title text-truncate">{{ b.title }}</span>
-                            </a>
-
-                            <div class="d-flex align-items-center gap-1">
-                                <button type="button" 
-                                        class="btn btn-sm p-0 border-0 shadow-none text-muted opacity-50 hover-opacity-100 ms-1" 
-                                        data-bs-toggle="modal" 
-                                        data-bs-target="#editBoardModalSidebar{{ b.id }}"
-                                        title="{% translate 'Editar tablero' %}"
-                                        style="font-size: 0.75rem;">
-                                    •••
-                                </button>
-                            </div>
-                        </div>
-                    {% endif %}
-                {% endfor %}
-
-                {% if has_shared_boards %}
-                    <hr class="my-2 border-0 opacity-100 mx-auto" style="height: 2px; width: 70%; background-color: #fbecae;">
-                {% endif %}
-
-                <!-- 2. TABLEROS COMPARTIDOS -->
-                {% for b in boards %}
-                    {% if not b.is_default %}
-                        {% if b.owner != request.user or b.members.exists %}
-                            {% if forloop.first %}
-                                <hr class="my-2 border-0 opacity-100" style="height: 2px; background-color: #FBBF24;">
-                            {% endif %}
-
+                    <!-- TABLEROS PERSONALES -->
+                    {% for b in boards %}
+                        {% if not b.is_default and b.owner == request.user and not b.members.exists %}
                             <div class="board-item d-flex align-items-center justify-content-between mb-1 p-2 rounded {% if current_board.id == b.id %}active{% endif %}"
                                 style="--board-color: {{ b.color|default:'#6c757d' }};">
                                 
@@ -349,8 +361,6 @@
                                 </a>
 
                                 <div class="d-flex align-items-center gap-1">
-                                    <i class="bi bi-people-fill" style="color: #fbbf24 !important; font-size: 0.85rem;" title="{% translate 'Tablero compartido' %}"></i>
-
                                     <button type="button" 
                                             class="btn btn-sm p-0 border-0 shadow-none text-muted opacity-50 hover-opacity-100 ms-1" 
                                             data-bs-toggle="modal" 
@@ -362,71 +372,168 @@
                                 </div>
                             </div>
                         {% endif %}
+                    {% endfor %}
+
+                    {% if has_shared_boards %}
+                        <hr class="my-2 border-0 opacity-100 mx-auto" style="height: 2px; width: 70%; background-color: #fbecae;">
                     {% endif %}
-                {% endfor %}
 
-                <!-- BOTÓN NUEVO TABLERO -->
-                <button class="btn btn-outline-secondary btn-sm mt-2 w-100" data-bs-toggle="modal" data-bs-target="#createBoardModal">
-                    + {% translate "Nuevo Tablero" %}
-                </button>
+                    <!-- TABLEROS COMPARTIDOS -->
+                    {% for b in boards %}
+                        {% if not b.is_default %}
+                            {% if b.owner != request.user or b.members.exists %}
+                                {% if forloop.first %}
+                                    <hr class="my-2 border-0 opacity-100" style="height: 2px; background-color: #FBBF24;">
+                                {% endif %}
 
-                <hr class="my-3 text-muted opacity-25">
+                                <div class="board-item d-flex align-items-center justify-content-between mb-1 p-2 rounded {% if current_board.id == b.id %}active{% endif %}"
+                                    style="--board-color: {{ b.color|default:'#6c757d' }};">
+                                    
+                                    <a href="{% url 'dashboard_board' b.id %}" 
+                                    class="text-decoration-none text-truncate flex-grow-1 d-flex align-items-center gap-2 small" style="color: inherit;">
+                                        <i class="bi bi-grid-fill flex-shrink-0" 
+                                        style="background: linear-gradient(135deg, var(--board-color) 0%, var(--board-color) 35%, color-mix(in srgb, var(--board-color) 10%, white) 100%);
+                                                -webkit-background-clip: text;
+                                                -webkit-text-fill-color: transparent;
+                                                color: transparent !important;
+                                                font-size: 0.9rem;
+                                                display: inline-block;"></i>
+                                        <span class="board-title text-truncate">{{ b.title }}</span>
+                                    </a>
 
-                <!-- BLOQUE DISTRIBUCIÓN ACTUAL -->
-                <div class="px-1 mt-2">
-                    <small class="text-uppercase fw-bold text-muted d-block mb-2" style="font-size: 0.72rem; letter-spacing: 0.05em;">
-                        {% translate "DISTRIBUCIÓN ACTUAL" %}
-                    </small>
+                                    <div class="d-flex align-items-center gap-1">
+                                        <i class="bi bi-people-fill" style="color: #fbbf24 !important; font-size: 0.85rem;" title="{% translate 'Tablero compartido' %}"></i>
 
-                    <div class="bg-light p-3 rounded-4 border border-light-subtle shadow-sm">
-                        <div class="d-flex flex-column gap-2">
-                            
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div class="d-flex align-items-center gap-2">
-                                    <span class="d-inline-block flex-shrink-0" style="width: 8px; height: 8px; background-color: #ef4444; border-radius: 2px;"></span>
-                                    <span class="fw-semibold text-secondary" style="font-size: 0.82rem;">Q1 (Hacer)</span>
+                                        <button type="button" 
+                                                class="btn btn-sm p-0 border-0 shadow-none text-muted opacity-50 hover-opacity-100 ms-1" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#editBoardModalSidebar{{ b.id }}"
+                                                title="{% translate 'Editar tablero' %}"
+                                                style="font-size: 0.75rem;">
+                                            •••
+                                        </button>
+                                    </div>
                                 </div>
-                                <span class="fw-bold text-dark" style="font-size: 0.82rem;" id="sidebar-q1-count">
-                                    {{ q1_count|default:0 }} {% if q1_count == 1 %}{% translate "tarea" %}{% else %}{% translate "tareas" %}{% endif %}
-                                </span>
-                            </div>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
 
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div class="d-flex align-items-center gap-2">
-                                    <span class="d-inline-block flex-shrink-0" style="width: 8px; height: 8px; background-color: #3b82f6; border-radius: 2px;"></span>
-                                    <span class="fw-semibold text-secondary" style="font-size: 0.82rem;">Q2 (Planificar)</span>
+                    <!-- BOTÓN NUEVO TABLERO -->
+                    <button class="btn btn-outline-secondary btn-sm mt-2 w-100" data-bs-toggle="modal" data-bs-target="#createBoardModal">
+                        + {% translate "Nuevo Tablero" %}
+                    </button>
+
+                    <hr class="my-3 text-muted opacity-25">
+
+                    <!-- BLOQUE DISTRIBUCIÓN ACTUAL -->
+                    <div class="px-1 mt-2">
+                        <small class="text-uppercase fw-bold text-muted d-block mb-2" style="font-size: 0.72rem; letter-spacing: 0.05em;">
+                            {% translate "DISTRIBUCIÓN ACTUAL" %}
+                        </small>
+
+                        <div class="bg-light p-3 rounded-4 border border-light-subtle shadow-sm">
+                            <div class="d-flex flex-column gap-2">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="d-inline-block flex-shrink-0" style="width: 8px; height: 8px; background-color: #ef4444; border-radius: 2px;"></span>
+                                        <span class="fw-semibold text-secondary" style="font-size: 0.82rem;">Q1 (Hacer)</span>
+                                    </div>
+                                    <span class="fw-bold text-dark" style="font-size: 0.82rem;" id="sidebar-q1-count">
+                                        {{ q1_count|default:0 }} {% if q1_count == 1 %}{% translate "tarea" %}{% else %}{% translate "tareas" %}{% endif %}
+                                    </span>
                                 </div>
-                                <span class="fw-bold text-dark" style="font-size: 0.82rem;" id="sidebar-q2-count">
-                                    {{ q2_count|default:0 }} {% if q2_count == 1 %}{% translate "tarea" %}{% else %}{% translate "tareas" %}{% endif %}
-                                </span>
-                            </div>
 
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div class="d-flex align-items-center gap-2">
-                                    <span class="d-inline-block flex-shrink-0" style="width: 8px; height: 8px; background-color: #f59e0b; border-radius: 2px;"></span>
-                                    <span class="fw-semibold text-secondary" style="font-size: 0.82rem;">Q3 (Delegar)</span>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="d-inline-block flex-shrink-0" style="width: 8px; height: 8px; background-color: #3b82f6; border-radius: 2px;"></span>
+                                        <span class="fw-semibold text-secondary" style="font-size: 0.82rem;">Q2 (Planificar)</span>
+                                    </div>
+                                    <span class="fw-bold text-dark" style="font-size: 0.82rem;" id="sidebar-q2-count">
+                                        {{ q2_count|default:0 }} {% if q2_count == 1 %}{% translate "tarea" %}{% else %}{% translate "tareas" %}{% endif %}
+                                    </span>
                                 </div>
-                                <span class="fw-bold text-dark" style="font-size: 0.82rem;" id="sidebar-q3-count">
-                                    {{ q3_count|default:0 }} {% if q3_count == 1 %}{% translate "tarea" %}{% else %}{% translate "tareas" %}{% endif %}
-                                </span>
-                            </div>
 
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div class="d-flex align-items-center gap-2">
-                                    <span class="d-inline-block flex-shrink-0" style="width: 8px; height: 8px; background-color: #9ca3af; border-radius: 2px;"></span>
-                                    <span class="fw-semibold text-secondary" style="font-size: 0.82rem;">Q4 (Eliminar)</span>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="d-inline-block flex-shrink-0" style="width: 8px; height: 8px; background-color: #f59e0b; border-radius: 2px;"></span>
+                                        <span class="fw-semibold text-secondary" style="font-size: 0.82rem;">Q3 (Delegar)</span>
+                                    </div>
+                                    <span class="fw-bold text-dark" style="font-size: 0.82rem;" id="sidebar-q3-count">
+                                        {{ q3_count|default:0 }} {% if q3_count == 1 %}{% translate "tarea" %}{% else %}{% translate "tareas" %}{% endif %}
+                                    </span>
                                 </div>
-                                <span class="fw-bold text-dark" style="font-size: 0.82rem;" id="sidebar-q4-count">
-                                    {{ q4_count|default:0 }} {% if q4_count == 1 %}{% translate "tarea" %}{% else %}{% translate "tareas" %}{% endif %}
-                                </span>
-                            </div>
 
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="d-inline-block flex-shrink-0" style="width: 8px; height: 8px; background-color: #9ca3af; border-radius: 2px;"></span>
+                                        <span class="fw-semibold text-secondary" style="font-size: 0.82rem;">Q4 (Eliminar)</span>
+                                    </div>
+                                    <span class="fw-bold text-dark" style="font-size: 0.82rem;" id="sidebar-q4-count">
+                                        {{ q4_count|default:0 }} {% if q4_count == 1 %}{% translate "tarea" %}{% else %}{% translate "tareas" %}{% endif %}
+                                    </span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-
-            </div>
             </aside>
+
+            <!-- PANEL OFFCANVAS DE TABLEROS (DESPLEGABLE AL PULSAR LA HAMBURGUESA EN TABLET/MÓVIL < 992px) -->
+            <div class="offcanvas offcanvas-start d-layout-mobile" tabindex="-1" id="offcanvasBoards" aria-labelledby="offcanvasBoardsLabel" style="width: 280px;">
+                <div class="offcanvas-header border-bottom">
+                    <h5 class="offcanvas-title fw-bold text-dark small text-uppercase" id="offcanvasBoardsLabel">
+                        <i class="bi bi-kanban me-1 text-primary"></i> {% translate "Tableros" %}
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                </div>
+                <div class="offcanvas-body p-3">
+                    <div class="boards-stack">
+                        <!-- ENLACE GENERAL -->
+                        <a href="{% url 'dashboard' %}" 
+                        class="board-chip d-flex text-decoration-none mb-1 p-2 gap-2 rounded small {% if not current_board %}active{% endif %}">
+                            <i class="bi bi-grid-fill flex-shrink-0" 
+                            style="background: linear-gradient(135deg, #6722fb 0%, #5f6cf7 35%, #42C6F6 100%);
+                                    -webkit-background-clip: text;
+                                    -webkit-text-fill-color: transparent;
+                                    color: transparent !important;
+                                    font-size: 0.9rem;
+                                    display: inline-block;"></i> {% translate "General" %}
+                        </a>
+
+                        <!-- TABLEROS PERSONALES -->
+                        {% for b in boards %}
+                            {% if not b.is_default and b.owner == request.user and not b.members.exists %}
+                                <div class="board-item d-flex align-items-center justify-content-between mb-1 p-2 rounded {% if current_board.id == b.id %}active{% endif %}"
+                                    style="--board-color: {{ b.color|default:'#6c757d' }};">
+                                    <a href="{% url 'dashboard_board' b.id %}" class="text-decoration-none text-truncate flex-grow-1 d-flex align-items-center gap-2 small" style="color: inherit;">
+                                        <i class="bi bi-grid-fill flex-shrink-0" style="color: var(--board-color);"></i>
+                                        <span class="board-title text-truncate">{{ b.title }}</span>
+                                    </a>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+
+                        <!-- TABLEROS COMPARTIDOS -->
+                        {% for b in boards %}
+                            {% if not b.is_default %}
+                                {% if b.owner != request.user or b.members.exists %}
+                                    <div class="board-item d-flex align-items-center justify-content-between mb-1 p-2 rounded {% if current_board.id == b.id %}active{% endif %}"
+                                        style="--board-color: {{ b.color|default:'#6c757d' }};">
+                                        <a href="{% url 'dashboard_board' b.id %}" class="text-decoration-none text-truncate flex-grow-1 d-flex align-items-center gap-2 small" style="color: inherit;">
+                                            <i class="bi bi-grid-fill flex-shrink-0" style="color: var(--board-color);"></i>
+                                            <span class="board-title text-truncate">{{ b.title }}</span>
+                                        </a>
+                                    </div>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+
+                        <button class="btn btn-outline-secondary btn-sm mt-3 w-100" data-bs-toggle="modal" data-bs-target="#createBoardModal">
+                            + {% translate "Nuevo Tablero" %}
+                        </button>
+                    </div>
+                </div>
+            </div>
 
             <!-- MODALES DE EDICIÓN Y GESTIÓN DE TABLERO -->
             {% for b in boards %}
@@ -536,7 +643,7 @@
                                                 <div id="selected-users-list-{{ b.id }}" class="d-flex flex-wrap gap-1.5"></div>
                                             </div>
                                             
-                                            <!-- CAMPO OCULTO DONDE JS GUARDA LOS USERNAMES AL PULSAR "GUARDAR CAMBIOS" -->
+                                            <!-- CAMPO OCULTO PARA "GUARDAR CAMBIOS" -->
                                             <input type="hidden" name="invite_identifier" id="hiddenIdentifierInput{{ b.id }}">
 
                                             <div class="d-flex justify-content-between align-items-center mt-2">
@@ -612,9 +719,10 @@
                                     </div>
                                 </form>
 
+                                <!-- FORMULARIO OCULTO DEDICADO -->
                                 <form id="inviteFormHidden{{ b.id }}" method="POST" action="{% url 'invite_to_board' b.id %}" class="d-none">
                                     {% csrf_token %}
-                                    <input type="hidden" name="identifier" id="hiddenIdentifierInput{{ b.id }}">
+                                    <input type="hidden" name="identifier" id="dedicatedIdentifierInput{{ b.id }}">
                                 </form>
 
                             </div>
@@ -632,7 +740,6 @@
 
     </div>
 
-    
     <!-- MODAL DE AJUSTES DE USUARIO (PERFIL, SEGURIDAD & IDIOMA) -->
     {% if user.is_authenticated %}
     <div class="modal fade" id="userSettingsModal" tabindex="-1" aria-hidden="true" style="z-index: 1070 !important;">
@@ -648,7 +755,7 @@
 
                 <div class="modal-body p-4 pt-2">
                     
-                    <!-- TARJETA CABECERA DEL USUARIO (PERMANENTE PARA TODAS LAS PESTAÑAS) -->
+                    <!-- TARJETA CABECERA DEL USUARIO -->
                     <div class="d-flex align-items-center gap-3 mb-3 p-3 bg-light rounded-3 border">
                         <span class="rounded-circle text-white d-inline-flex align-items-center justify-content-center flex-shrink-0" 
                             style="width: 52px; height: 52px; font-size: 1.1rem; font-weight: 700; background: linear-gradient(135deg, #497BF6 0%, #7855f7 50%, #9f48ec 100%);">
@@ -767,7 +874,6 @@
                         <div class="tab-pane fade" id="language-tab-pane" role="tabpanel">
                             <form action="{% url 'set_language' %}" method="post" id="languageChangeForm">
                                 {% csrf_token %}
-                                <!-- Forzamos la redirección a la página actual -->
                                 <input name="next" type="hidden" value="{{ request.path }}">
                                 
                                 {% get_current_language as LANGUAGE_CODE %}
@@ -818,7 +924,7 @@
     </div>
     {% endif %}
 
-    <!-- Menú desplegable flotante de resultados -->
+    <!-- Menú desplegable flotante de resultados de búsqueda -->
     <div id="searchDropdownResults" 
         class="dropdown-menu shadow-lg border-0 p-2 bg-dark text-white d-none" 
         style="position: fixed !important; max-height: 400px; overflow-y: auto; overflow-x: hidden !important; z-index: 1060 !important; box-sizing: border-box !important;">

@@ -17,9 +17,12 @@
         <!-- FILA SUPERIOR: CHECKBOX + TÍTULO + TRES PUNTOS -->
         <div class="task-card-header d-flex align-items-center justify-content-between position-relative w-100 gap-2" style="min-height: 24px;">
             
-            <!-- Checkbox flotante/interactivo -->
-            <div class="task-checkbox-wrapper flex-shrink-0 ">
-                <label class="task-checkbox-container m-0" onclick="event.stopPropagation();">
+            <!-- Checkbox de 22px aislado contra eventos táctiles (touch) -->
+            <div class="task-checkbox-wrapper flex-shrink-0" 
+                onclick="event.stopPropagation();" 
+                ontouchstart="event.stopPropagation();" 
+                ontouchend="event.stopPropagation();">
+                <label class="task-checkbox-container m-0" style="cursor: pointer;">
                     <input type="checkbox" 
                         class="task-completion-check" 
                         data-task-id="{{ task.id }}"
@@ -28,7 +31,7 @@
                 </label>
             </div>
 
-            <!-- Título de la tarjeta -->
+            <!-- Título de la tarjeta (anclado pegado al checkbox) -->
             <div class="task-title-wrapper flex-grow-1 min-w-0" data-bs-toggle="modal" data-bs-target="#viewTaskModal{{ task.id }}">
                 <h6 class="card-title task-title mb-0 fw-semibold text-dark {% if task.is_completed %}completed-text{% endif %}" 
                     style="font-size: 0.85rem; line-height: 1.3; margin: 0;">
@@ -37,7 +40,7 @@
             </div>
 
             <!-- Tres puntos de opciones -->
-            <div class="task-card-actions flex-shrink-0 opacity-50 hover-opacity-100 ms-1" data-bs-toggle="modal" data-bs-target="#viewTaskModal{{ task.id }}">
+            <div class="task-card-actions flex-shrink-0 opacity-75 ms-1" data-bs-toggle="modal" data-bs-target="#viewTaskModal{{ task.id }}">
                 <i class="bi bi-three-dots text-muted" style="font-size: 0.85rem; line-height: 1;"></i>
             </div>
 

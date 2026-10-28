@@ -506,7 +506,7 @@ document.addEventListener('DOMContentLoaded', function () {
         new Sortable(container, {
             group: 'eisenhower-matrix',
             draggable: '.task-card, .completed-task-item',
-            filter: '.empty-msg, .add-task-inline-wrapper', 
+            filter: '.empty-msg, .add-task-inline-wrapper, .task-checkbox-wrapper, .task-completion-check', 
             preventOnFilter: false,
             animation: 150,
             ghostClass: 'opacity-50',
@@ -1138,7 +1138,7 @@ function handleBoardInviteSearch(inputEl, boardId) {
     }
 }
 
-// Al seleccionar un usuario de la lista flotante (Soporta múltiples)
+// Al seleccionar un usuario de la lista flotante
 function selectBoardCollaborator(boardId, username, displayName) {
     const inputEl = document.getElementById(`invite-input-${boardId}`);
     const resultsMenu = document.getElementById(`invite-results-${boardId}`);
@@ -1147,20 +1147,17 @@ function selectBoardCollaborator(boardId, username, displayName) {
         selectedUsersMap[boardId] = [];
     }
 
-    // Evita duplicados en el array local
     const exists = selectedUsersMap[boardId].some(u => u.username === username);
     if (!exists) {
         selectedUsersMap[boardId].push({ username, displayName });
     }
 
-    // Limpiar buscador y ocultar desplegable
     if (inputEl) inputEl.value = '';
     if (resultsMenu) {
         resultsMenu.classList.add('d-none');
         resultsMenu.style.display = 'none';
     }
 
-    // Renderizar la lista actualizada de personas
     renderSelectedUsers(boardId);
 }
 
@@ -1170,7 +1167,7 @@ function renderSelectedUsers(boardId) {
     const listContainer = document.getElementById(`selected-users-list-${boardId}`);
     const users = selectedUsersMap[boardId] || [];
 
-    // 1. Localizar o crear el contenedor dinámico para inputs ocultos múltiples
+    // 1. Contenedor de inputs múltiples (name="invited_users")
     let hiddenContainer = document.getElementById(`hidden-inputs-container-${boardId}`);
     if (!hiddenContainer && boxEl) {
         hiddenContainer = document.createElement('div');
@@ -1178,9 +1175,8 @@ function renderSelectedUsers(boardId) {
         boxEl.parentNode.appendChild(hiddenContainer);
     }
 
-    // 2. Buscar las distintas variaciones de ID para la compatibilidad con la plantilla
-    const legacyInput = document.getElementById(`hiddenIdentifierInput${boardId}`) || 
-                        document.getElementById(`hiddenIdentifierInput-${boardId}`);
+    // 2. Input legacy dentro del formulario principal
+    const legacyInput = document.getElementById(`hiddenIdentifierInput${boardId}`);
 
     if (!boxEl) return;
 
@@ -1194,7 +1190,7 @@ function renderSelectedUsers(boardId) {
 
     boxEl.classList.remove('d-none');
 
-    // 3. Renderizar badges visuales
+    // Renderizar badges visuales
     if (listContainer) {
         listContainer.innerHTML = users.map(user => `
             <div class="d-inline-flex align-items-center gap-1.5 bg-white px-2.5 py-1 rounded-pill border shadow-sm" style="font-size: 0.78rem;">
@@ -1204,20 +1200,19 @@ function renderSelectedUsers(boardId) {
         `).join('');
     }
 
-    // 4. Crear inputs ocultos múltiples para request.POST.getlist('invited_users')
+    // Generar inputs ocultos múltiples (para 'invited_users')
     if (hiddenContainer) {
         hiddenContainer.innerHTML = users.map(user => `
             <input type="hidden" name="invited_users" value="${user.username}">
         `).join('');
     }
 
-    // 5. Asignar usernames separados por comas al input legacy para request.POST.get('invite_identifier')
+    // Asignar usernames en el input legacy (para 'invite_identifier')
     if (legacyInput) {
         legacyInput.value = users.map(u => u.username).join(',');
     }
 }
 
-// Elimina un usuario específico del listado acumulado
 function removeSelectedCollaborator(boardId, username) {
     if (selectedUsersMap[boardId]) {
         selectedUsersMap[boardId] = selectedUsersMap[boardId].filter(u => u.username !== username);
@@ -1225,17 +1220,14 @@ function removeSelectedCollaborator(boardId, username) {
     }
 }
 
-// Limpia toda la lista de usuarios seleccionados
 function clearSelectedCollaborator(boardId) {
     selectedUsersMap[boardId] = [];
     renderSelectedUsers(boardId);
 }
 
-// Envía las invitaciones asociándolas antes del submit del formulario
+// Envía la invitación utilizando el formulario dedicado (inviteFormHidden) o el principal
 function sendBoardInvite(boardId) {
     const users = selectedUsersMap[boardId] || [];
-    const hiddenInput = document.getElementById(`hiddenIdentifierInput${boardId}`);
-    const form = document.getElementById(`inviteFormHidden${boardId}`) || document.getElementById('createBoardForm');
     const feedbackEl = document.getElementById(`invite-feedback-${boardId}`);
 
     if (users.length === 0) {
@@ -1246,26 +1238,62 @@ function sendBoardInvite(boardId) {
         return;
     }
 
-    if (hiddenInput) {
-        hiddenInput.value = users.map(u => u.username).join(',');
+    // Asegurarse de volcar los nombres al input oculto del formulario independiente
+    const dedicatedForm = document.getElementById(`inviteFormHidden${boardId}`);
+    const dedicatedInput = document.getElementById(`dedicatedIdentifierInput${boardId}`);
+
+    if (dedicatedForm && dedicatedInput) {
+        dedicatedInput.value = users.map(u => u.username).join(',');
+        if (feedbackEl) {
+            feedbackEl.className = "text-success fw-bold";
+            feedbackEl.textContent = `Enviando invitación a ${users.length} persona(s)...`;
+        }
+        dedicatedForm.submit();
+        return;
     }
 
-    if (feedbackEl) {
-        feedbackEl.className = "text-success fw-bold";
-        feedbackEl.textContent = `Enviando invitaciones a ${users.length} persona(s)...`;
-    }
-
+    // Si no hay formulario independiente, hace submit al principal del modal
+    const inputEl = document.getElementById(`invite-input-${boardId}`);
+    const form = inputEl ? inputEl.closest('form') : null;
     if (form) {
+        renderSelectedUsers(boardId);
         form.submit();
     }
 }
 
-// Ocultar el desplegable si el usuario hace clic fuera de la zona del buscador
-document.addEventListener('click', function (e) {
-    if (!e.target.closest('.position-relative')) {
-        document.querySelectorAll('[id^="invite-results-"]').forEach(menu => {
-            menu.classList.add('d-none');
-            menu.style.display = 'none';
-        });
-    }
-});
+
+// ==========================================
+// POLLING DE NOTIFICACIONES EN TIEMPO REAL
+// ==========================================
+function pollUnreadNotifications() {
+    // Si la pestaña no está activa o visible, pausar peticiones
+    if (document.hidden) return;
+
+    fetch('/api/unread-notifications-count/', {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json'
+        }
+    })
+    .then(res => res.ok ? res.json() : Promise.reject())
+    .then(data => {
+        const bellBtn = document.getElementById('notificationsDropdown');
+        if (!bellBtn) return;
+
+        let redDot = bellBtn.querySelector('.notification-red-dot');
+
+        if (data.unread_count > 0) {
+            if (!redDot) {
+                const dot = document.createElement('span');
+                dot.className = 'notification-red-dot';
+                bellBtn.appendChild(dot);
+            }
+        } else if (redDot) {
+            redDot.remove();
+        }
+    })
+    .catch(err => console.debug("Polling pausado o sin conexión"));
+}
+
+// Comprobar notificaciones no leídas cada 12 segundos
+setInterval(pollUnreadNotifications, 12000);

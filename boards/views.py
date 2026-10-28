@@ -468,3 +468,10 @@ def search_users_api(request):
     ]
 
     return JsonResponse({'users': users_data})
+
+#actualiza las notificaciones
+@login_required
+def unread_notifications_count_api(request):
+    """Devuelve la cantidad de notificaciones no leídas para la campana en tiempo real."""
+    count = Notification.objects.filter(recipient=request.user, is_read=False).count()
+    return JsonResponse({'unread_count': count})

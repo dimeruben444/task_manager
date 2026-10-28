@@ -181,6 +181,18 @@ $star-error: #dc2626;
       }
     }
   }
+  a.text-decoration-none {
+    color: inherit !important;
+  }
+
+  .brand-title {
+    color: #ffffff !important;
+    font-weight: 700;
+
+    .brand-accent {
+      color: #60a5fa !important; // Azul acento Clarity
+    }
+  }
 }
 
 
@@ -398,4 +410,127 @@ html {
   background-color: #ffffff !important;
   box-shadow: 0 10px 25px rgba(15, 23, 42, 0.25) !important;
   border: 1px solid #e2e8f0 !important;
+}
+
+
+/* PREVENCIÓN DE DESBORDAMIENTO EN NAVBAR */
+.app-navbar {
+  overflow: visible !important;
+  box-sizing: border-box !important;
+  
+  .nav-fluid {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+}
+
+
+/* =======================================================
+   CAMBIO DE MARCA EXACTO A 440PX (EISENFLOW vs EISENHOWERFLOW)
+   ======================================================= */
+
+.brand-name-mobile {
+  display: inline !important;
+}
+.brand-name-desktop {
+  display: none !important;
+}
+
+@media (min-width: 441px) {
+  .brand-name-mobile {
+    display: none !important;
+  }
+  .brand-name-desktop {
+    display: inline !important;
+  }
+}
+
+
+
+/* =======================================================
+   ESTILOS Y ANCHO DEL DESPLEGABLE DE NOTIFICACIONES EN MÓVIL
+   ======================================================= */
+@media (max-width: 768px) {
+  /* Panel principal de notificaciones */
+  #notificationsDropdown + .dropdown-menu {
+    position: fixed !important;
+    top: 65px !important;
+    left: 10px !important;            /* Mismo alineamiento lateral que las tarjetas */
+    right: 10px !important;
+    width: auto !important;
+    max-width: none !important;
+    background-color: #0f172a !important; /* Color oscuro Slate del navbar */
+    border: 1px solid #334155 !important;
+    border-radius: 16px !important;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.5) !important;
+    transform: none !important;
+    z-index: 2070 !important;
+    padding: 1rem !important;
+  }
+
+  /* Textos y títulos en tema oscuro */
+  #notificationsDropdown + .dropdown-menu .text-muted,
+  #notificationsDropdown + .dropdown-menu small,
+  #notificationsDropdown + .dropdown-menu p {
+    color: #94a3b8 !important;
+  }
+
+  #notificationsDropdown + .dropdown-menu strong,
+  #notificationsDropdown + .dropdown-menu .text-dark {
+    color: #f8fafc !important;
+  }
+
+  /* Tarjetas individuales dentro de la lista de notificaciones */
+  #notificationsDropdown + .dropdown-menu .bg-light {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+  }
+}
+
+/* =======================================================
+   UNIFICACIÓN Y SEPARACIÓN DEL BUSCADOR MÓVIL (< 768PX)
+   ======================================================= */
+@media (max-width: 768px) {
+  /* 1. CAJA SUPERIOR DONDE ESCRIBES */
+  .mobile-search-dropdown-container {
+    position: fixed !important;
+    top: 65px !important;
+    left: 10px !important;
+    right: 10px !important;
+    width: auto !important;
+    max-width: none !important;
+    background-color: #0f172a !important;
+    border: 1px solid #334155 !important;
+    border-radius: 16px 16px 8px 8px !important; /* Esquinas superiores redondeadas */
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.4) !important;
+    transform: none !important;
+    z-index: 2075 !important;
+    padding: 0.75rem !important;
+  }
+
+  /* Input de texto */
+  .mobile-search-dropdown-container .search-input {
+    background-color: rgba(15, 23, 42, 0.8) !important;
+    border: 1px solid #334155 !important;
+    color: #f8fafc !important;
+    border-radius: 10px !important;
+  }
+
+  /* 2. LISTA DE RESULTADOS (PEGADA O LIGERAMENTE SEPARADA) */
+  #searchDropdownResults {
+    position: fixed !important;
+    top: 138px !important;           /* Separación limpia de 8px para darle respiro visual */
+    left: 10px !important;
+    right: 10px !important;
+    width: auto !important;
+    max-width: none !important;
+    background-color: #0f172a !important;
+    border: 1px solid #334155 !important;
+    border-radius: 12px !important;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5) !important;
+    transform: none !important;
+    z-index: 2080 !important;
+    padding: 0.75rem !important;
+  }
 }

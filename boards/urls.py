@@ -1,5 +1,5 @@
 # boards/urls.py
-from django.urls import path, include
+from django.urls import path
 from .views import BoardCreateView, BoardUpdateView, BoardDeleteView
 from boards.views import search_users_api
 from . import views
@@ -15,4 +15,5 @@ urlpatterns = [
     path('notification/<int:notification_id>/delete/', views.delete_notification, name='delete_notification'),
 
     path('api/search-users/', search_users_api, name='search_users_api'),
+    path('api/unread-notifications-count/', views.unread_notifications_count_api, name='unread_notifications_count_api'),
 ]
