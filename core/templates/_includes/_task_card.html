@@ -1,4 +1,5 @@
 {% load i18n %}
+{% load static %}
 
 <!-- TARJETA COMPACTA EN EL TABLERO -->
 <div class="card mb-2 shadow-sm border-0 task-card {% if task.is_completed %}is-completed{% endif %}" 
@@ -32,7 +33,7 @@
             </div>
 
             <!-- Título de la tarjeta (anclado pegado al checkbox) -->
-            <div class="task-title-wrapper flex-grow-1 min-w-0" data-bs-toggle="modal" data-bs-target="#viewTaskModal{{ task.id }}">
+            <div class="task-title-wrapper flex-grow-1 min-w-0" onclick="handleTaskCardClick('{{ task.id }}')">
                 <h6 class="card-title task-title mb-0 fw-semibold text-dark {% if task.is_completed %}completed-text{% endif %}" 
                     style="font-size: 0.85rem; line-height: 1.3; margin: 0;">
                     {{ task.title }}
@@ -40,7 +41,7 @@
             </div>
 
             <!-- Tres puntos de opciones -->
-            <div class="task-card-actions flex-shrink-0 opacity-75 ms-1" data-bs-toggle="modal" data-bs-target="#viewTaskModal{{ task.id }}">
+            <div class="task-card-actions flex-shrink-0 opacity-75 ms-1" onclick="handleTaskCardClick('{{ task.id }}')">
                 <i class="bi bi-three-dots text-muted" style="font-size: 0.85rem; line-height: 1;"></i>
             </div>
 
@@ -630,15 +631,12 @@
                 <div class="modal-footer border-top-0 px-4 pb-4 pt-2 d-flex justify-content-between align-items-center">
                     <!-- BOTÓN ELIMINAR EN EL MODAL DE TAREA -->
                     {% if task.created_by == request.user or task.board.owner == request.user %}
-                        <!-- Para el Creador o Propietario del tablero: Botón de eliminar activo en rojo -->
-                        <form method="POST" action="{% url 'delete_task' task.id %}" class="d-inline">
-                            {% csrf_token %}
-                            <button type="submit" 
-                                    class="btn btn-outline-danger btn-sm rounded-3 fw-semibold"
-                                    onclick="return confirm('{% translate "¿Seguro que quieres eliminar esta tarea?" %}');">
-                                <i class="bi bi-trash me-1"></i> {% translate "Eliminar Tarea" %}
-                            </button>
-                        </form>
+                        <!-- Para el Creador o Propietario del tablero: Botón de eliminar AJAX -->
+                        <button type="button" 
+                                class="btn btn-outline-danger btn-sm rounded-3 fw-semibold"
+                                onclick="deleteTaskModal('{{ task.id }}', '{% url 'delete_task' task.id %}')">
+                            <i class="bi bi-trash me-1"></i> {% translate "Eliminar Tarea" %}
+                        </button>
                     {% else %}
                         <!-- Para Miembros/Invitados (Persona B): Botón desactivado y en gris -->
                         <button type="button" 
@@ -661,6 +659,77 @@
                 </div>
 
             </form>
+        </div>
+    </div>
+</div>
+
+<!-- 3. MODAL TÁCTIL MÓVIL (mobileActionModal) -->
+
+<!-- MODAL DE OPCIONES RÁPIDAS (MÓVIL / TABLET) -->
+<div class="modal fade" id="mobileActionModal{{ task.id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm " >
+        <div class="modal-content border-0 shadow-lg rounded-5 overflow-hidden" 
+            >
+            
+            <!-- CABECERA DE LA TAREA CON EL ICONO SVG OFICIAL DEL CUADRANTE -->
+            <div class="modal-header border-bottom py-2.5 px-3 bg-light d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center gap-2 min-w-0 flex-grow-1 pe-2">
+                    
+                    <!-- ICONOS SVG NATIVOS CON SU FONDO DE COLOR CORRESPONDIENTE -->
+                    {% if task.urgency >= 3 and task.importance >= 3 %}
+                        <!-- Q1: Fire SVG -->
+                        <span class="quadrant-icon-box q1-bg flex-shrink-0 d-inline-flex align-items-center justify-content-center" style="width: 26px; height: 26px; border-radius: 6px;">
+                            <img src="{% static 'img/fire.svg' %}" alt="Q1" width="14" height="14" class="d-block">
+                        </span>
+                    {% elif task.urgency <= 2 and task.importance >= 3 %}
+                        <!-- Q2: Calendar SVG -->
+                        <span class="quadrant-icon-box q2-bg flex-shrink-0 d-inline-flex align-items-center justify-content-center" style="width: 26px; height: 26px; border-radius: 6px;">
+                            <img src="{% static 'img/calendar.svg' %}" alt="Q2" width="14" height="14" class="d-block">
+                        </span>
+                    {% elif task.urgency >= 3 and task.importance <= 2 %}
+                        <!-- Q3: Group SVG -->
+                        <span class="quadrant-icon-box q3-bg flex-shrink-0 d-inline-flex align-items-center justify-content-center" style="width: 26px; height: 26px; border-radius: 6px;">
+                            <img src="{% static 'img/group.svg' %}" alt="Q3" width="14" height="14" class="d-block">
+                        </span>
+                    {% else %}
+                        <!-- Q4: Trash SVG -->
+                        <span class="quadrant-icon-box q4-bg flex-shrink-0 d-inline-flex align-items-center justify-content-center" style="width: 26px; height: 26px; border-radius: 6px;">
+                            <img src="{% static 'img/trash.svg' %}" alt="Q4" width="14" height="14" class="d-block">
+                        </span>
+                    {% endif %}
+
+                    <!-- TÍTULO DE LA TAREA -->
+                    <h6 class="fw-bold mb-0 text-dark text-truncate small" title="{{ task.title }}">
+                        {{ task.title }}
+                    </h6>
+                </div>
+
+                <button type="button" class="btn-close btn-sm flex-shrink-0" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- CUERPO CON BOTONES EN HORIZONTAL Y SUS GRADIENTES -->
+            <div class="modal-body p-3 d-flex flex-row gap-2 bg-white">
+                
+                <!-- 1. BOTÓN COMPLETAR -->
+                <button type="button" 
+                        class="btn text-center flex-fill py-2.5 px-2 border-0 rounded-3 d-flex align-items-center justify-content-center gap-2 text-white shadow-sm" 
+                        style="background: linear-gradient(315deg, #7ce6c2 0%, #059669 100%); font-weight: 600; font-size: 0.85rem;"
+                        onclick="executeMobileComplete('{{ task.id }}')">
+                    <i class="bi bi-check-circle-fill fs-6 text-white"></i>
+                    <span>Completar</span>
+                </button>
+
+                <!-- 2. BOTÓN EDITAR -->
+                <button type="button" 
+                        class="btn text-center flex-fill py-2.5 px-2 border-0 rounded-3 d-flex align-items-center justify-content-center gap-2 text-white shadow-sm" 
+                        style="background: linear-gradient(315deg, #99c7e5 0%, #3B82F6 100%); font-weight: 600; font-size: 0.85rem;"
+                        onclick="executeMobileEdit('{{ task.id }}')">
+                    <i class="bi bi-pencil-square fs-6 text-white"></i>
+                    <span>Editar</span>
+                </button>
+
+            </div>
+
         </div>
     </div>
 </div>

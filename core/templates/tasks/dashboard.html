@@ -40,7 +40,7 @@
 
                 <div class="min-w-0">
                     <div class="d-flex align-items-center gap-2">
-                        <h2 class="h4 mb-0 fw-bold text-dark text-truncate">
+                        <h2 class="h4 mb-0 fw-bold text-truncate" style="color: {% if current_board and current_board.color %}{{ current_board.color }}{% else %}#0C6EFD{% endif %}  ">
                             {% if current_board %}{{ current_board.title }}{% else %}{% translate "General" %}{% endif %}
                         </h2>
                     </div>
@@ -55,37 +55,37 @@
                 </div>
             </div>
 
-            <!-- SECCIÓN DERECHA: FILTROS APILADOS -->
+            <!-- SECCIÓN DERECHA: FILTROS APILADOS EN DESKTOP / FILA EN MÓVIL Y TABLET -->
             {% with current_filter=request.GET.filter|default:"all" %}
-                <div class="filter-pills-container p-1.5 rounded-2xl d-inline-flex flex-column flex-xl-row align-items-stretch border shadow-sm flex-shrink-0 {% if current_board %}opacity-50{% endif %}" 
+                <div class="filter-pills-container p-1.5 rounded-2xl d-inline-flex flex-column flex-sm-row flex-xl-row align-items-stretch border shadow-sm flex-shrink-0 {% if current_board %}opacity-50{% endif %}" 
                     id="filterTaskGroup" 
                     style="border-radius: 12px; background-color: #f3f4f6 !important; min-width: 140px; {% if current_board %}pointer-events: none; filter: grayscale(100%);{% endif %}">
                     
                     <a href="?filter=all" 
-                    class="btn btn-sm border-0 px-3 py-1.5 fw-bold d-flex align-items-center justify-content-start gap-2 text-decoration-none {% if not current_board and current_filter == 'all' %}bg-white text-dark shadow-sm{% else %}text-secondary opacity-75{% endif %}"
-                    style="border-radius: 8px; font-size: 0.88rem;">
+                    class="btn btn-sm border-0 px-2 px-sm-3 py-1.5 fw-bold d-flex align-items-center justify-content-start justify-content-sm-center justify-content-xl-start gap-2 text-decoration-none text-nowrap {% if not current_board and current_filter == 'all' %}bg-white text-dark shadow-sm{% else %}text-secondary opacity-75{% endif %}"
+                    style="border-radius: 8px; font-size: 0.82rem;">
                         <i class="bi bi-grid-fill flex-shrink-0" 
-                                id="boardBadgeIconQuick"
-                                style="background: linear-gradient(135deg, #4f52f8 0%, #7173ed 35%, #42C6F6 100%);
-                                        -webkit-background-clip: text;
-                                        -webkit-text-fill-color: transparent;
-                                        color: transparent !important;
-                                        font-size: 0.85rem;
-                                        display: inline-block;"></i>
+                        id="boardBadgeIconQuick"
+                        style="background: linear-gradient(135deg, #4f52f8 0%, #7173ed 35%, #42C6F6 100%);
+                                -webkit-background-clip: text;
+                                -webkit-text-fill-color: transparent;
+                                color: transparent !important;
+                                font-size: 0.85rem;
+                                display: inline-block;"></i>
                         <span>{% translate "Todas" %}</span>
                     </a>
 
                     <a href="?filter=mine" 
-                    class="btn btn-sm border-0 px-3 py-1.5 fw-semibold d-flex align-items-center justify-content-start gap-2 text-decoration-none {% if not current_board and current_filter == 'mine' %}bg-white text-dark shadow-sm{% else %}text-secondary opacity-75{% endif %}"
-                    style="border-radius: 8px; font-size: 0.88rem;">
-                        <i class="bi bi-person-fill" style="color: #6466F1 !important; font-size: 0.9rem; {% if current_filter != 'mine' and not current_board %}opacity: 0.6;{% endif %}"></i>
+                    class="btn btn-sm border-0 px-2 px-sm-3 py-1.5 fw-semibold d-flex align-items-center justify-content-start justify-content-sm-center justify-content-xl-start gap-2 text-decoration-none text-nowrap {% if not current_board and current_filter == 'mine' %}bg-white text-dark shadow-sm{% else %}text-secondary opacity-75{% endif %}"
+                    style="border-radius: 8px; font-size: 0.82rem;">
+                        <i class="bi bi-person-fill flex-shrink-0" style="color: #6466F1 !important; font-size: 0.9rem; {% if current_filter != 'mine' and not current_board %}opacity: 0.6;{% endif %}"></i>
                         <span>{% translate "Mis tareas" %}</span>
                     </a>
 
                     <a href="?filter=shared" 
-                    class="btn btn-sm border-0 px-3 py-1.5 fw-semibold d-flex align-items-center justify-content-start gap-2 text-decoration-none {% if not current_board and current_filter == 'shared' or not current_board and current_filter == 'assigned' %}bg-white text-dark shadow-sm{% else %}text-secondary opacity-75{% endif %}"
-                    style="border-radius: 8px; font-size: 0.88rem;">
-                        <i class="bi bi-people-fill" style="color: #fbbf24 !important; font-size: 0.85rem; {% if current_filter != 'shared' and current_filter != 'assigned' and not current_board %}opacity: 0.6;{% endif %}" title="Compartidas"></i>
+                    class="btn btn-sm border-0 px-2 px-sm-3 py-1.5 fw-semibold d-flex align-items-center justify-content-start justify-content-sm-center justify-content-xl-start gap-2 text-decoration-none text-nowrap {% if not current_board and current_filter == 'shared' or not current_board and current_filter == 'assigned' %}bg-white text-dark shadow-sm{% else %}text-secondary opacity-75{% endif %}"
+                    style="border-radius: 8px; font-size: 0.82rem;">
+                        <i class="bi bi-people-fill flex-shrink-0" style="color: #fbbf24 !important; font-size: 0.85rem; {% if current_filter != 'shared' and current_filter != 'assigned' and not current_board %}opacity: 0.6;{% endif %}" title="Compartidas"></i>
                         <span>{% translate "Compartidas" %}</span>
                     </a>
                 </div>
@@ -94,7 +94,7 @@
         </div>
     </div>
 
-    <!-- TARJETA ALTA RÁPIDA (QUICK ADD BAR) -->
+   <!-- TARJETA ALTA RÁPIDA (QUICK ADD BAR) -->
     <div class="card mb-4 quick-add-card dashboard-hero-section border-0 shadow-sm rounded-4 overflow-hidden">
         
         <!-- CABECERA PLEGABLE: SOLAMENTE VISIBLE EN TABLET Y MÓVIL (<= 1240px) -->
@@ -185,9 +185,17 @@
                         </div>
                     </div>
 
-                    <!-- OPCIONES AVANZADAS -->
-                    <div class="d-flex justify-content-between align-items-center mt-3 pe-1 flex-wrap gap-2">
-                        <button class="btn btn-link btn-sm text-decoration-none p-0 text-muted shadow-none d-inline-flex align-items-center gap-1" 
+                    <!-- CONTROLES SECUNDARIOS: REORDENADOS PARA MÓVIL/TABLET Y ESCRITORIO -->
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mt-3 pe-1 flex-wrap gap-2">
+                        
+                        <!-- 1. DESTINO PREVISTO (ORDER-1 EN MÓVIL/TABLET, ORDER-MD-2 EN ESCRITORIO) -->
+                        <div class="order-1 order-md-2" style="font-size: 0.88rem;">
+                            <span class="text-muted me-1">{% translate "Destino previsto:" %}</span>
+                            <span id="quickTaskTargetQuadrant" class="fw-bold text-secondary">-</span>
+                        </div>
+
+                        <!-- 2. BOTÓN OPCIONES AVANZADAS (ORDER-2 EN MÓVIL/TABLET, ORDER-MD-1 EN ESCRITORIO) -->
+                        <button class="btn btn-link btn-sm text-decoration-none p-0 text-muted shadow-none d-inline-flex align-items-center gap-1 order-2 order-md-1" 
                                 type="button" 
                                 data-bs-toggle="collapse" 
                                 data-bs-target="#advancedOptions" 
@@ -196,10 +204,6 @@
                             <span style="font-size: 0.8rem;">{% translate "Opciones avanzadas (Tablero, fecha límite, notas...)" %} ▼</span>
                         </button>
 
-                        <div style="font-size: 0.88rem;">
-                            <span class="text-muted me-1">{% translate "Destino previsto:" %}</span>
-                            <span id="quickTaskTargetQuadrant" class="fw-bold text-secondary">-</span>
-                        </div>
                     </div>
 
                     <!-- CONTENEDOR COLLAPSE OPCIONES AVANZADAS -->
@@ -423,6 +427,7 @@
                                             </div>
                                         </div>
                                     </div>
+
                                 </div>
 
                                 <!-- 4. DESCRIPCIÓN -->

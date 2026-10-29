@@ -315,6 +315,9 @@ document.addEventListener("show.bs.dropdown", function (event) {
 
 // 6. GUARDAR TAREA CON ANIMACIÓN DE VIAJE (FLIP) Y SACUDIDA
 function saveTaskModal(taskId, event) {
+
+
+
     if (event) {
         event.preventDefault();
         event.stopPropagation();
@@ -362,6 +365,15 @@ function saveTaskModal(taskId, event) {
             const dateBadgeDisplay = document.getElementById(`dateBadgeDisplay${taskId}`);
             if (dateBadgeDisplay && data.due_date_formatted) {
                 dateBadgeDisplay.textContent = data.due_date_formatted;
+            }
+            // Actualizamos el título en la cabecera del modal de opciones rápidas si existe
+            const formTitleInput = form.querySelector('textarea[name="title"]');
+            const newTitleText = data.title || (formTitleInput ? formTitleInput.value.trim() : '');
+
+            const mobileModalTitle = document.querySelector(`#mobileActionModal${taskId} .modal-header h6`);
+            if (mobileModalTitle && newTitleText) {
+                mobileModalTitle.textContent = newTitleText;
+                mobileModalTitle.title = newTitleText;
             }
 
             const applyCardUpdates = () => {

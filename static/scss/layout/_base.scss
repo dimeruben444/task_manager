@@ -534,3 +534,24 @@ html {
     padding: 0.75rem !important;
   }
 }
+
+
+/* =======================================================
+   ESTILO PARA RESALTAR EL TABLERO ACTIVO EN SIDEBAR Y MOBILE
+   ======================================================= */
+.board-item.active,
+.board-chip.active {
+    background-color: #eff6ff !important; /* Azul claro de selección */
+    border-radius: 8px !important;
+}
+
+.board-item.active a,
+.board-chip.active {
+    color: #2563eb !important; /* Azul primario */
+    font-weight: 700 !important;
+}
+
+.board-item.active .board-title,
+.board-chip.active {
+    color: #2563eb !important;
+}

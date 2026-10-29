@@ -835,94 +835,130 @@ body,
   }
 }
 /* =======================================================
-   ESTILOS DE CHECKBOX AISLADOS PARA MÓVIL Y DESKTOP
+   PASO 1: ANULACIÓN DE OVER Y CHECKBOX EN TABLET Y MÓVIL (<= 1240PX)
    ======================================================= */
-/* 1. MÓVIL Y TABLET (<= 992PX): SIEMPRE VISIBLE Y EN FLUJO RELATIVO */
-@media (max-width: 992px) {
-  .task-card .task-card-header {
-    display: flex !important;
-    align-items: center !important;
-    width: 100% !important;
-    gap: 0.5rem !important; /* Mantiene la separación limpia sin montar el texto */
+@media (max-width: 1240px) {
+  /* 1. Ocultar checkbox de las tarjetas en la matriz y completadas */
+  .task-card .task-checkbox-wrapper,
+  .completed-task-item .task-checkbox-wrapper-sidebar {
+    display: none !important;
   }
-  .task-card .task-checkbox-wrapper {
-    position: relative !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    width: 18px !important;
-    height: 18px !important;
-    min-width: 20px !important;
-    flex-shrink: 0 !important;
-    top: 0 !important;
-    left: 0 !important;
+  /* 2. Anular estados hover/over para que la tarjeta no cambie de estilo al tocarla */
+  .task-card:hover,
+  .completed-item:hover {
+    background-color: var(--bg-surface) !important;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04) !important;
     transform: none !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    touch-action: manipulation !important; /* Desactiva retrasos al tocar con el pulgar */
-  }
-  .task-card .task-checkbox-container {
-    position: relative !important;
-    display: block !important;
-    width: 18px !important;
-    height: 18px !important;
-    margin: 0 !important;
-    cursor: pointer !important;
-    /* Área de toque transparente ampliada alrededor del círculo de 18px */
-  }
-  .task-card .task-checkbox-container::before {
-    content: "" !important;
-    position: absolute !important;
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(-50%, -50%) !important;
-    width: 38px !important;
-    height: 38px !important;
-    z-index: 10 !important;
-  }
-  .task-card .task-checkbox-container input {
-    position: absolute !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-    opacity: 0 !important;
-    z-index: 11 !important;
-    cursor: pointer !important;
-  }
-  .task-card .checkmark {
-    position: absolute !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 18px !important;
-    height: 18px !important;
-    background-color: transparent !important;
-    border: 2px solid #cbd5e1 !important;
-    border-radius: 50% !important;
-    box-sizing: border-box !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    pointer-events: none !important;
-  }
-  .task-card .task-checkbox-container input:checked ~ .checkmark {
-    background-color: #10b981 !important;
-    border-color: #10b981 !important;
-  }
-  .task-card .task-title-wrapper {
-    position: relative !important;
-    flex-grow: 1 !important;
-    min-width: 0 !important;
-  }
-  .task-card .task-card-actions {
-    opacity: 1 !important;
-    visibility: visible !important;
   }
 }
-/* 2. ESCRITORIO CON RATÓN (> 992PX): COMPORTAMIENTO HOVER NATIVO */
-@media (min-width: 993px) {
-  .task-card .task-checkbox-container input:checked ~ .checkmark {
-    background-color: #10b981 !important;
-    border-color: #10b981 !important;
+/* =======================================================
+   AJUSTE RESPONSIVE: DESPLEGABLE DE FECHAS EN MÓVIL (<= 768PX)
+   ======================================================= */
+@media (max-width: 768px) {
+  /* 1. Ajuste del menú desplegable del Pop-over de Fechas */
+  .dropdown-menu-dates {
+    width: calc(100vw - 32px) !important;
+    max-width: 320px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    box-sizing: border-box !important;
+  }
+  /* 2. Ajuste del contenedor de Flatpickr */
+  .flatpickr-clean-container {
+    width: 100% !important;
+  }
+  .flatpickr-clean-container .flatpickr-calendar {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    box-shadow: none !important;
+  }
+  .flatpickr-clean-container .flatpickr-days,
+  .flatpickr-clean-container .dayContainer {
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+  }
+  .flatpickr-clean-container .flatpickr-day {
+    max-width: 38px !important;
+    height: 36px !important;
+    line-height: 36px !important;
+  }
+  /* 3. Evitar recortes en la tarjeta de Alta Rápida */
+  .quick-add-card,
+  .quick-add-card .card-body {
+    overflow: visible !important;
+  }
+}
+/* =======================================================
+   BLOQUEO DE SCROLL HORIZONTAL EN MÓVIL Y TABLET
+   ======================================================= */
+html, body {
+  max-width: 100vw !important;
+  overflow-x: hidden !important;
+}
+
+/* Evita que los modales o contenedores del dashboard empujen la pantalla */
+#app-container,
+.main-content,
+.dashboard-hero-section,
+.quick-add-card {
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+}
+
+/* Ajusta las filas de Bootstrap en pantallas estrechas */
+@media (max-width: 1240px) {
+  .row {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+}
+/* =======================================================
+   FILTRO DE TAREAS EN MÓVIL: MANTENER EN UNA SOLA LÍNEA
+   ======================================================= */
+@media (max-width: 576px) {
+  .board-filter-tabs,
+  .nav-pills,
+  .task-filter-container {
+    padding: 3px !important;
+    gap: 2px !important;
+  }
+  .board-filter-tabs .nav-link,
+  .board-filter-tabs .btn,
+  .board-filter-tabs .filter-tab-item,
+  .nav-pills .nav-link,
+  .nav-pills .btn,
+  .nav-pills .filter-tab-item,
+  .task-filter-container .nav-link,
+  .task-filter-container .btn,
+  .task-filter-container .filter-tab-item {
+    font-size: 0.78rem !important;
+    padding: 6px 8px !important;
+    white-space: nowrap !important; /* Impide saltos de línea */
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 4px !important;
+  }
+  .board-filter-tabs .nav-link i, .board-filter-tabs .nav-link svg,
+  .board-filter-tabs .btn i,
+  .board-filter-tabs .btn svg,
+  .board-filter-tabs .filter-tab-item i,
+  .board-filter-tabs .filter-tab-item svg,
+  .nav-pills .nav-link i,
+  .nav-pills .nav-link svg,
+  .nav-pills .btn i,
+  .nav-pills .btn svg,
+  .nav-pills .filter-tab-item i,
+  .nav-pills .filter-tab-item svg,
+  .task-filter-container .nav-link i,
+  .task-filter-container .nav-link svg,
+  .task-filter-container .btn i,
+  .task-filter-container .btn svg,
+  .task-filter-container .filter-tab-item i,
+  .task-filter-container .filter-tab-item svg {
+    font-size: 0.82rem !important;
   }
 }
 .app-navbar {
@@ -1345,6 +1381,25 @@ html {
     z-index: 2080 !important;
     padding: 0.75rem !important;
   }
+}
+/* =======================================================
+   ESTILO PARA RESALTAR EL TABLERO ACTIVO EN SIDEBAR Y MOBILE
+   ======================================================= */
+.board-item.active,
+.board-chip.active {
+  background-color: #eff6ff !important; /* Azul claro de selección */
+  border-radius: 8px !important;
+}
+
+.board-item.active a,
+.board-chip.active {
+  color: #2563eb !important; /* Azul primario */
+  font-weight: 700 !important;
+}
+
+.board-item.active .board-title,
+.board-chip.active {
+  color: #2563eb !important;
 }
 
 /*# sourceMappingURL=main.css.map */
