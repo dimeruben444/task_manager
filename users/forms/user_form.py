@@ -26,6 +26,16 @@ class CustomUserCreationForm(UserCreationForm):
             'placeholder': _('Ej. García Pérez')
         })
     )
+    accepted_terms = forms.BooleanField(
+        required=True,
+        label=_("He leído y acepto los Términos y la Política de Privacidad"),
+        error_messages={
+            'required': _('Debes aceptar el Aviso Legal y la Política de Privacidad para registrarte.')
+        },
+        widget=forms.CheckboxInput(attrs={
+            'class': 'form-check-input'
+        })
+    )
 
     class Meta(UserCreationForm.Meta):
         model = User
@@ -51,8 +61,9 @@ class CustomUserCreationForm(UserCreationForm):
         }
 
         for field_name, field in self.fields.items():
-            # Aplicar clases de Bootstrap minimalistas
-            field.widget.attrs['class'] = 'form-control form-control-lg border-light-subtle bg-light-subtle fs-6'
+            # Aplicar clases de Bootstrap a todos los campos excepto al checkbox de términos
+            if field_name != 'accepted_terms':
+                field.widget.attrs['class'] = 'form-control form-control-lg border-light-subtle bg-light-subtle fs-6'
             
             if field_name in placeholders:
                 field.widget.attrs['placeholder'] = placeholders[field_name]

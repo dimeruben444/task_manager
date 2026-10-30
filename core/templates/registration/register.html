@@ -1,123 +1,100 @@
-{% extends 'base/base.html' %}
+{% extends "base/base.html" %}
 {% load i18n %}
+{% load static %}
 
-{% block title %}{% translate "Registro" %}{% endblock %}
+{% block title %}{% translate "Crear cuenta" %} - EisenhowerFlow{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <div class="row justify-content-center align-items-center min-vh-75">
-        <div class="col-md-6 col-lg-5">
-            <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
-                <div class="card-body p-4 p-md-5 bg-white">
-                    
-                    <!-- CABECERA DE LA TARJETA -->
-                    <div class="text-center mb-4">
-                        <div class="d-inline-flex align-items-center justify-content-center bg-primary-subtle text-primary rounded-circle mb-3" style="width: 56px; height: 56px;">
-                            <span class="fs-3">📝</span>
-                        </div>
-                        <h3 class="fw-bold text-dark mb-1">{% translate "Crear Cuenta" %}</h3>
-                        <p class="text-muted small">{% translate "Únete para gestionar tus tareas con la Matriz Eisenhower" %}</p>
-                    </div>
-
-                    <form method="POST" novalidate>
-                        {% csrf_token %}
-
-                        {% if form.non_field_errors %}
-                            <div class="alert alert-danger border-0 rounded-3 small p-3 mb-3">
-                                {% for error in form.non_field_errors %}
-                                    <div>{{ error }}</div>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-
-                        <!-- NOMBRE Y APELLIDOS EN 2 COLUMNAS -->
-                        <div class="row g-2 mb-3">
-                            <div class="col-6">
-                                <label for="{{ form.first_name.id_for_label }}" class="form-label small fw-semibold text-secondary mb-1">
-                                    {{ form.first_name.label }}
-                                </label>
-                                {{ form.first_name }}
-                                {% for error in form.first_name.errors %}
-                                    <div class="text-danger small mt-1" style="font-size: 0.75rem;">{{ error }}</div>
-                                {% endfor %}
-                            </div>
-
-                            <div class="col-6">
-                                <label for="{{ form.last_name.id_for_label }}" class="form-label small fw-semibold text-secondary mb-1">
-                                    {{ form.last_name.label }}
-                                </label>
-                                {{ form.last_name }}
-                                {% for error in form.last_name.errors %}
-                                    <div class="text-danger small mt-1" style="font-size: 0.75rem;">{{ error }}</div>
-                                {% endfor %}
-                            </div>
-                        </div>
-
-                        <!-- USUARIO -->
-                        <div class="mb-3">
-                            <label for="{{ form.username.id_for_label }}" class="form-label small fw-semibold text-secondary mb-1">
-                                {{ form.username.label }}
-                            </label>
-                            {{ form.username }}
-                            {% for error in form.username.errors %}
-                                <div class="text-danger small mt-1" style="font-size: 0.75rem;">{{ error }}</div>
-                            {% endfor %}
-                        </div>
-
-                        <!-- EMAIL -->
-                        <div class="mb-3">
-                            <label for="{{ form.email.id_for_label }}" class="form-label small fw-semibold text-secondary mb-1">
-                                {{ form.email.label }}
-                            </label>
-                            {{ form.email }}
-                            {% for error in form.email.errors %}
-                                <div class="text-danger small mt-1" style="font-size: 0.75rem;">{{ error }}</div>
-                            {% endfor %}
-                        </div>
-
-                        <!-- CONTRASEÑAS EN 2 COLUMNAS -->
-                        <div class="row g-2 mb-4">
-                            <div class="col-6">
-                                <label for="{{ form.password1.id_for_label }}" class="form-label small fw-semibold text-secondary mb-1">
-                                    {{ form.password1.label }}
-                                </label>
-                                {{ form.password1 }}
-                                {% for error in form.password1.errors %}
-                                    <div class="text-danger small mt-1" style="font-size: 0.75rem;">{{ error }}</div>
-                                {% endfor %}
-                            </div>
-
-                            <div class="col-6">
-                                <label for="{{ form.password2.id_for_label }}" class="form-label small fw-semibold text-secondary mb-1">
-                                    {{ form.password2.label }}
-                                </label>
-                                {{ form.password2 }}
-                                {% for error in form.password2.errors %}
-                                    <div class="text-danger small mt-1" style="font-size: 0.75rem;">{{ error }}</div>
-                                {% endfor %}
-                            </div>
-                        </div>
-
-                        <!-- BOTÓN DE REGISTRO -->
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary btn-lg fw-bold shadow-sm py-2.5 rounded-3 fs-6">
-                                {% translate "Registrarse" %}
-                            </button>
-                        </div>
-                    </form>
-
-                    <!-- PIE DE TARJETA -->
-                    <div class="text-center mt-4 pt-2 border-top">
-                        <small class="text-muted">
-                            {% translate "¿Ya tienes cuenta?" %} 
-                            <a href="{% url 'login' %}" class="text-primary text-decoration-none fw-bold ms-1">
-                                {% translate "Inicia sesión aquí" %}
-                            </a>
-                        </small>
-                    </div>
-
+<div class="container d-flex align-items-center justify-content-center min-vh-100 py-5">
+    <div class="card border-0 shadow-lg rounded-4 overflow-hidden style-card-auth" style="max-width: 460px; width: 100%;">
+        <div class="card-body p-4 p-sm-5">
+            
+            <!-- LOGO / CABECERA -->
+            <div class="text-center mb-4">
+                <div class="d-inline-flex align-items-center justify-content-center bg-success bg-opacity-10 text-success rounded-circle mb-3" style="width: 56px; height: 56px;">
+                    <i class="bi bi-person-plus fs-3"></i>
                 </div>
+                <h4 class="fw-bold text-dark mb-1">{% translate "Crear una cuenta" %}</h4>
+                <p class="text-muted small">{% translate "Empieza a gestionar tu tiempo con la Matriz de Eisenhower" %}</p>
             </div>
+
+            <!-- ERRORES -->
+            {% if form.errors %}
+                <div class="alert alert-danger border-0 rounded-3 small py-2 px-3 mb-4">
+                    {% for field, errors in form.errors.items %}
+                        {% for error in errors %}
+                            <div class="d-flex align-items-center gap-1">
+                                <i class="bi bi-exclamation-circle-fill"></i>
+                                <span>{{ error }}</span>
+                            </div>
+                        {% endfor %}
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- FORMULARIO -->
+            <form method="POST" action="{% url 'register' %}">
+                {% csrf_token %}
+
+                {% for field in form %}
+                    {% if field.name != 'accepted_terms' %}
+                        <div class="mb-3">
+                            <label for="{{ field.id_for_label }}" class="form-label fw-semibold text-dark small">
+                                {{ field.label }}
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0 text-muted">
+                                    {% if 'username' in field.name %}<i class="bi bi-person"></i>
+                                    {% elif 'email' in field.name %}<i class="bi bi-envelope"></i>
+                                    {% elif 'first_name' in field.name or 'last_name' in field.name %}<i class="bi bi-card-text"></i>
+                                    {% else %}<i class="bi bi-lock"></i>{% endif %}
+                                </span>
+                                <input type="{{ field.field.widget.input_type|default:'text' }}" 
+                                       name="{{ field.name }}" 
+                                       id="{{ field.id_for_label }}" 
+                                       class="form-control bg-light border-start-0 ps-0 {% if field.errors %}is-invalid{% endif %}" 
+                                       placeholder="{{ field.field.widget.attrs.placeholder|default:field.label }}" 
+                                       value="{{ field.value|default:'' }}"
+                                       {% if field.field.required %}required{% endif %}>
+                            </div>
+                            {% if field.errors %}
+                                <div class="invalid-feedback d-block small mt-1">
+                                    {{ field.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+
+                <!-- CHECKBOX RGPD / TÉRMINOS Y PRIVACIDAD -->
+                <div class="mb-4 mt-3 form-check text-start">
+                    {{ form.accepted_terms }}
+                    <label class="form-check-label text-muted small ms-1" for="{{ form.accepted_terms.id_for_label }}" style="font-size: 0.78rem; line-height: 1.3;">
+                        {% translate "He leído y acepto el" %} 
+                        <a href="{% url 'terms' %}" target="_blank" class="text-primary text-decoration-underline">{% translate "Aviso Legal" %}</a> 
+                        {% translate "y la" %} 
+                        <a href="{% url 'privacy_policy' %}" target="_blank" class="text-primary text-decoration-underline">{% translate "Política de Privacidad" %}</a>.
+                    </label>
+                    {% if form.accepted_terms.errors %}
+                        <div class="text-danger small mt-1" style="font-size: 0.75rem;">
+                            {{ form.accepted_terms.errors.0 }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <button type="submit" class="btn btn-success w-100 py-2 fw-semibold rounded-3 shadow-sm mb-3">
+                    {% translate "Registrarse" %}
+                </button>
+            </form>
+
+            <!-- ENLACE A LOGIN -->
+            <div class="text-center mt-4 pt-2 border-top">
+                <p class="text-muted small mb-0">
+                    {% translate "¿Ya tienes una cuenta?" %} 
+                    <a href="{% url 'login' %}" class="text-primary fw-semibold text-decoration-none">{% translate "Inicia sesión" %}</a>
+                </p>
+            </div>
+
         </div>
     </div>
 </div>

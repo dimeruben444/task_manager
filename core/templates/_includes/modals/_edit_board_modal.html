@@ -1,0 +1,185 @@
+{% load i18n %}
+
+{% for b in boards %}
+    {% if not b.is_default %}
+        <div class="modal fade" id="editBoardModalSidebar{{ b.id }}" tabindex="-1" aria-hidden="true" data-bs-backdrop="false" style="z-index: 1060 !important;">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content text-dark border-0 shadow-lg rounded-4">
+                    <form method="POST" action="{% url 'edit_board' b.id %}">
+                        {% csrf_token %}
+                        <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
+                            <h5 class="modal-title fw-bold text-dark d-flex align-items-center gap-2">
+                                ⚙ {% translate "Ajustes del Tablero" %}: {{ b.title }}
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{% translate 'Cerrar' %}"></button>
+                        </div>
+
+                        <div class="modal-body text-start px-4 py-3">
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold text-dark">{% translate "Nombre del tablero" %}</label>
+                                <input type="text" name="title" value="{{ b.title }}" class="form-control rounded-3" required>
+                            </div>
+
+                            <div class="row g-2 mb-3">
+                                <div class="col-md-5">
+                                    <label class="form-label small fw-bold text-dark">{% translate "Color" %}</label>
+                                    <select name="color" class="form-select rounded-3">
+                                        <option value="#3B82F6" {% if b.color == "#3B82F6" %}selected{% endif %}>🟦 {% translate "Azul" %}</option>
+                                        <option value="#10B981" {% if b.color == "#10B981" %}selected{% endif %}>🟩 {% translate "Verde" %}</option>
+                                        <option value="#EF4444" {% if b.color == "#EF4444" %}selected{% endif %}>🟥 {% translate "Rojo" %}</option>
+                                        <option value="#F59E0B" {% if b.color == "#F59E0B" %}selected{% endif %}>🟧 {% translate "Naranja" %}</option>
+                                        <option value="#8B5CF6" {% if b.color == "#8B5CF6" %}selected{% endif %}>🟪 {% translate "Púrpura" %}</option>
+                                        <option value="#6B7280" {% if b.color == "#6B7280" %}selected{% endif %}>⬜ {% translate "Gris" %}</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-7">
+                                    <label class="form-label small fw-bold text-dark">{% translate "Descripción" %}</label>
+                                    <input type="text" name="description" value="{{ b.description|default:'' }}" class="form-control rounded-3" placeholder="{% translate 'Opcional' %}">
+                                </div>
+                            </div>
+
+                            <hr class="my-3 text-muted opacity-25">
+
+                            <div class="mb-3 position-relative" style="z-index: 3000 !important; overflow: visible !important;">
+                                <label class="form-label small fw-bold text-dark d-flex align-items-center gap-1">
+                                    <i class="bi bi-person-plus text-primary"></i> {% translate "Invitar a un nuevo miembro" %}
+                                </label>
+
+                                <div class="input-group input-group-sm border rounded-3 overflow-hidden bg-light align-items-center">
+                                    <span class="input-group-text bg-transparent border-0 pe-1">
+                                        <i class="bi bi-search text-muted" style="font-size: 0.8rem;"></i>
+                                    </span>
+                                    <input type="text" 
+                                        id="invite-input-{{ b.id }}" 
+                                        class="form-control border-0 bg-transparent shadow-none small text-dark" 
+                                        placeholder="{% translate 'Escribe usuario, email o nombre...' %}" 
+                                        autocomplete="off"
+                                        oninput="handleBoardInviteSearch(this, '{{ b.id }}')"
+                                        onfocus="handleBoardInviteSearch(this, '{{ b.id }}')">
+                                </div>
+
+                                <div id="invite-results-{{ b.id }}" 
+                                    class="shadow-lg border rounded-4 p-2 w-100 mt-1 d-none position-absolute" 
+                                    style="max-height: 220px; overflow-y: auto; z-index: 99999 !important; top: 100%; left: 0; background-color: #ffffff !important; display: block;">
+                                    
+                                    <div class="d-flex flex-column gap-1" id="invite-list-container-{{ b.id }}">
+                                        {% for collaborator in frequent_collaborators %}
+                                            <div class="member-search-item" data-search-key="{{ collaborator.get_full_name|lower }} {{ collaborator.username|lower }} {{ collaborator.email|lower }}">
+                                                <button type="button" 
+                                                        class="btn btn-light btn-sm w-100 text-start border-0 d-flex align-items-center justify-content-between p-2 rounded-3"
+                                                        onmousedown="selectBoardCollaborator('{{ b.id }}', '{{ collaborator.username }}', '{{ collaborator.get_full_name|default:collaborator.username }}')">
+                                                    
+                                                    <div class="d-flex align-items-center gap-2 overflow-hidden">
+                                                        <span class="rounded-circle text-white d-inline-flex align-items-center justify-content-center flex-shrink-0" 
+                                                            style="width: 32px; height: 32px; font-size: 0.75rem; font-weight: 700; background: linear-gradient(135deg, #497BF6 0%, #7855f7 50%, #9f48ec 100%);">
+                                                            {{ collaborator.username|slice:":2"|upper }}
+                                                        </span>
+                                                        <div class="d-flex flex-column text-truncate">
+                                                            <span class="text-dark fw-bold text-truncate" style="font-size: 0.85rem; line-height: 1.2;">
+                                                                {{ collaborator.get_full_name|default:collaborator.username }}
+                                                            </span>
+                                                            <small class="text-muted text-truncate" style="font-size: 0.72rem;">
+                                                                {{ collaborator.email }}
+                                                            </small>
+                                                        </div>
+                                                    </div>
+                                                </button>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+
+                                    <div id="invite-no-results-{{ b.id }}" class="text-center py-3 text-muted small d-none">
+                                        <i class="bi bi-person-x d-block fs-5 mb-1 text-secondary opacity-50"></i>
+                                        {% translate "No se encontró ningún usuario registrado." %}
+                                    </div>
+                                </div>
+
+                                <div id="invite-selected-box-{{ b.id }}" class="mt-3 p-2.5 bg-primary-subtle border border-primary-subtle rounded-3 d-none">
+                                    <span class="d-block small text-primary-emphasis fw-semibold mb-1.5" style="font-size: 0.75rem;">
+                                        Se enviará una invitación para participar en el tablero a:
+                                    </span>
+                                    <div id="selected-users-list-{{ b.id }}" class="d-flex flex-wrap gap-1.5"></div>
+                                </div>
+                                
+                                <input type="hidden" name="invite_identifier" id="hiddenIdentifierInput{{ b.id }}">
+
+                                <div class="d-flex justify-content-between align-items-center mt-2">
+                                    <small id="invite-feedback-{{ b.id }}" class="text-muted" style="font-size: 0.72rem;">
+                                        {% translate "Le llegará una notificación inmediata para unirse." %}
+                                    </small>
+                                    <button type="button" 
+                                            class="btn btn-primary btn-sm rounded-3 px-3 fw-bold" 
+                                            onclick="sendBoardInvite('{{ b.id }}')">
+                                        {% translate "Enviar Invitación" %}
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="form-label small fw-bold text-dark mb-1">{% translate "Miembros actuales" %}</label>
+                                <div class="border rounded-3 p-2 bg-light" style="max-height: 130px; overflow-y: auto;">
+                                    
+                                    <div class="d-flex align-items-center justify-content-between p-1.5 border-bottom">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="rounded-circle text-white d-inline-flex align-items-center justify-content-center flex-shrink-0" 
+                                                style="width: 24px; height: 24px; font-size: 0.7rem; font-weight: 600; background: linear-gradient(135deg, #497BF6 0%, #7855f7 50%, #9f48ec 100%);">
+                                                {{ b.owner.username|slice:":2"|upper }}
+                                            </span>
+                                            <span class="small fw-semibold text-dark">{{ b.owner.get_full_name|default:b.owner.username }}</span>
+                                        </div>
+                                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle" style="font-size: 0.65rem;">{% translate "Propietario" %}</span>
+                                    </div>
+
+                                    {% for member in b.members.all %}
+                                        <div class="d-flex align-items-center justify-content-between p-1.5 border-bottom">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <span class="rounded-circle text-white d-inline-flex align-items-center justify-content-center flex-shrink-0" 
+                                                    style="width: 24px; height: 24px; font-size: 0.7rem; font-weight: 600; background: linear-gradient(135deg, #497BF6 0%, #7855f7 50%, #9f48ec 100%);">
+                                                    {{ member.username|slice:":2"|upper }}
+                                                </span>
+                                                <span class="small text-dark">{{ member.get_full_name|default:member.username }}</span>
+                                            </div>
+                                            
+                                            {% if b.owner == request.user %}
+                                                <div class="form-check m-0">
+                                                    <input class="form-check-input" type="checkbox" name="members" value="{{ member.id }}" id="member-keep-{{ b.id }}-{{ member.id }}" checked title="{% translate 'Desmarca para quitar miembro' %}">
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    {% empty %}
+                                        <div class="text-center text-muted small py-2" style="font-size: 0.78rem;">
+                                            {% translate "Sin miembros colaboradores adicionales." %}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="modal-footer justify-content-between border-top-0 bg-light px-4 py-3">
+                            {% if b.owner == request.user %}
+                                <button type="submit" 
+                                        formaction="{% url 'delete_board' b.id %}" 
+                                        class="btn btn-outline-danger btn-sm rounded-3"
+                                        onclick="return confirm('{% translate '¿Seguro que quieres eliminar el tablero' %} {{ b.title }}?');">
+                                    {% translate "Eliminar Tablero" %}
+                                </button>
+                            {% else %}
+                                <div></div>
+                            {% endif %}
+                            
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-outline-secondary btn-sm rounded-3 fw-semibold" data-bs-dismiss="modal">{% translate "Cancelar" %}</button>
+                                <button type="submit" class="btn btn-primary btn-sm rounded-3 fw-bold shadow-sm">{% translate "Guardar Cambios" %}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <form id="inviteFormHidden{{ b.id }}" method="POST" action="{% url 'invite_to_board' b.id %}" class="d-none">
+                        {% csrf_token %}
+                        <input type="hidden" name="identifier" id="dedicatedIdentifierInput{{ b.id }}">
+                    </form>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endfor %}

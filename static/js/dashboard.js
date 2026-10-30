@@ -496,216 +496,119 @@ document.addEventListener('DOMContentLoaded', function () {
     // Inicialización de la vista previa del destino en el Alta Rápida
     initQuickQuadrantListeners();
 
-    // A. INICIALIZACIÓN DE SORTABLEJS (Scroll Nativo Directo)
+    // A. INICIALIZACIÓN DE SORTABLEJS EN LOS CUADRANTES
     const quadrantContainers = document.querySelectorAll('.quadrant-container');
 
     quadrantContainers.forEach(container => {
         if (container.dataset.sortableInitialized) return;
         container.dataset.sortableInitialized = 'true';
 
-        if (!isMobileOrTablet) {
-            new Sortable(container, {
-                group: 'eisenhower-matrix',
-                draggable: '.task-card, .completed-task-item',
-                filter: '.empty-msg, .add-task-inline-wrapper, .task-checkbox-wrapper, .task-completion-check', 
-                preventOnFilter: false,
-                animation: 150,
-                ghostClass: 'opacity-50',
-                
-                scroll: true,
-                scrollSensitivity: 200, // Sensibilidad amplia para detectar el borde antes del Dock
-                scrollSpeed: 30,        // Velocidad de paso
-                bubbleScroll: true,     // Propaga el scroll al contenedor padre (.matrix-container-wrapper)
-                forceAutoScrollFallback: true, // Forzar comportamiento fluido nativo
+        new Sortable(container, {
+            group: 'eisenhower-matrix',
+            draggable: '.task-card, .completed-task-item',
+            filter: '.empty-msg, .empty-msg-box, .task-checkbox-wrapper, .task-completion-check', 
+            preventOnFilter: false,
+            animation: 150,
+            ghostClass: 'opacity-50',
+            
+            scroll: true,
+            scrollSensitivity: 200,
+            scrollSpeed: 30,
+            bubbleScroll: true,
+            forceAutoScrollFallback: true,
 
-                setData: function (dataTransfer, dragEl) {
-                    dataTransfer.setData('Text', dragEl.textContent);
-                },
+            onMove: function (evt) {
+                const targetContainer = evt.to;
 
-                onAdd: function (evt) {
-                    const emptyMsg = evt.to.querySelector('.empty-msg, #empty-trash-msg');
-                    if (emptyMsg) emptyMsg.style.display = 'none';
-                },
+                // Ocultar mensaje de "No hay tareas" al entrar la previsualización
+                const targetEmptyMsg = targetContainer.querySelector('.empty-msg, .empty-msg-box, #empty-trash-msg');
+                if (targetEmptyMsg) {
+                    targetEmptyMsg.classList.add('d-none');
+                    targetEmptyMsg.style.setProperty('display', 'none', 'important');
+                }
+                return true;
+            },
 
-                onRemove: function (evt) {
-                    const remainingCards = evt.from.querySelectorAll('.task-card, .completed-task-item');
-                    if (remainingCards.length === 0) {
-                        const emptyMsg = evt.from.querySelector('.empty-msg, #empty-trash-msg');
-                        if (emptyMsg) emptyMsg.style.display = 'block';
-                    }
-                },
+            onAdd: function (evt) {
+                const emptyMsg = evt.to.querySelector('.empty-msg, .empty-msg-box, #empty-trash-msg');
+                if (emptyMsg) {
+                    emptyMsg.classList.add('d-none');
+                    emptyMsg.style.setProperty('display', 'none', 'important');
+                }
+            },
 
-                onEnd: async function (evt) {
-                    if (isProcessingMove) return;
-
-                    const itemEl = evt.item;
-                    const targetContainer = evt.to;
-                    const sourceContainer = evt.from;
-
-                    const inlineWrapperTarget = targetContainer.querySelector('.add-task-inline-wrapper');
-                    if (inlineWrapperTarget) {
-                        targetContainer.appendChild(inlineWrapperTarget);
-                    }
-
-                    if (targetContainer === sourceContainer) return;
-
-                    const taskId = itemEl.getAttribute('data-task-id');
-                    const targetQuadrant = targetContainer.getAttribute('data-quadrant');
-
-                    if (!taskId || !targetQuadrant) return;
-
-                    isProcessingMove = true;
-
-                    // 1. SI SE ARRASTRA A LA COLUMNA DE COMPLETADAS (DONE)
-                    if (targetQuadrant === 'DONE') {
-                        const checkbox = itemEl.querySelector('.task-completion-check');
-                        if (checkbox && !checkbox.checked) {
-                            checkbox.checked = true;
-                            sendToggleRequest(taskId, true, checkbox);
-                        } else if (!checkbox) {
-                            sendToggleRequest(taskId, true, { closest: () => itemEl });
-                        }
-                        isProcessingMove = false;
-                        return;
-                    }
-
-                    // 2. SI VIENE DE COMPLETADAS Y SE MUEVE A UN CUADRANTE DE LA MATRIZ
-                    const sourceQuadrant = sourceContainer.getAttribute('data-quadrant');
-                    if (sourceQuadrant === 'DONE') {
-                        let urgency = 4, importance = 4;
-                        if (targetQuadrant === 'Q1') { urgency = 4; importance = 4; }
-                        else if (targetQuadrant === 'Q2') { urgency = 1; importance = 4; }
-                        else if (targetQuadrant === 'Q3') { urgency = 4; importance = 1; }
-                        else if (targetQuadrant === 'Q4') { urgency = 1; importance = 1; }
-
-                        const titleText = itemEl.querySelector('.task-title')?.textContent.trim() || "Tarea sin título";
-
-                        const formData = new FormData();
-                        formData.append('is_completed', 'false');
-                        formData.append('urgency', urgency);
-                        formData.append('importance', importance);
-
-                        try {
-                            const response = await fetch(`/task/${taskId}/edit/`, {
-                                method: 'POST',
-                                headers: {
-                                    'X-Requested-With': 'XMLHttpRequest',
-                                    'Accept': 'application/json',
-                                    'X-CSRFToken': getCookie('csrftoken')
-                                },
-                                body: formData
-                            });
-
-                            const data = await response.json();
-
-                            if (data.status === 'success') {
-                                const restoredCard = document.createElement('div');
-                                restoredCard.className = 'card mb-2 shadow-sm border-0 task-card';
-                                restoredCard.id = `task-card-${taskId}`;
-                                restoredCard.setAttribute('data-task-id', taskId);
-                                restoredCard.setAttribute('data-urgency', urgency);
-                                restoredCard.setAttribute('data-importance', importance);
-                                restoredCard.style.cursor = 'pointer';
-
-                                restoredCard.innerHTML = `
-                                    <div class="card-body py-2 px-3 d-flex flex-column justify-content-center">
-                                        <div class="task-card-header d-flex align-items-center justify-content-between position-relative w-100 gap-2" style="min-height: 24px;">
-                                            <div class="task-checkbox-wrapper flex-shrink-0">
-                                                <label class="task-checkbox-container m-0" onclick="event.stopPropagation();">
-                                                    <input type="checkbox" class="task-completion-check" data-task-id="${taskId}">
-                                                    <span class="checkmark"></span>
-                                                </label>
-                                            </div>
-                                            <div class="task-title-wrapper flex-grow-1 min-w-0" data-bs-toggle="modal" data-bs-target="#viewTaskModal${taskId}">
-                                                <h6 class="card-title task-title mb-0 fw-semibold text-dark" style="font-size: 0.85rem; line-height: 1.3; margin: 0;">
-                                                    ${titleText}
-                                                </h6>
-                                            </div>
-                                            <div class="task-card-actions flex-shrink-0 opacity-50 hover-opacity-100 ms-1" data-bs-toggle="modal" data-bs-target="#viewTaskModal${taskId}">
-                                                <i class="bi bi-three-dots text-muted" style="font-size: 0.85rem; line-height: 1;"></i>
-                                            </div>
-                                        </div>
-                                    </div>
-                                `;
-
-                                itemEl.replaceWith(restoredCard);
-
-                                const finalContainer = document.querySelector(`.quadrant-container[data-quadrant="${targetQuadrant}"]`) || targetContainer;
-                                const inlineWrapper = finalContainer.querySelector('.add-task-inline-wrapper');
-                                if (inlineWrapper) {
-                                    finalContainer.appendChild(inlineWrapper);
-                                }
-
-                                updateMatrixAndSidebarCounts();
-                                const countBadge = document.getElementById('completed-count');
-                                if (countBadge) {
-                                    let currentCount = parseInt(countBadge.textContent, 10) || 0;
-                                    countBadge.textContent = Math.max(0, currentCount - 1);
-                                }
-                            } else {
-                                sourceContainer.appendChild(itemEl);
-                            }
-                        } catch (err) {
-                            console.error('Error al sacar tarjeta de completadas:', err);
-                            sourceContainer.appendChild(itemEl);
-                        } finally {
-                            isProcessingMove = false;
-                        }
-                        return;
-                    }
-
-                    // 3. LÓGICA NORMAL DE CAMBIO DE CUADRANTE ENTRE Q1, Q2, Q3 y Q4
-                    let urgency = 4, importance = 4;
-                    if (targetQuadrant === 'Q1') { urgency = 4; importance = 4; }
-                    else if (targetQuadrant === 'Q2') { urgency = 1; importance = 4; }
-                    else if (targetQuadrant === 'Q3') { urgency = 4; importance = 1; }
-                    else if (targetQuadrant === 'Q4') { urgency = 1; importance = 1; }
-
-                    const formData = new FormData();
-                    formData.append('urgency', urgency);
-                    formData.append('importance', importance);
-
-                    try {
-                        const response = await fetch(`/task/${taskId}/edit/`, {
-                            method: 'POST',
-                            headers: {
-                                'X-Requested-With': 'XMLHttpRequest',
-                                'Accept': 'application/json',
-                                'X-CSRFToken': getCookie('csrftoken')
-                            },
-                            body: formData
-                        });
-
-                        const data = await response.json();
-
-                        if (data.status === 'success') {
-                            if (data.card_html) {
-                                const tempDiv = document.createElement('div');
-                                tempDiv.innerHTML = data.card_html.trim();
-                                const newCard = tempDiv.firstElementChild;
-                                
-                                itemEl.replaceWith(newCard);
-
-                                const finalContainer = document.querySelector(`.quadrant-container[data-quadrant="${data.quadrant || targetQuadrant}"]`) || targetContainer;
-                                const inlineWrapper = finalContainer.querySelector('.add-task-inline-wrapper');
-                                if (inlineWrapper) {
-                                    finalContainer.appendChild(inlineWrapper);
-                                }
-                            }
-                            updateMatrixAndSidebarCounts();
-                        } else {
-                            sourceContainer.appendChild(itemEl);
-                        }
-                    } catch (err) {
-                        console.error('Error al mover tarjeta vía Drag & Drop:', err);
-                        sourceContainer.appendChild(itemEl);
-                    } finally {
-                        isProcessingMove = false;
+            onRemove: function (evt) {
+                const remainingCards = evt.from.querySelectorAll('.task-card:not(.sortable-ghost), .completed-task-item:not(.sortable-ghost)');
+                if (remainingCards.length === 0) {
+                    const emptyMsg = evt.from.querySelector('.empty-msg, .empty-msg-box, #empty-trash-msg');
+                    if (emptyMsg) {
+                        emptyMsg.classList.remove('d-none');
+                        emptyMsg.style.removeProperty('display');
                     }
                 }
-            });
+            },
 
-        }
+            onEnd: async function (evt) {
+                if (isProcessingMove) return;
+
+                const itemEl = evt.item;
+                const targetContainer = evt.to;
+                const sourceContainer = evt.from;
+
+                checkEmptyQuadrants();
+
+                if (targetContainer === sourceContainer) return;
+
+                const taskId = itemEl.getAttribute('data-task-id');
+                const targetQuadrant = targetContainer.getAttribute('data-quadrant');
+
+                if (!taskId || !targetQuadrant) return;
+
+                isProcessingMove = true;
+
+                let urgency = 4, importance = 4;
+                if (targetQuadrant === 'Q1') { urgency = 4; importance = 4; }
+                else if (targetQuadrant === 'Q2') { urgency = 1; importance = 4; }
+                else if (targetQuadrant === 'Q3') { urgency = 4; importance = 1; }
+                else if (targetQuadrant === 'Q4') { urgency = 1; importance = 1; }
+
+                itemEl.setAttribute('data-urgency', urgency);
+                itemEl.setAttribute('data-importance', importance);
+
+                updateMatrixAndSidebarCounts();
+
+                const formData = new FormData();
+                formData.append('urgency', urgency);
+                formData.append('importance', importance);
+
+                try {
+                    const response = await fetch(`/task/${taskId}/edit/`, {
+                        method: 'POST',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'X-CSRFToken': getCookie('csrftoken')
+                        },
+                        body: formData
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json().catch(() => ({ status: 'success' }));
+                        
+                        if (data && data.card_html) {
+                            const tempDiv = document.createElement('div');
+                            tempDiv.innerHTML = data.card_html.trim();
+                            const newCard = tempDiv.firstElementChild;
+                            itemEl.replaceWith(newCard);
+                        }
+                        updateMatrixAndSidebarCounts();
+                    }
+                } catch (err) {
+                    console.error('Error en la petición AJAX:', err);
+                } finally {
+                    isProcessingMove = false;
+                }
+            }
+        });
     });
 });
 

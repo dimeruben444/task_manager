@@ -1,9 +1,14 @@
+// compilación con las importaciones en orden
+
+// 1. Abstracts (Tokens, Variables y Animaciones)
+@import "abstracts/variables";
+
+// 2. Componentes UI reutilizables
 @import "components/stars";
 @import "components/boards";
-@import "components/tasks";
 @import "components/task_card";
+@import "components/tasks";
 
-@import "layout/dashboard";
+// 3. Layouts de página y vistas globales
 @import "layout/base";
-
-
+@import "layout/dashboard";

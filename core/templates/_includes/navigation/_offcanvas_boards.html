@@ -1,0 +1,97 @@
+{% load i18n %}
+
+<div class="offcanvas offcanvas-start d-layout-mobile" tabindex="-1" id="offcanvasBoards" aria-labelledby="offcanvasBoardsLabel" style="width: 280px;">
+    <div class="offcanvas-header border-bottom">
+        <h5 class="offcanvas-title fw-bold text-dark small text-uppercase" id="offcanvasBoardsLabel">
+            <i class="bi bi-kanban" style="color: #6466F1 !important; transform: rotate(-90deg); display: inline-block;"></i> {% translate "Tableros" %}
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body p-3">
+        <div class="boards-stack">
+            <!-- ENLACE GENERAL -->
+            <a href="{% url 'dashboard' %}" 
+            class="board-chip d-flex text-decoration-none mb-1 p-2 gap-2 rounded small {% if not current_board %}active{% endif %}">
+                <i class="bi bi-grid-fill flex-shrink-0" 
+                style="background: linear-gradient(135deg, #6722fb 0%, #5f6cf7 35%, #42C6F6 100%);
+                        -webkit-background-clip: text;
+                        -webkit-text-fill-color: transparent;
+                        color: transparent !important;
+                        font-size: 0.9rem;
+                        display: inline-block;"></i> {% translate "General" %}
+            </a>
+
+            <!-- TABLEROS PERSONALES -->
+            {% for b in boards %}
+                {% if not b.is_default and b.owner == request.user and not b.members.exists %}
+                    <div class="board-item d-flex align-items-center justify-content-between mb-1 p-2 rounded {% if current_board and current_board.id|slugify == b.id|slugify %}active{% endif %}"
+                        style="--board-color: {{ b.color|default:'#6c757d' }};">
+                        <a href="{% url 'dashboard_board' b.id %}" class="text-decoration-none text-truncate flex-grow-1 d-flex align-items-center gap-2 small" style="color: inherit;">
+                            <i class="bi bi-grid-fill flex-shrink-0" 
+                               style="background: linear-gradient(135deg, var(--board-color) 0%, var(--board-color) 35%, color-mix(in srgb, var(--board-color) 10%, white) 100%);
+                                      -webkit-background-clip: text;
+                                      -webkit-text-fill-color: transparent;
+                                      color: transparent !important;
+                                      font-size: 0.9rem;
+                                      display: inline-block;"></i>
+                            <span class="board-title text-truncate">{{ b.title }}</span>
+                        </a>
+
+                        <div class="d-flex align-items-center gap-1">
+                            <button type="button" 
+                                    class="btn btn-sm p-0 border-0 shadow-none text-muted opacity-50 hover-opacity-100 ms-1" 
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#editBoardModalSidebar{{ b.id }}"
+                                    title="{% translate 'Editar tablero' %}"
+                                    style="font-size: 0.75rem;">
+                                •••
+                            </button>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+
+            {% if has_shared_boards %}
+                <hr class="my-2 border-0 opacity-100 mx-auto" style="height: 2px; width: 70%; background-color: #fbecae;">
+            {% endif %}
+
+            <!-- TABLEROS COMPARTIDOS -->
+            {% for b in boards %}
+                {% if not b.is_default %}
+                    {% if b.owner != request.user or b.members.exists %}
+                        <div class="board-item d-flex align-items-center justify-content-between mb-1 p-2 rounded {% if current_board and current_board.id|slugify == b.id|slugify %}active{% endif %}"
+                            style="--board-color: {{ b.color|default:'#6c757d' }};">
+                            <a href="{% url 'dashboard_board' b.id %}" class="text-decoration-none text-truncate flex-grow-1 d-flex align-items-center gap-2 small" style="color: inherit;">
+                                <i class="bi bi-grid-fill flex-shrink-0" 
+                                   style="background: linear-gradient(135deg, var(--board-color) 0%, var(--board-color) 35%, color-mix(in srgb, var(--board-color) 10%, white) 100%);
+                                          -webkit-background-clip: text;
+                                          -webkit-text-fill-color: transparent;
+                                          color: transparent !important;
+                                          font-size: 0.9rem;
+                                          display: inline-block;"></i>
+                                <span class="board-title text-truncate">{{ b.title }}</span>
+                            </a>
+
+                            <div class="d-flex align-items-center gap-1">
+                                <i class="bi bi-people-fill" style="color: #fbbf24 !important; font-size: 0.85rem;" title="{% translate 'Tablero compartido' %}"></i>
+
+                                <button type="button" 
+                                        class="btn btn-sm p-0 border-0 shadow-none text-muted opacity-50 hover-opacity-100 ms-1" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#editBoardModalSidebar{{ b.id }}"
+                                        title="{% translate 'Editar tablero' %}"
+                                        style="font-size: 0.75rem;">
+                                    •••
+                                </button>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+
+            <button class="btn btn-outline-secondary btn-sm mt-3 w-100" data-bs-toggle="modal" data-bs-target="#createBoardModal">
+                + {% translate "Nuevo Tablero" %}
+            </button>
+        </div>
+    </div>
+</div>

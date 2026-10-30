@@ -1,0 +1,35 @@
+{% load i18n %}
+
+<!-- BANNER DE COOKIES (RGPD / ePrivacy) -->
+<div id="cookieBanner" class="position-fixed bottom-0 start-0 w-100 p-3 bg-dark text-white shadow-lg d-none" style="z-index: 2000; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+    <div class="container d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+        <div class="small text-white-50">
+            <span class="fw-semibold text-white">{% translate "Valoramos tu privacidad" %}:</span> <br>
+            {% translate "Utilizamos cookies estrictamente necesarias para mantener tu sesión activa y garantizar la seguridad del sitio." %} 
+            <a href="{% url 'cookies_policy' %}" target="_blank" class="text-info text-decoration-underline ms-1">{% translate "Más información en nuestra Política de Cookies" %}</a>.
+        </div>
+        <div class="d-flex align-items-center gap-2 flex-shrink-0">
+            <button id="acceptCookiesBtn" type="button" class="btn btn-primary btn-sm px-4 fw-bold rounded-3">
+                {% translate "Aceptar" %}
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const cookieBanner = document.getElementById("cookieBanner");
+        const acceptBtn = document.getElementById("acceptCookiesBtn");
+
+        // Verificar si el usuario ya aceptó las cookies previamente
+        if (!localStorage.getItem("cookies_accepted")) {
+            cookieBanner.classList.remove("d-none");
+        }
+
+        // Guardar la preferencia en localStorage al hacer clic
+        acceptBtn.addEventListener("click", function () {
+            localStorage.setItem("cookies_accepted", "true");
+            cookieBanner.classList.add("d-none");
+        });
+    });
+</script>

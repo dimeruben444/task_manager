@@ -1,4 +1,3 @@
-<!-- core/templates/tasks/dashboard.html -->
 {% extends 'base/base.html' %}
 {% load i18n %}
 {% load static %}
@@ -10,11 +9,10 @@
 {% block content %}
 <div class="container-fluid p-0">
 
-    <!-- CONTENEDOR BLANCO DE CABECERA Y FILTROS -->
+    <!-- CABECERA Y FILTROS -->
     <div class="bg-white border rounded-2xl p-4 shadow-sm mb-4 dashboard-header-card" style="border-radius: 16px;">
         <div class="d-flex justify-content-between align-items-center flex-row gap-3 header-flex-container">
             
-            <!-- SECCIÓN IZQUIERDA: ICONO + TÍTULO Y DESCRIPCIÓN -->
             <div class="d-flex align-items-center gap-3 min-w-0 flex-grow-1">
                 <div class="d-flex align-items-center justify-content-center rounded-2xl flex-shrink-0" 
                     style="width: 52px; height: 52px; background-color: {% if current_board and current_board.color %}{{ current_board.color }}18{% else %}#d5e8fb{% endif %}; border-radius: 12px;">
@@ -40,7 +38,7 @@
 
                 <div class="min-w-0">
                     <div class="d-flex align-items-center gap-2">
-                        <h2 class="h4 mb-0 fw-bold text-truncate" style="color: {% if current_board and current_board.color %}{{ current_board.color }}{% else %}#0C6EFD{% endif %}  ">
+                        <h2 class="h4 mb-0 fw-bold text-truncate" style="color: {% if current_board and current_board.color %}{{ current_board.color }}{% else %}#0C6EFD{% endif %}">
                             {% if current_board %}{{ current_board.title }}{% else %}{% translate "General" %}{% endif %}
                         </h2>
                     </div>
@@ -55,7 +53,7 @@
                 </div>
             </div>
 
-            <!-- SECCIÓN DERECHA: FILTROS APILADOS EN DESKTOP / FILA EN MÓVIL Y TABLET -->
+            <!-- FILTROS TODAS / MIS TAREAS / COMPARTIDAS -->
             {% with current_filter=request.GET.filter|default:"all" %}
                 <div class="filter-pills-container p-1.5 rounded-2xl d-inline-flex flex-column flex-sm-row flex-xl-row align-items-stretch border shadow-sm flex-shrink-0 {% if current_board %}opacity-50{% endif %}" 
                     id="filterTaskGroup" 
@@ -94,455 +92,66 @@
         </div>
     </div>
 
-   <!-- TARJETA ALTA RÁPIDA (QUICK ADD BAR) -->
-    <div class="card mb-4 quick-add-card dashboard-hero-section border-0 shadow-sm rounded-4 overflow-hidden">
-        
-        <!-- CABECERA PLEGABLE: SOLAMENTE VISIBLE EN TABLET Y MÓVIL (<= 1240px) -->
-        <button class="btn btn-white w-100 p-3.5 border-0 shadow-none text-decoration-none d-layout-mobile justify-content-between align-items-center" 
-                type="button" 
-                data-bs-toggle="collapse" 
-                data-bs-target="#quickAddCollapse" 
-                aria-expanded="false" 
-                aria-controls="quickAddCollapse"
-                style="background-color: #ffffff; border-radius: 16px;">
-            
-            <div class="d-flex align-items-center gap-3">
-                <span class="d-inline-flex align-items-center justify-content-center rounded-circle bg-primary-subtle text-primary flex-shrink-0" style="width: 32px; height: 32px;">
-                    <i class="bi bi-plus-lg fw-bold fs-6"></i>
-                </span>
-                <span class="fw-bold text-dark" style="font-size: 0.95rem;">{% translate "Añadir nueva tarea..." %}</span>
-            </div>
+    <!-- TARJETA ALTA RÁPIDA -->
+    {% include "_includes/tasks/_quick_add_bar.html" %}
 
-            <i class="bi bi-chevron-down text-muted small flex-shrink-0 ms-2"></i>
-        </button>
-
-        <!-- FORMULARIO COMPLETO: PLEGABLE EN TABLET/MÓVIL, SIEMPRE MOSTRADO EN DESKTOP (> 1240px) -->
-        <div class="collapse d-layout-desktop-block" id="quickAddCollapse">
-            <div class="card-body p-4 pt-3 border-top border-top-layout-0">
-                <form id="quickTaskForm" method="POST" action="" novalidate autocomplete="off">
-                    {% csrf_token %}
-                    
-                    <div class="row g-2 g-md-3 align-items-end mb-2">
-                        <!-- TÍTULO DE LA TAREA -->
-                        <div class="col-12 col-md-5">
-                            <div class="d-flex justify-content-between align-items-center mb-1">
-                                <label class="form-label text-uppercase fw-bold text-muted mb-1" style="font-size: 0.7rem; letter-spacing: 0.05em; margin-left: 4px;">
-                                    {% translate "TÍTULO DE LA TAREA" %}
-                                </label>
-                            </div>
-                            {{ form.title }}
-                        </div>
-
-                        <!-- URGENCIA -->
-                        <div class="col-6 col-md-3">
-                            <div class="d-flex justify-content-between align-items-center mb-1" style="min-height: 20px;">
-                                <span class="text-uppercase fw-bold text-muted quick-label" style="margin-left: 4px;">{% translate "URGENCIA" %}</span>
-                                <span class="fw-bold small quick-sublabel d-inline-block" id="urgencyLabelQuick"></span>
-                            </div>
-                            <div class="rating-box-container urgency-box px-2 px-xl-3 py-1.5 border rounded-3 d-flex justify-content-between align-items-center quick-input-box">
-                                <span class="text-muted fw-bold rating-symbol">-</span>
-                                <div class="star-rating d-flex align-items-center">
-                                    <input type="radio" id="urgency-4" name="urgency" value="4" onchange="updateQuickTargetQuadrantDisplay()">
-                                    <label for="urgency-4" title="4">★</label>
-                                    <input type="radio" id="urgency-3" name="urgency" value="3" onchange="updateQuickTargetQuadrantDisplay()">
-                                    <label for="urgency-3" title="3">★</label>
-                                    <input type="radio" id="urgency-2" name="urgency" value="2" onchange="updateQuickTargetQuadrantDisplay()">
-                                    <label for="urgency-2" title="2">★</label>
-                                    <input type="radio" id="urgency-1" name="urgency" value="1" onchange="updateQuickTargetQuadrantDisplay()">
-                                    <label for="urgency-1" title="1">★</label>
-                                </div>
-                                <span class="text-muted fw-bold rating-symbol">+</span>
-                            </div>
-                        </div>
-
-                        <!-- IMPORTANCIA -->
-                        <div class="col-6 col-md-3">
-                            <div class="d-flex justify-content-between align-items-center mb-1" style="min-height: 20px;">
-                                <span class="text-uppercase fw-bold text-muted quick-label" style="margin-left: 4px;">{% translate "IMPORTANCIA" %}</span>
-                                <span class="fw-bold small quick-sublabel d-inline-block" id="importanceLabelQuick"></span>
-                            </div>
-                            <div class="rating-box-container importance-box px-2 px-xl-3 py-1.5 border rounded-3 d-flex justify-content-between align-items-center quick-input-box">
-                                <span class="text-muted fw-bold rating-symbol">-</span>
-                                <div class="star-rating d-flex align-items-center">
-                                    <input type="radio" id="importance-4" name="importance" value="4" onchange="updateQuickTargetQuadrantDisplay()">
-                                    <label for="importance-4" title="4">★</label>
-                                    <input type="radio" id="importance-3" name="importance" value="3" onchange="updateQuickTargetQuadrantDisplay()">
-                                    <label for="importance-3" title="3">★</label>
-                                    <input type="radio" id="importance-2" name="importance" value="2" onchange="updateQuickTargetQuadrantDisplay()">
-                                    <label for="importance-2" title="2">★</label>
-                                    <input type="radio" id="importance-1" name="importance" value="1" onchange="updateQuickTargetQuadrantDisplay()">
-                                    <label for="importance-1" title="1">★</label>
-                                </div>
-                                <span class="text-muted fw-bold rating-symbol">+</span>
-                            </div>
-                        </div>
-
-                        <!-- BOTÓN SUBMIT -->
-                        <div class="col-12 col-md-1">
-                            <button type="submit" class="btn btn-primary fw-bold rounded-3 shadow-sm w-100 d-flex align-items-center justify-content-center quick-action-btn">
-                                <i class="bi bi-plus-lg fs-5"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- CONTROLES SECUNDARIOS: REORDENADOS PARA MÓVIL/TABLET Y ESCRITORIO -->
-                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mt-3 pe-1 flex-wrap gap-2">
-                        
-                        <!-- 1. DESTINO PREVISTO (ORDER-1 EN MÓVIL/TABLET, ORDER-MD-2 EN ESCRITORIO) -->
-                        <div class="order-1 order-md-2" style="font-size: 0.88rem;">
-                            <span class="text-muted me-1">{% translate "Destino previsto:" %}</span>
-                            <span id="quickTaskTargetQuadrant" class="fw-bold text-secondary">-</span>
-                        </div>
-
-                        <!-- 2. BOTÓN OPCIONES AVANZADAS (ORDER-2 EN MÓVIL/TABLET, ORDER-MD-1 EN ESCRITORIO) -->
-                        <button class="btn btn-link btn-sm text-decoration-none p-0 text-muted shadow-none d-inline-flex align-items-center gap-1 order-2 order-md-1" 
-                                type="button" 
-                                data-bs-toggle="collapse" 
-                                data-bs-target="#advancedOptions" 
-                                aria-expanded="false">
-                            <i class="bi bi-gear-fill"></i>
-                            <span style="font-size: 0.8rem;">{% translate "Opciones avanzadas (Tablero, fecha límite, notas...)" %} ▼</span>
-                        </button>
-
-                    </div>
-
-                    <!-- CONTENEDOR COLLAPSE OPCIONES AVANZADAS -->
-                    <div class="collapse mt-3" id="advancedOptions">
-                        <div class="p-3 border rounded-3 bg-light-subtle shadow-sm">
-                            <div class="row g-3 align-items-center">
-                                
-                                <!-- 1. SELECCIONAR TABLERO -->
-                                <div class="col-12 col-md-3">
-                                    <div class="dropdown">
-                                        <button class="btn btn-outline-secondary btn-sm text-start w-100 d-flex justify-content-between align-items-center bg-white shadow-none py-2 px-3 border rounded-3" 
-                                                type="button" 
-                                                id="quickDropdownBoard" 
-                                                data-bs-toggle="dropdown" 
-                                                aria-expanded="false">
-                                            <span class="d-flex align-items-center gap-2 text-dark">
-                                                <i class="bi bi-kanban" style="color: #6466F1 !important; transform: rotate(-90deg); display: inline-block;"></i>
-                                                <span class="fw-medium text-dark">{% translate "Tablero" %}</span>
-                                            </span>
-                                            <span class="d-flex align-items-center gap-2">
-                                                {% if current_board and current_board.color %}
-                                                    <i class="bi bi-grid-fill flex-shrink-0" 
-                                                    id="boardBadgeIconQuick"
-                                                    style="background: linear-gradient(135deg, {{ current_board.color }} 0%, {{ current_board.color }} 35%, color-mix(in srgb, {{ current_board.color }} 10%, white) 100%);
-                                                            -webkit-background-clip: text;
-                                                            -webkit-text-fill-color: transparent;
-                                                            color: transparent !important;
-                                                            font-size: 0.85rem;
-                                                            display: inline-block;"></i>
-                                                {% else %}
-                                                    <i class="bi bi-grid-fill flex-shrink-0" 
-                                                    id="boardBadgeIconQuick"
-                                                    style="background: linear-gradient(135deg, #4f52f8 0%, #4f52f8 35%, #42C6F6 100%);
-                                                            -webkit-background-clip: text;
-                                                            -webkit-text-fill-color: transparent;
-                                                            color: transparent !important;
-                                                            font-size: 0.85rem;
-                                                            display: inline-block;"></i>
-                                                {% endif %}
-                                                <small class="text-muted fw-semibold" id="boardBadgeDisplayQuick">
-                                                    {% if current_board %}{{ current_board.title }}{% else %}General{% endif %} 
-                                                </small>
-                                            </span>
-                                        </button>
-                                        
-                                        <div class="dropdown-menu p-2 shadow-lg border-0 rounded-3 mt-1 bg-white" aria-labelledby="quickDropdownBoard" style="width: 280px; z-index: 1055;">
-                                            <div class="d-flex justify-content-between align-items-center px-2 py-1 mb-2 border-bottom">
-                                                <span class="fw-bold small text-dark">{% translate "Seleccionar Tablero" %}</span>
-                                                <button type="button" class="btn-close btn-sm" onclick="bootstrap.Dropdown.getInstance(document.getElementById('quickDropdownBoard')).hide();"></button>
-                                            </div>
-                                            <div class="d-flex flex-column gap-1">
-                                                {% if boards %}
-                                                    {% for b in boards %}
-                                                        <div class="custom-board-item d-flex justify-content-between align-items-center py-2 px-3 rounded-2 fw-semibold"
-                                                            style="cursor: pointer; color: #1f2937 !important; background-color: {% if current_board and current_board.id == b.id %}#e5e7eb{% else %}transparent{% endif %};"
-                                                            onclick="selectBoardOption('{{ b.id }}', '{{ b.title|escapejs }}', 'Quick', '{{ b.color|default:'' }}')">
-                                                            
-                                                            <div class="d-flex align-items-center gap-2">
-                                                                {% if b.color %}
-                                                                    <i class="bi bi-grid-fill flex-shrink-0" 
-                                                                    style="background: linear-gradient(135deg, {{ b.color }} 0%, {{ b.color }} 35%, color-mix(in srgb, {{ b.color }} 10%, white) 100%);
-                                                                            -webkit-background-clip: text;
-                                                                            -webkit-text-fill-color: transparent;
-                                                                            color: transparent !important;
-                                                                            font-size: 0.85rem;
-                                                                            display: inline-block;"></i>
-                                                                {% else %}
-                                                                    <i class="bi bi-grid-fill flex-shrink-0" 
-                                                                    style="background: linear-gradient(135deg, #4f52f8 0%, #4f52f8 35%, #42C6F6 100%);
-                                                                            -webkit-background-clip: text;
-                                                                            -webkit-text-fill-color: transparent;
-                                                                            color: transparent !important;
-                                                                            font-size: 0.85rem;
-                                                                            display: inline-block;"></i>
-                                                                {% endif %}
-
-                                                                <span style="font-size: 0.88rem;">{{ b.title }}</span>
-                                                            </div>
-                                                        </div>
-                                                    {% endfor %}
-                                                {% endif %}
-                                            </div>
-                                            <input type="hidden" name="board" id="hiddenBoardIdQuick" value="{% if current_board %}{{ current_board.id }}{% endif %}">
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- 2. POP-OVER FECHAS -->
-                                <div class="col-12 col-md-3">
-                                    <div class="dropdown">
-                                        <button class="btn btn-outline-secondary btn-sm text-start w-100 d-flex justify-content-between align-items-center bg-white shadow-none py-2 px-3 border rounded-3" 
-                                                type="button" 
-                                                id="quickDropdownDate" 
-                                                data-bs-toggle="dropdown" 
-                                                data-bs-auto-close="outside" 
-                                                aria-expanded="false">
-                                            <span class="d-flex align-items-center gap-2 text-dark">
-                                                <i class="bi bi-calendar3" style="color: #dc2626 !important;"></i>
-                                                <span class="fw-medium text-dark">{% translate "Fechas" %}</span>
-                                            </span>
-                                            <small class="text-muted fw-semibold" id="quickDateBadgeDisplay">+</small>
-                                        </button>
-                                        
-                                        <div class="dropdown-menu dropdown-menu-dates p-3 shadow-lg border-0 rounded-3 mt-1 bg-white" aria-labelledby="quickDropdownDate" style="width: 310px; z-index: 1055;">
-                                            <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
-                                                <span class="fw-bold small text-dark">{% translate "Fechas" %}</span>
-                                                <button type="button" class="btn-close btn-sm" onclick="bootstrap.Dropdown.getInstance(document.getElementById('quickDropdownDate')).hide();"></button>
-                                            </div>
-
-                                            <div id="quickInlineCalendar" class="mb-2 d-flex justify-content-center flatpickr-clean-container"></div>
-
-                                            <div class="mb-2">
-                                                <label class="form-label small text-muted mb-1 fw-bold">{% translate "Fecha de vencimiento" %}</label>
-                                                <div class="row g-2">
-                                                    <div class="col-7">
-                                                        <input type="text" id="quickDisplayDate" class="form-control form-control-sm text-center fw-medium" placeholder="AAAA-MM-DD">
-                                                    </div>
-                                                    <div class="col-5">
-                                                        <input type="time" id="quickDisplayTime" class="form-control form-control-sm text-center fw-medium" value="12:00">
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="form-check form-switch mt-2 mb-1 d-flex align-items-center gap-2 ps-0">
-                                                <input class="form-check-input ms-0 me-2" 
-                                                    type="checkbox" 
-                                                    name="reminder_enabled" 
-                                                    id="reminder_enabled_quick" 
-                                                    style="cursor: pointer;">
-                                                <label class="form-check-label small text-dark fw-medium" for="reminder_enabled_quick" style="cursor: pointer; font-size: 0.8rem;">
-                                                    <i class="bi bi-bell me-1 text-muted"></i> {% translate "Recibir recordatorio por correo" %}
-                                                </label>
-                                            </div>
-
-                                            <input type="hidden" name="due_date" id="quickHiddenDueDate">
-
-                                            <div class="d-flex flex-column gap-1 mt-3">
-                                                <button type="button" class="btn btn-primary btn-sm w-100 fw-bold" onclick="saveQuickDate()">
-                                                    {% translate "Guardar" %}
-                                                </button>
-                                                <button type="button" class="btn btn-link btn-sm text-danger text-decoration-none w-100 p-0" onclick="clearQuickDate()">
-                                                    {% translate "Quitar" %}
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- 3. ASIGNADA A -->
-                                <div class="col-12 col-md-3">
-                                    <div class="dropdown">
-                                        <button class="btn btn-outline-secondary btn-sm text-start w-100 d-flex justify-content-between align-items-center bg-white shadow-none py-2 px-3 border rounded-3" 
-                                                type="button" 
-                                                id="dropdownAssigneesQuick" 
-                                                data-bs-toggle="dropdown" 
-                                                data-bs-auto-close="outside" 
-                                                aria-expanded="false">
-                                            <span class="d-flex align-items-center gap-2 text-dark">
-                                                <i class="bi bi-people-fill" style="color: #fbbf24 !important;"></i>
-                                                <span class="fw-medium text-dark">{% translate "Asignada a" %}</span>
-                                            </span>
-                                            <small class="text-muted fw-semibold" id="quickAssigneesCounter">+</small>
-                                        </button>
-
-                                        <div class="dropdown-menu p-3 shadow-lg border-0 rounded-4 mt-1 bg-white" 
-                                            aria-labelledby="dropdownAssigneesQuick" 
-                                            style="width: 290px; z-index: 1055;">
-                                            
-                                            <div class="d-flex justify-content-between align-items-center mb-2 pb-1 border-bottom">
-                                                <span class="fw-bold small text-dark">{% translate "Asignar personas" %}</span>
-                                                <button type="button" class="btn-close btn-sm" onclick="bootstrap.Dropdown.getInstance(document.getElementById('dropdownAssigneesQuick')).hide();"></button>
-                                            </div>
-
-                                            <div class="position-relative mb-2">
-                                                <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-2.5 text-muted" style="font-size: 0.8rem;"></i>
-                                                <input type="text" 
-                                                    id="userSearchInputQuick"
-                                                    class="form-control form-control-sm ps-4 bg-light border-0 rounded-3" 
-                                                    placeholder="{% translate 'Buscar persona o email...' %}"
-                                                    data-search-url="{% url 'search_users_api' %}"
-                                                    oninput="handleLiveUserSearch(this)">
-                                            </div>
-
-                                            <div class="d-flex flex-column gap-1 overflow-auto pe-1" id="quickMembersList" style="max-height: 220px;">
-                                                {% for u in board_members %}
-                                                    <div class="member-search-item" data-search-key="{{ u.get_full_name|default:u.username|lower }} {{ u.username|lower }} {{ u.email|lower }}">
-                                                        <input type="checkbox" 
-                                                            name="assigned_to" 
-                                                            value="{{ u.id }}" 
-                                                            id="assign-user-Quick-{{ u.id }}" 
-                                                            class="d-none member-check-input" 
-                                                            data-username="{{ u.get_full_name|default:u.username }}"
-                                                            data-initials="{{ u.username|slice:':2'|upper }}"
-                                                            data-task-id="Quick"
-                                                            data-user-id="{{ u.id }}"
-                                                            onchange="toggleMemberRow(this)">
-                                                        
-                                                        <label for="assign-user-Quick-{{ u.id }}" 
-                                                            class="custom-member-item d-flex align-items-center justify-content-between py-2 px-2 rounded-3 fw-medium w-100 m-0"
-                                                            style="cursor: pointer;">
-                                                            
-                                                            <div class="d-flex align-items-center gap-2 overflow-hidden">
-                                                                <span class="rounded-circle text-white d-inline-flex align-items-center justify-content-center flex-shrink-0" 
-                                                                    style="width: 26px; height: 26px; font-size: 0.72rem; font-weight: 600; background: linear-gradient(135deg, #497BF6 0%, #7855f7 50%, #9f48ec 100%);">
-                                                                    {{ u.username|slice:":2"|upper }}
-                                                                </span>
-                                                                <div class="d-flex flex-column text-truncate">
-                                                                    <span class="member-name text-dark text-truncate" style="font-size: 0.83rem; line-height: 1.2;">
-                                                                        {{ u.get_full_name|default:u.username }}
-                                                                    </span>
-                                                                    <small class="text-muted text-truncate" style="font-size: 0.72rem;">
-                                                                        {% if u.email %}{{ u.email }}{% else %}@{{ u.username }}{% endif %}
-                                                                    </small>
-                                                                </div>
-                                                            </div>
-
-                                                            <i class="bi bi-check2 text-primary fw-bold member-check-icon d-none ms-2" style="font-size: 1rem;"></i>
-                                                        </label>
-                                                    </div>
-                                                {% endfor %}
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                </div>
-
-                                <!-- 4. DESCRIPCIÓN -->
-                                <div class="col-12 col-md-3">
-                                    <button class="btn btn-outline-secondary btn-sm text-start w-100 d-flex justify-content-between align-items-center bg-white shadow-none py-2 px-3 border rounded-3" 
-                                            type="button" 
-                                            data-bs-toggle="collapse" 
-                                            data-bs-target="#collapseQuickDesc">
-                                        <span class="d-flex align-items-center gap-2 text-dark">
-                                            <i class="bi bi-card-text" style="color: #5cbcf3 !important;"></i>
-                                            <span class="fw-medium text-dark">{% translate "Descripción" %}</span>
-                                        </span>
-                                        <small class="text-muted fw-bold">+</small>
-                                    </button>
-                                </div>
-
-                            </div>
-
-                            <div class="collapse mt-2" id="collapseQuickDesc">
-                                <textarea name="description" 
-                                        id="quickDescriptionTextarea" 
-                                        class="form-control form-control-sm bg-white" 
-                                        rows="2" 
-                                        maxlength="500" 
-                                        oninput="document.getElementById('charCountQuick').textContent = this.value.length;"
-                                        placeholder="{% translate 'Escribe una descripción más detallada...' %}"></textarea>
-                                <div class="d-flex justify-content-end mt-1">
-                                    <small class="text-muted" style="font-size: 0.7rem;">
-                                        <span id="charCountQuick">0</span>/500 {% translate "caracteres" %}
-                                    </small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                </form>
-            </div>
-        </div>
-    </div>
-
-
-    
     <!-- REJILLA PRINCIPAL: MATRIZ EISENHOWER + PANEL COMPLETADAS -->
     <div class="d-flex flex-layout-responsive gap-5 align-items-start w-100 bajar-gap">
         
         <!-- MATRIZ DE 4 CUADRANTES -->
         <div class="matrix-container-wrapper flex-grow-1 min-w-0 w-100">
+
             <div class="row g-4">
-                
+                            
                 <!-- Q1: HACER AHORA -->
                 <div class="col-md-6">
                     <div class="quadrant quadrant-q1 h-100 d-flex flex-column">
                         <div class="d-flex align-items-center justify-content-between mb-3 px-1">
                             <div class="d-flex align-items-center gap-2">
                                 <span class="quadrant-icon-box q1-bg flex-shrink-0">
-                                    <img src="{% static 'img/fire.svg' %}" alt="Eliminar" width="16" height="16"> 
+                                    <img src="{% static 'img/fire.svg' %}" alt="Q1" width="16" height="16"> 
                                 </span>
-                                
                                 <div class="d-flex flex-column gap-1">
-                                    <h6 class="fw-bold mb-0 text-dark" style="font-size: 1.1rem; line-height: 1.2;">
-                                        {% translate "Urgente - Importante" %}
-                                    </h6>
-                                    <small class="text-danger fw-semibold" style="font-size: 0.85rem; line-height: 1.2;">
-                                        {% translate "Hacer ahora • Crisis y plazos clave" %}
-                                    </small>
+                                    <h6 class="fw-bold mb-0 text-dark" style="font-size: 1.1rem; line-height: 1.2;">{% translate "Urgente - Importante" %}</h6>
+                                    <small class="text-danger fw-semibold" style="font-size: 0.85rem; line-height: 1.2;">{% translate "Hacer ahora • Crisis y plazos clave" %}</small>
                                 </div>
                             </div>
-
                             <span class="quadrant-header-badge bg-danger text-white">{{ q1_tasks|length }}</span>
                         </div>
                         
+                        <!-- CONTENEDOR EXCLUSIVO DE ARRASTRE DE TARJETAS (SORTABLE TARGET) -->
                         <div class="flex-grow-1 d-flex flex-column quadrant-container" data-quadrant="Q1" style="min-height: 120px;">
                             {% for task in q1_tasks %}
-                                {% include '_includes/_task_card.html' with task=task %}
+                                {% include '_includes/tasks/_task_card.html' with task=task %}
                             {% endfor %}
-                                <div class="empty-msg-box text-center my-auto empty-msg">
-                                    <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center p-2 mb-2" style="width: 36px; height: 36px;">
-                                        <i class="bi bi-check2 text-muted fs-5"></i>
-                                    </div>
-                                    <p class="text-dark fw-bold small mb-0">{% translate "No hay tareas críticas" %}</p>
-                                    <small class="text-muted d-block" style="font-size: 0.75rem;">{% translate "Mantén el control y reacciona solo a lo imprescindible." %}</small>
+                            <div class="empty-msg-box text-center my-auto empty-msg {% if q1_tasks %}d-none{% endif %}">
+                                <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center p-2 mb-2" style="width: 36px; height: 36px;">
+                                    <i class="bi bi-check2 text-muted fs-5"></i>
                                 </div>
-                            
-
-                            <div class="add-task-inline-wrapper mt-auto pt-2">
-                                <button type="button" class="btn btn-add-inline d-flex align-items-center justify-content-center gap-2" onclick="showInlineForm(this)">
-                                    <i class="bi bi-plus-lg" style="font-size: 0.85rem;"></i>
-                                    <span>{% translate "Añadir tarea a Q1" %}</span>
-                                </button>
-                                <form method="POST" action="{% url 'quick_create_task' %}" class="inline-task-form d-none mt-2">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="urgency" value="4">
-                                    <input type="hidden" name="importance" value="4">
-                                    
-                                    {% if current_board %}
-                                        <input type="hidden" name="board" value="{{ current_board.id }}">
-                                    {% endif %}
-
-                                    <div class="card p-2 border-0 shadow-sm mb-2 rounded-3">
-                                        <textarea name="title" 
-                                                class="form-control border-0 p-1 shadow-none task-inline-input" 
-                                                rows="2" 
-                                                placeholder="{% translate 'Introduce un título para esta tarjeta...' %}" 
-                                                required 
-                                                style="resize: none; font-size: 0.85rem;"></textarea>
-                                    </div>
-                                    
-                                    <div class="d-flex align-items-center gap-2">
-                                        <button type="submit" class="btn btn-primary btn-sm px-3 fw-semibold">
-                                            {% translate "Añadir tarea" %}
-                                        </button>
-                                        <button type="button" class="btn btn-close-inline btn-sm text-muted" onclick="hideInlineForm(this)">✕</button>
-                                    </div>
-                                </form>
+                                <p class="text-dark fw-bold small mb-0">{% translate "No hay tareas críticas" %}</p>
+                                <small class="text-muted d-block" style="font-size: 0.75rem;">{% translate "Mantén el control y reacciona solo a lo imprescindible." %}</small>
                             </div>
+                        </div>
+
+                        <!-- BOTÓN AÑADIR TAREA (FUERA DE SORTABLE) -->
+                        <div class="add-task-inline-wrapper mt-auto pt-2">
+                            <button type="button" class="btn btn-add-inline d-flex align-items-center justify-content-center gap-2" onclick="showInlineForm(this)">
+                                <i class="bi bi-plus-lg" style="font-size: 0.85rem;"></i>
+                                <span>{% translate "Añadir tarea a Q1" %}</span>
+                            </button>
+                            <form method="POST" action="{% url 'quick_create_task' %}" class="inline-task-form d-none mt-2">
+                                {% csrf_token %}
+                                <input type="hidden" name="urgency" value="4">
+                                <input type="hidden" name="importance" value="4">
+                                {% if current_board %}<input type="hidden" name="board" value="{{ current_board.id }}">{% endif %}
+                                <div class="card p-2 border-0 shadow-sm mb-2 rounded-3">
+                                    <textarea name="title" class="form-control border-0 p-1 shadow-none task-inline-input" rows="2" placeholder="{% translate 'Introduce un título para esta tarjeta...' %}" required style="resize: none; font-size: 0.85rem;"></textarea>
+                                </div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <button type="submit" class="btn btn-primary btn-sm px-3 fw-semibold">{% translate "Añadir tarea" %}</button>
+                                    <button type="button" class="btn btn-close-inline btn-sm text-muted" onclick="hideInlineForm(this)">✕</button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -553,66 +162,49 @@
                         <div class="d-flex align-items-center justify-content-between mb-3 px-1">
                             <div class="d-flex align-items-center gap-2">
                                 <span class="quadrant-icon-box q2-bg flex-shrink-0">
-                                    <img src="{% static 'img/calendar.svg' %}" alt="Eliminar" width="16" height="16"> 
+                                    <img src="{% static 'img/calendar.svg' %}" alt="Q2" width="16" height="16"> 
                                 </span>
-                                
                                 <div class="d-flex flex-column gap-1">
-                                    <h6 class="fw-bold mb-0 text-dark" style="font-size: 1.1rem; line-height: 1.2;">
-                                        {% translate "Importante - No Urgente" %}
-                                    </h6>
-                                    <small class="text-primary fw-semibold" style="font-size: 0.85rem; line-height: 1.2;">
-                                        {% translate "Planificar • Metas a medio plazo" %}
-                                    </small>
+                                    <h6 class="fw-bold mb-0 text-dark" style="font-size: 1.1rem; line-height: 1.2;">{% translate "Importante - No Urgente" %}</h6>
+                                    <small class="text-primary fw-semibold" style="font-size: 0.85rem; line-height: 1.2;">{% translate "Planificar • Metas a medio plazo" %}</small>
                                 </div>
                             </div>
-
                             <span class="quadrant-header-badge bg-primary text-white">{{ q2_tasks|length }}</span>
                         </div>
                         
+                        <!-- CONTENEDOR EXCLUSIVO DE ARRASTRE DE TARJETAS (SORTABLE TARGET) -->
                         <div class="flex-grow-1 d-flex flex-column quadrant-container" data-quadrant="Q2" style="min-height: 120px;">
                             {% for task in q2_tasks %}
-                                {% include '_includes/_task_card.html' with task=task %}
+                                {% include '_includes/tasks/_task_card.html' with task=task %}
                             {% endfor %}
-                                <div class="empty-msg-box text-center my-auto empty-msg">
-                                    <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center p-2 mb-2" style="width: 36px; height: 36px;">
-                                        <i class="bi bi-check2 text-muted fs-5"></i>
-                                    </div>
-                                    <p class="text-dark fw-bold small mb-0">{% translate "No hay tareas estratégicas" %}</p>
-                                    <small class="text-muted d-block" style="font-size: 0.75rem;">{% translate "Dedica tiempo a proyectar tus metas a largo plazo." %}</small>
+                            <div class="empty-msg-box text-center my-auto empty-msg {% if q2_tasks %}d-none{% endif %}">
+                                <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center p-2 mb-2" style="width: 36px; height: 36px;">
+                                    <i class="bi bi-check2 text-muted fs-5"></i>
                                 </div>
-                            
-
-                            <div class="add-task-inline-wrapper mt-auto pt-2">
-                                <button type="button" class="btn btn-add-inline d-flex align-items-center justify-content-center gap-2" onclick="showInlineForm(this)">
-                                    <i class="bi bi-plus-lg" style="font-size: 0.85rem;"></i>
-                                    <span>{% translate "Añadir tarea a Q2" %}</span>
-                                </button>
-                                <form method="POST" action="{% url 'quick_create_task' %}" class="inline-task-form d-none mt-2">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="urgency" value="1">
-                                    <input type="hidden" name="importance" value="4">
-                                    
-                                    {% if current_board %}
-                                        <input type="hidden" name="board" value="{{ current_board.id }}">
-                                    {% endif %}
-
-                                    <div class="card p-2 border-0 shadow-sm mb-2 rounded-3">
-                                        <textarea name="title" 
-                                                class="form-control border-0 p-1 shadow-none task-inline-input" 
-                                                rows="2" 
-                                                placeholder="{% translate 'Introduce un título para esta tarjeta...' %}" 
-                                                required 
-                                                style="resize: none; font-size: 0.85rem;"></textarea>
-                                    </div>
-                                    
-                                    <div class="d-flex align-items-center gap-2">
-                                        <button type="submit" class="btn btn-primary btn-sm px-3 fw-semibold">
-                                            {% translate "Añadir tarea" %}
-                                        </button>
-                                        <button type="button" class="btn btn-close-inline btn-sm text-muted" onclick="hideInlineForm(this)">✕</button>
-                                    </div>
-                                </form>
+                                <p class="text-dark fw-bold small mb-0">{% translate "No hay tareas estratégicas" %}</p>
+                                <small class="text-muted d-block" style="font-size: 0.75rem;">{% translate "Dedica tiempo a proyectar tus metas a largo plazo." %}</small>
                             </div>
+                        </div>
+
+                        <!-- BOTÓN AÑADIR TAREA (FUERA DE SORTABLE) -->
+                        <div class="add-task-inline-wrapper mt-auto pt-2">
+                            <button type="button" class="btn btn-add-inline d-flex align-items-center justify-content-center gap-2" onclick="showInlineForm(this)">
+                                <i class="bi bi-plus-lg" style="font-size: 0.85rem;"></i>
+                                <span>{% translate "Añadir tarea a Q2" %}</span>
+                            </button>
+                            <form method="POST" action="{% url 'quick_create_task' %}" class="inline-task-form d-none mt-2">
+                                {% csrf_token %}
+                                <input type="hidden" name="urgency" value="1">
+                                <input type="hidden" name="importance" value="4">
+                                {% if current_board %}<input type="hidden" name="board" value="{{ current_board.id }}">{% endif %}
+                                <div class="card p-2 border-0 shadow-sm mb-2 rounded-3">
+                                    <textarea name="title" class="form-control border-0 p-1 shadow-none task-inline-input" rows="2" placeholder="{% translate 'Introduce un título para esta tarjeta...' %}" required style="resize: none; font-size: 0.85rem;"></textarea>
+                                </div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <button type="submit" class="btn btn-primary btn-sm px-3 fw-semibold">{% translate "Añadir tarea" %}</button>
+                                    <button type="button" class="btn btn-close-inline btn-sm text-muted" onclick="hideInlineForm(this)">✕</button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -623,66 +215,49 @@
                         <div class="d-flex align-items-center justify-content-between mb-3 px-1">
                             <div class="d-flex align-items-center gap-2">
                                 <span class="quadrant-icon-box q3-bg flex-shrink-0">
-                                    <img src="{% static 'img/group.svg' %}" alt="Eliminar" width="16" height="16"> 
+                                    <img src="{% static 'img/group.svg' %}" alt="Q3" width="16" height="16"> 
                                 </span>
-                                
                                 <div class="d-flex flex-column gap-1">
-                                    <h6 class="fw-bold mb-0 text-dark" style="font-size: 1.1rem; line-height: 1.2;">
-                                        {% translate "Urgente - No Importante" %}
-                                    </h6>
-                                    <small class="text-warning fw-semibold" style="font-size: 0.85rem; line-height: 1.2;">
-                                        {% translate "Delegar • Interrupciones y tareas operativas" %}
-                                    </small>
+                                    <h6 class="fw-bold mb-0 text-dark" style="font-size: 1.1rem; line-height: 1.2;">{% translate "Urgente - No Importante" %}</h6>
+                                    <small class="text-warning fw-semibold" style="font-size: 0.85rem; line-height: 1.2;">{% translate "Delegar • Interrupciones y tareas operativas" %}</small>
                                 </div>
                             </div>
-
                             <span class="quadrant-header-badge bg-warning text-dark">{{ q3_tasks|length }}</span>
                         </div>
                         
+                        <!-- CONTENEDOR EXCLUSIVO DE ARRASTRE DE TARJETAS (SORTABLE TARGET) -->
                         <div class="flex-grow-1 d-flex flex-column quadrant-container" data-quadrant="Q3" style="min-height: 120px;">
                             {% for task in q3_tasks %}
-                                {% include '_includes/_task_card.html' with task=task %}
+                                {% include '_includes/tasks/_task_card.html' with task=task %}
                             {% endfor %}
-                                <div class="empty-msg-box text-center my-auto empty-msg">
-                                    <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center p-2 mb-2" style="width: 36px; height: 36px;">
-                                        <i class="bi bi-check2 text-muted fs-5"></i>
-                                    </div>
-                                    <p class="text-dark fw-bold small mb-0">{% translate "No hay tareas operativas" %}</p>
-                                    <small class="text-muted d-block" style="font-size: 0.75rem;">{% translate "Libera tu agenda de interrupciones no esenciales." %}</small>
+                            <div class="empty-msg-box text-center my-auto empty-msg {% if q3_tasks %}d-none{% endif %}">
+                                <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center p-2 mb-2" style="width: 36px; height: 36px;">
+                                    <i class="bi bi-check2 text-muted fs-5"></i>
                                 </div>
-                            
-
-                            <div class="add-task-inline-wrapper mt-auto pt-2">
-                                <button type="button" class="btn btn-add-inline d-flex align-items-center justify-content-center gap-2" onclick="showInlineForm(this)">
-                                    <i class="bi bi-plus-lg" style="font-size: 0.85rem;"></i>
-                                    <span>{% translate "Añadir tarea a Q3" %}</span>
-                                </button>
-                                <form method="POST" action="{% url 'quick_create_task' %}" class="inline-task-form d-none mt-2">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="urgency" value="4">
-                                    <input type="hidden" name="importance" value="1">
-                                    
-                                    {% if current_board %}
-                                        <input type="hidden" name="board" value="{{ current_board.id }}">
-                                    {% endif %}
-
-                                    <div class="card p-2 border-0 shadow-sm mb-2 rounded-3">
-                                        <textarea name="title" 
-                                                class="form-control border-0 p-1 shadow-none task-inline-input" 
-                                                rows="2" 
-                                                placeholder="{% translate 'Introduce un título para esta tarjeta...' %}" 
-                                                required 
-                                                style="resize: none; font-size: 0.85rem;"></textarea>
-                                    </div>
-                                    
-                                    <div class="d-flex align-items-center gap-2">
-                                        <button type="submit" class="btn btn-primary btn-sm px-3 fw-semibold">
-                                            {% translate "Añadir tarea" %}
-                                        </button>
-                                        <button type="button" class="btn btn-close-inline btn-sm text-muted" onclick="hideInlineForm(this)">✕</button>
-                                    </div>
-                                </form>
+                                <p class="text-dark fw-bold small mb-0">{% translate "No hay tareas operativas" %}</p>
+                                <small class="text-muted d-block" style="font-size: 0.75rem;">{% translate "Libera tu agenda de interrupciones no esenciales." %}</small>
                             </div>
+                        </div>
+
+                        <!-- BOTÓN AÑADIR TAREA (FUERA DE SORTABLE) -->
+                        <div class="add-task-inline-wrapper mt-auto pt-2">
+                            <button type="button" class="btn btn-add-inline d-flex align-items-center justify-content-center gap-2" onclick="showInlineForm(this)">
+                                <i class="bi bi-plus-lg" style="font-size: 0.85rem;"></i>
+                                <span>{% translate "Añadir tarea a Q3" %}</span>
+                            </button>
+                            <form method="POST" action="{% url 'quick_create_task' %}" class="inline-task-form d-none mt-2">
+                                {% csrf_token %}
+                                <input type="hidden" name="urgency" value="4">
+                                <input type="hidden" name="importance" value="1">
+                                {% if current_board %}<input type="hidden" name="board" value="{{ current_board.id }}">{% endif %}
+                                <div class="card p-2 border-0 shadow-sm mb-2 rounded-3">
+                                    <textarea name="title" class="form-control border-0 p-1 shadow-none task-inline-input" rows="2" placeholder="{% translate 'Introduce un título para esta tarjeta...' %}" required style="resize: none; font-size: 0.85rem;"></textarea>
+                                </div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <button type="submit" class="btn btn-primary btn-sm px-3 fw-semibold">{% translate "Añadir tarea" %}</button>
+                                    <button type="button" class="btn btn-close-inline btn-sm text-muted" onclick="hideInlineForm(this)">✕</button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -693,316 +268,90 @@
                         <div class="d-flex align-items-center justify-content-between mb-3 px-1">
                             <div class="d-flex align-items-center gap-2">
                                 <span class="quadrant-icon-box q4-bg flex-shrink-0">
-                                    <img src="{% static 'img/trash.svg' %}" alt="Eliminar" width="16" height="16"> 
+                                    <img src="{% static 'img/trash.svg' %}" alt="Q4" width="16" height="16"> 
                                 </span>
-                                
                                 <div class="d-flex flex-column gap-1">
-                                    <h6 class="fw-bold mb-0 text-dark" style="font-size: 1.1rem; line-height: 1.2;">
-                                        {% translate "No Urgente - No Importante" %}
-                                    </h6>
-                                    <small class="text-muted fw-semibold" style="font-size: 0.85rem; line-height: 1.2;">
-                                        {% translate "Eliminar • Distracciones e irrelevantes" %}
-                                    </small>
+                                    <h6 class="fw-bold mb-0 text-dark" style="font-size: 1.1rem; line-height: 1.2;">{% translate "No Urgente - No Importante" %}</h6>
+                                    <small class="text-muted fw-semibold" style="font-size: 0.85rem; line-height: 1.2;">{% translate "Eliminar • Distracciones e irrelevantes" %}</small>
                                 </div>
                             </div>
-
                             <span class="quadrant-header-badge bg-secondary text-white">{{ q4_tasks|length }}</span>
                         </div>
                         
+                        <!-- CONTENEDOR EXCLUSIVO DE ARRASTRE DE TARJETAS (SORTABLE TARGET) -->
                         <div class="flex-grow-1 d-flex flex-column quadrant-container" data-quadrant="Q4" style="min-height: 120px;">
                             {% for task in q4_tasks %}
-                                {% include '_includes/_task_card.html' with task=task %}
+                                {% include '_includes/tasks/_task_card.html' with task=task %}
                             {% endfor %}
-                                <div class="empty-msg-box text-center my-auto empty-msg">
-                                    <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center p-2 mb-2" style="width: 36px; height: 36px;">
-                                        <i class="bi bi-check2 text-muted fs-5"></i>
-                                    </div>
-                                    <p class="text-dark fw-bold small mb-0">{% translate "No hay tareas irrelevantes" %}</p>
-                                    <small class="text-muted d-block" style="font-size: 0.75rem;">{% translate "Mantén tu foco libre de ruido innecesario" %}</small>
+                            <div class="empty-msg-box text-center my-auto empty-msg {% if q4_tasks %}d-none{% endif %}">
+                                <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center p-2 mb-2" style="width: 36px; height: 36px;">
+                                    <i class="bi bi-check2 text-muted fs-5"></i>
                                 </div>
-                            
-
-                            <div class="add-task-inline-wrapper mt-auto pt-2">
-                                <button type="button" class="btn btn-add-inline d-flex align-items-center justify-content-center gap-2" onclick="showInlineForm(this)">
-                                    <i class="bi bi-plus-lg" style="font-size: 0.85rem;"></i>
-                                    <span>{% translate "Añadir tarea a Q4" %}</span>
-                                </button>
-                                <form method="POST" action="{% url 'quick_create_task' %}" class="inline-task-form d-none mt-2">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="urgency" value="1">
-                                    <input type="hidden" name="importance" value="1">
-                                    
-                                    {% if current_board %}
-                                        <input type="hidden" name="board" value="{{ current_board.id }}">
-                                    {% endif %}
-
-                                    <div class="card p-2 border-0 shadow-sm mb-2 rounded-3">
-                                        <textarea name="title" 
-                                                class="form-control border-0 p-1 shadow-none task-inline-input" 
-                                                rows="2" 
-                                                placeholder="{% translate 'Introduce un título para esta tarjeta...' %}" 
-                                                required 
-                                                style="resize: none; font-size: 0.85rem;"></textarea>
-                                    </div>
-                                    
-                                    <div class="d-flex align-items-center gap-2">
-                                        <button type="submit" class="btn btn-primary btn-sm px-3 fw-semibold">
-                                            {% translate "Añadir tarea" %}
-                                        </button>
-                                        <button type="button" class="btn btn-close-inline btn-sm text-muted" onclick="hideInlineForm(this)">✕</button>
-                                    </div>
-                                </form>
+                                <p class="text-dark fw-bold small mb-0">{% translate "No hay tareas irrelevantes" %}</p>
+                                <small class="text-muted d-block" style="font-size: 0.75rem;">{% translate "Mantén tu foco libre de ruido innecesario" %}</small>
                             </div>
                         </div>
-                    </div>
-                </div>
 
-            </div>
-        </div>
-
-        <!-- SECCIÓN DERECHA: PANEL COMPLETADAS -->
-        <!-- SECCIÓN DERECHA: PANEL COMPLETADAS (ADAPTABLE RESPONSIVE) -->
-        <div class="completed-panel-wrapper w-100">
-            
-            <!-- BOTÓN DESPLEGABLE EN PANTALLAS MENORES A 992px -->
-            <div class="d-lg-none mb-3">
-                <button class="btn btn-white border shadow-sm w-100 py-2.5 px-3 rounded-3 d-flex align-items-center justify-content-between text-dark fw-bold" 
-                        type="button" 
-                        data-bs-toggle="collapse" 
-                        data-bs-target="#collapseCompletedTablet" 
-                        aria-expanded="false">
-                    <div class="d-flex align-items-center gap-2">
-                        <span class="rounded-circle bg-success-subtle text-success p-1 d-inline-flex align-items-center justify-content-center" style="width: 24px; height: 24px;">
-                            <i class="bi bi-check-lg fw-bold"></i>
-                        </span>
-                        <span>{% translate "Ver tareas completadas" %}</span>
-                    </div>
-                    <span class="badge bg-primary text-white rounded-pill" id="completed-count-mobile">
-                        {{ completed_tasks|length }}
-                    </span>
-                </button>
-            </div>
-
-            <!-- CONTENEDOR COLLAPSIBLE EN TABLETS / PERMANENTE EN ESCRITORIO (>= 992px) -->
-            <div class="collapse d-lg-block" id="collapseCompletedTablet">
-                <div class="completed-panel p-3 h-100 d-flex flex-column bg-white border rounded-4 shadow-sm">
-                    <div class="d-flex align-items-center justify-content-between pb-3 border-bottom mb-2">
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="rounded-circle bg-success-subtle text-success p-1 d-inline-flex align-items-center justify-content-center" style="width: 26px; height: 26px;">
-                                <i class="bi bi-check-lg fw-bold"></i>
-                            </span>
-                            <h6 class="fw-bold mb-0 text-dark" style="font-size: 0.95rem;">
-                                {% translate "Completadas" %}
-                            </h6>
-                            <span class="badge bg-light text-dark border rounded-circle" id="completed-count">
-                                {{ completed_tasks|length }}
-                            </span>
-                        </div>
-
-                        <div class="d-flex align-items-center gap-1">
-                            <select id="completed-filter-select" class="form-select form-select-sm border-0 shadow-none bg-light py-1 px-2 text-muted" style="font-size: 0.78rem; width: auto; cursor: pointer;">
-                                <option value="all" selected>{% translate "Todas" %}</option>
-                                <option value="today">{% translate "Hoy" %}</option>
-                                <option value="week">{% translate "Esta semana" %}</option>
-                            </select>
-
-                            <button type="button" class="btn btn-outline-danger btn-sm p-1.5 border-0 rounded-2" data-bs-toggle="modal" data-bs-target="#clearCompletedModal" title="{% translate 'Vaciar completadas' %}">
-                                <i class="bi bi-trash3"></i>
+                        <!-- BOTÓN AÑADIR TAREA (FUERA DE SORTABLE) -->
+                        <div class="add-task-inline-wrapper mt-auto pt-2">
+                            <button type="button" class="btn btn-add-inline d-flex align-items-center justify-content-center gap-2" onclick="showInlineForm(this)">
+                                <i class="bi bi-plus-lg" style="font-size: 0.85rem;"></i>
+                                <span>{% translate "Añadir tarea a Q4" %}</span>
                             </button>
-                        </div>
-                    </div>
-
-                    <div class="flex-grow-1 overflow-auto quadrant-container py-2" id="completed-tasks-container" data-quadrant="DONE" style="max-height: calc(100vh - 280px); min-height: 200px;">
-                        {% for task in completed_tasks %}
-                            <div class="completed-item completed-task-item task-card mb-2 d-flex align-items-center justify-content-between gap-2" 
-                                data-task-id="{{ task.id }}"
-                                data-urgency="{{ task.urgency }}"
-                                data-importance="{{ task.importance }}"
-                                data-updated-at="{{ task.updated_at|date:'Y-m-d' }}">
-                                
-                                <div class="d-flex align-items-center gap-2 flex-grow-1 min-w-0">
-                                    <div class="task-checkbox-wrapper-sidebar flex-shrink-0" style="width: 17px; height: 17px;">
-                                        <label class="task-checkbox-container m-0" onclick="event.stopPropagation();">
-                                            <input type="checkbox" 
-                                                class="task-completion-check" 
-                                                data-task-id="{{ task.id }}" 
-                                                checked>
-                                            <span class="checkmark"></span>
-                                        </label>
-                                    </div>
-                                    
-                                    <span class="task-title text-muted text-decoration-line-through text-truncate fw-medium" 
-                                        style="font-size: 0.82rem; cursor: pointer;" 
-                                        title="{{ task.title }}"
-                                        data-bs-toggle="modal" 
-                                        data-bs-target="#viewTaskModal{{ task.id }}">
-                                        {{ task.title }}
-                                    </span>
+                            <form method="POST" action="{% url 'quick_create_task' %}" class="inline-task-form d-none mt-2">
+                                {% csrf_token %}
+                                <input type="hidden" name="urgency" value="1">
+                                <input type="hidden" name="importance" value="1">
+                                {% if current_board %}<input type="hidden" name="board" value="{{ current_board.id }}">{% endif %}
+                                <div class="card p-2 border-0 shadow-sm mb-2 rounded-3">
+                                    <textarea name="title" class="form-control border-0 p-1 shadow-none task-inline-input" rows="2" placeholder="{% translate 'Introduce un título para esta tarjeta...' %}" required style="resize: none; font-size: 0.85rem;"></textarea>
                                 </div>
-
-                                <form method="POST" action="{% url 'delete_task' task.id %}" class="d-inline m-0 flex-shrink-0" onsubmit="return confirm('¿Eliminar esta tarea definitivamente?');">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-link text-danger p-0 border-0 opacity-50 hover-opacity-100" title="Eliminar">
-                                        <i class="bi bi-x-lg" style="font-size: 0.8rem;"></i>
-                                    </button>
-                                </form>
-                            </div>
-                        {% empty %}
-                            <p class="text-muted text-center py-4 small mb-0 empty-msg" id="empty-trash-msg">
-                                {% translate "No hay tareas completadas." %}
-                            </p>
-                        {% endfor %}
+                                <div class="d-flex align-items-center gap-2">
+                                    <button type="submit" class="btn btn-primary btn-sm px-3 fw-semibold">{% translate "Añadir tarea" %}</button>
+                                    <button type="button" class="btn btn-close-inline btn-sm text-muted" onclick="hideInlineForm(this)">✕</button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
-            </div>
 
+            </div>            
         </div>
+
+        <!-- PANEL LATERAL COMPLETADAS -->
+        {% include "_includes/tasks/_completed_panel.html" %}
 
     </div>
 
-    <!-- MODALES -->
-   <!-- MODAL PARA CREAR UN NUEVO TABLERO -->
-    <div class="modal fade" id="createBoardModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="false" style="z-index: 1060 !important;">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content text-dark border-0 shadow-lg rounded-4">
-                
-                <form method="POST" action="{% url 'create_board' %}">
-                    {% csrf_token %}
-                    
-                    <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
-                        <h5 class="modal-title fw-bold text-dark d-flex align-items-center gap-2">
-                            ➕ {% translate "Crear nuevo tablero" %}
-                        </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{% translate 'Cerrar' %}"></button>
-                    </div>
+    <!-- MODALES DE TAREAS (UBICADOS FUERA DE LOS CUADRANTES PARA PERMITIR DRAG AND DROP) -->
+    {% for task in q1_tasks %}
+        {% include "_includes/tasks/_task_edit_modal.html" with task=task %}
+        {% include "_includes/tasks/_mobile_action_modal.html" with task=task %}
+    {% endfor %}
 
-                    <div class="modal-body text-start px-4 py-3">
-                        
-                        <!-- NOMBRE DEL TABLERO -->
-                        <div class="mb-3">
-                            <label class="form-label small fw-bold text-dark">{% translate "Nombre del tablero" %}</label>
-                            <input type="text" name="title" class="form-control rounded-3" placeholder="{% translate 'Nombre del tablero...' %}" required autocomplete="off">
-                        </div>
+    {% for task in q2_tasks %}
+        {% include "_includes/tasks/_task_edit_modal.html" with task=task %}
+        {% include "_includes/tasks/_mobile_action_modal.html" with task=task %}
+    {% endfor %}
 
-                        <!-- COLOR Y DESCRIPCIÓN (INPUT CORTO EN LUGAR DE TEXTAREA) -->
-                        <div class="row g-2 mb-3">
-                            <div class="col-md-5">
-                                <label class="form-label small fw-bold text-dark">{% translate "Color" %}</label>
-                                <select name="color" class="form-select rounded-3">
-                                    <option value="#3B82F6" selected>🟦 {% translate "Azul" %}</option>
-                                    <option value="#10B981">🟩 {% translate "Verde" %}</option>
-                                    <option value="#EF4444">🟥 {% translate "Rojo" %}</option>
-                                    <option value="#F59E0B">🟧 {% translate "Naranja" %}</option>
-                                    <option value="#8B5CF6">🟪 {% translate "Púrpura" %}</option>
-                                    <option value="#6B7280">⬜ {% translate "Gris" %}</option>
-                                </select>
-                            </div>
-                            <div class="col-md-7">
-                                <label class="form-label small fw-bold text-dark">{% translate "Descripción" %}</label>
-                                <input type="text" name="description" class="form-control rounded-3" placeholder="{% translate 'Opcional' %}">
-                            </div>
-                        </div>
+    {% for task in q3_tasks %}
+        {% include "_includes/tasks/_task_edit_modal.html" with task=task %}
+        {% include "_includes/tasks/_mobile_action_modal.html" with task=task %}
+    {% endfor %}
 
-                        <hr class="my-3 text-muted opacity-25">
+    {% for task in q4_tasks %}
+        {% include "_includes/tasks/_task_edit_modal.html" with task=task %}
+        {% include "_includes/tasks/_mobile_action_modal.html" with task=task %}
+    {% endfor %}
 
-                        <!-- SECCIÓN: INVITAR NUEVO MIEMBRO CON BUSCADOR DINÁMICO (CREAR TABLERO) -->
-                        <div class="mb-3 position-relative" style="z-index: 3000 !important; overflow: visible !important;">
-                            <label class="form-label small fw-bold text-dark d-flex align-items-center gap-1">
-                                <i class="bi bi-person-plus text-primary"></i> {% translate "Invitar a un nuevo miembro" %}
-                            </label>
+    {% for task in completed_tasks %}
+        {% include "_includes/tasks/_task_edit_modal.html" with task=task %}
+        {% include "_includes/tasks/_mobile_action_modal.html" with task=task %}
+    {% endfor %}
 
-                            <div class="input-group input-group-sm border rounded-3 overflow-hidden bg-light align-items-center">
-                                <span class="input-group-text bg-transparent border-0 pe-1">
-                                    <i class="bi bi-search text-muted" style="font-size: 0.8rem;"></i>
-                                </span>
-                                <input type="text" 
-                                    id="invite-input-newboard" 
-                                    class="form-control border-0 bg-transparent shadow-none small text-dark" 
-                                    placeholder="{% translate 'Escribe usuario, email o nombre...' %}" 
-                                    autocomplete="off"
-                                    oninput="handleBoardInviteSearch(this, 'newboard')"
-                                    onfocus="handleBoardInviteSearch(this, 'newboard')">
-                            </div>
-
-                            <!-- MENÚ FLOTANTE DE RESULTADOS -->
-                            <div id="invite-results-newboard" 
-                                class="shadow-lg border rounded-4 p-2 w-100 mt-1 d-none position-absolute" 
-                                style="max-height: 220px; overflow-y: auto; z-index: 99999 !important; top: 100%; left: 0; background-color: #ffffff !important;">
-                                
-                                <div class="d-flex flex-column gap-1" id="invite-list-container-newboard">
-                                    {% for collaborator in frequent_collaborators %}
-                                        <div class="member-search-item" data-search-key="{{ collaborator.get_full_name|lower }} {{ collaborator.username|lower }} {{ collaborator.email|lower }}">
-                                            <button type="button" 
-                                                    class="btn btn-light btn-sm w-100 text-start border-0 d-flex align-items-center justify-content-between p-2 rounded-3"
-                                                    onmousedown="selectBoardCollaborator('newboard', '{{ collaborator.username }}', '{{ collaborator.get_full_name|default:collaborator.username }}')">
-                                                
-                                                <div class="d-flex align-items-center gap-2 overflow-hidden">
-                                                    <span class="rounded-circle text-white d-inline-flex align-items-center justify-content-center flex-shrink-0" 
-                                                        style="width: 32px; height: 32px; font-size: 0.75rem; font-weight: 700; background: linear-gradient(135deg, #497BF6 0%, #7855f7 50%, #9f48ec 100%);">
-                                                        {{ collaborator.username|slice:":2"|upper }}
-                                                    </span>
-                                                    <div class="d-flex flex-column text-truncate">
-                                                        <span class="text-dark fw-bold text-truncate" style="font-size: 0.85rem; line-height: 1.2;">
-                                                            {{ collaborator.get_full_name|default:collaborator.username }}
-                                                        </span>
-                                                        <small class="text-muted text-truncate" style="font-size: 0.72rem;">
-                                                            {{ collaborator.email }}
-                                                        </small>
-                                                    </div>
-                                                </div>
-                                            </button>
-                                        </div>
-                                    {% endfor %}
-                                </div>
-
-                                <div id="invite-no-results-newboard" class="text-center py-3 text-muted small d-none">
-                                    <i class="bi bi-person-x d-block fs-5 mb-1 text-secondary opacity-50"></i>
-                                    {% translate "No se encontró ningún usuario registrado." %}
-                                </div>
-                            </div>
-
-                            <!-- CAJA ACUMULATIVA DE PERSONAS SELECCIONADAS -->
-                            <div id="invite-selected-box-newboard" class="mt-3 p-2.5 bg-primary-subtle border border-primary-subtle rounded-3 d-none">
-                                <span class="d-block small text-primary-emphasis fw-semibold mb-1.5" style="font-size: 0.75rem;">
-                                    Se enviará una invitación para participar en el tablero a:
-                                </span>
-                                <div id="selected-users-list-newboard" class="d-flex flex-wrap gap-1.5"></div>
-                            </div>
-
-                            <!-- CAMPO OCULTO PARA ENVIAR LOS USUARIOS AL GUARDAR EL FORMULARIO -->
-                            <div id="hidden-inputs-container-newboard"></div>
-
-                            <small class="text-muted d-block mt-2" style="font-size: 0.72rem;">
-                                {% translate "Le llegará una notificación inmediata para unirse al guardar." %}
-                            </small>
-                        </div>
-                    </div>
-                    
-                    <!-- BOTONES DE ACCIÓN -->
-                    <div class="modal-footer justify-content-end border-top-0 bg-light px-4 py-3 gap-2">
-                        <button type="button" class="btn btn-outline-secondary btn-sm rounded-3 fw-semibold" data-bs-dismiss="modal">{% translate "Cancelar" %}</button>
-                        <button type="submit" class="btn btn-primary btn-sm rounded-3 fw-bold shadow-sm">{% translate "Guardar Tablero" %}</button>
-                    </div>
-                </form>
-
-            </div>
-        </div>
-    </div>
-    <!-- MODAL PARA ELIMINAR TAREAS COMLETADAS-->
-    <div class="modal fade" id="clearCompletedModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-sm">
-            <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden text-center p-3">
-                <h6 class="fw-bold mb-2">{% translate "Vaciar completadas" %}</h6>
-                <p class="text-muted small mb-3">{% translate "¿Deseas eliminar permanentemente las tareas completadas?" %}</p>
-                <form method="POST" action="{% url 'clear_completed_tasks' %}" class="m-0">
-                    {% csrf_token %}
-                    <input type="hidden" name="time_filter" id="modal-time-filter-input" value="all">
-                    <button type="submit" class="btn btn-danger btn-sm fw-bold w-100">{% translate "Eliminar definitivamente" %}</button>
-                </form>
-            </div>
-        </div>
-    </div>
-
+    <!-- MODALES GLOBALES DE TABLERO Y LIMPIEZA -->
+    {% include "_includes/modals/_create_board_modal.html" %}
+    {% include "_includes/modals/_clear_completed_modal.html" %}
 
 </div>
 

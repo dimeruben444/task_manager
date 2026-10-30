@@ -1,131 +1,148 @@
-// static/scss/components/_stars.scss
+// Sistema de valoración por estrellas (Urgencia/Importancia)
 
-$star-active-importance: #6466F1;      
-$star-active-urgency: #fbbf24;
-$star-inactive: #e2e8f0;    
-$star-error: #dc2626;        
+// Componente de Estrellas (Urgencia e Importancia)
 
 .rating-wrapper {
-    width: fit-content;
+  width: fit-content;
 }
-.importance-box{
 
-    .star-rating {
-        display: inline-flex;
-        flex-direction: row-reverse; // Invierte el orden en el DOM para que el selector ~ funcione a la izquierda
-        justify-content: flex-end;
-        gap: 0.32rem;
+.star-rating {
+  display: inline-flex;
+  flex-direction: row-reverse;
+  justify-content: flex-end;
 
-        input[type="radio"] {
-            display: none;
-        }
-        
-        label {
-            font-size: 1.35rem;
-            color: $star-inactive;
-            cursor: pointer;
-            transition: color 0.15s ease-in-out, transform 0.1s ease;
-            user-select: none;
-            line-height: 1;
+  input {
+    display: none;
+  }
 
-            // Al hacer hover, colorea la estrella apuntada y todas sus anteriores a la izquierda
-            &:hover,
-            &:hover ~ label {
-                color: $star-active-importance !important;
-            }
-        }
+  label {
+    font-size: 1.25rem;
+    color: $border-strong;
+    cursor: pointer;
+    transition: color 0.1s ease-in-out;
+  }
+}
 
+.importance-box {
+  .star-rating {
+    display: inline-flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+    gap: 0.32rem;
 
-        // Colorea las estrellas seleccionadas
-        input[type="radio"]:checked ~ label,
-        input[type="radio"]:checked + label {
-            color: $star-active-importance !important;
-        }
-
-        label:hover {
-            transform: scale(1.15);
-        }
-
-        // Animación de agitación y estado de error
-        &.is-invalid label {
-            color: $star-error !important;
-            animation: shakeStars 0.3s ease-in-out;
-        }
+    input[type="radio"] {
+      display: none;
     }
-}
 
-.urgency-box{
+    label {
+      font-size: 1.35rem;
+      color: $star-inactive;
+      cursor: pointer;
+      transition: color 0.15s ease-in-out, transform 0.1s ease;
+      user-select: none;
+      line-height: 1;
 
-    .star-rating {
-        display: inline-flex;
-        flex-direction: row-reverse; // Invierte el orden en el DOM para que el selector ~ funcione a la izquierda
-        justify-content: flex-end;
-        gap: 0.32rem;
-
-        input[type="radio"] {
-            display: none;
-        }
-        
-        label {
-            font-size: 1.35rem;
-            color: $star-inactive;
-            cursor: pointer;
-            transition: color 0.15s ease-in-out, transform 0.1s ease;
-            user-select: none;
-            line-height: 1;
-
-            // Al hacer hover, colorea la estrella apuntada y todas sus anteriores a la izquierda
-            &:hover,
-            &:hover ~ label {
-                color: $star-active-urgency !important;
-            }
-        }
-
-
-        // Colorea las estrellas seleccionadas
-        input[type="radio"]:checked ~ label,
-        input[type="radio"]:checked + label {
-            color: $star-active-urgency !important;
-        }
-
-        label:hover {
-            transform: scale(1.15);
-        }
-
-        // Animación de agitación y estado de error
-        &.is-invalid label {
-            color: $star-active-urgency !important;
-            animation: shakeStars 0.3s ease-in-out;
-        }
+      &:hover,
+      &:hover ~ label {
+        color: $star-active-importance !important;
+      }
     }
-}
 
-
-
-
-/* Animación de sacudida rápida (0.2s) */
-@keyframes shakeStars {
-    0%, 100% { transform: translateX(0); }
-    20% { transform: translateX(-6px); }
-    40% { transform: translateX(6px); }
-    60% { transform: translateX(-4px); }
-    80% { transform: translateX(4px); }
-}
-
-/* Fuerza el color rojo en todas las estrellas y aplica la animación rápida */
-
-.urgency-box{
-    .star-rating.is-invalid label,
-    .star-rating.is-invalid label i {
-        color: #dc2626 !important;
-        animation: shakeStars 0.2s ease-in-out;
+    input[type="radio"]:checked ~ label,
+    input[type="radio"]:checked + label {
+      color: $star-active-importance !important;
     }
+
+    label:hover {
+      transform: scale(1.15);
+    }
+
+    &.is-invalid label {
+      color: $star-error !important;
+      animation: shakeStars 0.3s ease-in-out;
+    }
+  }
 }
 
-.importance-box{
-    .star-rating.is-invalid label,
-    .star-rating.is-invalid label i {
-        color: #dc2626 !important;
-        animation: shakeStars 0.2s ease-in-out;
+.urgency-box {
+  .star-rating {
+    display: inline-flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+    gap: 0.32rem;
+
+    input[type="radio"] {
+      display: none;
     }
+
+    label {
+      font-size: 1.35rem;
+      color: $star-inactive;
+      cursor: pointer;
+      transition: color 0.15s ease-in-out, transform 0.1s ease;
+      user-select: none;
+      line-height: 1;
+
+      &:hover,
+      &:hover ~ label {
+        color: $star-active-urgency !important;
+      }
+    }
+
+    input[type="radio"]:checked ~ label,
+    input[type="radio"]:checked + label {
+      color: $star-active-urgency !important;
+    }
+
+    label:hover {
+      transform: scale(1.15);
+    }
+
+    &.is-invalid label {
+      color: $star-active-urgency !important;
+      animation: shakeStars 0.3s ease-in-out;
+    }
+  }
+}
+
+.urgency-box {
+  .star-rating.is-invalid label,
+  .star-rating.is-invalid label i {
+    color: #dc2626 !important;
+    animation: shakeStars 0.2s ease-in-out;
+  }
+}
+
+.importance-box {
+  .star-rating.is-invalid label,
+  .star-rating.is-invalid label i {
+    color: #dc2626 !important;
+    animation: shakeStars 0.2s ease-in-out;
+  }
+}
+
+.star-rating.urgency-box-modal {
+  label {
+    &:hover,
+    &:hover ~ label {
+      color: $star-active-urgency;
+    }
+  }
+
+  input:checked ~ label {
+    color: $star-active-urgency;
+  }
+}
+
+.star-rating.importance-box-modal {
+  label {
+    &:hover,
+    &:hover ~ label {
+      color: $star-active-importance;
+    }
+  }
+
+  input:checked ~ label {
+    color: $star-active-importance;
+  }
 }

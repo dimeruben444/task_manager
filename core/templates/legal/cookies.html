@@ -1,0 +1,52 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Política de Cookies" %} - EisenhowerFlow{% endblock %}
+
+{% block content %}
+<div class="container py-5" style="max-width: 800px;">
+    <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5">
+        <h2 class="fw-bold text-dark mb-4">{% translate "Política de Cookies" %}</h2>
+
+        <section class="mb-4">
+            <h5 class="fw-bold text-dark">1. ¿Qué son las cookies?</h5>
+            <p class="text-secondary small">
+                Una cookie es un pequeño archivo de texto que un sitio web guarda en tu ordenador o dispositivo móvil cuando lo visitas.
+            </p>
+        </section>
+
+        <section class="mb-4">
+            <h5 class="fw-bold text-dark">2. Cookies que utilizamos en este sitio</h5>
+            <table class="table table-bordered table-sm small mt-3">
+                <thead class="table-light">
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Proveedor</th>
+                        <th>Propósito</th>
+                        <th>Tipo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>csrftoken</code></td>
+                        <td>Propia (Django)</td>
+                        <td>Protección contra ataques informáticos de falsificación de petición (CSRF).</td>
+                        <td>Técnica / Necesaria</td>
+                    </tr>
+                    <tr>
+                        <td><code>sessionid</code></td>
+                        <td>Propia (Django)</td>
+                        <td>Mantener la sesión abierta del usuario autenticado.</td>
+                        <td>Técnica / Necesaria</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p class="text-muted extra-small">
+                <em>* EisenhowerFlow utiliza únicamente cookies estrictamente necesarias para el funcionamiento técnico de la aplicación. No utilizamos cookies publicitarias ni de rastreo de terceros.</em>
+            </p>
+        </section>
+
+        <a href="javascript:history.back()" class="btn btn-outline-secondary btn-sm mt-3">← {% translate "Volver" %}</a>
+    </div>
+</div>
+{% endblock %}

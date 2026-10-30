@@ -1,0 +1,37 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Política de Privacidad" %} - EisenhowerFlow{% endblock %}
+
+{% block content %}
+<div class="container py-5" style="max-width: 800px;">
+    <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5">
+        <h2 class="fw-bold text-dark mb-4">{% translate "Política de Privacidad" %}</h2>
+        <p class="text-muted small mb-4">{% translate "Cumplimiento del Reglamento General de Protección de Datos (RGPD UE 2016/679)" %}</p>
+
+        <section class="mb-4">
+            <h5 class="fw-bold text-dark">1. Responsable del Tratamiento</h5>
+            <p class="text-secondary small">
+                El responsable del tratamiento de los datos recabados en esta web es EisenhowerFlow. Contacto delegado en protección de datos: <strong>privacidad@eisenhowerflow.com</strong>.
+            </p>
+        </section>
+
+        <section class="mb-4">
+            <h5 class="fw-bold text-dark">2. Datos Recabados y Finalidad</h5>
+            <ul class="text-secondary small">
+                <li><strong>Registro de cuenta:</strong> Recogemos nombre de usuario, correo electrónico y contraseña cifrada para gestionar la ejecución del servicio contractual.</li>
+                <li><strong>Gestión de tareas:</strong> Datos introducidos voluntariamente en tus tableros (títulos, descripciones, fechas límite) para ofrecer la funcionalidad principal del servicio.</li>
+            </ul>
+        </section>
+
+        <section class="mb-4">
+            <h5 class="fw-bold text-dark">3. Derechos del Usuario (ARCO / POL)</h5>
+            <p class="text-secondary small">
+                Conforme al RGPD, tienes derecho a solicitar el <strong>Acceso</strong>, <strong>Rectificación</strong>, <strong>Portabilidad</strong> y la <strong>Eliminación completa de tus datos</strong> ("Derecho al olvido"). Puedes ejercer estos derechos desde los ajustes de tu cuenta o enviando un email a <strong>privacidad@eisenhowerflow.com</strong>.
+            </p>
+        </section>
+
+        <a href="javascript:history.back()" class="btn btn-outline-secondary btn-sm mt-3">← {% translate "Volver" %}</a>
+    </div>
+</div>
+{% endblock %}

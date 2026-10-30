@@ -1,22 +1,4 @@
-// static/scss/_base.scss
-// ==========================================
-// TOKENS UI - PALETA CLARITY / SLATE
-// ==========================================
-
-$nav-bg: #0F172A;            // Slate 800
-$nav-border: #334155;        // Slate 700
-$nav-search-bg: rgba(15, 23, 42, 0.6); // Slate 900 traslúcido
-$text-logo-primary: #ffffff;
-$text-logo-accent: #60a5fa;  // Blue 400
-$text-muted-slate: #94a3b8;  // Slate 400
-$badge-workspace-bg: rgba(255, 255, 255, 0.08);
-$badge-workspace-text: #cbd5e1; // Slate 300
-$avatar-bg: #60a5fa;         // Blue 600
-
-$star-active-importance: #6466F1;      
-$star-active-urgency: #fbbf24;
-$star-inactive: #e2e8f0;    
-$star-error: #dc2626;        
+//Shell base, Navbar superior, buscador global y responsive móvil
 
 // ==========================================
 // COMPONENTE: NAVBAR SUPERIOR
@@ -29,9 +11,8 @@ $star-error: #dc2626;
   width: 100%;
   position: sticky;
   top: 0;
-  z-index: 1020; // Asegura estar por debajo de los modales (2050)
+  z-index: 1020;
 
-  // 1. BRANDING Y LOGO
   .navbar-brand-wrapper {
     display: flex;
     align-items: center;
@@ -60,7 +41,6 @@ $star-error: #dc2626;
     }
   }
 
-  // 2. BUSCADOR CENTRAL
   .navbar-search-wrapper {
     position: relative;
     width: 100%;
@@ -114,12 +94,10 @@ $star-error: #dc2626;
     }
   }
 
-  // 3. SECCIÓN DERECHA: NOTIFICACIONES Y USUARIO
   .navbar-user-wrapper {
     display: flex;
     align-items: center;
 
-    // Botón de notificaciones transparente que muestra caja en hover/open
     .notification-btn {
       width: 40px;
       height: 40px;
@@ -139,7 +117,6 @@ $star-error: #dc2626;
         color: #ffffff;
       }
 
-      // Puntito rojo dinámico
       .notification-red-dot {
         position: absolute;
         top: 7px;
@@ -147,24 +124,22 @@ $star-error: #dc2626;
         width: 11px;
         height: 11px;
         background-color: #ff4d4d;
-        border: 2px solid $nav-bg; // Se acopla dinámicamente al fondo del nav
+        border: 2px solid $nav-bg;
         border-radius: 50%;
       }
     }
 
-    // Línea divisoria vertical entre campana y avatar
     .navbar-divider {
       width: 1px;
       height: 26px;
       background-color: rgba(255, 255, 255, 0.15);
     }
 
-    // Avatar de usuario con el degradado de EisenhowerFlow
     .user-avatar {
       width: 36px;
       height: 36px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #815FF4 0%, #3b82f6 100%);
+      background: linear-gradient(135deg, #815ff4 0%, #3b82f6 100%);
       color: #ffffff;
       font-weight: 700;
       font-size: 0.82rem;
@@ -181,6 +156,7 @@ $star-error: #dc2626;
       }
     }
   }
+
   a.text-decoration-none {
     color: inherit !important;
   }
@@ -190,27 +166,23 @@ $star-error: #dc2626;
     font-weight: 700;
 
     .brand-accent {
-      color: #60a5fa !important; // Azul acento Clarity
+      color: #60a5fa !important;
     }
   }
 }
-
-
-
 
 // ==========================================
 // BUSCADOR GLOBAL Y DROPDOWN FLOTANTE
 // ==========================================
 
 #searchDropdownResults {
-  background-color: #0f172a !important; // Slate 900
-  border: 1px solid #334155 !important; // Slate 700
+  background-color: #0f172a !important;
+  border: 1px solid #334155 !important;
   box-shadow: 0 10px 25px rgba(15, 23, 42, 0.5) !important;
   border-radius: 12px;
   overflow-x: hidden !important;
   box-sizing: border-box !important;
 
-  /* Regla clave: Si tiene la clase d-none se oculta 100% sin dejar barra vacía */
   &.d-none {
     display: none !important;
   }
@@ -269,9 +241,51 @@ $star-error: #dc2626;
     }
   }
 }
-// CAPAS DE APILAMIENTO DE MODALES REFORZADAS
+
+/* =======================================================
+   ANULACIÓN DEFINITIVA DEL HUECO LATERAL (15px) EN MODALES
+   ======================================================= */
+
+/* 1. Anula el padding-right que Bootstrap mete por JS en el body y en el modal */
+html body.modal-open,
+html body[style*="padding-right"],
+html .modal,
+html .modal[style*="padding-right"] {
+  padding-right: 0px !important;
+  margin-right: 0px !important;
+}
+
+/* 2. Mantén el layout sin cambios de dimensiones */
+body.modal-open {
+  overflow: hidden !important;
+}
+
+/* 3. Asegura que el navbar sticky no se desplace lateralmente */
+.app-navbar {
+  padding-right: 0px !important;
+  margin-right: 0px !important;
+  width: 100% !important;
+  max-width: 100vw !important;
+}
+
+/* 4. Modal a pantalla completa impecable sin scrollbar lateral del sistema */
 .modal {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
   z-index: 2050 !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+
+  /* Ocultar la barra de scroll visual manteniendo el scroll funcional */
+  &::-webkit-scrollbar {
+    width: 0px !important;
+    display: none !important;
+  }
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
 }
 
 .modal-backdrop {
@@ -288,57 +302,6 @@ $star-error: #dc2626;
   }
 }
 
-// Estilos para el sistema de valoración por estrellas dentro de las cajas
-// Estilos comunes para cualquier .star-rating (si lo deseas)
-.star-rating {
-    display: inline-flex;
-    flex-direction: row-reverse;
-    justify-content: flex-end;
-
-    input {
-        display: none;
-    }
-
-    label {
-        font-size: 1.25rem;
-        color: #cbd5e1; // Color gris por defecto para estrellas vacías
-        cursor: pointer;
-        transition: color 0.1s ease-in-out;
-    }
-}
-
-// 1. Selector específico para URGENCIA (clase pegada para máxima especificidad)
-.star-rating.urgency-box-modal {
-    label {
-        &:hover,
-        &:hover ~ label {
-            color: $star-active-urgency; // Color de urgencia al pasar el ratón
-        }
-    }
-
-    input:checked ~ label {
-        color: $star-active-urgency; // Color de urgencia al seleccionar
-    }
-}
-
-// 2. Selector específico para IMPORTANCIA (clase pegada para máxima especificidad)
-.star-rating.importance-box-modal {
-    label {
-        &:hover,
-        &:hover ~ label {
-            color: $star-active-importance; // Color de importancia al pasar el ratón
-        }
-    }
-
-    input:checked ~ label {
-        color: $star-active-importance; // Color de importancia al seleccionar
-    }
-}
-
-
-// ==========================================
-// ESTILOS DE LA BARRA DE ALTA RÁPIDA (QUICK ADD)
-// ==========================================
 .quick-label {
   font-size: 0.7rem;
   letter-spacing: 0.05em;
@@ -368,67 +331,49 @@ $star-error: #dc2626;
   height: 38px;
 }
 
-// Fondo gris suave para el input del título de la tarea renderizado por Django
-#quickTaskInput, 
+#quickTaskInput,
 .quick-add-card input[type="text"] {
   background-color: #f8fafc !important;
 }
 
-
-
-
-// Activamos el anclaje magnético global en el HTML
 html {
-    scroll-snap-type: y mandatory;
-    scroll-behavior: smooth;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
 }
 
-// Hacemos que cada sección detectada por el scroll ocupe exactamente la vista del navegador de forma natural
 .dashboard-hero-section,
 .matrix-section {
-    scroll-snap-align: start;
-    scroll-snap-stop: always; // Fuerza a que el scroll se detenga en cada sección al girar la rueda
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
 }
 
-/* Contenedor de la barra lateral izquierda (Tableros y Distribución) */
 .sidebar-boards {
-    position: sticky;
-    top: 78px;                  // Distancia exacta desde arriba cuando haces scroll
-    height: calc(100vh - 100px); // Altura ajustada para que no desborde la ventana
-    margin-top: 8px;           // Empuja toda la barra lateral hacia abajo para que coincida con la altura de los cuadrantes
-    border-radius: 16px; // Opcional: si quieres redondear ligeramente las esquinas derechas de la barra
-    overflow-y: auto;           // Scroll interno si la lista de tableros es muy larga
-    margin-top: 0;
+  position: sticky;
+  top: 78px;
+  height: calc(100vh - 100px);
+  margin-top: 8px;
+  border-radius: 16px;
+  overflow-y: auto;
+  margin-top: 0;
 }
 
-
-// ==========================================
-// FIX BUSCADOR FLOTANTE EN MODALES DE TABLERO
-// ==========================================
 [id^="invite-results-"] {
-  z-index: 2100 !important; // Fuerza a estar por encima de la capa 2050 del modal
+  z-index: 2100 !important;
   background-color: #ffffff !important;
   box-shadow: 0 10px 25px rgba(15, 23, 42, 0.25) !important;
   border: 1px solid #e2e8f0 !important;
 }
 
-
-/* PREVENCIÓN DE DESBORDAMIENTO EN NAVBAR */
 .app-navbar {
   overflow: visible !important;
   box-sizing: border-box !important;
-  
+
   .nav-fluid {
     width: 100% !important;
     max-width: 100% !important;
     box-sizing: border-box !important;
   }
 }
-
-
-/* =======================================================
-   CAMBIO DE MARCA EXACTO A 440PX (EISENFLOW vs EISENHOWERFLOW)
-   ======================================================= */
 
 .brand-name-mobile {
   display: inline !important;
@@ -446,21 +391,15 @@ html {
   }
 }
 
-
-
-/* =======================================================
-   ESTILOS Y ANCHO DEL DESPLEGABLE DE NOTIFICACIONES EN MÓVIL
-   ======================================================= */
 @media (max-width: 768px) {
-  /* Panel principal de notificaciones */
   #notificationsDropdown + .dropdown-menu {
     position: fixed !important;
     top: 65px !important;
-    left: 10px !important;            /* Mismo alineamiento lateral que las tarjetas */
+    left: 10px !important;
     right: 10px !important;
     width: auto !important;
     max-width: none !important;
-    background-color: #0f172a !important; /* Color oscuro Slate del navbar */
+    background-color: #0f172a !important;
     border: 1px solid #334155 !important;
     border-radius: 16px !important;
     box-shadow: 0 10px 30px rgba(15, 23, 42, 0.5) !important;
@@ -469,7 +408,6 @@ html {
     padding: 1rem !important;
   }
 
-  /* Textos y títulos en tema oscuro */
   #notificationsDropdown + .dropdown-menu .text-muted,
   #notificationsDropdown + .dropdown-menu small,
   #notificationsDropdown + .dropdown-menu p {
@@ -481,18 +419,13 @@ html {
     color: #f8fafc !important;
   }
 
-  /* Tarjetas individuales dentro de la lista de notificaciones */
   #notificationsDropdown + .dropdown-menu .bg-light {
     background-color: rgba(255, 255, 255, 0.05) !important;
     border-color: rgba(255, 255, 255, 0.1) !important;
   }
 }
 
-/* =======================================================
-   UNIFICACIÓN Y SEPARACIÓN DEL BUSCADOR MÓVIL (< 768PX)
-   ======================================================= */
 @media (max-width: 768px) {
-  /* 1. CAJA SUPERIOR DONDE ESCRIBES */
   .mobile-search-dropdown-container {
     position: fixed !important;
     top: 65px !important;
@@ -502,14 +435,13 @@ html {
     max-width: none !important;
     background-color: #0f172a !important;
     border: 1px solid #334155 !important;
-    border-radius: 16px 16px 8px 8px !important; /* Esquinas superiores redondeadas */
+    border-radius: 16px 16px 8px 8px !important;
     box-shadow: 0 4px 12px rgba(15, 23, 42, 0.4) !important;
     transform: none !important;
     z-index: 2075 !important;
     padding: 0.75rem !important;
   }
 
-  /* Input de texto */
   .mobile-search-dropdown-container .search-input {
     background-color: rgba(15, 23, 42, 0.8) !important;
     border: 1px solid #334155 !important;
@@ -517,10 +449,9 @@ html {
     border-radius: 10px !important;
   }
 
-  /* 2. LISTA DE RESULTADOS (PEGADA O LIGERAMENTE SEPARADA) */
   #searchDropdownResults {
     position: fixed !important;
-    top: 138px !important;           /* Separación limpia de 8px para darle respiro visual */
+    top: 138px !important;
     left: 10px !important;
     right: 10px !important;
     width: auto !important;
@@ -535,23 +466,19 @@ html {
   }
 }
 
-
-/* =======================================================
-   ESTILO PARA RESALTAR EL TABLERO ACTIVO EN SIDEBAR Y MOBILE
-   ======================================================= */
 .board-item.active,
 .board-chip.active {
-    background-color: #eff6ff !important; /* Azul claro de selección */
-    border-radius: 8px !important;
+  background-color: #eff6ff !important;
+  border-radius: 8px !important;
 }
 
 .board-item.active a,
 .board-chip.active {
-    color: #2563eb !important; /* Azul primario */
-    font-weight: 700 !important;
+  color: #2563eb !important;
+  font-weight: 700 !important;
 }
 
 .board-item.active .board-title,
 .board-chip.active {
-    color: #2563eb !important;
+  color: #2563eb !important;
 }

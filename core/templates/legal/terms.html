@@ -1,0 +1,36 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Aviso Legal y Términos de Uso" %} - EisenhowerFlow{% endblock %}
+
+{% block content %}
+<div class="container py-5" style="max-width: 800px;">
+    <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5">
+        <h2 class="fw-bold text-dark mb-4">{% translate "Aviso Legal y Términos de Uso" %}</h2>
+        <p class="text-muted small mb-4">{% translate "Última actualización:" %} {% now "j \d\e F \d\e Y" %}</p>
+
+        <section class="mb-4">
+            <h5 class="fw-bold text-dark">1. Datos Identificativos (LSSI-CE)</h5>
+            <p class="text-secondary small">
+                En cumplimiento del artículo 10 de la Ley 34/2002, de 11 de julio, de Servicios de la Sociedad de la Información y Comercio Electrónico, se informa que el sitio web <strong>EisenhowerFlow</strong> es gestionado por [Tu Nombre o Razón Social], con DNI/NIF [Tu NIF] y domicilio de contacto en [Tu Ciudad, España]. Email de contacto: <strong>soporte@eisenhowerflow.com</strong>.
+            </p>
+        </section>
+
+        <section class="mb-4">
+            <h5 class="fw-bold text-dark">2. Objeto y Condiciones de Uso</h5>
+            <p class="text-secondary small">
+                El acceso a esta aplicación web atribuye la condición de usuario e implica la aceptación de estas condiciones. EisenhowerFlow ofrece una herramienta SaaS de gestión de tareas basada en la Matriz de Eisenhower. El usuario se compromete a hacer un uso adecuado de los contenidos y servicios.
+            </p>
+        </section>
+
+        <section class="mb-4">
+            <h5 class="fw-bold text-dark">3. Propiedad Intelectual</h5>
+            <p class="text-secondary small">
+                Todos los derechos de propiedad intelectual del código fuente, diseño gráfico, interfaz de usuario y contenidos son titularidad de EisenhowerFlow o de sus licenciantes.
+            </p>
+        </section>
+
+        <a href="javascript:history.back()" class="btn btn-outline-secondary btn-sm mt-3">← {% translate "Volver" %}</a>
+    </div>
+</div>
+{% endblock %}

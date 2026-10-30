@@ -1,0 +1,255 @@
+{% load i18n %}
+
+<div class="modal fade" id="userSettingsModal" tabindex="-1" aria-hidden="true" style="z-index: 1070 !important;">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            
+            <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
+                <h5 class="modal-title fw-bold text-dark d-flex align-items-center gap-2">
+                    {% translate "Ajustes de Cuenta" %}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body p-4 pt-2">
+                <!-- CABECERA DEL USUARIO -->
+                <div class="d-flex align-items-center gap-3 mb-3 p-3 bg-light rounded-3 border">
+                    <span class="rounded-circle text-white d-inline-flex align-items-center justify-content-center flex-shrink-0" 
+                        style="width: 52px; height: 52px; font-size: 1.1rem; font-weight: 700; background: linear-gradient(135deg, #497BF6 0%, #7855f7 50%, #9f48ec 100%);">
+                        {% if user.first_name and user.last_name %}
+                            {{ user.first_name|slice:":1"|upper }}{{ user.last_name|slice:":1"|upper }}
+                        {% else %}
+                            {{ user.username|slice:":2"|upper }}
+                        {% endif %}
+                    </span>
+                    <div class="d-flex flex-column min-w-0">
+                        <h6 class="fw-bold text-dark m-0 text-truncate">{{ user.get_full_name|default:user.username }}</h6>
+                        <small class="text-muted text-truncate">@{{ user.username }} • {{ user.email }}</small>
+                    </div>
+                </div>
+
+                <!-- NAVEGACIÓN POR PESTAÑAS -->
+                <ul class="nav nav-pills gap-2 mb-4 p-1 bg-light rounded-3" id="settingsTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active rounded-2 fw-semibold small" 
+                                id="profile-tab" 
+                                data-bs-toggle="tab" 
+                                data-bs-target="#profile-tab-pane" 
+                                type="button" 
+                                role="tab">
+                            <i class="bi bi-person me-1"></i> {% translate "Perfil" %}
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link rounded-2 fw-semibold small" 
+                                id="security-tab" 
+                                data-bs-toggle="tab" 
+                                data-bs-target="#security-tab-pane" 
+                                type="button" 
+                                role="tab">
+                            <i class="bi bi-shield-lock me-1"></i> {% translate "Seguridad" %}
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link rounded-2 fw-semibold small" 
+                                id="language-tab" 
+                                data-bs-toggle="tab" 
+                                data-bs-target="#language-tab-pane" 
+                                type="button" 
+                                role="tab">
+                            <i class="bi bi-translate me-1"></i> {% translate "Idioma" %}
+                        </button>
+                    </li>
+                    <!-- NUEVA PESTAÑA DE PRIVACIDAD Y DATOS -->
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link rounded-2 fw-semibold small" 
+                                id="privacy-tab" 
+                                data-bs-toggle="tab" 
+                                data-bs-target="#privacy-tab-pane" 
+                                type="button" 
+                                role="tab">
+                            <i class="bi bi-shield-check me-1"></i> {% translate "Privacidad" %}
+                        </button>
+                    </li>
+                </ul>
+
+                <!-- CONTENIDO DE LAS PESTAÑAS -->
+                <div class="tab-content" id="settingsTabContent">
+                    
+                    <!-- PESTAÑA PERFIL -->
+                    <div class="tab-pane fade show active" id="profile-tab-pane" role="tabpanel">
+                        <form method="POST" action="{% url 'users:update_profile' %}">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold text-dark">{% translate "Nombre de usuario" %}</label>
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text bg-light text-muted">@</span>
+                                    <input type="text" name="username" value="{{ user.username }}" class="form-control rounded-end-3" required>
+                                </div>
+                            </div>
+
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold text-dark">{% translate "Nombre" %}</label>
+                                    <input type="text" name="first_name" value="{{ user.first_name }}" class="form-control rounded-3" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold text-dark">{% translate "Apellidos" %}</label>
+                                    <input type="text" name="last_name" value="{{ user.last_name }}" class="form-control rounded-3">
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label small fw-bold text-dark">{% translate "Correo electrónico" %}</label>
+                                <input type="email" name="email" value="{{ user.email }}" class="form-control rounded-3" required>
+                            </div>
+
+                            <div class="d-flex justify-content-end gap-2">
+                                <button type="button" class="btn btn-outline-secondary btn-sm rounded-3 fw-semibold" data-bs-dismiss="modal">{% translate "Cancelar" %}</button>
+                                <button type="submit" class="btn btn-primary btn-sm rounded-3 fw-bold shadow-sm px-4">{% translate "Guardar Perfil" %}</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- PESTAÑA SEGURIDAD -->
+                    <div class="tab-pane fade" id="security-tab-pane" role="tabpanel">
+                        <form method="POST" action="{% url 'users:change_password' %}">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold text-dark">{% translate "Contraseña actual" %}</label>
+                                <input type="password" name="old_password" class="form-control rounded-3" autocomplete="current-password" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold text-dark">{% translate "Nueva contraseña" %}</label>
+                                <input type="password" name="new_password" class="form-control rounded-3" autocomplete="new-password" required>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label small fw-bold text-dark">{% translate "Confirmar nueva contraseña" %}</label>
+                                <input type="password" name="confirm_password" class="form-control rounded-3" autocomplete="new-password" required>
+                            </div>
+
+                            <div class="d-flex justify-content-end gap-2">
+                                <button type="button" class="btn btn-outline-secondary btn-sm rounded-3 fw-semibold" data-bs-dismiss="modal">{% translate "Cancelar" %}</button>
+                                <button type="submit" class="btn btn-primary btn-sm rounded-3 fw-bold shadow-sm px-4">{% translate "Actualizar Contraseña" %}</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- PESTAÑA IDIOMA -->
+                    <div class="tab-pane fade" id="language-tab-pane" role="tabpanel">
+                        <form action="{% url 'set_language' %}" method="post" id="languageChangeForm">
+                            {% csrf_token %}
+                            <input name="next" type="hidden" value="{{ request.path }}">
+                            {% get_current_language as LANGUAGE_CODE %}
+                            
+                            <label class="form-label small fw-bold text-dark mb-2">{% translate "Selecciona el idioma de la aplicación" %}</label>
+                            
+                            <div class="d-flex flex-column gap-2 mb-4">
+                                <label class="d-flex align-items-center justify-content-between p-3 border rounded-3 bg-light cursor-pointer">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="fs-5">🇪🇸</span>
+                                        <span class="fw-semibold text-dark small">Español</span>
+                                    </div>
+                                    <input type="radio" 
+                                        name="language" 
+                                        value="es" 
+                                        class="form-check-input" 
+                                        {% if LANGUAGE_CODE == 'es' or not LANGUAGE_CODE %}checked{% endif %} 
+                                        onchange="document.getElementById('languageChangeForm').submit();">
+                                </label>
+
+                                <label class="d-flex align-items-center justify-content-between p-3 border rounded-3 bg-light cursor-pointer">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="fs-5">🇬🇧</span>
+                                        <span class="fw-semibold text-dark small">English</span>
+                                    </div>
+                                    <input type="radio" 
+                                        name="language" 
+                                        value="en" 
+                                        class="form-check-input" 
+                                        {% if LANGUAGE_CODE == 'en' %}checked{% endif %} 
+                                        onchange="document.getElementById('languageChangeForm').submit();">
+                                </label>
+                            </div>
+
+                            <div class="d-flex justify-content-end">
+                                <button type="button" class="btn btn-outline-secondary btn-sm rounded-3 fw-semibold" data-bs-dismiss="modal">{% translate "Cerrar" %}</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- CONTENIDO PESTAÑA PRIVACIDAD (RGPD) -->
+                    <div class="tab-pane fade" id="privacy-tab-pane" role="tabpanel">
+                        <div class="d-flex flex-column gap-3">
+                            
+                            <!-- 1. EXPORTACIÓN DE DATOS -->
+                            <div class="d-flex align-items-center justify-content-between p-3 rounded-3 bg-light border">
+                                <div>
+                                    <h6 class="fw-bold text-dark mb-1 small">{% translate "Exportar mis datos (RGPD)" %}</h6>
+                                    <p class="text-muted mb-0" style="font-size: 0.78rem;">
+                                        {% translate "Descarga una copia de todos tus tableros, tareas y configuraciones en formato JSON." %}
+                                    </p>
+                                </div>
+                                <a href="{% url 'users:export_data' %}" class="btn btn-outline-primary btn-sm fw-semibold rounded-3 flex-shrink-0 ms-2">
+                                    <i class="bi bi-download me-1"></i>{% translate "Exportar JSON" %}
+                                </a>
+                            </div>
+
+                            <!-- 2. Eliminar cuenta (SUPRESIÓN) -->
+                            <div class="rounded-3 p-3 bg-danger bg-opacity-10 border border-danger border-opacity-25">
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <i class="bi bi-exclamation-triangle-fill text-danger fs-6"></i>
+                                    <h6 class="fw-bold text-danger mb-0 small">{% translate "ATENCION" %}</h6>
+                                    <i class="bi bi-exclamation-triangle-fill text-danger fs-6"></i>
+                                </div>
+                                <p class="text-muted mb-3" style="font-size: 0.78rem;">
+                                    {% translate "Al eliminar tu cuenta se borrarán permanentemente todos tus tableros, tareas y configuraciones. Esta acción no se puede deshacer." %}
+                                </p>
+                                <button type="button" class="btn btn-outline-danger btn-sm fw-semibold rounded-3" data-bs-toggle="modal" data-bs-target="#deleteAccountConfirmModal">
+                                    <i class="bi bi-trash3 me-1"></i>{% translate "Eliminar mi cuenta" %}
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- MODAL DE CONFIRMACIÓN DE ELIMINACIÓN DE CUENTA -->
+<div class="modal fade" id="deleteAccountConfirmModal" tabindex="-1" aria-hidden="true" style="z-index: 1080 !important;">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header border-0 pb-0">
+                <h6 class="modal-title fw-bold text-danger">{% translate "¿Confirmar eliminación?" %}</h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-secondary small py-3">
+                <p class="mb-2" style="font-size: 0.8rem;">
+                    {% translate "Escribe tu contraseña para confirmar que deseas eliminar definitivamente tu cuenta de EisenhowerFlow." %}
+                </p>
+                
+                <form method="POST" action="{% url 'users:delete_account' %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <input type="password" name="password_confirm" class="form-control form-control-sm bg-light rounded-3" placeholder="{% translate 'Tu contraseña' %}" required>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-danger btn-sm fw-semibold rounded-3">
+                            {% translate "Sí, eliminar mi cuenta" %}
+                        </button>
+                        <button type="button" class="btn btn-light btn-sm text-muted rounded-3" data-bs-dismiss="modal">
+                            {% translate "Cancelar" %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

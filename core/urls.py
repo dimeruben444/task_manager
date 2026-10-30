@@ -19,15 +19,17 @@ from django.urls import path, include
 from django.contrib.auth.views import LoginView, LogoutView
 from users.views import register_view
 from boards.views import search_users_api
+from .views import TermsView, PrivacyPolicyView, CookiesPolicyView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 
     path('i18n/', include('django.conf.urls.i18n')),
-    path('users/', include('users.urls')),
-    # Rutas de tus apps
+    
+    # Rutas de apps
     path('', include('tasks.urls')),
     path('boards/', include('boards.urls')),
+    path('users/', include('users.urls')),
 
     # RUTAS DE AUTENTICACIÓN (Asegúrate de tener esta línea con name='logout')
     path('logout/', LogoutView.as_view(next_page='login'), name='logout'),
@@ -36,5 +38,8 @@ urlpatterns = [
 
     path('api/search-users/', search_users_api, name='search_users_api'),
 
-    
+    #legal
+    path('terminos/', TermsView.as_view(), name='terms'),
+    path('privacidad/', PrivacyPolicyView.as_view(), name='privacy_policy'),
+    path('cookies/', CookiesPolicyView.as_view(), name='cookies_policy'),
 ]

@@ -1,123 +1,5 @@
 {% load i18n %}
-{% load static %}
 
-<!-- TARJETA COMPACTA EN EL TABLERO -->
-<div class="card mb-2 shadow-sm border-0 task-card {% if task.is_completed %}is-completed{% endif %}" 
-    id="task-card-{{ task.id }}"
-    data-task-id="{{ task.id }}"
-    data-urgency="{{ task.urgency }}"
-    data-importance="{{ task.importance }}"
-    data-created-by="{% if task.created_by == request.user %}mine{% else %}shared{% endif %}"
-    data-due-date="{{ task.due_date|date:'d M'|default:'' }}"
-    data-has-description="{% if task.description %}true{% else %}false{% endif %}"
-    data-is-shared="{% if task.assigned_to.exists or task.board.members.exists %}true{% else %}false{% endif %}"
-    style="cursor: pointer;">
-    
-    <div class="card-body py-2 px-3 d-flex flex-column justify-content-center">
-        
-        <!-- FILA SUPERIOR: CHECKBOX + TÍTULO + TRES PUNTOS -->
-        <div class="task-card-header d-flex align-items-center justify-content-between position-relative w-100 gap-2" style="min-height: 24px;">
-            
-            <!-- Checkbox de 22px aislado contra eventos táctiles (touch) -->
-            <div class="task-checkbox-wrapper flex-shrink-0" 
-                onclick="event.stopPropagation();" 
-                ontouchstart="event.stopPropagation();" 
-                ontouchend="event.stopPropagation();">
-                <label class="task-checkbox-container m-0" style="cursor: pointer;">
-                    <input type="checkbox" 
-                        class="task-completion-check" 
-                        data-task-id="{{ task.id }}"
-                        {% if task.is_completed %}checked{% endif %}>
-                    <span class="checkmark"></span>
-                </label>
-            </div>
-
-            <!-- Título de la tarjeta (anclado pegado al checkbox) -->
-            <div class="task-title-wrapper flex-grow-1 min-w-0" onclick="handleTaskCardClick('{{ task.id }}')">
-                <h6 class="card-title task-title mb-0 fw-semibold text-dark {% if task.is_completed %}completed-text{% endif %}" 
-                    style="font-size: 0.85rem; line-height: 1.3; margin: 0;">
-                    {{ task.title }}
-                </h6>
-            </div>
-
-            <!-- Tres puntos de opciones -->
-            <div class="task-card-actions flex-shrink-0 opacity-75 ms-1" onclick="handleTaskCardClick('{{ task.id }}')">
-                <i class="bi bi-three-dots text-muted" style="font-size: 0.85rem; line-height: 1;"></i>
-            </div>
-
-        </div>
-
-        {% with first_assignee=task.assigned_to.first total_assignees=task.assigned_to.count %}
-            <!-- MOSTRAR METADATOS SI TIENE FECHA, DESCRIPCIÓN, ASIGNADOS O SI ES UN TABLERO COMPARTIDO FUERA DE SU VISTA -->
-            {% if task.due_date or task.description or task.assigned_to.exists or task.board.members.exists and not current_board %}
-                
-                <!-- METADATOS COMPACTOS -->
-                <div class="d-flex align-items-center justify-content-between text-muted mt-0" 
-                     style="font-size: 0.7rem;" 
-                     data-bs-toggle="modal" 
-                     data-bs-target="#viewTaskModal{{ task.id }}">
-                    
-                    <div class="d-flex align-items-center gap-1.5 flex-wrap">
-                        <!-- Fecha vencimiento -->
-                        {% if task.due_date %}
-                            <span class="badge border d-inline-flex align-items-center gap-1 px-1.5 py-0.5 me-2 rounded-md task-date-badge" 
-                                style="font-size: 0.65rem; background-color: #FFE4E6 !important; color: #dc2626 !important; border-color: #fecdd3 !important;">
-                                <i class="bi bi-calendar3" style="color: #dc2626 !important;"></i>
-                                {{ task.due_date|date:"d M" }}
-                            </span>
-                        {% endif %}
-
-                        <!-- Descripción -->
-                        {% if task.description %}
-                            <span class="badge text-secondary px-1 py-0.5 me-1 rounded-md" title="{% translate 'Tiene descripción' %}" style="font-size: 0.98rem;">
-                                <i class="bi bi-card-text" style="color: #5cbcf3 !important;"></i> 
-                            </span>
-                        {% endif %}
-
-                        <!-- Icono Tarea Compartida / Miembros:
-                             REGLA 1: Se muestra siempre si el tablero tiene miembros o está asignada.
-                             REGLA 2: Se oculta si estamos dentro del propio tablero (not current_board). -->
-                        {% if not current_board %}
-                            {% if task.board and task.board.members.exists or task.assigned_to.exists %}
-                                <span class="badge text-warning px-1 py-0.5 me-1 rounded-md" 
-                                    title="{% translate 'Tarea compartida / asignada' %}" 
-                                    style="font-size: 0.85rem;">
-                                    <i class="bi bi-people-fill" style="color: #fbbf24 !important;"></i>
-                                </span>
-                            {% endif %}
-                        {% endif %}
-                    </div>
-
-                    <!-- ASIGNADOS COMPACTOS (Avatares de usuarios) -->
-                    <div class="ms-auto d-flex align-items-center gap-1">
-                        {% if task.assigned_to.exists %}
-                            <div class="position-relative d-inline-flex align-items-center">
-                                <span class="badge bg-dark text-white rounded-circle d-inline-flex align-items-center justify-content-center shadow-sm p-0" 
-                                    style="width: 20px; height: 20px; font-size: 0.6rem; font-weight: bold;"
-                                    title="{% translate 'Asignado a:' %} {{ first_assignee.username }}">
-                                    {{ first_assignee.username|slice:":2"|upper }}
-                                </span>
-
-                                {% if total_assignees > 1 %}
-                                    <span class="badge bg-secondary text-white rounded-pill ms-1 d-inline-flex align-items-center justify-content-center px-1 py-0.5" 
-                                        style="font-size: 0.58rem; font-weight: 700;"
-                                        title="{% translate 'Total de asignados:' %} {{ total_assignees }}">
-                                        +{{ total_assignees|add:"-1" }}
-                                    </span>
-                                {% endif %}
-                            </div>
-                        {% endif %}
-                    </div>
-
-                </div>
-
-            {% endif %}
-        {% endwith %}
-
-    </div>
-</div>
-
-<!-- MODAL DETALLE / EDICIÓN ESTILO STITCH -->
 <div class="modal fade" id="viewTaskModal{{ task.id }}" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-top-aligned">
         <div class="modal-content border-0 shadow-2xl rounded-2xl text-dark bg-white" style="border-radius: 16px;">
@@ -137,19 +19,15 @@
                             
                             <span id="quadrantDropdownSelected{{ task.id }}" class="d-flex align-items-center gap-2 text-dark fw-semibold">
                                 {% if task.urgency >= 3 and task.importance >= 3 %}
-                                    <!-- Q1: Solo cuadro superior-izq relleno de Rojo (#ef4444) -->
                                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="flex-shrink-0"><rect x="1" y="1" width="6" height="6" rx="1" fill="#ef4444"/><rect x="9" y="1" width="6" height="6" rx="1" stroke="#94a3b8" stroke-width="1.2"/><rect x="1" y="9" width="6" height="6" rx="1" stroke="#94a3b8" stroke-width="1.2"/><rect x="9" y="9" width="6" height="6" rx="1" stroke="#94a3b8" stroke-width="1.2"/></svg>
                                     <span>{% translate "Urgente e Importante (Hacer ahora)" %}</span>
                                 {% elif task.urgency <= 2 and task.importance >= 3 %}
-                                    <!-- Q2: Solo cuadro superior-der relleno de Azul (#3b82f6) -->
                                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="flex-shrink-0"><rect x="1" y="1" width="6" height="6" rx="1" stroke="#94a3b8" stroke-width="1.2"/><rect x="9" y="1" width="6" height="6" rx="1" fill="#3b82f6"/><rect x="1" y="9" width="6" height="6" rx="1" stroke="#94a3b8" stroke-width="1.2"/><rect x="9" y="9" width="6" height="6" rx="1" stroke="#94a3b8" stroke-width="1.2"/></svg>
                                     <span>{% translate "Importante - No Urgente (Planificar)" %}</span>
                                 {% elif task.urgency >= 3 and task.importance <= 2 %}
-                                    <!-- Q3: Solo cuadro inferior-izq relleno de Amarillo (#f59e0b) -->
                                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="flex-shrink-0"><rect x="1" y="1" width="6" height="6" rx="1" stroke="#94a3b8" stroke-width="1.2"/><rect x="9" y="1" width="6" height="6" rx="1" stroke="#94a3b8" stroke-width="1.2"/><rect x="1" y="9" width="6" height="6" rx="1" fill="#f59e0b"/><rect x="9" y="9" width="6" height="6" rx="1" stroke="#94a3b8" stroke-width="1.2"/></svg>
                                     <span>{% translate "Urgente - No Importante (Delegar)" %}</span>
                                 {% else %}
-                                    <!-- Q4: Solo cuadro inferior-der relleno de Gris (#64748b) -->
                                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="flex-shrink-0"><rect x="1" y="1" width="6" height="6" rx="1" stroke="#94a3b8" stroke-width="1.2"/><rect x="9" y="1" width="6" height="6" rx="1" stroke="#94a3b8" stroke-width="1.2"/><rect x="1" y="9" width="6" height="6" rx="1" stroke="#94a3b8" stroke-width="1.2"/><rect x="9" y="9" width="6" height="6" rx="1" fill="#64748b"/></svg>
                                     <span>{% translate "No Urgente - No Importante (Eliminar)" %}</span>
                                 {% endif %}
@@ -185,7 +63,6 @@
                         </ul>
                     </div>
 
-                    <!-- Botón de cerrar (X) -->
                     <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
@@ -206,11 +83,9 @@
                         <!-- COLUMNA IZQUIERDA -->
                         <div class="col-md-7 border-end-md pe-md-4">
                             
-                            <!-- CAJA DE EVALUACIÓN (URGENCIA & IMPORTANCIA) -->
+                            <!-- CAJA URGENCIA E IMPORTANCIA -->
                             <div class="p-3 bg-light-subtle rounded-2xl border mb-3" style="border-radius: 12px; background-color: #fcfcfd;">
                                 <div class="row g-0 align-items-center">
-                                    
-                                    <!-- Urgencia -->
                                     <div class="col-6 pe-3 border-end text-center">
                                         <div class="d-flex justify-content-between align-items-center text-muted fw-bold small px-2 mb-1" style="font-size: 0.72rem;">
                                             <span>-</span>
@@ -232,14 +107,13 @@
                                         </div>
                                     </div>
 
-                                    <!-- Importancia -->
                                     <div class="col-6 ps-3 text-center">
                                         <div class="d-flex justify-content-between align-items-center text-muted fw-bold small px-2 mb-1" style="font-size: 0.72rem;">
                                             <span>-</span>
                                             <span>{% translate "Importancia" %}</span>
                                             <span>+</span>
                                         </div>
-                                        <div class=" star-rating rating-wrapper d-inline-flex justify-content-center importance-box-modal">
+                                        <div class="star-rating rating-wrapper d-inline-flex justify-content-center importance-box-modal">
                                             <input type="radio" id="detail-importance-4-{{ task.id }}" name="importance" value="4" {% if task.importance == 4 %}checked{% endif %}>
                                             <label for="detail-importance-4-{{ task.id }}" title="Muy Importante - 4">★</label>
 
@@ -253,12 +127,11 @@
                                             <label for="detail-importance-1-{{ task.id }}" title="Baja - 1">★</label>
                                         </div>
                                     </div>
-
                                 </div>
                             </div>
+
                             <div class="d-flex flex-column gap-2">
-                                
-                                <!-- DESPLEGABLE FECHAS EN EL MODAL -->
+                                <!-- FECHAS -->
                                 <div class="dropdown position-relative">
                                     <button class="btn btn-outline-secondary btn-sm text-start w-100 d-flex justify-content-between align-items-center bg-white shadow-none py-2 px-3 border rounded-xl" 
                                             type="button" 
@@ -285,10 +158,8 @@
                                             <button type="button" class="btn-close btn-sm" onclick="bootstrap.Dropdown.getInstance(document.getElementById('dropdownDate{{ task.id }}')).hide();"></button>
                                         </div>
 
-                                        <!-- Calendario Flatpickr -->
                                         <div id="inlineCalendar{{ task.id }}" class="mb-2 d-flex justify-content-center flatpickr-clean-container"></div>
 
-                                        <!-- Inputs de Fecha y Hora -->
                                         <div class="mb-2">
                                             <label class="form-label small text-muted mb-1 fw-bold">{% translate "Fecha de vencimiento" %}</label>
                                             <div class="row g-2">
@@ -301,7 +172,6 @@
                                             </div>
                                         </div>
 
-                                        <!-- NOTIFICACIÓN / RECORDATORIO POR CORREO -->
                                         <div class="form-check form-switch mt-2 mb-1 d-flex align-items-center gap-2 ps-0">
                                             <input class="form-check-input ms-0 me-2" 
                                                 type="checkbox" 
@@ -316,7 +186,6 @@
 
                                         <input type="hidden" name="due_date" id="hiddenDueDate{{ task.id }}" value="{{ task.due_date|date:'Y-m-d H:i' }}">
 
-                                        <!-- Botones de Acción -->
                                         <div class="d-flex gap-2 mt-3 pt-1 border-top">
                                             <button type="button" class="btn btn-outline-danger btn-sm w-50 fw-bold rounded-lg" onclick="removeTaskDate('{{ task.id }}')">
                                                 {% translate "Quitar" %}
@@ -331,7 +200,6 @@
                                 <!-- TABLERO -->
                                 <div class="dropdown">
                                     {% if task.board and task.board.owner != request.user %}
-                                        <!-- CASO INVITADO (PERSONA B): BOTÓN BLOQUEADO SIN DESPLEGABLE -->
                                         <button class="btn btn-outline-secondary btn-sm text-start w-100 d-flex justify-content-between align-items-center bg-light shadow-none py-2 px-3 border rounded-xl" 
                                                 type="button" 
                                                 disabled 
@@ -358,15 +226,11 @@
                                                             font-size: 0.9rem;
                                                             display: inline-block;"></i>
                                                 {% endif %}
-                                                <small class="text-muted fw-semibold">
-                                                    {{ task.board.title }}
-                                                </small>
+                                                <small class="text-muted fw-semibold">{{ task.board.title }}</small>
                                             </span>
                                         </button>
                                         <input type="hidden" name="board" id="hiddenBoardId{{ task.id }}" value="{{ task.board.id }}">
-
                                     {% else %}
-                                        <!-- CASO PROPIETARIO (PERSONA A) O TAREA PROPIA: DROPDOWN HABITUAL -->
                                         <button class="btn btn-outline-secondary btn-sm text-start w-100 d-flex justify-content-between align-items-center bg-white shadow-none py-2 px-3 border rounded-xl" 
                                                 type="button" 
                                                 id="dropdownBoard{{ task.id }}" 
@@ -410,7 +274,6 @@
                                             </div>
 
                                             <div class="d-flex flex-column gap-1">
-                                                <!-- OPCIÓN GENERAL (#42C6F6 / #4f52f8) -->
                                                 <div class="custom-board-item d-flex justify-content-between align-items-center py-2 px-3 rounded-lg fw-semibold"
                                                     style="cursor: pointer; color: #1f2937 !important; background-color: {% if not task.board or task.board.is_default %}#e5e7eb{% else %}transparent{% endif %};"
                                                     onclick="selectBoardOption('', 'General', '{{ task.id }}', '')">
@@ -431,7 +294,6 @@
                                                     {% endif %}
                                                 </div>
 
-                                                <!-- LISTA DE TABLEROS PERSONALIZADOS DEL USUARIO -->
                                                 {% if user.boards.all %}
                                                     {% for board in user.boards.all %}
                                                         {% if not board.is_default %}
@@ -524,8 +386,6 @@
                                     </small>
 
                                     <div class="d-flex flex-wrap gap-2 align-items-center">
-                                        
-                                        <!-- BOTÓN + CON DESPLEGABLE DE BÚSQUEDA GLOBAL -->
                                         <div class="dropdown">
                                             <button class="btn btn-light btn-sm rounded-circle border shadow-sm d-flex align-items-center justify-content-center p-0" 
                                                     type="button" 
@@ -547,7 +407,6 @@
                                                     <button type="button" class="btn-close btn-sm" onclick="bootstrap.Dropdown.getInstance(document.getElementById('dropdownAssignees{{ task.id }}')).hide();"></button>
                                                 </div>
 
-                                                <!-- CAMPO DE BÚSQUEDA GLOBAL CON ENLACE A LA API -->
                                                 <div class="position-relative mb-2">
                                                     <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-2.5 text-muted" style="font-size: 0.8rem;"></i>
                                                     <input type="text" 
@@ -558,7 +417,6 @@
                                                         oninput="handleLiveUserSearch(this)">
                                                 </div>
 
-                                                <!-- LISTA DE COLABORADORES CON FILTRO LOCAL/GLOBAL -->
                                                 <div class="d-flex flex-column gap-1 overflow-auto pe-1" id="editMembersList{{ task.id }}" style="max-height: 220px;">
                                                     {% for u in users %}
                                                         <div class="member-search-item" data-search-key="{{ u.get_full_name|default:u.username|lower }} {{ u.username|lower }} {{ u.email|lower }}">
@@ -579,7 +437,6 @@
                                                                 style="cursor: pointer;">
                                                                 
                                                                 <div class="d-flex align-items-center gap-2 overflow-hidden">
-                                                                    <!-- AVATAR CON EL DEGRADADO CORPORATIVO DE LA APP -->
                                                                     <span class="rounded-circle text-white d-inline-flex align-items-center justify-content-center flex-shrink-0" 
                                                                         style="width: 26px; height: 26px; font-size: 0.72rem; font-weight: 600; background: linear-gradient(135deg, #497BF6 0%, #7855f7 50%, #9f48ec 100%);">
                                                                         {{ u.username|slice:":2"|upper }}
@@ -602,7 +459,6 @@
                                             </div>
                                         </div>
 
-                                        <!-- CONTENEDOR DE BADGES DE USUARIOS ASIGNADOS -->
                                         <div id="assignedBadgesContainer{{ task.id }}" class="d-flex flex-wrap gap-2 align-items-center">
                                             {% for user_assigned in task.assigned_to.all %}
                                                 <div class="d-flex align-items-center gap-2 bg-light pe-2.5 rounded-pill border shadow-xs" id="badge-user-{{ task.id }}-{{ user_assigned.id }}">
@@ -629,16 +485,13 @@
 
                 <!-- PIE DEL MODAL -->
                 <div class="modal-footer border-top-0 px-4 pb-4 pt-2 d-flex justify-content-between align-items-center">
-                    <!-- BOTÓN ELIMINAR EN EL MODAL DE TAREA -->
                     {% if task.created_by == request.user or task.board.owner == request.user %}
-                        <!-- Para el Creador o Propietario del tablero: Botón de eliminar AJAX -->
                         <button type="button" 
                                 class="btn btn-outline-danger btn-sm rounded-3 fw-semibold"
                                 onclick="deleteTaskModal('{{ task.id }}', '{% url 'delete_task' task.id %}')">
                             <i class="bi bi-trash me-1"></i> {% translate "Eliminar Tarea" %}
                         </button>
                     {% else %}
-                        <!-- Para Miembros/Invitados (Persona B): Botón desactivado y en gris -->
                         <button type="button" 
                                 class="btn btn-outline-secondary btn-sm rounded-3 fw-semibold opacity-50" 
                                 disabled 
@@ -659,77 +512,6 @@
                 </div>
 
             </form>
-        </div>
-    </div>
-</div>
-
-<!-- 3. MODAL TÁCTIL MÓVIL (mobileActionModal) -->
-
-<!-- MODAL DE OPCIONES RÁPIDAS (MÓVIL / TABLET) -->
-<div class="modal fade" id="mobileActionModal{{ task.id }}" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-sm " >
-        <div class="modal-content border-0 shadow-lg rounded-5 overflow-hidden" 
-            >
-            
-            <!-- CABECERA DE LA TAREA CON EL ICONO SVG OFICIAL DEL CUADRANTE -->
-            <div class="modal-header border-bottom py-2.5 px-3 bg-light d-flex align-items-center justify-content-between">
-                <div class="d-flex align-items-center gap-2 min-w-0 flex-grow-1 pe-2">
-                    
-                    <!-- ICONOS SVG NATIVOS CON SU FONDO DE COLOR CORRESPONDIENTE -->
-                    {% if task.urgency >= 3 and task.importance >= 3 %}
-                        <!-- Q1: Fire SVG -->
-                        <span class="quadrant-icon-box q1-bg flex-shrink-0 d-inline-flex align-items-center justify-content-center" style="width: 26px; height: 26px; border-radius: 6px;">
-                            <img src="{% static 'img/fire.svg' %}" alt="Q1" width="14" height="14" class="d-block">
-                        </span>
-                    {% elif task.urgency <= 2 and task.importance >= 3 %}
-                        <!-- Q2: Calendar SVG -->
-                        <span class="quadrant-icon-box q2-bg flex-shrink-0 d-inline-flex align-items-center justify-content-center" style="width: 26px; height: 26px; border-radius: 6px;">
-                            <img src="{% static 'img/calendar.svg' %}" alt="Q2" width="14" height="14" class="d-block">
-                        </span>
-                    {% elif task.urgency >= 3 and task.importance <= 2 %}
-                        <!-- Q3: Group SVG -->
-                        <span class="quadrant-icon-box q3-bg flex-shrink-0 d-inline-flex align-items-center justify-content-center" style="width: 26px; height: 26px; border-radius: 6px;">
-                            <img src="{% static 'img/group.svg' %}" alt="Q3" width="14" height="14" class="d-block">
-                        </span>
-                    {% else %}
-                        <!-- Q4: Trash SVG -->
-                        <span class="quadrant-icon-box q4-bg flex-shrink-0 d-inline-flex align-items-center justify-content-center" style="width: 26px; height: 26px; border-radius: 6px;">
-                            <img src="{% static 'img/trash.svg' %}" alt="Q4" width="14" height="14" class="d-block">
-                        </span>
-                    {% endif %}
-
-                    <!-- TÍTULO DE LA TAREA -->
-                    <h6 class="fw-bold mb-0 text-dark text-truncate small" title="{{ task.title }}">
-                        {{ task.title }}
-                    </h6>
-                </div>
-
-                <button type="button" class="btn-close btn-sm flex-shrink-0" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-
-            <!-- CUERPO CON BOTONES EN HORIZONTAL Y SUS GRADIENTES -->
-            <div class="modal-body p-3 d-flex flex-row gap-2 bg-white">
-                
-                <!-- 1. BOTÓN COMPLETAR -->
-                <button type="button" 
-                        class="btn text-center flex-fill py-2.5 px-2 border-0 rounded-3 d-flex align-items-center justify-content-center gap-2 text-white shadow-sm" 
-                        style="background: linear-gradient(315deg, #7ce6c2 0%, #059669 100%); font-weight: 600; font-size: 0.85rem;"
-                        onclick="executeMobileComplete('{{ task.id }}')">
-                    <i class="bi bi-check-circle-fill fs-6 text-white"></i>
-                    <span>Completar</span>
-                </button>
-
-                <!-- 2. BOTÓN EDITAR -->
-                <button type="button" 
-                        class="btn text-center flex-fill py-2.5 px-2 border-0 rounded-3 d-flex align-items-center justify-content-center gap-2 text-white shadow-sm" 
-                        style="background: linear-gradient(315deg, #99c7e5 0%, #3B82F6 100%); font-weight: 600; font-size: 0.85rem;"
-                        onclick="executeMobileEdit('{{ task.id }}')">
-                    <i class="bi bi-pencil-square fs-6 text-white"></i>
-                    <span>Editar</span>
-                </button>
-
-            </div>
-
         </div>
     </div>
 </div>

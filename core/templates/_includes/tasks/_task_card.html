@@ -1,0 +1,109 @@
+{% load i18n %}
+{% load static %}
+
+<!-- TARJETA COMPACTA EN EL TABLERO -->
+<div class="card mb-2 shadow-sm border-0 task-card {% if task.is_completed %}is-completed{% endif %}" 
+    id="task-card-{{ task.id }}"
+    data-task-id="{{ task.id }}"
+    data-urgency="{{ task.urgency }}"
+    data-importance="{{ task.importance }}"
+    data-created-by="{% if task.created_by == request.user %}mine{% else %}shared{% endif %}"
+    data-due-date="{{ task.due_date|date:'d M'|default:'' }}"
+    data-has-description="{% if task.description %}true{% else %}false{% endif %}"
+    data-is-shared="{% if task.assigned_to.exists or task.board.members.exists %}true{% else %}false{% endif %}"
+    style="cursor: pointer;">
+    
+    <div class="card-body py-2 px-3 d-flex flex-column justify-content-center">
+        
+        <!-- FILA SUPERIOR: CHECKBOX + TÍTULO + TRES PUNTOS -->
+        <div class="task-card-header d-flex align-items-center justify-content-between position-relative w-100 gap-2" style="min-height: 24px;">
+            
+            <div class="task-checkbox-wrapper flex-shrink-0" 
+                onclick="event.stopPropagation();" 
+                ontouchstart="event.stopPropagation();" 
+                ontouchend="event.stopPropagation();">
+                <label class="task-checkbox-container m-0" style="cursor: pointer;">
+                    <input type="checkbox" 
+                        class="task-completion-check" 
+                        data-task-id="{{ task.id }}"
+                        {% if task.is_completed %}checked{% endif %}>
+                    <span class="checkmark"></span>
+                </label>
+            </div>
+
+            <div class="task-title-wrapper flex-grow-1 min-w-0" onclick="handleTaskCardClick('{{ task.id }}')">
+                <h6 class="card-title task-title mb-0 fw-semibold text-dark {% if task.is_completed %}completed-text{% endif %}" 
+                    style="font-size: 0.85rem; line-height: 1.3; margin: 0;">
+                    {{ task.title }}
+                </h6>
+            </div>
+
+            <div class="task-card-actions flex-shrink-0 opacity-75 ms-1" onclick="handleTaskCardClick('{{ task.id }}')">
+                <i class="bi bi-three-dots text-muted" style="font-size: 0.85rem; line-height: 1;"></i>
+            </div>
+
+        </div>
+
+        {% with first_assignee=task.assigned_to.first total_assignees=task.assigned_to.count %}
+            {% if task.due_date or task.description or task.assigned_to.exists or task.board.members.exists and not current_board %}
+                
+                <div class="d-flex align-items-center justify-content-between text-muted mt-0" 
+                     style="font-size: 0.7rem;" 
+                     data-bs-toggle="modal" 
+                     data-bs-target="#viewTaskModal{{ task.id }}">
+                    
+                    <div class="d-flex align-items-center gap-1.5 flex-wrap">
+                        {% if task.due_date %}
+                            <span class="badge border d-inline-flex align-items-center gap-1 px-1.5 py-0.5 me-2 rounded-md task-date-badge" 
+                                style="font-size: 0.65rem; background-color: #FFE4E6 !important; color: #dc2626 !important; border-color: #fecdd3 !important;">
+                                <i class="bi bi-calendar3" style="color: #dc2626 !important;"></i>
+                                {{ task.due_date|date:"d M" }}
+                            </span>
+                        {% endif %}
+
+                        {% if task.description %}
+                            <span class="badge text-secondary px-1 py-0.5 me-1 rounded-md" title="{% translate 'Tiene descripción' %}" style="font-size: 0.98rem;">
+                                <i class="bi bi-card-text" style="color: #5cbcf3 !important;"></i> 
+                            </span>
+                        {% endif %}
+
+                        {% if not current_board %}
+                            {% if task.board and task.board.members.exists or task.assigned_to.exists %}
+                                <span class="badge text-warning px-1 py-0.5 me-1 rounded-md" 
+                                    title="{% translate 'Tarea compartida / asignada' %}" 
+                                    style="font-size: 0.85rem;">
+                                    <i class="bi bi-people-fill" style="color: #fbbf24 !important;"></i>
+                                </span>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+
+                    <div class="ms-auto d-flex align-items-center gap-1">
+                        {% if task.assigned_to.exists %}
+                            <div class="position-relative d-inline-flex align-items-center">
+                                <span class="badge bg-dark text-white rounded-circle d-inline-flex align-items-center justify-content-center shadow-sm p-0" 
+                                    style="width: 20px; height: 20px; font-size: 0.6rem; font-weight: bold;"
+                                    title="{% translate 'Asignado a:' %} {{ first_assignee.username }}">
+                                    {{ first_assignee.username|slice:":2"|upper }}
+                                </span>
+
+                                {% if total_assignees > 1 %}
+                                    <span class="badge bg-secondary text-white rounded-pill ms-1 d-inline-flex align-items-center justify-content-center px-1 py-0.5" 
+                                        style="font-size: 0.58rem; font-weight: 700;"
+                                        title="{% translate 'Total de asignados:' %} {{ total_assignees }}">
+                                        +{{ total_assignees|add:"-1" }}
+                                    </span>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                </div>
+
+            {% endif %}
+        {% endwith %}
+
+    </div>
+</div>
+
+
