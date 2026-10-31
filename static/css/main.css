@@ -1398,5 +1398,28 @@ body {
     font-size: 0.82rem !important;
   }
 }
+/* ==========================================================================
+   AJUSTE VERTICAL PARA FORMULARIOS EN TARJETAS (.card)
+   ========================================================================== */
+.card form p {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  margin-bottom: 1rem !important;
+  width: 100% !important;
+}
+.card form p label {
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+}
+.card form p input[type=password],
+.card form p input[type=text],
+.card form p input[type=email] {
+  width: 100% !important;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  box-sizing: border-box !important;
+}
 
 /*# sourceMappingURL=main.css.map */

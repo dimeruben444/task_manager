@@ -4,6 +4,8 @@ from .views import delete_account_view, export_user_data
 
 from django.contrib.auth import views as auth_views
 
+from django.urls import path, reverse_lazy
+
 app_name = 'users'
 
 urlpatterns = [
@@ -14,19 +16,25 @@ urlpatterns = [
     path('delete-account/', delete_account_view, name='delete_account'),
 
     #RUTAS DE RECUPERACIÓN DE CONTRASEÑA
-    path('reset-password/', auth_views.PasswordResetView.as_view(
-        template_name='registration/password_reset_form.html',
-        email_template_name='registration/password_reset_email.html',
-        subject_template_name='registration/password_reset_subject.txt',
-        success_url='/users/reset-password/done/'
-    ), name='password_reset'),
+    path(
+        'reset-password/',
+        auth_views.PasswordResetView.as_view(
+            template_name='registration/password_reset_form.html',
+            email_template_name='registration/password_reset_email.html',
+            html_email_template_name='registration/password_reset_email.html',  # <-- Usar la ruta correcta de tu plantilla HTML
+            subject_template_name='registration/password_reset_subject.txt',
+            success_url='/users/reset-password/done/',
+        ),
+        name='password_reset',
+    ),
     
     path('reset-password/done/', auth_views.PasswordResetDoneView.as_view(
         template_name='registration/password_reset_done.html'
     ), name='password_reset_done'),
     
     path('reset-password/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(
-        template_name='registration/password_reset_confirm.html'
+        template_name='registration/password_reset_confirm.html',
+        success_url=reverse_lazy('users:password_reset_complete'),
     ), name='password_reset_confirm'),
     
     path('reset-password/complete/', auth_views.PasswordResetCompleteView.as_view(
