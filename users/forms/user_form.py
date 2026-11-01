@@ -1,4 +1,4 @@
-# users/forms/user_form.py
+
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
@@ -8,6 +8,19 @@ User = get_user_model()
 
 
 class CustomUserCreationForm(UserCreationForm):
+    email = forms.EmailField(
+        label=_("Correo electrónico"),
+        required=True,  # Campo obligatorio a nivel de formulario
+        error_messages={
+            'required': _('El correo electrónico es obligatorio para crear la cuenta.'),
+            'invalid': _('Introduce una dirección de correo electrónico válida.')
+        },
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control form-control-lg border-light-subtle bg-light-subtle fs-6',
+            'placeholder': _('tu@email.com'),
+            'required': 'required'  # Validación HTML5 nativa en navegador
+        })
+    )
     first_name = forms.CharField(
         label=_("Nombre"),
         max_length=150,
@@ -44,6 +57,9 @@ class CustomUserCreationForm(UserCreationForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
+        # Marcar explícitamente el campo email como obligatorio en las propiedades del campo
+        self.fields['email'].required = True
+
         # Placeholders personalizados
         placeholders = {
             'username': _('tu_usuario'),
@@ -76,6 +92,7 @@ class CustomUserCreationForm(UserCreationForm):
 
     def save(self, commit=True):
         user = super().save(commit=False)
+        user.email = self.cleaned_data['email']
         user.first_name = self.cleaned_data['first_name']
         user.last_name = self.cleaned_data['last_name']
         if commit:

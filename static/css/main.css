@@ -1422,4 +1422,8 @@ body {
   box-sizing: border-box !important;
 }
 
+:root {
+  color-scheme: light;
+}
+
 /*# sourceMappingURL=main.css.map */

@@ -316,8 +316,6 @@ document.addEventListener("show.bs.dropdown", function (event) {
 // 6. GUARDAR TAREA CON ANIMACIÓN DE VIAJE (FLIP) Y SACUDIDA
 function saveTaskModal(taskId, event) {
 
-
-
     if (event) {
         event.preventDefault();
         event.stopPropagation();

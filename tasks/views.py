@@ -198,7 +198,7 @@ class TaskUpdateView(LoginRequiredMixin, UpdateView):
         if is_ajax:
             try:
                 card_html = render_to_string(
-                    '_includes/_task_card.html',
+                    '_includes/tasks/_task_card.html',
                     {'task': task, 'request': self.request},
                     request=self.request
                 )
