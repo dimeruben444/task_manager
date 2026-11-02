@@ -182,13 +182,15 @@
                                 </div>
                             </div>
 
+                            
                             <div class="col-12 col-md-3">
-                                <div class="dropdown">
+                                <div class="dropdown position-relative">
                                     <button class="btn btn-outline-secondary btn-sm text-start w-100 d-flex justify-content-between align-items-center bg-white shadow-none py-2 px-3 border rounded-3" 
                                             type="button" 
                                             id="quickDropdownDate" 
                                             data-bs-toggle="dropdown" 
                                             data-bs-auto-close="outside" 
+                                            data-bs-display="static"
                                             aria-expanded="false">
                                         <span class="d-flex align-items-center gap-2 text-dark">
                                             <i class="bi bi-calendar3" style="color: #dc2626 !important;"></i>
@@ -197,7 +199,10 @@
                                         <small class="text-muted fw-semibold" id="quickDateBadgeDisplay">+</small>
                                     </button>
                                     
-                                    <div class="dropdown-menu dropdown-menu-dates p-3 shadow-lg border-0 rounded-3 mt-1 bg-white" aria-labelledby="quickDropdownDate" style="width: 310px; z-index: 1055;">
+                                    <div class="dropdown-menu dropdown-menu-dates p-3 shadow-lg border-0 rounded-3 mt-1 bg-white" 
+                                        aria-labelledby="quickDropdownDate" 
+                                        style="width: 310px; z-index: 1055;">
+                                        
                                         <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
                                             <span class="fw-bold small text-dark">{% translate "Fechas" %}</span>
                                             <button type="button" class="btn-close btn-sm" onclick="bootstrap.Dropdown.getInstance(document.getElementById('quickDropdownDate')).hide();"></button>
@@ -217,11 +222,28 @@
                                             </div>
                                         </div>
 
+                                        <!-- Desplegable Offset del Recordatorio Rápido -->
+                                        <div class="mb-2" id="quickReminderOffsetContainer" style="display: none;">
+                                            <label class="form-label small text-muted mb-1 fw-bold">{% translate "Aviso del recordatorio" %}</label>
+                                            <select name="reminder_offset" id="quick_reminder_offset" class="form-select form-select-sm border text-dark fw-medium" style="font-size: 0.8rem;">
+                                                <option value="at_time">{% translate "A la hora del vencimiento" %}</option>
+                                                <option value="5_min">{% translate "5 minutos antes" %}</option>
+                                                <option value="15_min">{% translate "15 minutos antes" %}</option>
+                                                <option value="1_hour">{% translate "1 hora antes" %}</option>
+                                                <option value="2_hours">{% translate "2 horas antes" %}</option>
+                                                <option value="1_day" selected>{% translate "1 día antes" %}</option>
+                                                <option value="2_days">{% translate "2 días antes" %}</option>
+                                                <option value="1_week">{% translate "1 semana antes" %}</option>
+                                                <option value="2_weeks">{% translate "2 semanas antes" %}</option>
+                                            </select>
+                                        </div>
+
                                         <div class="form-check form-switch mt-2 mb-1 d-flex align-items-center gap-2 ps-0">
                                             <input class="form-check-input ms-0 me-2" 
                                                 type="checkbox" 
                                                 name="reminder_enabled" 
                                                 id="reminder_enabled_quick" 
+                                                onchange="document.getElementById('quickReminderOffsetContainer').style.display = this.checked ? 'block' : 'none';"
                                                 style="cursor: pointer;">
                                             <label class="form-check-label small text-dark fw-medium" for="reminder_enabled_quick" style="cursor: pointer; font-size: 0.8rem;">
                                                 <i class="bi bi-bell me-1 text-muted"></i> {% translate "Recibir recordatorio por correo" %}
@@ -230,12 +252,12 @@
 
                                         <input type="hidden" name="due_date" id="quickHiddenDueDate">
 
-                                        <div class="d-flex flex-column gap-1 mt-3">
-                                            <button type="button" class="btn btn-primary btn-sm w-100 fw-bold" onclick="saveQuickDate()">
-                                                {% translate "Guardar" %}
-                                            </button>
-                                            <button type="button" class="btn btn-link btn-sm text-danger text-decoration-none w-100 p-0" onclick="clearQuickDate()">
+                                        <div class="d-flex gap-2 mt-3 pt-1 border-top">
+                                            <button type="button" class="btn btn-outline-danger btn-sm w-50 fw-bold rounded-2" onclick="clearQuickDate()">
                                                 {% translate "Quitar" %}
+                                            </button>
+                                            <button type="button" class="btn btn-primary btn-sm w-50 fw-bold rounded-2" onclick="saveQuickDate()">
+                                                {% translate "Guardar" %}
                                             </button>
                                         </div>
                                     </div>

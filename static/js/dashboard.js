@@ -1,3 +1,5 @@
+// dashboard.js
+
 // Configuración exacta para cada nivel numérico (1 al 4) en Urgencia
 const urgencyConfig = {
     4: { text: 'Crítica (4/4)', color: '#dc2626' },   // Rojo para Crítica
@@ -83,6 +85,11 @@ function updateQuickTargetQuadrantDisplay() {
         targetEl.textContent = 'Q4 (Eliminar)';
         targetEl.className = 'fw-bold text-secondary';
     }
+}
+
+// Helper para detectar entorno móvil
+function isMobileView() {
+    return window.innerWidth <= 768 || ('ontouchstart' in window && window.innerWidth <= 1024);
 }
 
 // Inicializar eventos de Hover y selección en las estrellas
@@ -266,7 +273,7 @@ function sendToggleRequest(taskId, isCompleted, checkbox) {
         if (data.status === 'success' || data.is_completed !== undefined) {
             const card = checkbox.closest('.task-card, .completed-task-item');
 
-            // 1. SI MARCAMOS COMO COMPLETADA
+            // 1. SI MARCAMOS COMO COMPLETADA (CON ANIMACIÓN DE VUELO / DESVANECIMIENTO)
             if (isCompleted && card) {
                 const targetContainer = document.getElementById('completed-tasks-container');
                 if (targetContainer) {
@@ -285,13 +292,15 @@ function sendToggleRequest(taskId, isCompleted, checkbox) {
                     const hasDescription = card.dataset.hasDescription || "false";
                     const isShared = card.dataset.isShared || "false";
 
+                    // Medir posición inicial de la tarjeta en la matriz
+                    const startRect = card.getBoundingClientRect();
+
                     const completedItem = document.createElement('div');
                     completedItem.className = 'completed-task-item task-card card border-0 shadow-sm mb-2 p-2 d-flex flex-row align-items-center justify-content-between gap-2 bg-light';
                     completedItem.setAttribute('data-task-id', taskId);
                     completedItem.setAttribute('data-urgency', urgency);
                     completedItem.setAttribute('data-importance', importance);
                     
-                    // Guardar metadatos en el dataset del elemento completado
                     if (dueDate) completedItem.setAttribute('data-due-date', dueDate);
                     if (hasDescription === 'true') completedItem.setAttribute('data-has-description', 'true');
                     if (isShared === 'true') completedItem.setAttribute('data-is-shared', 'true');
@@ -320,8 +329,33 @@ function sendToggleRequest(taskId, isCompleted, checkbox) {
                         </form>
                     `;
 
+                    // Insertar la nueva tarjeta en el panel de completadas
                     targetContainer.prepend(completedItem);
-                    card.remove();
+
+                    // Medir posición final y calcular delta para la animación FLIP
+                    const endRect = completedItem.getBoundingClientRect();
+                    const deltaX = startRect.left - endRect.left;
+                    const deltaY = startRect.top - endRect.top;
+
+                    // Aplicar posición inicial desplazada en la tarjeta destino
+                    completedItem.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(0.98)`;
+                    completedItem.style.transition = 'none';
+
+                    // Animar la tarjeta original desvaneciéndola
+                    card.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
+                    card.style.opacity = '0';
+                    card.style.transform = 'scale(0.9)';
+
+                    // Animar el elemento de completadas hacia su sitio definitivo
+                    requestAnimationFrame(() => {
+                        completedItem.style.transition = 'transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s ease';
+                        completedItem.style.transform = 'translate(0, 0) scale(1)';
+                    });
+
+                    // Eliminar la tarjeta antigua tras completar la transición de desvanecimiento
+                    setTimeout(() => {
+                        card.remove();
+                    }, 250);
 
                     const countBadge = document.getElementById('completed-count');
                     if (countBadge) {
@@ -355,12 +389,10 @@ function sendToggleRequest(taskId, isCompleted, checkbox) {
                                    || card.querySelector('span')?.textContent.trim() 
                                    || card.textContent.trim();
 
-                    // Leer metadatos guardados en la tarjeta
                     const dueDate = card.dataset.dueDate || "";
                     const hasDescription = card.dataset.hasDescription === 'true';
                     const isShared = card.dataset.isShared === 'true';
 
-                    // Construcción dinámica del bloque HTML de metadatos
                     let metadataHtml = '';
                     if (dueDate || hasDescription || isShared) {
                         let dateBadge = '';
@@ -399,7 +431,6 @@ function sendToggleRequest(taskId, isCompleted, checkbox) {
                             </div>`;
                     }
 
-                    // Obtenemos la posición de origen en el panel de completadas
                     const startRect = card.getBoundingClientRect();
 
                     const restoredCard = document.createElement('div');
@@ -442,7 +473,6 @@ function sendToggleRequest(taskId, isCompleted, checkbox) {
                         targetQuadrantContainer.appendChild(restoredCard);
                     }
 
-                    // Obtenemos la posición final y aplicamos la animación de vuelo (FLIP)
                     const endRect = restoredCard.getBoundingClientRect();
                     const deltaX = startRect.left - endRect.left;
                     const deltaY = startRect.top - endRect.top;
@@ -503,13 +533,14 @@ document.addEventListener('DOMContentLoaded', function () {
         if (container.dataset.sortableInitialized) return;
         container.dataset.sortableInitialized = 'true';
 
-        new Sortable(container, {
+        const sortableInstance = new Sortable(container, {
             group: 'eisenhower-matrix',
             draggable: '.task-card, .completed-task-item',
             filter: '.empty-msg, .empty-msg-box, .task-checkbox-wrapper, .task-completion-check', 
             preventOnFilter: false,
             animation: 150,
             ghostClass: 'opacity-50',
+            disabled: isMobileView(), // Se desactiva automáticamente si entra en vista móvil
             
             scroll: true,
             scrollSensitivity: 200,
@@ -607,6 +638,19 @@ document.addEventListener('DOMContentLoaded', function () {
                 } finally {
                     isProcessingMove = false;
                 }
+            }
+        });
+
+        // Guardar referencia en el contenedor para actualizaciones dinámicas
+        container._sortableInstance = sortableInstance;
+    });
+
+    // Reevaluar Sortable al cambiar el tamaño o la orientación
+    window.addEventListener('resize', function() {
+        const disableDrag = isMobileView();
+        document.querySelectorAll('.quadrant-container').forEach(container => {
+            if (container._sortableInstance) {
+                container._sortableInstance.option('disabled', disableDrag);
             }
         });
     });
@@ -1238,18 +1282,49 @@ function handleTaskCardClick(taskId) {
     }
 }
 
-// 2. Acción para el botón "Completar tarea" del menú móvil
+// 2. Acción para el botón "Completar tarea" del menú móvil con captura previa de coordenadas
 function executeMobileComplete(taskId) {
     const actionModalEl = document.getElementById(`mobileActionModal${taskId}`);
-    if (actionModalEl) {
-        const bsModal = bootstrap.Modal.getInstance(actionModalEl);
-        if (bsModal) bsModal.hide();
+    const taskCard = document.getElementById(`task-card-${taskId}`);
+
+    if (!taskCard) return;
+
+    // 1. Capturar la posición REAL de la tarjeta en la pantalla ANTES de ocultar nada
+    const cardRect = taskCard.getBoundingClientRect();
+    const realCheckbox = taskCard.querySelector('.task-completion-check');
+
+    // Guardar las coordenadas exactas en la casilla para que task-animation.js las lea directamente
+    if (realCheckbox) {
+        realCheckbox.dataset.overrideX = cardRect.left + (cardRect.width / 2);
+        realCheckbox.dataset.overrideY = cardRect.top + (cardRect.height / 2);
     }
 
-    const taskCard = document.getElementById(`task-card-${taskId}`);
-    if (taskCard) {
-        const fakeCheckbox = { checked: true, dataset: { taskId: taskId }, closest: () => taskCard };
-        sendToggleRequest(taskId, true, fakeCheckbox);
+    // 2. Ocultar el modal de opciones móviles
+    if (actionModalEl && typeof bootstrap !== 'undefined') {
+        const bsModal = bootstrap.Modal.getInstance(actionModalEl);
+        if (bsModal && actionModalEl.classList.contains('show')) {
+
+            actionModalEl.addEventListener('hidden.bs.modal', function handler() {
+                actionModalEl.removeEventListener('hidden.bs.modal', handler);
+
+                // Disparar el evento 'change' una vez cerrado el modal
+                if (realCheckbox) {
+                    realCheckbox.checked = true;
+                    realCheckbox.dispatchEvent(new Event('change', { bubbles: true }));
+                } else {
+                    sendToggleRequest(taskId, true, { dataset: { taskId: taskId }, closest: () => taskCard });
+                }
+            });
+
+            bsModal.hide();
+            return;
+        }
+    }
+
+    // Ejecución directa si el modal no estaba abierto
+    if (realCheckbox) {
+        realCheckbox.checked = true;
+        realCheckbox.dispatchEvent(new Event('change', { bubbles: true }));
     }
 }
 

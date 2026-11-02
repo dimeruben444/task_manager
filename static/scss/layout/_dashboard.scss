@@ -513,3 +513,28 @@ body {
     }
   }
 }
+
+@media (max-width: 767.98px) {
+    .task-card {
+        /* Desactiva la propiedad de arrastrar propia del navegador */
+        -webkit-user-drag: none;
+        user-select: none;
+        touch-action: pan-y; /* Permite el scroll vertical suave sin activar drag */
+        cursor: default !important;
+    }
+}
+
+
+/* Permitir que los desplegables dentro de la barra rápida sobresalgan del contenedor */
+#quickTaskForm,
+.quick-add-card,
+#advancedOptions,
+.add-task-quick-container {
+    overflow: visible !important;
+}
+
+/* Elevar el z-index del menú flotante de fechas */
+#quickDropdownDate + .dropdown-menu,
+.quick-date-dropdown-menu {
+    z-index: 1055 !important;
+}
