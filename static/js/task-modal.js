@@ -50,6 +50,7 @@ function selectQuadrant(quadrantCode, taskId, labelText) {
     if (urgencyRadio) urgencyRadio.checked = true;
     if (importanceRadio) importanceRadio.checked = true;
 }
+
 // 3. FUNCIONES AUXILIARES PARA EL DROPDOWN DE FECHAS EN MODALES
 function syncHiddenDueDate(taskId) {
   const displayDate = document.getElementById(`displayDate${taskId}`);
@@ -71,6 +72,13 @@ function prepareDateDropdown(taskId) {
   const hiddenInput = document.getElementById(`hiddenDueDate${taskId}`);
   const displayDate = document.getElementById(`displayDate${taskId}`);
   const displayTime = document.getElementById(`displayTime${taskId}`);
+  const reminderCheck = document.getElementById(`reminder_enabled_${taskId}`);
+  const reminderOffsetBox = document.getElementById(`reminderOffsetContainer_${taskId}`);
+
+  // Sincronizar visibilidad del desplegable offset según el estado del checkbox
+  if (reminderCheck && reminderOffsetBox) {
+    reminderOffsetBox.style.display = reminderCheck.checked ? 'block' : 'none';
+  }
 
   if (!calendarContainer || typeof flatpickr === "undefined") return;
 
@@ -124,10 +132,15 @@ function removeTaskDate(taskId) {
   const hiddenInput = document.getElementById(`hiddenDueDate${taskId}`);
   const displayDate = document.getElementById(`displayDate${taskId}`);
   const dateBadgeDisplay = document.getElementById(`dateBadgeDisplay${taskId}`);
+  const reminderCheck = document.getElementById(`reminder_enabled_${taskId}`);
+  const reminderOffsetBox = document.getElementById(`reminderOffsetContainer_${taskId}`);
 
   if (hiddenInput) hiddenInput.value = "";
   if (displayDate) displayDate.value = "";
   if (dateBadgeDisplay) dateBadgeDisplay.textContent = "+";
+
+  if (reminderCheck) reminderCheck.checked = false;
+  if (reminderOffsetBox) reminderOffsetBox.style.display = "none";
 
   const dropdownBtn = document.getElementById(`dropdownDate${taskId}`);
   if (dropdownBtn && typeof bootstrap !== "undefined") {
@@ -364,7 +377,7 @@ function saveTaskModal(taskId, event) {
             if (dateBadgeDisplay && data.due_date_formatted) {
                 dateBadgeDisplay.textContent = data.due_date_formatted;
             }
-            // Actualizamos el título en la cabecera del modal de opciones rápidas si existe
+
             const formTitleInput = form.querySelector('textarea[name="title"]');
             const newTitleText = data.title || (formTitleInput ? formTitleInput.value.trim() : '');
 
@@ -394,7 +407,6 @@ function saveTaskModal(taskId, event) {
                             targetContainer.appendChild(newCard);
                         }
 
-                        //ocultar mensaje no hay tareas
                         if (typeof updateMatrixAndSidebarCounts === 'function') {
                             updateMatrixAndSidebarCounts();
                         }
@@ -435,7 +447,6 @@ function saveTaskModal(taskId, event) {
             if (modalEl && typeof bootstrap !== 'undefined') {
                 const bsModal = bootstrap.Modal.getInstance(modalEl);
                 if (bsModal && modalEl.classList.contains('show')) {
-                    // Quitamos el foco del botón activo para evitar la advertencia de aria-hidden en la consola
                     if (document.activeElement) {
                         document.activeElement.blur();
                     }
@@ -501,29 +512,23 @@ function deleteTaskModal(taskId, deleteUrl) {
     });
 }
 
-
 // SELECCIÓN DIRECTA DE TABLERO EN DESPLEGABLES
 function selectBoardOption(boardId, boardName, targetSuffix, boardColor) {
-  // 1. Asignar el ID al input oculto
   const hiddenInput = document.getElementById(`hiddenBoardId${targetSuffix}`);
   if (hiddenInput) {
     hiddenInput.value = boardId;
   }
 
-  // 2. Actualizar el texto del botón
   const badgeDisplay = document.getElementById(`boardBadgeDisplay${targetSuffix}`);
   if (badgeDisplay) {
     badgeDisplay.textContent = boardName;
   }
 
-  // 3. Actualizar el DEGRADADO del icono bi-grid-fill al instante
   const iconDisplay = document.getElementById(`boardBadgeIcon${targetSuffix}`);
   if (iconDisplay) {
     if (boardColor && boardColor.trim() !== '') {
-      // Degradado intenso para tableros con color propio (35% base + color-mix claro al final)
       iconDisplay.style.background = `linear-gradient(135deg, ${boardColor} 0%, ${boardColor} 35%, color-mix(in srgb, ${boardColor} 10%, white) 100%)`;
     } else {
-      // Degradado azul/morado por defecto (General)
       iconDisplay.style.background = 'linear-gradient(135deg, #4f52f8 0%, #4f52f8 35%, #42C6F6 100%)';
     }
     iconDisplay.style.webkitBackgroundClip = 'text';
@@ -531,7 +536,6 @@ function selectBoardOption(boardId, boardName, targetSuffix, boardColor) {
     iconDisplay.style.setProperty('color', 'transparent', 'important');
   }
 
-  // 4. Cerrar el desplegable
   const dropdownBtn = document.getElementById(`dropdownBoard${targetSuffix}`);
   if (dropdownBtn && typeof bootstrap !== "undefined") {
     const bsDropdown = bootstrap.Dropdown.getInstance(dropdownBtn);
@@ -567,7 +571,6 @@ function toggleMemberRow(checkboxEl) {
     }
   }
 
-  // CASO A: ALTA RÁPIDA (Quick)
   if (taskId === 'Quick') {
     const checkedQuick = document.querySelectorAll('input[name="assigned_to"][data-task-id="Quick"]:checked');
     const counterEl = document.getElementById('quickAssigneesCounter');
@@ -577,7 +580,6 @@ function toggleMemberRow(checkboxEl) {
     return;
   }
 
-  // CASO B: MODAL DE TAREA EXISTENTE
   const container = document.getElementById(`assignedBadgesContainer${taskId}`);
   if (checkboxEl.checked) {
     if (container && !document.getElementById(`badge-user-${taskId}-${userId}`)) {
@@ -601,7 +603,6 @@ function toggleMemberRow(checkboxEl) {
     }
   }
 
-  // Sincronización en vivo de la tarjeta del tablero
   const taskCard = document.getElementById(`task-card-${taskId}`);
   if (taskCard) {
     const checkedBoxes = document.querySelectorAll(`input[name="assigned_to"][data-task-id="${taskId}"]:checked`);
@@ -629,14 +630,13 @@ function toggleMemberRow(checkboxEl) {
   }
 }
 
-
 function updateDistributionCounts() {
   const getCount = (id) => {
     const container = document.getElementById(id);
     return container ? container.querySelectorAll('.task-card').length : 0;
   };
 
-  const q1 = getCount('q1-container'); // O el ID que tengas para Q1
+  const q1 = getCount('q1-container');
   const q2 = getCount('q2-container');
   const q3 = getCount('q3-container');
   const q4 = getCount('q4-container');
@@ -651,4 +651,3 @@ function updateDistributionCounts() {
   if (elQ3) elQ3.textContent = `${q3} ${q3 === 1 ? 'tarea' : 'tareas'}`;
   if (elQ4) elQ4.textContent = `${q4} ${q4 === 1 ? 'tarea' : 'tareas'}`;
 }
-

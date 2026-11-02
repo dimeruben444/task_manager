@@ -37,6 +37,7 @@ urlpatterns = [
     path('register/', register_view, name='register'),
 
     path('api/search-users/', search_users_api, name='search_users_api'),
+    
 
     #legal
     path('terminos/', TermsView.as_view(), name='terms'),

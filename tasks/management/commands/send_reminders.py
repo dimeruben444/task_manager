@@ -2,18 +2,18 @@ import zoneinfo
 from datetime import timedelta
 from django.conf import settings
 from django.core.management.base import BaseCommand
-from django.core.mail import send_mail
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string, TemplateDoesNotExist
 from django.utils import timezone
 from tasks.models import Task
 
 
 class Command(BaseCommand):
-    help = 'Revisa las tareas con recordatorio activo y envía un correo electrónico'
+    help = 'Revisa las tareas con recordatorio activo y envía un correo electrónico en HTML'
 
     def handle(self, *args, **options):
         now = timezone.now()
 
-        # Mapeo exhaustivo de offsets (cubre tanto '5_min' como '5min', 'at_time', etc.)
         offsets = {
             'at_time': timedelta(minutes=0),
             '5_min': timedelta(minutes=5),
@@ -46,11 +46,9 @@ class Command(BaseCommand):
         sent_count = 0
 
         for task in tasks:
-            # Obtener offset de antelación
             offset = offsets.get(str(task.reminder_offset).strip(), timedelta(minutes=0))
             reminder_trigger_time = task.due_date - offset
 
-            # Comprobar si ya es hora de notificar (comparación consciente de timezone UTC)
             if now >= reminder_trigger_time:
                 recipients = set()
 
@@ -62,9 +60,8 @@ class Command(BaseCommand):
                         recipients.add(user.email)
 
                 if recipients:
-                    board_name = task.board.title if task.board else 'Sin tablero'
+                    board_name = task.board.title if task.board else 'General'
 
-                    # Determinar la zona horaria a utilizar
                     user_tz_str = getattr(
                         getattr(task.created_by, 'profile', None),
                         'timezone',
@@ -76,12 +73,12 @@ class Command(BaseCommand):
                     except Exception:
                         user_tz = zoneinfo.ZoneInfo(settings.TIME_ZONE)
 
-                    # Formatear la hora en la zona horaria adecuada
                     due_date_local = task.due_date.astimezone(user_tz)
                     due_date_formatted = due_date_local.strftime('%d/%m/%Y a las %H:%M')
 
                     subject = f"⏰ Recordatorio: La tarea '{task.title}' vence pronto"
-                    message = f"""Hola,
+
+                    text_content = f"""Hola,
 
 Te recordamos que tienes una tarea pendiente en Eisenhower Task Manager:
 
@@ -96,15 +93,45 @@ Descripción / Notas:
 Mensaje enviado automáticamente desde tu Gestor de Tareas Eisenhower.
 """
 
-                    send_mail(
-                        subject,
-                        message,
-                        None,  # Utiliza DEFAULT_FROM_EMAIL de settings.py
-                        list(recipients),
-                        fail_silently=False,
+                    context = {
+                        'task': task,
+                        'user': task.created_by,
+                        'board_name': board_name,
+                        'due_date_formatted': due_date_formatted,
+                        'site_url': getattr(settings, 'SITE_URL', 'http://127.0.0.1:8000')
+                    }
+
+                    # Cargar plantilla y mostrar cualquier fallo de renderizado en la terminal
+                    html_content = None
+                    template_path = '_includes/tasks/_reminder_email.html'
+                    
+                    try:
+                        html_content = render_to_string(template_path, context)
+                    except TemplateDoesNotExist:
+                        self.stdout.write(
+                            self.style.ERROR(f"No se encontró la plantilla en '{template_path}'. Revisa la carpeta en tu proyecto.")
+                        )
+                    except Exception as e:
+                        self.stdout.write(
+                            self.style.ERROR(f"Error de sintaxis o procesamiento al renderizar HTML: {e}")
+                        )
+
+                    from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', None)
+                    msg = EmailMultiAlternatives(
+                        subject=subject,
+                        body=text_content,
+                        from_email=from_email,
+                        to=list(recipients)
                     )
 
-                    # Actualización explícita evitando disparar save() completo si no es necesario
+                    if html_content:
+                        msg.attach_alternative(html_content, "text/html")
+                        self.stdout.write(self.style.SUCCESS("Plantilla HTML adjuntada correctamente al mensaje."))
+                    else:
+                        self.stdout.write(self.style.WARNING("El correo se enviará sólo en texto plano porque la plantilla HTML falló."))
+
+                    msg.send(fail_silently=False)
+
                     task.email_notification_sent = True
                     task.save(update_fields=['email_notification_sent'])
                     sent_count += 1

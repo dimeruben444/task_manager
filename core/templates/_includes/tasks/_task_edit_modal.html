@@ -172,12 +172,29 @@
                                             </div>
                                         </div>
 
+                                        <!-- Desplegable Offset del Recordatorio -->
+                                        <div class="mb-2" id="reminderOffsetContainer_{{ task.id }}" {% if not task.reminder_enabled %}style="display: none;"{% endif %}>
+                                            <label class="form-label small text-muted mb-1 fw-bold">{% translate "Aviso del recordatorio" %}</label>
+                                            <select name="reminder_offset" class="form-select form-select-sm border text-dark fw-medium" style="font-size: 0.8rem;">
+                                                <option value="at_time" {% if task.reminder_offset == 'at_time' %}selected{% endif %}>{% translate "A la hora del vencimiento" %}</option>
+                                                <option value="5_min" {% if task.reminder_offset == '5_min' %}selected{% endif %}>{% translate "5 minutos antes" %}</option>
+                                                <option value="15_min" {% if task.reminder_offset == '15_min' %}selected{% endif %}>{% translate "15 minutos antes" %}</option>
+                                                <option value="1_hour" {% if task.reminder_offset == '1_hour' %}selected{% endif %}>{% translate "1 hora antes" %}</option>
+                                                <option value="2_hours" {% if task.reminder_offset == '2_hours' %}selected{% endif %}>{% translate "2 horas antes" %}</option>
+                                                <option value="1_day" {% if not task.reminder_offset or task.reminder_offset == '1_day' %}selected{% endif %}>{% translate "1 día antes" %}</option>
+                                                <option value="2_days" {% if task.reminder_offset == '2_days' %}selected{% endif %}>{% translate "2 días antes" %}</option>
+                                                <option value="1_week" {% if task.reminder_offset == '1_week' %}selected{% endif %}>{% translate "1 semana antes" %}</option>
+                                                <option value="2_weeks" {% if task.reminder_offset == '2_weeks' %}selected{% endif %}>{% translate "2 semanas antes" %}</option>
+                                            </select>
+                                        </div>
+
                                         <div class="form-check form-switch mt-2 mb-1 d-flex align-items-center gap-2 ps-0">
                                             <input class="form-check-input ms-0 me-2" 
                                                 type="checkbox" 
                                                 name="reminder_enabled" 
                                                 id="reminder_enabled_{{ task.id }}" 
                                                 {% if task.reminder_enabled %}checked{% endif %}
+                                                onchange="document.getElementById('reminderOffsetContainer_{{ task.id }}').style.display = this.checked ? 'block' : 'none';"
                                                 style="cursor: pointer;">
                                             <label class="form-check-label small text-dark fw-medium" for="reminder_enabled_{{ task.id }}" style="cursor: pointer; font-size: 0.8rem;">
                                                 <i class="bi bi-bell me-1 text-muted"></i> {% translate "Recibir recordatorio por correo" %}

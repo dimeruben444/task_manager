@@ -8,3 +8,5 @@ class PrivacyPolicyView(TemplateView):
 
 class CookiesPolicyView(TemplateView):
     template_name = 'legal/cookies.html'
+
+    

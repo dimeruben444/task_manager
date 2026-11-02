@@ -375,3 +375,13 @@ def search_tasks_api(request):
         })
 
     return JsonResponse({'results': results})
+
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+from .models import Notification  # Ajusta según el nombre de tu modelo de notificaciones
+
+@login_required
+def unread_notifications_count(request):
+    """Devuelve el número de notificaciones no leídas del usuario actual."""
+    count = Notification.objects.filter(recipient=request.user, is_read=False).count()
+    return JsonResponse({'unread_count': count})
