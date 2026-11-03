@@ -3,3 +3,4 @@ python run_auto_reminders.py
 
 
 
+npx sass --watch static/scss/main.scss:static/css/main.css   
