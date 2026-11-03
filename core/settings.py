@@ -218,3 +218,23 @@ DEFAULT_FROM_EMAIL = 'EisenhowerFlow <eisenhowerflow@gmail.com>'
 SERVER_EMAIL = 'eisenhowerflow@gmail.com'
 
 
+
+
+# ==========================================
+# CONFIGURACIÓN DE SEGURIDAD PARA PRODUCCIÓN
+# ==========================================
+if not DEBUG:
+    # Redirigir todo el tráfico HTTP a HTTPS
+    SECURE_SSL_REDIRECT = True
+
+    # Forzar que las cookies de sesión y CSRF solo se envíen por HTTPS
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+
+    # HTTP Strict Transport Security (HSTS)
+    SECURE_HSTS_SECONDS = 31536000  # 1 año
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+
+    # Indicar a Django que Render / Supabase maneja el certificado SSL en el proxy
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')

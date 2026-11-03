@@ -14,27 +14,65 @@ document.addEventListener('change', function (e) {
 
             if (card) {
                 card.classList.add('task-completing');
+                
+                card.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
+                card.style.opacity = '0';
+                card.style.transform = 'scale(0.9)';
+                
+                setTimeout(() => {
+                    card.remove(); // Se quita del DOM
+                }, 200);
 
-                // 1. ORIGEN EXACTO (Centro de la casilla pulsada)
-                const rect = checkbox.getBoundingClientRect();
-                const startX = rect.left + rect.width / 2;
-                const startY = rect.top + rect.height / 2;
+                // 1. ORIGEN EXACTO DE LA PARTÍCULA
+                let startX, startY;
 
-                // 2. DESTINO ROBUSTO (Si falla el contenedor, apunta al lateral derecho)
-                let endX, endY;
-                if (targetContainer) {
-                    const targetRect = targetContainer.getBoundingClientRect();
-                    endX = targetRect.left + 60;
-                    endY = targetRect.top + 100;
+                // Comprobar si vienen coordenadas capturadas previamente desde el menú móvil
+                if (checkbox.dataset.overrideX && checkbox.dataset.overrideY) {
+                    startX = parseFloat(checkbox.dataset.overrideX);
+                    startY = parseFloat(checkbox.dataset.overrideY);
+                    // Limpiar para siguientes usos
+                    delete checkbox.dataset.overrideX;
+                    delete checkbox.dataset.overrideY;
                 } else {
+                    const rect = checkbox.getBoundingClientRect();
+                    const cardRect = card.getBoundingClientRect();
+
+                    startX = (rect.left > 0 ? rect.left + rect.width / 2 : cardRect.left + 24);
+                    startY = (rect.top > 0 ? rect.top + rect.height / 2 : cardRect.top + cardRect.height / 2);
+                }
+
+                // Garantizar que nunca sea (0, 0) bajo ningún concepto en pantallas móviles
+                if (!startX || startX <= 0) startX = window.innerWidth / 2;
+                if (!startY || startY <= 0) startY = window.innerHeight / 2;
+
+                // 2. DETECCIÓN DE ENTORNO Y DESTINO ROBUSTO
+                const isMobileOrTablet = window.innerWidth <= 1024 || ('ontouchstart' in window && window.innerWidth <= 1024);
+                let endX, endY;
+
+                // Comprobar si el contenedor de completadas existe y está visible en la pantalla actual
+                const isContainerVisible = targetContainer && (targetContainer.offsetWidth > 0 || targetContainer.offsetHeight > 0 || targetContainer.getClientRects().length > 0);
+
+                if (isContainerVisible) {
+                    const targetRect = targetContainer.getBoundingClientRect();
+                    endX = targetRect.left + (targetRect.width / 2);
+                    endY = targetRect.top + 60;
+                } else if (isMobileOrTablet) {
+                    // En Móvil / Tablet: El destino cae hacia abajo (panel inferior)
+                    endX = window.innerWidth / 2;
+                    endY = window.innerHeight - 80;
+                } else {
+                    // En Escritorio / PC: El destino va hacia el panel lateral derecho
                     endX = window.innerWidth - 220;
                     endY = 180;
                 }
 
-                // 3. VÉRTICE DEL ÁNGULO (Cálculo estricto en V)
-                // Altura fija de subida de 150px (mínimo a 80px del borde superior de la pantalla)
-                const peakY = Math.max(80, startY - 150);
-                // El vértice avanza un 20% hacia la derecha durante el ascenso
+                // 3. VÉRTICE DEL ÁNGULO (Cálculo adaptativo de la parábola)
+                // En móvil la subida es más moderada (60px) para no salirse por el borde superior
+                const peakY = isMobileOrTablet 
+                    ? Math.max(40, startY - 60) 
+                    : Math.max(80, startY - 150);
+
+                // El vértice avanza un 20% hacia la dirección horizontal del destino
                 const peakX = startX + ((endX - startX) * 0.20);
 
                 // 4. CONFETTI LOCAL
@@ -67,9 +105,9 @@ document.addEventListener('change', function (e) {
                 document.body.appendChild(particle);
 
                 // 6. CONTROL DEL VUELO VECTORIAL (TRAMO 1 -> VÉRTICE -> TRAMO 2)
-                const tSubida = 380;   // Subida rápida y empinada
-                const tPausa = 80;     // Pausa estática para marcar el quiebre del ángulo
-                const tCaida = 550;    // Caida diagonal en línea recta a completadas
+                const tSubida = isMobileOrTablet ? 300 : 380;
+                const tPausa = isMobileOrTablet ? 40 : 80;
+                const tCaida = isMobileOrTablet ? 450 : 550;
                 const tTotal = tSubida + tPausa + tCaida;
 
                 const startTime = performance.now();
@@ -87,13 +125,13 @@ document.addEventListener('change', function (e) {
                         currentY = startY + (peakY - startY) * segmentProgress;
                         currentScale = 1 + (1.3 - 1) * segmentProgress;
                     } 
-                    // PAUSA: Parada estática en el pico para fijar la esquina
+                    // PAUSA: Parada estática breve en el pico
                     else if (elapsed < tSubida + tPausa) {
                         currentX = peakX;
                         currentY = peakY;
                         currentScale = 1.3;
                     } 
-                    // RECTA 2: Bajada hacia la derecha hasta la columna de completadas
+                    // RECTA 2: Caída hacia el punto de destino
                     else {
                         const segmentProgress = (elapsed - (tSubida + tPausa)) / tCaida;
                         currentX = peakX + (endX - peakX) * segmentProgress;
@@ -116,6 +154,9 @@ document.addEventListener('change', function (e) {
                         particle.remove();
                         if (typeof sendToggleRequest === 'function') {
                             sendToggleRequest(taskId, isCompleted, checkbox);
+                        }
+                        if (typeof updateMatrixAndSidebarCounts === 'function') {
+                            updateMatrixAndSidebarCounts();
                         }
                     }
                 }
