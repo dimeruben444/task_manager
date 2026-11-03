@@ -2,3 +2,4 @@ Para que funcionen los recordatorios en el correo hay que lanzar en una terminal
 python run_auto_reminders.py
 
 
+
