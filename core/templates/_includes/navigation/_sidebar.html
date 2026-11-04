@@ -111,40 +111,56 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="d-flex align-items-center gap-2">
                             <span class="d-inline-block flex-shrink-0" style="width: 8px; height: 8px; background-color: #ef4444; border-radius: 2px;"></span>
-                            <span class="fw-semibold text-secondary" style="font-size: 0.82rem;">Q1 (Hacer)</span>
+                            <span class="fw-semibold text-secondary" style="font-size: 0.82rem;">Q1 ({% translate "Hacer" %})</span>
                         </div>
                         <span class="fw-bold text-dark" style="font-size: 0.82rem;" id="sidebar-q1-count">
-                            {{ q1_count|default:0 }} {% if q1_count == 1 %}{% translate "tarea" %}{% else %}{% translate "tareas" %}{% endif %}
+                            {% blocktranslate count counter=q1_count|default:0 %}
+                                1 tarea
+                            {% plural %}
+                                {{ counter }} tareas
+                            {% endblocktranslate %}
                         </span>
                     </div>
 
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="d-flex align-items-center gap-2">
                             <span class="d-inline-block flex-shrink-0" style="width: 8px; height: 8px; background-color: #3b82f6; border-radius: 2px;"></span>
-                            <span class="fw-semibold text-secondary" style="font-size: 0.82rem;">Q2 (Planificar)</span>
+                            <span class="fw-semibold text-secondary" style="font-size: 0.82rem;">Q2 ({% translate "Planificar" %})</span>
                         </div>
                         <span class="fw-bold text-dark" style="font-size: 0.82rem;" id="sidebar-q2-count">
-                            {{ q2_count|default:0 }} {% if q2_count == 1 %}{% translate "tarea" %}{% else %}{% translate "tareas" %}{% endif %}
+                            {% blocktranslate count counter=q2_count|default:0 %}
+                                1 tarea
+                            {% plural %}
+                                {{ counter }} tareas
+                            {% endblocktranslate %}
                         </span>
                     </div>
 
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="d-flex align-items-center gap-2">
                             <span class="d-inline-block flex-shrink-0" style="width: 8px; height: 8px; background-color: #f59e0b; border-radius: 2px;"></span>
-                            <span class="fw-semibold text-secondary" style="font-size: 0.82rem;">Q3 (Delegar)</span>
+                            <span class="fw-semibold text-secondary" style="font-size: 0.82rem;">Q3 ({% translate "Delegar" %})</span>
                         </div>
                         <span class="fw-bold text-dark" style="font-size: 0.82rem;" id="sidebar-q3-count">
-                            {{ q3_count|default:0 }} {% if q3_count == 1 %}{% translate "tarea" %}{% else %}{% translate "tareas" %}{% endif %}
+                            {% blocktranslate count counter=q3_count|default:0 %}
+                                1 tarea
+                            {% plural %}
+                                {{ counter }} tareas
+                            {% endblocktranslate %}
                         </span>
                     </div>
 
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="d-flex align-items-center gap-2">
                             <span class="d-inline-block flex-shrink-0" style="width: 8px; height: 8px; background-color: #9ca3af; border-radius: 2px;"></span>
-                            <span class="fw-semibold text-secondary" style="font-size: 0.82rem;">Q4 (Eliminar)</span>
+                            <span class="fw-semibold text-secondary" style="font-size: 0.82rem;">Q4 ({% translate "Eliminar" %})</span>
                         </div>
                         <span class="fw-bold text-dark" style="font-size: 0.82rem;" id="sidebar-q4-count">
-                            {{ q4_count|default:0 }} {% if q4_count == 1 %}{% translate "tarea" %}{% else %}{% translate "tareas" %}{% endif %}
+                            {% blocktranslate count counter=q4_count|default:0 %}
+                                1 tarea
+                            {% plural %}
+                                {{ counter }} tareas
+                            {% endblocktranslate %}
                         </span>
                     </div>
                 </div>

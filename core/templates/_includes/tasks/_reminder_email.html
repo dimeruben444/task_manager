@@ -1,9 +1,10 @@
+{% load i18n %}
 <!DOCTYPE html>
-<html lang="es">
+<html lang="{{ LANGUAGE_CODE|default:'es' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recordatorio de Tarea - EisenhowerFlow</title>
+    <title>{% translate "Recordatorio de Tarea" %} - EisenhowerFlow</title>
 </head>
 <body style="margin: 0; padding: 0; background-color: #f4f6f9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; color: #334155;">
     
@@ -19,7 +20,7 @@
                                 Eisenhower<span style="color: #93c5fd;">Flow</span>
                             </h1>
                             <p style="color: #e0e7ff; font-size: 13px; margin: 6px 0 0 0; font-weight: 500;">
-                                Gestor de Tareas & Prioridades
+                                {% translate "Gestor de Tareas & Prioridades" %}
                             </p>
                         </td>
                     </tr>
@@ -28,10 +29,10 @@
                     <tr>
                         <td style="padding: 32px 28px;">
                             <p style="font-size: 16px; color: #1e293b; margin: 0 0 16px 0; font-weight: 600;">
-                                ¡Hola, {{ user.first_name|default:user.username }}! 👋
+                                {% translate "¡Hola" %}, {{ user.first_name|default:user.username }}! 👋
                             </p>
                             <p style="font-size: 14px; color: #64748b; margin: 0 0 24px 0; line-height: 1.5;">
-                                Te recordamos que tienes una tarea pendiente cuya fecha de vencimiento está próxima a cumplirse:
+                                {% translate "Te recordamos que tienes una tarea pendiente cuya fecha de vencimiento está próxima a cumplirse:" %}
                             </p>
 
                             <!-- TARJETA DESTACADA DE LA TAREA -->
@@ -46,7 +47,7 @@
                                         <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
                                             <!-- Tablero -->
                                             <tr>
-                                                <td style="padding: 4px 0; font-size: 13px; color: #64748b; width: 100px; font-weight: 600;">Tablero:</td>
+                                                <td style="padding: 4px 0; font-size: 13px; color: #64748b; width: 100px; font-weight: 600;">{% translate "Tablero:" %}</td>
                                                 <td style="padding: 4px 0; font-size: 13px; color: #1e293b; font-weight: 600;">
                                                     📁 {{ board_name }}
                                                 </td>
@@ -54,7 +55,7 @@
 
                                             <!-- Vencimiento -->
                                             <tr>
-                                                <td style="padding: 4px 0; font-size: 13px; color: #64748b; font-weight: 600;">Vencimiento:</td>
+                                                <td style="padding: 4px 0; font-size: 13px; color: #64748b; font-weight: 600;">{% translate "Vencimiento:" %}</td>
                                                 <td style="padding: 4px 0; font-size: 13px; color: #dc2626; font-weight: 700;">
                                                     ⏰ {{ due_date_formatted }}
                                                 </td>
@@ -63,7 +64,7 @@
                                             <!-- Cuadrante -->
                                             {% if task.quadrant %}
                                             <tr>
-                                                <td style="padding: 4px 0; font-size: 13px; color: #64748b; font-weight: 600;">Cuadrante:</td>
+                                                <td style="padding: 4px 0; font-size: 13px; color: #64748b; font-weight: 600;">{% translate "Cuadrante:" %}</td>
                                                 <td style="padding: 4px 0; font-size: 13px; color: #2563eb; font-weight: 700;">
                                                     🎯 {{ task.get_quadrant_display|default:task.quadrant }}
                                                 </td>
@@ -73,9 +74,9 @@
 
                                         <!-- Sección Descripción -->
                                         <div style="margin-top: 16px; padding-top: 12px; border-top: 1px dashed #cbd5e1;">
-                                            <span style="font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">Descripción / Notas:</span>
+                                            <span style="font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">{% translate "Descripción / Notas:" %}</span>
                                             <p style="font-size: 13px; color: #334155; margin: 6px 0 0 0; line-height: 1.5; font-style: {% if not task.description %}italic{% else %}normal{% endif %};">
-                                                {{ task.description|default:"Sin descripción adicional." }}
+                                                {% if task.description %}{{ task.description }}{% else %}{% translate "Sin descripción adicional." %}{% endif %}
                                             </p>
                                         </div>
                                     </td>
@@ -87,14 +88,14 @@
                                 <tr>
                                     <td align="center">
                                         <a href="{{ site_url|default:'#' }}" target="_blank" style="display: inline-block; background-color: #0d6efd; color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 700; padding: 12px 28px; border-radius: 50px; box-shadow: 0 4px 10px rgba(13, 110, 253, 0.25);">
-                                            Ver Tarea en EisenhowerFlow
+                                            {% translate "Ver Tarea en EisenhowerFlow" %}
                                         </a>
                                     </td>
                                 </tr>
                             </table>
 
                             <p style="font-size: 12px; color: #94a3b8; margin: 0; text-align: center; line-height: 1.4;">
-                                Este es un mensaje automático generado por tu aplicación para ayudarte a mantener tus tareas al día.
+                                {% translate "Este es un mensaje automático generado por tu aplicación para ayudarte a mantener tus tareas al día." %}
                             </p>
                         </td>
                     </tr>
@@ -103,7 +104,7 @@
                     <tr>
                         <td style="background-color: #f1f5f9; padding: 16px 20px; text-align: center; border-top: 1px solid #e2e8f0;">
                             <p style="font-size: 11px; color: #64748b; margin: 0;">
-                                © {% now "Y" %} EisenhowerFlow. Todos los derechos reservados.
+                                © {% now "Y" %} EisenhowerFlow. {% translate "Todos los derechos reservados." %}
                             </p>
                         </td>
                     </tr>

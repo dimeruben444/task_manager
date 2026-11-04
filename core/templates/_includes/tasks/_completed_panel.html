@@ -6,14 +6,15 @@
                 type="button" 
                 data-bs-toggle="collapse" 
                 data-bs-target="#collapseCompletedTablet" 
-                aria-expanded="false">
+                aria-expanded="false"
+                aria-label="{% translate 'Ver tareas completadas' %}">
             <div class="d-flex align-items-center gap-2">
                 <span class="rounded-circle bg-success-subtle text-success p-1 d-inline-flex align-items-center justify-content-center" style="width: 24px; height: 24px;">
                     <i class="bi bi-check-lg fw-bold"></i>
                 </span>
                 <span>{% translate "Ver tareas completadas" %}</span>
             </div>
-            <span class="badge bg-primary text-white rounded-pill" id="completed-count-mobile">
+            <span class="badge bg-primary text-white rounded-pill" id="completed-count-mobile" title="{% translate 'Total de tareas completadas' %}">
                 {{ completed_tasks|length }}
             </span>
         </button>
@@ -29,7 +30,7 @@
                     <h6 class="fw-bold mb-0 text-dark" style="font-size: 0.95rem;">
                         {% translate "Completadas" %}
                     </h6>
-                    <span class="badge bg-light text-dark border rounded-circle" id="completed-count">
+                    <span class="badge bg-light text-dark border rounded-circle" id="completed-count" title="{% translate 'Total de tareas completadas' %}">
                         {{ completed_tasks|length }}
                     </span>
                 </div>
@@ -75,9 +76,10 @@
                             </span>
                         </div>
 
-                        <form method="POST" action="{% url 'delete_task' task.id %}" class="d-inline m-0 flex-shrink-0" onsubmit="return confirm('¿Eliminar esta tarea definitivamente?');">
+                        <form method="POST" action="{% url 'delete_task' task.id %}" class="d-inline m-0 flex-shrink-0" 
+                            onsubmit="return confirm('{% translate "¿Eliminar esta tarea definitivamente?" %}');">
                             {% csrf_token %}
-                            <button type="submit" class="btn btn-link text-danger p-0 border-0 opacity-50 hover-opacity-100" title="Eliminar">
+                            <button type="submit" class="btn btn-link text-danger p-0 border-0 opacity-50 hover-opacity-100" title="{% translate 'Eliminar' %}">
                                 <i class="bi bi-x-lg" style="font-size: 0.8rem;"></i>
                             </button>
                         </form>

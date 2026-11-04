@@ -44,7 +44,7 @@
                             <input type="text" 
                                 id="globalTaskSearchInput" 
                                 class="form-control search-input" 
-                                placeholder="Buscar tareas..." 
+                                placeholder="{% translate 'Buscar tareas...' %}"
                                 autocomplete="off"
                                 oninput="handleTaskSearchInput(this.value)"
                                 onfocus="handleTaskSearchInput(this.value)">
@@ -78,7 +78,7 @@
                                 <input type="text" 
                                     id="globalTaskSearchInputMobile" 
                                     class="form-control search-input ps-5" 
-                                    placeholder="Buscar tareas..." 
+                                    placeholder="{% translate 'Buscar tareas...' %}"
                                     autocomplete="off"
                                     oninput="handleTaskSearchInput(this.value)"
                                     onfocus="handleTaskSearchInput(this.value)">
@@ -113,7 +113,11 @@
                             </span>
                             {% if unread_notifications_count > 0 %}
                                 <span class="badge bg-danger rounded-pill px-2 py-1 small fw-bold">
-                                    {{ unread_notifications_count }} {% translate "nueva" %}{% if unread_notifications_count > 1 %}s{% endif %}
+                                    {% blocktranslate count counter=unread_notifications_count %}
+                                        1 nueva
+                                    {% plural %}
+                                        {{ counter }} nuevas
+                                    {% endblocktranslate %}
                                 </span>
                             {% endif %}
                         </div>

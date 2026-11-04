@@ -83,7 +83,7 @@
                     <a href="?filter=shared" 
                     class="btn btn-sm border-0 px-2 px-sm-3 py-1.5 fw-semibold d-flex align-items-center justify-content-start justify-content-sm-center justify-content-xl-start gap-2 text-decoration-none text-nowrap {% if not current_board and current_filter == 'shared' or not current_board and current_filter == 'assigned' %}bg-white text-dark shadow-sm{% else %}text-secondary opacity-75{% endif %}"
                     style="border-radius: 8px; font-size: 0.82rem;">
-                        <i class="bi bi-people-fill flex-shrink-0" style="color: #fbbf24 !important; font-size: 0.85rem; {% if current_filter != 'shared' and current_filter != 'assigned' and not current_board %}opacity: 0.6;{% endif %}" title="Compartidas"></i>
+                        <i class="bi bi-people-fill flex-shrink-0" style="color: #fbbf24 !important; font-size: 0.85rem; {% if current_filter != 'shared' and current_filter != 'assigned' and not current_board %}opacity: 0.6;{% endif %}" title="{% translate 'Compartidas' %}"></i>
                         <span>{% translate "Compartidas" %}</span>
                     </a>
                 </div>

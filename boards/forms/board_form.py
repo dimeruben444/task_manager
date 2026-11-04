@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth import get_user_model
 from ..models import Board
+from django.utils.translation import gettext_lazy as _
 
 User = get_user_model()
 
@@ -9,7 +10,7 @@ class BoardForm(forms.ModelForm):
         queryset=User.objects.none(),
         required=False,
         widget=forms.CheckboxSelectMultiple,
-        label='Compartir con miembros'
+        label=_("Compartir con miembros"),
     )
     
     class Meta:
