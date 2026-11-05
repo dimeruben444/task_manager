@@ -1,15 +1,13 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# EisenhowerFlow Internationalization Catalog.
+# Copyright (C) 2026 EisenhowerFlow
 # This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: EisenhowerFlow 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-26 19:26+0100\n"
-"PO-Revision-Date: 2026-10-26 19:30+0100\n"
+"POT-Creation-Date: 2026-11-04 18:27+0100\n"
+"PO-Revision-Date: 2026-11-04 18:35+0100\n"
 "Last-Translator: EisenhowerFlow <dev@eisenhowerflow.local>\n"
 "Language-Team: English <en@li.org>\n"
 "Language: en\n"
@@ -18,33 +16,49 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: boards/models.py:11 core/templates/base/base.html:461
-#: core/templates/tasks/dashboard.html:848 dashboard_antiguo.txt:559
+#: boards/forms/board_form.py:13
+msgid "Compartir con miembros"
+msgstr "Share with members"
+
+#: boards/models.py:11
+#: core/templates/_includes/modals/_create_board_modal.html:25
+#: core/templates/_includes/modals/_edit_board_modal.html:27
+#: dashboard_antiguo.txt:559
 msgid "Azul"
 msgstr "Blue"
 
-#: boards/models.py:12 core/templates/base/base.html:462
-#: core/templates/tasks/dashboard.html:849 dashboard_antiguo.txt:560
+#: boards/models.py:12
+#: core/templates/_includes/modals/_create_board_modal.html:26
+#: core/templates/_includes/modals/_edit_board_modal.html:28
+#: dashboard_antiguo.txt:560
 msgid "Verde"
 msgstr "Green"
 
-#: boards/models.py:13 core/templates/base/base.html:463
-#: core/templates/tasks/dashboard.html:850 dashboard_antiguo.txt:561
+#: boards/models.py:13
+#: core/templates/_includes/modals/_create_board_modal.html:27
+#: core/templates/_includes/modals/_edit_board_modal.html:29
+#: dashboard_antiguo.txt:561
 msgid "Rojo"
 msgstr "Red"
 
-#: boards/models.py:14 core/templates/base/base.html:464
-#: core/templates/tasks/dashboard.html:851 dashboard_antiguo.txt:562
+#: boards/models.py:14
+#: core/templates/_includes/modals/_create_board_modal.html:28
+#: core/templates/_includes/modals/_edit_board_modal.html:30
+#: dashboard_antiguo.txt:562
 msgid "Naranja"
 msgstr "Orange"
 
-#: boards/models.py:15 core/templates/base/base.html:465
-#: core/templates/tasks/dashboard.html:852 dashboard_antiguo.txt:563
+#: boards/models.py:15
+#: core/templates/_includes/modals/_create_board_modal.html:29
+#: core/templates/_includes/modals/_edit_board_modal.html:31
+#: dashboard_antiguo.txt:563
 msgid "Púrpura"
 msgstr "Purple"
 
-#: boards/models.py:16 core/templates/base/base.html:466
-#: core/templates/tasks/dashboard.html:853 dashboard_antiguo.txt:564
+#: boards/models.py:16
+#: core/templates/_includes/modals/_create_board_modal.html:30
+#: core/templates/_includes/modals/_edit_board_modal.html:32
+#: dashboard_antiguo.txt:564
 msgid "Gris"
 msgstr "Gray"
 
@@ -52,14 +66,18 @@ msgstr "Gray"
 msgid "Título"
 msgstr "Title"
 
-#: boards/models.py:20 core/templates/_includes/_task_card.html:480
-#: core/templates/base/base.html:470 core/templates/tasks/dashboard.html:425
-#: core/templates/tasks/dashboard.html:857 dashboard_antiguo.txt:278
+#: boards/models.py:20
+#: core/templates/_includes/modals/_create_board_modal.html:34
+#: core/templates/_includes/modals/_edit_board_modal.html:36
+#: core/templates/_includes/tasks/_quick_add_bar.html:350
+#: core/templates/_includes/tasks/_task_edit_modal.html:363
+#: dashboard_antiguo.txt:278
 msgid "Descripción"
 msgstr "Description"
 
-#: boards/models.py:21 core/templates/base/base.html:459
-#: core/templates/tasks/dashboard.html:846
+#: boards/models.py:21
+#: core/templates/_includes/modals/_create_board_modal.html:23
+#: core/templates/_includes/modals/_edit_board_modal.html:25
 msgid "Color"
 msgstr "Color"
 
@@ -67,7 +85,8 @@ msgstr "Color"
 msgid "¿Tablero general?"
 msgstr "General board?"
 
-#: boards/models.py:29 core/templates/base/base.html:564
+#: boards/models.py:29
+#: core/templates/_includes/modals/_edit_board_modal.html:130
 msgid "Propietario"
 msgstr "Owner"
 
@@ -87,19 +106,27 @@ msgstr "Notification sent"
 msgid "Fecha de creación"
 msgstr "Creation date"
 
-#: boards/models.py:45 core/templates/_includes/_task_card.html:337
-#: core/templates/_includes/_task_card.html:373
-#: core/templates/tasks/dashboard.html:205 dashboard_antiguo.txt:126
-#: tasks/models.py:96
+#: boards/models.py:45 core/templates/_includes/tasks/_quick_add_bar.html:115
+#: core/templates/_includes/tasks/_task_edit_modal.html:226
+#: core/templates/_includes/tasks/_task_edit_modal.html:258
+#: dashboard_antiguo.txt:126 tasks/models.py:96
 msgid "Tablero"
 msgstr "Board"
 
-#: boards/models.py:46 core/templates/base/base.html:275
+#: boards/models.py:46
+#: core/templates/_includes/navigation/_offcanvas_boards.html:6
+#: core/templates/_includes/navigation/_sidebar.html:5
 msgid "Tableros"
 msgstr "Boards"
 
-#: boards/models.py:58 core/templates/base/base.html:289
-#: core/templates/tasks/dashboard.html:7 core/templates/tasks/dashboard.html:48
+#: boards/models.py:58
+#: core/templates/_includes/navigation/_offcanvas_boards.html:21
+#: core/templates/_includes/navigation/_sidebar.html:18
+#: core/templates/_includes/tasks/_quick_add_bar.html:138
+#: core/templates/_includes/tasks/_task_edit_modal.html:282
+#: core/templates/_includes/tasks/_task_edit_modal.html:306
+#: core/templates/_includes/tasks/_task_edit_modal.html:392
+#: core/templates/tasks/dashboard.html:6 core/templates/tasks/dashboard.html:42
 #: dashboard_antiguo.txt:7 dashboard_antiguo.txt:17 dashboard_antiguo.txt:128
 msgid "General"
 msgstr "General"
@@ -108,583 +135,1225 @@ msgstr "General"
 msgid "Personalizado"
 msgstr "Custom"
 
-#: core/settings.py:139
+#: core/settings.py:147
 msgid "Español"
 msgstr "Spanish"
 
-#: core/settings.py:140
+#: core/settings.py:148
 msgid "English"
 msgstr "English"
 
-#: core/templates/_includes/_task_card.html:68
-msgid "Tiene descripción"
-msgstr "Has description"
+#: core/templates/_includes/modals/_clear_completed_modal.html:6
+#: core/templates/_includes/tasks/_completed_panel.html:45
+#: dashboard_antiguo.txt:488
+msgid "Vaciar completadas"
+msgstr "Clear completed"
 
-#: core/templates/_includes/_task_card.html:79
-msgid "Tarea compartida / asignada"
-msgstr "Shared / assigned task"
+#: core/templates/_includes/modals/_clear_completed_modal.html:7
+msgid "¿Deseas eliminar permanentemente las tareas completadas?"
+msgstr "Do you want to permanently delete completed tasks?"
 
-#: core/templates/_includes/_task_card.html:93
-msgid "Asignado a:"
-msgstr "Assigned to:"
+#: core/templates/_includes/modals/_clear_completed_modal.html:11
+#: dashboard_antiguo.txt:597
+msgid "Eliminar definitivamente"
+msgstr "Delete permanently"
 
-#: core/templates/_includes/_task_card.html:100
-msgid "Total de asignados:"
-msgstr "Total assignees:"
+#: core/templates/_includes/modals/_create_board_modal.html:10
+#: dashboard_antiguo.txt:547
+msgid "Crear nuevo tablero"
+msgstr "Create new board"
 
-#: core/templates/_includes/_task_card.html:138
-#: core/templates/_includes/_task_card.html:158
-#: core/templates/_includes/_task_card.html:160
-msgid "Urgente e Importante (Hacer ahora)"
-msgstr "Urgent & Important (Do now)"
+#: core/templates/_includes/modals/_create_board_modal.html:12
+#: core/templates/_includes/modals/_edit_board_modal.html:14
+#: core/templates/_includes/modals/_user_settings_modal.html:178
+msgid "Cerrar"
+msgstr "Close"
 
-#: core/templates/_includes/_task_card.html:142
-#: core/templates/_includes/_task_card.html:164
-#: core/templates/_includes/_task_card.html:166 dashboard_antiguo.txt:350
-msgid "Importante - No Urgente (Planificar)"
-msgstr "Important - Not Urgent (Schedule)"
+#: core/templates/_includes/modals/_create_board_modal.html:17
+#: core/templates/_includes/modals/_edit_board_modal.html:19
+#: dashboard_antiguo.txt:552
+msgid "Nombre del tablero"
+msgstr "Board name"
 
-#: core/templates/_includes/_task_card.html:146
-#: core/templates/_includes/_task_card.html:170
-#: core/templates/_includes/_task_card.html:172 dashboard_antiguo.txt:390
-msgid "Urgente - No Importante (Delegar)"
-msgstr "Urgent - Not Important (Delegate)"
+#: core/templates/_includes/modals/_create_board_modal.html:18
+msgid "Nombre del tablero..."
+msgstr "Board name..."
 
-#: core/templates/_includes/_task_card.html:150
-#: core/templates/_includes/_task_card.html:176
-#: core/templates/_includes/_task_card.html:178 dashboard_antiguo.txt:430
-msgid "No Urgente - No Importante (Eliminar)"
-msgstr "Not Urgent - Not Important (Delete)"
+#: core/templates/_includes/modals/_create_board_modal.html:35
+#: core/templates/_includes/modals/_edit_board_modal.html:37
+msgid "Opcional"
+msgstr "Optional"
 
-#: core/templates/_includes/_task_card.html:213
-msgid "Urgencia"
-msgstr "Urgency"
+#: core/templates/_includes/modals/_create_board_modal.html:43
+#: core/templates/_includes/modals/_edit_board_modal.html:45
+msgid "Invitar a un nuevo miembro"
+msgstr "Invite a new member"
 
-#: core/templates/_includes/_task_card.html:235
-msgid "Importancia"
-msgstr "Importance"
+#: core/templates/_includes/modals/_create_board_modal.html:53
+#: core/templates/_includes/modals/_edit_board_modal.html:55
+msgid "Escribe usuario, email o nombre..."
+msgstr "Type username, email or name..."
 
-#: core/templates/_includes/_task_card.html:269
-#: core/templates/_includes/_task_card.html:280
-#: core/templates/tasks/dashboard.html:286
-#: core/templates/tasks/dashboard.html:293 dashboard_antiguo.txt:160
-#: dashboard_antiguo.txt:167
-msgid "Fechas"
-msgstr "Dates"
+#: core/templates/_includes/modals/_create_board_modal.html:91
+#: core/templates/_includes/modals/_edit_board_modal.html:93
+msgid "No se encontró ningún usuario registrado."
+msgstr "No registered user found."
 
-#: core/templates/_includes/_task_card.html:289
-#: core/templates/tasks/dashboard.html:300 dashboard_antiguo.txt:175
-msgid "Fecha de vencimiento"
-msgstr "Due date"
+#: core/templates/_includes/modals/_create_board_modal.html:97
+#: core/templates/_includes/modals/_edit_board_modal.html:99
+msgid "Se enviará una invitación para participar en el tablero a:"
+msgstr "An invitation to participate in the board will be sent to:"
 
-#: core/templates/_includes/_task_card.html:309
-#: core/templates/tasks/dashboard.html:318
-msgid "Recibir recordatorio por correo"
-msgstr "Receive email reminder"
+#: core/templates/_includes/modals/_create_board_modal.html:105
+msgid "Le llegará una notificación inmediata para unirse al guardar."
+msgstr "An immediate notification to join will be sent upon saving."
 
-#: core/templates/_includes/_task_card.html:318
-#: core/templates/tasks/dashboard.html:329 dashboard_antiguo.txt:217
-msgid "Quitar"
-msgstr "Remove"
-
-#: core/templates/_includes/_task_card.html:321
-#: core/templates/_includes/_task_card.html:655
-#: core/templates/tasks/dashboard.html:326 dashboard_antiguo.txt:214
-msgid "Guardar"
-msgstr "Save"
-
-#: core/templates/_includes/_task_card.html:404
-#: core/templates/tasks/dashboard.html:235 dashboard_antiguo.txt:133
-msgid "Seleccionar Tablero"
-msgstr "Select Board"
-
-#: core/templates/_includes/_task_card.html:487
-#: core/templates/tasks/dashboard.html:440
-msgid "Escribe una descripción más detallada..."
-msgstr "Write a more detailed description..."
-
-#: core/templates/_includes/_task_card.html:508
-msgid "ha añadido esta tarjeta a"
-msgstr "added this card to"
-
-#: core/templates/_includes/_task_card.html:519
-#: core/templates/tasks/dashboard.html:348 dashboard_antiguo.txt:235
-msgid "Asignada a"
-msgstr "Assigned to"
-
-#: core/templates/_includes/_task_card.html:542
-#: core/templates/tasks/dashboard.html:358
-msgid "Asignar personas"
-msgstr "Assign people"
-
-#: core/templates/_includes/_task_card.html:552
-#: core/templates/tasks/dashboard.html:368
-msgid "Buscar persona o email..."
-msgstr "Search person or email..."
-
-#: core/templates/_includes/_task_card.html:635
-msgid "¿Seguro que quieres eliminar esta tarea?"
-msgstr "Are you sure you want to delete this task?"
-
-#: core/templates/_includes/_task_card.html:636
-#: core/templates/_includes/_task_card.html:646
-msgid "Eliminar Tarea"
-msgstr "Delete Task"
-
-#: core/templates/_includes/_task_card.html:645
-msgid "Solo el creador o el propietario del tablero pueden eliminar esta tarea"
-msgstr "Only the creator or board owner can delete this task"
-
-#: core/templates/_includes/_task_card.html:652
-#: core/templates/base/base.html:606 core/templates/base/base.html:730
-#: core/templates/base/base.html:757 core/templates/tasks/dashboard.html:939
+#: core/templates/_includes/modals/_create_board_modal.html:111
+#: core/templates/_includes/modals/_edit_board_modal.html:171
+#: core/templates/_includes/modals/_user_settings_modal.html:108
+#: core/templates/_includes/modals/_user_settings_modal.html:134
+#: core/templates/_includes/modals/_user_settings_modal.html:248
+#: core/templates/_includes/tasks/_task_edit_modal.html:523
 #: dashboard_antiguo.txt:574 dashboard_antiguo.txt:593
 msgid "Cancelar"
 msgstr "Cancel"
+
+#: core/templates/_includes/modals/_create_board_modal.html:112
+#: dashboard_antiguo.txt:575
+msgid "Guardar Tablero"
+msgstr "Save Board"
+
+#: core/templates/_includes/modals/_edit_board_modal.html:12
+msgid "Ajustes del Tablero"
+msgstr "Board Settings"
+
+#: core/templates/_includes/modals/_edit_board_modal.html:108
+msgid "Le llegará una notificación inmediata para unirse."
+msgstr "An immediate notification will be sent to join."
+
+#: core/templates/_includes/modals/_edit_board_modal.html:113
+msgid "Enviar Invitación"
+msgstr "Send Invitation"
+
+#: core/templates/_includes/modals/_edit_board_modal.html:119
+msgid "Miembros actuales"
+msgstr "Current members"
+
+#: core/templates/_includes/modals/_edit_board_modal.html:145
+msgid "Desmarca para quitar miembro"
+msgstr "Uncheck to remove member"
+
+#: core/templates/_includes/modals/_edit_board_modal.html:151
+msgid "Sin miembros colaboradores adicionales."
+msgstr "No additional collaborating members."
+
+#: core/templates/_includes/modals/_edit_board_modal.html:163
+msgid "¿Seguro que quieres eliminar el tablero"
+msgstr "Are you sure you want to delete the board"
+
+#: core/templates/_includes/modals/_edit_board_modal.html:164
+msgid "Eliminar Tablero"
+msgstr "Delete Board"
+
+#: core/templates/_includes/modals/_edit_board_modal.html:172
+msgid "Guardar Cambios"
+msgstr "Save Changes"
+
+#: core/templates/_includes/modals/_user_settings_modal.html:9
+msgid "Ajustes de Cuenta"
+msgstr "Account Settings"
+
+#: core/templates/_includes/modals/_user_settings_modal.html:40
+msgid "Perfil"
+msgstr "Profile"
+
+#: core/templates/_includes/modals/_user_settings_modal.html:50
+msgid "Seguridad"
+msgstr "Security"
+
+#: core/templates/_includes/modals/_user_settings_modal.html:60
+msgid "Idioma"
+msgstr "Language"
+
+#: core/templates/_includes/modals/_user_settings_modal.html:71
+#: core/templates/_includes/navigation/_footer.html:11
+msgid "Privacidad"
+msgstr "Privacy"
+
+#: core/templates/_includes/modals/_user_settings_modal.html:84
+msgid "Nombre de usuario"
+msgstr "Username"
+
+#: core/templates/_includes/modals/_user_settings_modal.html:93
+#: core/templates/legal/cookies.html:23 users/forms/user_form.py:25
+msgid "Nombre"
+msgstr "First Name"
+
+#: core/templates/_includes/modals/_user_settings_modal.html:97
+#: users/forms/user_form.py:34
+msgid "Apellidos"
+msgstr "Last Name"
+
+#: core/templates/_includes/modals/_user_settings_modal.html:103
+#: core/templates/registration/password_reset_form.html:21
+#: users/forms/user_form.py:12 users/forms/user_form.py:74
+msgid "Correo electrónico"
+msgstr "Email address"
+
+#: core/templates/_includes/modals/_user_settings_modal.html:109
+msgid "Guardar Perfil"
+msgstr "Save Profile"
+
+#: core/templates/_includes/modals/_user_settings_modal.html:119
+msgid "Contraseña actual"
+msgstr "Current password"
+
+#: core/templates/_includes/modals/_user_settings_modal.html:124
+msgid "Nueva contraseña"
+msgstr "New password"
+
+#: core/templates/_includes/modals/_user_settings_modal.html:129
+msgid "Confirmar nueva contraseña"
+msgstr "Confirm new password"
+
+#: core/templates/_includes/modals/_user_settings_modal.html:135
+msgid "Actualizar Contraseña"
+msgstr "Update Password"
+
+#: core/templates/_includes/modals/_user_settings_modal.html:147
+msgid "Selecciona el idioma de la aplicación"
+msgstr "Select application language"
+
+#: core/templates/_includes/modals/_user_settings_modal.html:190
+msgid "Exportar mis datos (RGPD)"
+msgstr "Export my data (GDPR)"
+
+#: core/templates/_includes/modals/_user_settings_modal.html:192
+msgid ""
+"Descarga una copia de todos tus tableros, tareas y configuraciones en "
+"formato JSON."
+msgstr ""
+"Download a copy of all your boards, tasks, and settings in JSON format."
+
+#: core/templates/_includes/modals/_user_settings_modal.html:196
+msgid "Exportar JSON"
+msgstr "Export JSON"
+
+#: core/templates/_includes/modals/_user_settings_modal.html:204
+msgid "ATENCION"
+msgstr "WARNING"
+
+#: core/templates/_includes/modals/_user_settings_modal.html:208
+msgid ""
+"Al eliminar tu cuenta se borrarán permanentemente todos tus tableros, tareas "
+"y configuraciones. Esta acción no se puede deshacer."
+msgstr ""
+"Deleting your account will permanently remove all your boards, tasks, and "
+"settings. This action cannot be undone."
+
+#: core/templates/_includes/modals/_user_settings_modal.html:211
+msgid "Eliminar mi cuenta"
+msgstr "Delete my account"
+
+#: core/templates/_includes/modals/_user_settings_modal.html:230
+msgid "¿Confirmar eliminación?"
+msgstr "Confirm deletion?"
+
+#: core/templates/_includes/modals/_user_settings_modal.html:235
+msgid ""
+"Escribe tu contraseña para confirmar que deseas eliminar definitivamente tu "
+"cuenta de EisenhowerFlow."
+msgstr ""
+"Enter your password to confirm that you want to permanently delete your "
+"EisenhowerFlow account."
+
+#: core/templates/_includes/modals/_user_settings_modal.html:241
+msgid "Tu contraseña"
+msgstr "Your password"
+
+#: core/templates/_includes/modals/_user_settings_modal.html:245
+msgid "Sí, eliminar mi cuenta"
+msgstr "Yes, delete my account"
+
+#: core/templates/_includes/navigation/_cookie_banner.html:7
+msgid "Valoramos tu privacidad"
+msgstr "We value your privacy"
+
+#: core/templates/_includes/navigation/_cookie_banner.html:8
+msgid ""
+"Utilizamos cookies estrictamente necesarias para mantener tu sesión activa y "
+"garantizar la seguridad del sitio."
+msgstr ""
+"We use strictly necessary cookies to keep your session active and ensure "
+"site security."
+
+#: core/templates/_includes/navigation/_cookie_banner.html:9
+msgid "Más información en nuestra Política de Cookies"
+msgstr "More information in our Cookie Policy"
+
+#: core/templates/_includes/navigation/_cookie_banner.html:13
+#: core/templates/_includes/navigation/_navbar.html:179
+msgid "Aceptar"
+msgstr "Accept"
+
+#: core/templates/_includes/navigation/_footer.html:6
+#: core/templates/_includes/tasks/_reminder_email.html:107
+#: core/templates/registration/password_reset_email.html:42
+msgid "Todos los derechos reservados."
+msgstr "All rights reserved."
+
+#: core/templates/_includes/navigation/_footer.html:10
+#: core/templates/registration/register.html:74
+msgid "Aviso Legal"
+msgstr "Legal Notice"
+
+#: core/templates/_includes/navigation/_footer.html:12
+msgid "Cookies"
+msgstr "Cookies"
+
+#: core/templates/_includes/navigation/_navbar.html:15
+msgid "Ver tableros"
+msgstr "View boards"
+
+#: core/templates/_includes/navigation/_navbar.html:47
+#: core/templates/_includes/navigation/_navbar.html:81
+msgid "Buscar tareas..."
+msgstr "Search tasks..."
+
+#: core/templates/_includes/navigation/_navbar.html:70
+msgid "Buscar tareas"
+msgstr "Search tasks"
+
+#: core/templates/_includes/navigation/_navbar.html:112
+msgid "NOTIFICACIONES"
+msgstr "NOTIFICATIONS"
+
+#: core/templates/_includes/navigation/_navbar.html:116
+#, python-format
+msgid ""
+"\n"
+"                                        1 nueva\n"
+"                                    "
+msgid_plural ""
+"\n"
+"                                        %(counter)s nuevas\n"
+"                                    "
+msgstr[0] ""
+"\n"
+"                                        1 new\n"
+"                                    "
+msgstr[1] ""
+"\n"
+"                                        %(counter)s new\n"
+"                                    "
+
+#: core/templates/_includes/navigation/_navbar.html:138
+msgid "Descartar notificación"
+msgstr "Dismiss notification"
+
+#: core/templates/_includes/navigation/_navbar.html:182
+msgid "Rechazar"
+msgstr "Decline"
+
+#: core/templates/_includes/navigation/_navbar.html:187
+msgid "Ver en el tablero"
+msgstr "View on board"
+
+#: core/templates/_includes/navigation/_navbar.html:191
+msgid "Ver en General"
+msgstr "View in General"
+
+#: core/templates/_includes/navigation/_navbar.html:198
+msgid "No tienes notificaciones pendientes."
+msgstr "You have no pending notifications."
+
+#: core/templates/_includes/navigation/_navbar.html:232
+msgid "CUENTA"
+msgstr "ACCOUNT"
+
+#: core/templates/_includes/navigation/_navbar.html:261
+msgid "Ajustes de cuenta"
+msgstr "Account settings"
+
+#: core/templates/_includes/navigation/_navbar.html:268
+msgid "Cerrar sesión"
+msgstr "Log out"
+
+#: core/templates/_includes/navigation/_navbar.html:276
+#: core/templates/registration/login.html:5
+#: core/templates/registration/login.html:53
+#: core/templates/registration/password_reset_complete.html:18
+msgid "Iniciar sesión"
+msgstr "Log in"
+
+#: core/templates/_includes/navigation/_navbar.html:279
+#: core/templates/registration/register.html:86
+msgid "Registrarse"
+msgstr "Sign up"
+
+#: core/templates/_includes/navigation/_offcanvas_boards.html:45
+#: core/templates/_includes/navigation/_offcanvas_boards.html:82
+#: core/templates/_includes/navigation/_sidebar.html:44
+#: core/templates/_includes/navigation/_sidebar.html:87
+msgid "Editar tablero"
+msgstr "Edit board"
+
+#: core/templates/_includes/navigation/_offcanvas_boards.html:76
+#: core/templates/_includes/navigation/_sidebar.html:81
+msgid "Tablero compartido"
+msgstr "Shared board"
+
+#: core/templates/_includes/navigation/_offcanvas_boards.html:93
+#: core/templates/_includes/navigation/_sidebar.html:98
+msgid "Nuevo Tablero"
+msgstr "New Board"
+
+#: core/templates/_includes/navigation/_sidebar.html:106
+msgid "DISTRIBUCIÓN ACTUAL"
+msgstr "CURRENT DISTRIBUTION"
+
+#: core/templates/_includes/navigation/_sidebar.html:114
+msgid "Hacer"
+msgstr "Do"
+
+#: core/templates/_includes/navigation/_sidebar.html:117
+#: core/templates/_includes/navigation/_sidebar.html:131
+#: core/templates/_includes/navigation/_sidebar.html:145
+#: core/templates/_includes/navigation/_sidebar.html:159
+#, python-format
+msgid ""
+"\n"
+"                                1 tarea\n"
+"                            "
+msgid_plural ""
+"\n"
+"                                %(counter)s tareas\n"
+"                            "
+msgstr[0] ""
+"\n"
+"                                1 task\n"
+"                            "
+msgstr[1] ""
+"\n"
+"                                %(counter)s tasks\n"
+"                            "
+
+#: core/templates/_includes/navigation/_sidebar.html:128
+msgid "Planificar"
+msgstr "Schedule"
+
+#: core/templates/_includes/navigation/_sidebar.html:142
+msgid "Delegar"
+msgstr "Delegate"
+
+#: core/templates/_includes/navigation/_sidebar.html:156
+#: core/templates/_includes/tasks/_completed_panel.html:82
+msgid "Eliminar"
+msgstr "Delete"
+
+#: core/templates/_includes/tasks/_completed_panel.html:10
+#: core/templates/_includes/tasks/_completed_panel.html:15
+msgid "Ver tareas completadas"
+msgstr "View completed tasks"
+
+#: core/templates/_includes/tasks/_completed_panel.html:17
+#: core/templates/_includes/tasks/_completed_panel.html:33
+msgid "Total de tareas completadas"
+msgstr "Total completed tasks"
+
+#: core/templates/_includes/tasks/_completed_panel.html:31
+#: dashboard_antiguo.txt:474
+msgid "Completadas"
+msgstr "Completed"
+
+#: core/templates/_includes/tasks/_completed_panel.html:40
+#: core/templates/tasks/dashboard.html:73 dashboard_antiguo.txt:23
+#: dashboard_antiguo.txt:483
+msgid "Todas"
+msgstr "All"
+
+#: core/templates/_includes/tasks/_completed_panel.html:41
+#: dashboard_antiguo.txt:484
+msgid "Hoy"
+msgstr "Today"
+
+#: core/templates/_includes/tasks/_completed_panel.html:42
+#: dashboard_antiguo.txt:485
+msgid "Esta semana"
+msgstr "This week"
+
+#: core/templates/_includes/tasks/_completed_panel.html:80
+msgid "¿Eliminar esta tarea definitivamente?"
+msgstr "Delete this task permanently?"
+
+#: core/templates/_includes/tasks/_completed_panel.html:89
+#: dashboard_antiguo.txt:531
+msgid "No hay tareas completadas."
+msgstr "No completed tasks."
+
+#: core/templates/_includes/tasks/_mobile_action_modal.html:42
+msgid "Completar"
+msgstr "Complete"
+
+#: core/templates/_includes/tasks/_mobile_action_modal.html:50
+msgid "Editar"
+msgstr "Edit"
+
+#: core/templates/_includes/tasks/_quick_add_bar.html:16
+msgid "Añadir nueva tarea..."
+msgstr "Add new task..."
+
+#: core/templates/_includes/tasks/_quick_add_bar.html:31
+msgid "TÍTULO DE LA TAREA"
+msgstr "TASK TITLE"
+
+#: core/templates/_includes/tasks/_quick_add_bar.html:39
+msgid "URGENCIA"
+msgstr "URGENCY"
+
+#: core/templates/_includes/tasks/_quick_add_bar.html:60
+msgid "IMPORTANCIA"
+msgstr "IMPORTANCE"
+
+#: core/templates/_includes/tasks/_quick_add_bar.html:88
+msgid "Destino previsto:"
+msgstr "Intended destination:"
+
+#: core/templates/_includes/tasks/_quick_add_bar.html:98
+#: dashboard_antiguo.txt:108
+msgid "Opciones avanzadas (Tablero, fecha límite, notas...)"
+msgstr "Advanced options (Board, due date, notes...)"
+
+#: core/templates/_includes/tasks/_quick_add_bar.html:145
+#: core/templates/_includes/tasks/_task_edit_modal.html:289
+#: dashboard_antiguo.txt:133
+msgid "Seleccionar Tablero"
+msgstr "Select Board"
+
+#: core/templates/_includes/tasks/_quick_add_bar.html:197
+#: core/templates/_includes/tasks/_quick_add_bar.html:207
+#: core/templates/_includes/tasks/_task_edit_modal.html:146
+#: core/templates/_includes/tasks/_task_edit_modal.html:157
+#: dashboard_antiguo.txt:160 dashboard_antiguo.txt:167
+msgid "Fechas"
+msgstr "Dates"
+
+#: core/templates/_includes/tasks/_quick_add_bar.html:214
+#: core/templates/_includes/tasks/_task_edit_modal.html:164
+#: dashboard_antiguo.txt:175
+msgid "Fecha de vencimiento"
+msgstr "Due date"
+
+#: core/templates/_includes/tasks/_quick_add_bar.html:227
+#: core/templates/_includes/tasks/_task_edit_modal.html:177
+msgid "Aviso del recordatorio"
+msgstr "Reminder notice"
+
+#: core/templates/_includes/tasks/_quick_add_bar.html:229
+#: core/templates/_includes/tasks/_task_edit_modal.html:179
+#: dashboard_antiguo.txt:200 tasks/models.py:25
+msgid "A la hora del vencimiento"
+msgstr "At time of due date"
+
+#: core/templates/_includes/tasks/_quick_add_bar.html:230
+#: core/templates/_includes/tasks/_task_edit_modal.html:180
+#: dashboard_antiguo.txt:201 tasks/models.py:26
+msgid "5 minutos antes"
+msgstr "5 minutes before"
+
+#: core/templates/_includes/tasks/_quick_add_bar.html:231
+#: core/templates/_includes/tasks/_task_edit_modal.html:181
+#: dashboard_antiguo.txt:202 tasks/models.py:27
+msgid "15 minutos antes"
+msgstr "15 minutes before"
+
+#: core/templates/_includes/tasks/_quick_add_bar.html:232
+#: core/templates/_includes/tasks/_task_edit_modal.html:182
+#: dashboard_antiguo.txt:203 tasks/models.py:28
+msgid "1 hora antes"
+msgstr "1 hour before"
+
+#: core/templates/_includes/tasks/_quick_add_bar.html:233
+#: core/templates/_includes/tasks/_task_edit_modal.html:183
+#: dashboard_antiguo.txt:204 tasks/models.py:29
+msgid "2 horas antes"
+msgstr "2 hours before"
+
+#: core/templates/_includes/tasks/_quick_add_bar.html:234
+#: core/templates/_includes/tasks/_task_edit_modal.html:184
+#: dashboard_antiguo.txt:205 tasks/models.py:30
+msgid "1 día antes"
+msgstr "1 day before"
+
+#: core/templates/_includes/tasks/_quick_add_bar.html:235
+#: core/templates/_includes/tasks/_task_edit_modal.html:185
+#: dashboard_antiguo.txt:206 tasks/models.py:31
+msgid "2 días antes"
+msgstr "2 days before"
+
+#: core/templates/_includes/tasks/_quick_add_bar.html:236
+#: core/templates/_includes/tasks/_task_edit_modal.html:186
+#: dashboard_antiguo.txt:207 tasks/models.py:32
+msgid "1 semana antes"
+msgstr "1 week before"
+
+#: core/templates/_includes/tasks/_quick_add_bar.html:237
+#: core/templates/_includes/tasks/_task_edit_modal.html:187
+#: dashboard_antiguo.txt:208 tasks/models.py:33
+msgid "2 semanas antes"
+msgstr "2 weeks before"
+
+#: core/templates/_includes/tasks/_quick_add_bar.html:249
+#: core/templates/_includes/tasks/_task_edit_modal.html:200
+msgid "Recibir recordatorio por correo"
+msgstr "Receive email reminder"
+
+#: core/templates/_includes/tasks/_quick_add_bar.html:257
+#: core/templates/_includes/tasks/_task_edit_modal.html:208
+#: dashboard_antiguo.txt:217
+msgid "Quitar"
+msgstr "Remove"
+
+#: core/templates/_includes/tasks/_quick_add_bar.html:260
+#: core/templates/_includes/tasks/_task_edit_modal.html:211
+#: core/templates/_includes/tasks/_task_edit_modal.html:526
+#: dashboard_antiguo.txt:214
+msgid "Guardar"
+msgstr "Save"
+
+#: core/templates/_includes/tasks/_quick_add_bar.html:277
+#: core/templates/_includes/tasks/_task_edit_modal.html:402
+#: dashboard_antiguo.txt:235
+msgid "Asignada a"
+msgstr "Assigned to"
+
+#: core/templates/_includes/tasks/_quick_add_bar.html:287
+#: core/templates/_includes/tasks/_task_edit_modal.html:423
+msgid "Asignar personas"
+msgstr "Assign people"
+
+#: core/templates/_includes/tasks/_quick_add_bar.html:296
+#: core/templates/_includes/tasks/_task_edit_modal.html:432
+msgid "Buscar persona o email..."
+msgstr "Search person or email..."
+
+#: core/templates/_includes/tasks/_quick_add_bar.html:365
+#: core/templates/_includes/tasks/_task_edit_modal.html:370
+msgid "Escribe una descripción más detallada..."
+msgstr "Write a more detailed description..."
+
+#: core/templates/_includes/tasks/_quick_add_bar.html:368
+msgid "caracteres"
+msgstr "characters"
+
+#: core/templates/_includes/tasks/_reminder_email.html:7
+msgid "Recordatorio de Tarea"
+msgstr "Task Reminder"
+
+#: core/templates/_includes/tasks/_reminder_email.html:23
+msgid "Gestor de Tareas & Prioridades"
+msgstr "Task & Priority Manager"
+
+#: core/templates/_includes/tasks/_reminder_email.html:32
+msgid "¡Hola"
+msgstr "Hello"
+
+#: core/templates/_includes/tasks/_reminder_email.html:35
+msgid ""
+"Te recordamos que tienes una tarea pendiente cuya fecha de vencimiento está "
+"próxima a cumplirse:"
+msgstr ""
+"We remind you that you have a pending task whose due date is coming up:"
+
+#: core/templates/_includes/tasks/_reminder_email.html:50
+msgid "Tablero:"
+msgstr "Board:"
+
+#: core/templates/_includes/tasks/_reminder_email.html:58
+msgid "Vencimiento:"
+msgstr "Due date:"
+
+#: core/templates/_includes/tasks/_reminder_email.html:67
+msgid "Cuadrante:"
+msgstr "Quadrant:"
+
+#: core/templates/_includes/tasks/_reminder_email.html:77
+msgid "Descripción / Notas:"
+msgstr "Description / Notes:"
+
+#: core/templates/_includes/tasks/_reminder_email.html:79
+msgid "Sin descripción adicional."
+msgstr "No additional description."
+
+#: core/templates/_includes/tasks/_reminder_email.html:91
+msgid "Ver Tarea en EisenhowerFlow"
+msgstr "View Task in EisenhowerFlow"
+
+#: core/templates/_includes/tasks/_reminder_email.html:98
+msgid ""
+"Este es un mensaje automático generado por tu aplicación para ayudarte a "
+"mantener tus tareas al día."
+msgstr ""
+"This is an automated message generated by your app to help you keep your "
+"tasks up to date."
+
+#: core/templates/_includes/tasks/_task_card.html:65
+msgid "Tiene descripción"
+msgstr "Has description"
+
+#: core/templates/_includes/tasks/_task_card.html:73
+msgid "Tarea compartida / asignada"
+msgstr "Shared / assigned task"
+
+#: core/templates/_includes/tasks/_task_card.html:86
+msgid "Asignado a:"
+msgstr "Assigned to:"
+
+#: core/templates/_includes/tasks/_task_card.html:93
+msgid "Total de asignados:"
+msgstr "Total assignees:"
+
+#: core/templates/_includes/tasks/_task_edit_modal.html:23
+#: core/templates/_includes/tasks/_task_edit_modal.html:40
+#: core/templates/_includes/tasks/_task_edit_modal.html:42
+msgid "Urgente e Importante (Hacer ahora)"
+msgstr "Urgent & Important (Do now)"
+
+#: core/templates/_includes/tasks/_task_edit_modal.html:26
+#: core/templates/_includes/tasks/_task_edit_modal.html:46
+#: core/templates/_includes/tasks/_task_edit_modal.html:48
+#: dashboard_antiguo.txt:350
+msgid "Importante - No Urgente (Planificar)"
+msgstr "Important - Not Urgent (Schedule)"
+
+#: core/templates/_includes/tasks/_task_edit_modal.html:29
+#: core/templates/_includes/tasks/_task_edit_modal.html:52
+#: core/templates/_includes/tasks/_task_edit_modal.html:54
+#: dashboard_antiguo.txt:390
+msgid "Urgente - No Importante (Delegar)"
+msgstr "Urgent - Not Important (Delegate)"
+
+#: core/templates/_includes/tasks/_task_edit_modal.html:32
+#: core/templates/_includes/tasks/_task_edit_modal.html:58
+#: core/templates/_includes/tasks/_task_edit_modal.html:60
+#: dashboard_antiguo.txt:430
+msgid "No Urgente - No Importante (Eliminar)"
+msgstr "Not Urgent - Not Important (Delete)"
+
+#: core/templates/_includes/tasks/_task_edit_modal.html:74
+#: dashboard_antiguo.txt:44 tasks/models.py:38
+msgid "Título de la tarea"
+msgstr "Task title"
+
+#: core/templates/_includes/tasks/_task_edit_modal.html:92
+msgid "Urgencia"
+msgstr "Urgency"
+
+#: core/templates/_includes/tasks/_task_edit_modal.html:113
+msgid "Importancia"
+msgstr "Importance"
+
+#: core/templates/_includes/tasks/_task_edit_modal.html:391
+msgid "ha añadido esta tarjeta a"
+msgstr "added this card to"
+
+#: core/templates/_includes/tasks/_task_edit_modal.html:509
+#: core/templates/_includes/tasks/_task_edit_modal.html:517
+msgid "Eliminar Tarea"
+msgstr "Delete Task"
+
+#: core/templates/_includes/tasks/_task_edit_modal.html:516
+msgid "Solo el creador o el propietario del tablero pueden eliminar esta tarea"
+msgstr "Only the creator or board owner can delete this task"
 
 #: core/templates/base/base.html:9
 msgid "EisenhowerFlow"
 msgstr "EisenhowerFlow"
 
-#: core/templates/base/base.html:88
-msgid "NOTIFICACIONES"
-msgstr "NOTIFICATIONS"
+#: core/templates/legal/cookies.html:4 core/templates/legal/cookies.html:9
+msgid "Política de Cookies"
+msgstr "Cookie Policy"
 
-#: core/templates/base/base.html:92
-msgid "nueva"
-msgstr "new"
+#: core/templates/legal/cookies.html:14
+msgid ""
+"Una cookie es un pequeño archivo de texto que un sitio web guarda en tu "
+"ordenador o dispositivo móvil cuando lo visitas."
+msgstr ""
+"A cookie is a small text file that a website saves on your computer or "
+"mobile device when you visit it."
 
-#: core/templates/base/base.html:110
-msgid "Descartar notificación"
-msgstr "Dismiss notification"
+#: core/templates/legal/cookies.html:19
+msgid "2. Cookies que utilizamos en este sitio"
+msgstr "2. Cookies we use on this site"
 
-#: core/templates/base/base.html:125 core/templates/base/base.html:352
-msgid "Tablero compartido"
-msgstr "Shared board"
+#: core/templates/legal/cookies.html:24
+msgid "Proveedor"
+msgstr "Provider"
 
-#: core/templates/base/base.html:151
-msgid "Aceptar"
-msgstr "Accept"
+#: core/templates/legal/cookies.html:25
+msgid "Propósito"
+msgstr "Purpose"
 
-#: core/templates/base/base.html:154
-msgid "Rechazar"
-msgstr "Decline"
+#: core/templates/legal/cookies.html:26
+msgid "Tipo"
+msgstr "Type"
 
-#: core/templates/base/base.html:159
-msgid "Ver en el tablero"
-msgstr "View on board"
+#: core/templates/legal/cookies.html:32 core/templates/legal/cookies.html:38
+msgid "Propia (Django)"
+msgstr "First-party (Django)"
 
-#: core/templates/base/base.html:163
-msgid "Ver en General"
-msgstr "View in General"
+#: core/templates/legal/cookies.html:33
+msgid ""
+"Protección contra ataques informáticos de falsificación de petición (CSRF)."
+msgstr "Protection against Cross-Site Request Forgery (CSRF) computer attacks."
 
-#: core/templates/base/base.html:170
-msgid "No tienes notificaciones pendientes."
-msgstr "You have no pending notifications."
+#: core/templates/legal/cookies.html:34 core/templates/legal/cookies.html:40
+msgid "Técnica / Necesaria"
+msgstr "Technical / Necessary"
 
-#: core/templates/base/base.html:206
-msgid "CUENTA"
-msgstr "ACCOUNT"
+#: core/templates/legal/cookies.html:39
+msgid "Mantener la sesión abierta del usuario autenticado."
+msgstr "Keep the authenticated user's session active."
 
-#: core/templates/base/base.html:242
-msgid "Ajustes de cuenta"
-msgstr "Account settings"
+#: core/templates/legal/cookies.html:45
+msgid ""
+"EisenhowerFlow utiliza únicamente cookies estrictamente necesarias para el "
+"funcionamiento técnico de la aplicación. No utilizamos cookies publicitarias "
+"ni de rastreo de terceros."
+msgstr ""
+"EisenhowerFlow uses only strictly necessary cookies for the technical "
+"operation of the application. We do not use advertising or third-party "
+"tracking cookies."
 
-#: core/templates/base/base.html:249
-msgid "Cerrar sesión"
-msgstr "Log out"
+#: core/templates/legal/cookies.html:49 core/templates/legal/privacy.html:34
+#: core/templates/legal/terms.html:33
+msgid "Volver"
+msgstr "Back"
 
-#: core/templates/base/base.html:257
-msgid "Iniciar sesión"
-msgstr "Log in"
+#: core/templates/legal/privacy.html:4 core/templates/legal/privacy.html:9
+#: core/templates/registration/register.html:76
+msgid "Política de Privacidad"
+msgstr "Privacy Policy"
 
-#: core/templates/base/base.html:260
-#: core/templates/registration/register.html:104
-msgid "Registrarse"
-msgstr "Sign up"
+#: core/templates/legal/privacy.html:10
+msgid ""
+"Cumplimiento del Reglamento General de Protección de Datos (RGPD UE 2016/679)"
+msgstr ""
+"Compliance with the General Data Protection Regulation (GDPR EU 2016/679)"
 
-#: core/templates/base/base.html:315 core/templates/base/base.html:358
-msgid "Editar tablero"
-msgstr "Edit board"
+#: core/templates/legal/privacy.html:13
+msgid "1. Responsable del Tratamiento"
+msgstr "1. Data Controller"
 
-#: core/templates/base/base.html:370
-msgid "Nuevo Tablero"
-msgstr "New Board"
+#: core/templates/legal/privacy.html:15
+msgid ""
+"El responsable del tratamiento de los datos recabados en esta web es "
+"EisenhowerFlow. Contacto delegado en protección de datos:"
+msgstr ""
+"The data controller responsible for the data collected on this website is "
+"EisenhowerFlow. Data protection contact:"
 
-#: core/templates/base/base.html:378
-msgid "DISTRIBUCIÓN ACTUAL"
-msgstr "CURRENT DISTRIBUTION"
+#: core/templates/legal/privacy.html:20
+msgid "2. Datos Recabados y Finalidad"
+msgstr "2. Data Collected and Purpose"
 
-#: core/templates/base/base.html:390 core/templates/base/base.html:400
-#: core/templates/base/base.html:410 core/templates/base/base.html:420
-msgid "tarea"
-msgstr "task"
+#: core/templates/legal/privacy.html:22
+msgid "Registro de cuenta:"
+msgstr "Account registration:"
 
-#: core/templates/base/base.html:390 core/templates/base/base.html:400
-#: core/templates/base/base.html:410 core/templates/base/base.html:420
-msgid "tareas"
-msgstr "tasks"
+#: core/templates/legal/privacy.html:22
+msgid ""
+"Recogemos nombre de usuario, correo electrónico y contraseña cifrada para "
+"gestionar la ejecución del servicio contractual."
+msgstr ""
+"We collect username, email address, and encrypted password to manage the "
+"execution of the contractual service."
 
-#: core/templates/base/base.html:443
-msgid "Ajustes del Tablero"
-msgstr "Board Settings"
+#: core/templates/legal/privacy.html:23
+msgid "Gestión de tareas:"
+msgstr "Task management:"
 
-#: core/templates/base/base.html:445 core/templates/base/base.html:794
-#: core/templates/tasks/dashboard.html:832
-msgid "Cerrar"
-msgstr "Close"
+#: core/templates/legal/privacy.html:23
+msgid ""
+"Datos introducidos voluntariamente en tus tableros (títulos, descripciones, "
+"fechas límite) para ofrecer la funcionalidad principal del servicio."
+msgstr ""
+"Data voluntarily entered on your boards (titles, descriptions, due dates) to "
+"provide the main functionality of the service."
 
-#: core/templates/base/base.html:452 core/templates/tasks/dashboard.html:839
-#: dashboard_antiguo.txt:552
-msgid "Nombre del tablero"
-msgstr "Board name"
+#: core/templates/legal/privacy.html:28
+msgid "3. Derechos del Usuario (ARCO / POL)"
+msgstr "3. User Rights"
 
-#: core/templates/base/base.html:471 core/templates/tasks/dashboard.html:858
-msgid "Opcional"
-msgstr "Optional"
+#: core/templates/legal/privacy.html:30
+msgid ""
+"Conforme al RGPD, tienes derecho a solicitar el Acceso, Rectificación, "
+"Portabilidad y la Eliminación completa de tus datos ('Derecho al olvido'). "
+"Puedes ejercer estos derechos desde los ajustes de tu cuenta o enviando un "
+"email a"
+msgstr ""
+"In accordance with the GDPR, you have the right to request Access, "
+"Rectification, Portability, and Complete Erasure of your data ('Right to be "
+"forgotten'). You can exercise these rights from your account settings or by "
+"sending an email to"
 
-#: core/templates/base/base.html:480 core/templates/tasks/dashboard.html:867
-msgid "Invitar a un nuevo miembro"
-msgstr "Invite a new member"
+#: core/templates/legal/terms.html:4 core/templates/legal/terms.html:9
+msgid "Aviso Legal y Términos de Uso"
+msgstr "Legal Notice and Terms of Use"
 
-#: core/templates/base/base.html:490 core/templates/tasks/dashboard.html:877
-msgid "Escribe usuario, email o nombre..."
-msgstr "Type username, email or name..."
+#: core/templates/legal/terms.html:10
+msgid "Última actualización:"
+msgstr "Last updated:"
 
-#: core/templates/base/base.html:528 core/templates/tasks/dashboard.html:916
-msgid "No se encontró ningún usuario registrado."
-msgstr "No registered user found."
+#: core/templates/legal/terms.html:13
+msgid "1. Datos Identificativos (LSSI-CE)"
+msgstr "1. Identifying Data"
 
-#: core/templates/base/base.html:541
-msgid "Le llegará una notificación inmediata para unirse."
-msgstr "An immediate notification will be sent to join."
+#: core/templates/legal/terms.html:15
+msgid ""
+"En cumplimiento del artículo 10 de la Ley 34/2002, de 11 de julio, de "
+"Servicios de la Sociedad de la Información y Comercio Electrónico, se "
+"informa que el sitio web"
+msgstr ""
+"In compliance with article 10 of Law 34/2002, of July 11, on Information "
+"Society Services and Electronic Commerce, it is reported that the website"
 
-#: core/templates/base/base.html:546
-msgid "Enviar Invitación"
-msgstr "Send Invitation"
+#: core/templates/legal/terms.html:15
+msgid ""
+"es gestionado por [Tu Nombre o Razón Social], con DNI/NIF [Tu NIF] y "
+"domicilio de contacto en [Tu Ciudad, España]. Email de contacto:"
+msgstr ""
+"is managed by [Your Name or Company Name], with ID/Tax Code [Your Tax Code] "
+"and contact address in [Your City, Spain]. Contact email:"
 
-#: core/templates/base/base.html:553
-msgid "Miembros actuales"
-msgstr "Current members"
+#: core/templates/legal/terms.html:20
+msgid "2. Objeto y Condiciones de Uso"
+msgstr "2. Purpose and Terms of Use"
 
-#: core/templates/base/base.html:579
-msgid "Desmarca para quitar miembro"
-msgstr "Uncheck to remove member"
+#: core/templates/legal/terms.html:22
+msgid ""
+"El acceso a esta aplicación web atribuye la condición de usuario e implica "
+"la aceptación de estas condiciones. EisenhowerFlow ofrece una herramienta "
+"SaaS de gestión de tareas basada en la Matriz de Eisenhower. El usuario se "
+"compromete a hacer un uso adecuado de los contenidos y servicios."
+msgstr ""
+"Accessing this web application attributes the status of user and implies "
+"acceptance of these conditions. EisenhowerFlow provides a SaaS task "
+"management tool based on the Eisenhower Matrix. The user undertakes to make "
+"appropriate use of contents and services."
 
-#: core/templates/base/base.html:585
-msgid "Sin miembros colaboradores adicionales."
-msgstr "No additional collaborating members."
+#: core/templates/legal/terms.html:27
+msgid "3. Propiedad Intelectual"
+msgstr "3. Intellectual Property"
 
-#: core/templates/base/base.html:598
-msgid "¿Seguro que quieres eliminar el tablero"
-msgstr "Are you sure you want to delete the board"
+#: core/templates/legal/terms.html:29
+msgid ""
+"Todos los derechos de propiedad intelectual del código fuente, diseño "
+"gráfico, interfaz de usuario y contenidos son titularidad de EisenhowerFlow "
+"o de sus licenciantes."
+msgstr ""
+"All intellectual property rights of the source code, graphic design, user "
+"interface, and contents are owned by EisenhowerFlow or its licensors."
 
-#: core/templates/base/base.html:599
-msgid "Eliminar Tablero"
-msgstr "Delete Board"
+#: core/templates/registration/login.html:17
+msgid "¡Bienvenido de nuevo!"
+msgstr "Welcome back!"
 
-#: core/templates/base/base.html:607
-msgid "Guardar Cambios"
-msgstr "Save Changes"
+#: core/templates/registration/login.html:18
+msgid "Accede a tus tableros y prioriza tus tareas"
+msgstr "Access your boards and prioritize your tasks"
 
-#: core/templates/base/base.html:641
-msgid "Ajustes de Cuenta"
-msgstr "Account Settings"
-
-#: core/templates/base/base.html:673
-msgid "Perfil"
-msgstr "Profile"
-
-#: core/templates/base/base.html:683
-msgid "Seguridad"
-msgstr "Security"
-
-#: core/templates/base/base.html:693
-msgid "Idioma"
-msgstr "Language"
-
-#: core/templates/base/base.html:706
-msgid "Nombre de usuario"
-msgstr "Username"
-
-#: core/templates/base/base.html:715 users/forms/user_form.py:12
-msgid "Nombre"
-msgstr "First Name"
-
-#: core/templates/base/base.html:719 users/forms/user_form.py:21
-msgid "Apellidos"
-msgstr "Last Name"
-
-#: core/templates/base/base.html:725 users/forms/user_form.py:48
-msgid "Correo electrónico"
-msgstr "Email address"
-
-#: core/templates/base/base.html:731
-msgid "Guardar Perfil"
-msgstr "Save Profile"
-
-#: core/templates/base/base.html:742
-msgid "Contraseña actual"
-msgstr "Current password"
-
-#: core/templates/base/base.html:747
-msgid "Nueva contraseña"
-msgstr "New password"
-
-#: core/templates/base/base.html:752
-msgid "Confirmar nueva contraseña"
-msgstr "Confirm new password"
-
-#: core/templates/base/base.html:758
-msgid "Actualizar Contraseña"
-msgstr "Update Password"
-
-#: core/templates/base/base.html:771
-msgid "Selecciona el idioma de la aplicación"
-msgstr "Select application language"
-
-#: core/templates/registration/login.html:4
-#: core/templates/registration/login.html:12
-msgid "Iniciar Sesión"
-msgstr "Log In"
-
-#: core/templates/registration/login.html:20
+#: core/templates/registration/login.html:25
 msgid "Usuario o contraseña incorrectos. Por favor, inténtalo de nuevo."
 msgstr "Incorrect username or password. Please try again."
 
-#: core/templates/registration/login.html:41 users/forms/user_form.py:47
-#: users/models.py:10
-msgid "Usuario"
-msgstr "Username"
+#: core/templates/registration/login.html:35
+msgid "Usuario o Correo electrónico"
+msgstr "Username or Email address"
 
-#: core/templates/registration/login.html:45 users/forms/user_form.py:49
+#: core/templates/registration/login.html:39
+msgid "Tu usuario o correo"
+msgstr "Your username or email"
+
+#: core/templates/registration/login.html:44 users/forms/user_form.py:75
 msgid "Contraseña"
 msgstr "Password"
 
-#: core/templates/registration/login.html:50
-msgid "Entrar"
-msgstr "Sign In"
+#: core/templates/registration/login.html:60
+msgid "¿Aún no tienes cuenta?"
+msgstr "Don't have an account yet?"
 
-#: core/templates/registration/login.html:56
-msgid "¿No tienes cuenta?"
-msgstr "Don't have an account?"
-
-#: core/templates/registration/login.html:57
+#: core/templates/registration/login.html:61
 msgid "Regístrate aquí"
 msgstr "Register here"
 
-#: core/templates/registration/register.html:4
-msgid "Registro"
-msgstr "Register"
+#: core/templates/registration/login.html:65
+#: core/templates/registration/password_reset_form.html:14
+msgid "¿Olvidaste tu contraseña?"
+msgstr "Forgot your password?"
+
+#: core/templates/registration/password_reset_complete.html:4
+msgid "Contraseña restablecida"
+msgstr "Password reset"
+
+#: core/templates/registration/password_reset_complete.html:13
+msgid "¡Contraseña cambiada!"
+msgstr "Password changed!"
+
+#: core/templates/registration/password_reset_complete.html:15
+msgid ""
+"Tu contraseña se ha restablecido correctamente. Ya puedes iniciar sesión con "
+"tu nueva clave."
+msgstr ""
+"Your password has been successfully reset. You can now log in with your new "
+"password."
+
+#: core/templates/registration/password_reset_confirm.html:47
+msgid "Crea tu nueva contraseña"
+msgstr "Create your new password"
+
+#: core/templates/registration/password_reset_confirm.html:48
+msgid "Introduce y confirma tu nueva clave de acceso."
+msgstr "Enter and confirm your new password."
+
+#: core/templates/registration/password_reset_confirm.html:67
+msgid "Guardar nueva contraseña"
+msgstr "Save new password"
+
+#: core/templates/registration/password_reset_confirm.html:76
+msgid "Enlace no válido"
+msgstr "Invalid link"
+
+#: core/templates/registration/password_reset_confirm.html:78
+msgid ""
+"El enlace para restablecer la contraseña no es válido o ha caducado. Por "
+"favor, solicita uno nuevo."
+msgstr ""
+"The password reset link is invalid or has expired. Please request a new one."
+
+#: core/templates/registration/password_reset_confirm.html:80
+msgid "Solicitar nuevo enlace"
+msgstr "Request new link"
+
+#: core/templates/registration/password_reset_done.html:4
+msgid "Correo enviado"
+msgstr "Email sent"
+
+#: core/templates/registration/password_reset_done.html:13
+msgid "¡Correo enviado!"
+msgstr "Email sent!"
+
+#: core/templates/registration/password_reset_done.html:15
+msgid ""
+"Te hemos enviado las instrucciones para restablecer tu contraseña. Revisa tu "
+"bandeja de entrada o la carpeta de spam."
+msgstr ""
+"We have sent you instructions to reset your password. Check your inbox or "
+"spam folder."
+
+#: core/templates/registration/password_reset_done.html:18
+msgid "Volver a iniciar sesión"
+msgstr "Back to login"
+
+#: core/templates/registration/password_reset_email.html:23
+msgid "Hola,"
+msgstr "Hello,"
+
+#: core/templates/registration/password_reset_email.html:24
+msgid ""
+"Has solicitado restablecer la contraseña de tu cuenta en EisenhowerFlow. Haz "
+"clic en el siguiente botón para continuar:"
+msgstr ""
+"You requested a password reset for your EisenhowerFlow account. Click the "
+"button below to proceed:"
+
+#: core/templates/registration/password_reset_email.html:28
+msgid "Restablecer contraseña"
+msgstr "Reset password"
+
+#: core/templates/registration/password_reset_email.html:33
+msgid ""
+"Si no puedes pulsar el botón, copia y pega el siguiente enlace en tu "
+"navegador:"
+msgstr ""
+"If you cannot click the button, copy and paste the following link into your "
+"browser:"
+
+#: core/templates/registration/password_reset_email.html:39
+msgid ""
+"Si no has solicitado este cambio, puedes ignorar este correo de forma "
+"segura. Tu contraseña seguirá siendo la misma."
+msgstr ""
+"If you did not request this change, you can safely ignore this email. Your "
+"password will remain the same."
+
+#: core/templates/registration/password_reset_form.html:4
+msgid "Recuperar contraseña"
+msgstr "Recover password"
+
+#: core/templates/registration/password_reset_form.html:15
+msgid "Introduce tu email y te enviaremos un enlace para restablecerla."
+msgstr "Enter your email and we will send you a link to reset it."
+
+#: core/templates/registration/password_reset_form.html:24
+#: users/forms/user_form.py:20 users/forms/user_form.py:66
+msgid "tu@email.com"
+msgstr "you@email.com"
+
+#: core/templates/registration/password_reset_form.html:29
+msgid "Enviar enlace de recuperación"
+msgstr "Send recovery link"
+
+#: core/templates/registration/password_reset_form.html:35
+msgid "Volver al inicio de sesión"
+msgstr "Back to login"
+
+#: core/templates/registration/password_reset_subject.txt:1
+msgid "Restablecer contraseña de EisenhowerFlow"
+msgstr "Reset EisenhowerFlow password"
+
+#: core/templates/registration/register.html:5
+msgid "Crear cuenta"
+msgstr "Create account"
+
+#: core/templates/registration/register.html:17
+msgid "Crear una cuenta"
+msgstr "Create an account"
 
 #: core/templates/registration/register.html:18
-msgid "Crear Cuenta"
-msgstr "Create Account"
+msgid "Empieza a gestionar tu tiempo con la Matriz de Eisenhower"
+msgstr "Start managing your time with the Eisenhower Matrix"
 
-#: core/templates/registration/register.html:19
-msgid "Únete para gestionar tus tareas con la Matriz Eisenhower"
-msgstr "Join to manage your tasks with the Eisenhower Matrix"
+#: core/templates/registration/register.html:73
+msgid "He leído y acepto el"
+msgstr "I have read and accept the"
 
-#: core/templates/registration/register.html:112
-msgid "¿Ya tienes cuenta?"
+#: core/templates/registration/register.html:75
+msgid "y la"
+msgstr "and the"
+
+#: core/templates/registration/register.html:93
+msgid "¿Ya tienes una cuenta?"
 msgstr "Already have an account?"
 
-#: core/templates/registration/register.html:114
-msgid "Inicia sesión aquí"
-msgstr "Log in here"
+#: core/templates/registration/register.html:94
+msgid "Inicia sesión"
+msgstr "Log in"
 
-#: core/templates/tasks/dashboard.html:56
+#: core/templates/tasks/dashboard.html:50
 msgid "Matriz de Eisenhower interactiva para priorización estratégica"
 msgstr "Interactive Eisenhower Matrix for strategic prioritization"
 
-#: core/templates/tasks/dashboard.html:80
-#: core/templates/tasks/dashboard.html:762 dashboard_antiguo.txt:23
-#: dashboard_antiguo.txt:483
-msgid "Todas"
-msgstr "All"
-
-#: core/templates/tasks/dashboard.html:88 dashboard_antiguo.txt:26
+#: core/templates/tasks/dashboard.html:80 dashboard_antiguo.txt:26
 msgid "Mis tareas"
 msgstr "My tasks"
 
-#: core/templates/tasks/dashboard.html:96
+#: core/templates/tasks/dashboard.html:86
+#: core/templates/tasks/dashboard.html:87
 msgid "Compartidas"
 msgstr "Shared"
 
-#: core/templates/tasks/dashboard.html:114
-msgid "TÍTULO DE LA TAREA"
-msgstr "TASK TITLE"
-
-#: core/templates/tasks/dashboard.html:124
-msgid "URGENCIA"
-msgstr "URGENCY"
-
-#: core/templates/tasks/dashboard.html:146
-msgid "IMPORTANCIA"
-msgstr "IMPORTANCE"
-
-#: core/templates/tasks/dashboard.html:181 dashboard_antiguo.txt:108
-msgid "Opciones avanzadas (Tablero, fecha límite, notas...)"
-msgstr "Advanced options (Board, due date, notes...)"
-
-#: core/templates/tasks/dashboard.html:185
-msgid "Destino previsto:"
-msgstr "Intended destination:"
-
-#: core/templates/tasks/dashboard.html:443
-msgid "caracteres"
-msgstr "characters"
-
-#: core/templates/tasks/dashboard.html:472
+#: core/templates/tasks/dashboard.html:115
 msgid "Urgente - Importante"
 msgstr "Urgent - Important"
 
-#: core/templates/tasks/dashboard.html:475
+#: core/templates/tasks/dashboard.html:116
 msgid "Hacer ahora • Crisis y plazos clave"
 msgstr "Do first • Crises and key deadlines"
 
-#: core/templates/tasks/dashboard.html:491
+#: core/templates/tasks/dashboard.html:131
 msgid "No hay tareas críticas"
 msgstr "No critical tasks"
 
-#: core/templates/tasks/dashboard.html:492
+#: core/templates/tasks/dashboard.html:132
 msgid "Mantén el control y reacciona solo a lo imprescindible."
 msgstr "Stay in control and react only to essential matters."
 
-#: core/templates/tasks/dashboard.html:499
+#: core/templates/tasks/dashboard.html:140
 msgid "Añadir tarea a Q1"
 msgstr "Add task to Q1"
 
-#: core/templates/tasks/dashboard.html:514
-#: core/templates/tasks/dashboard.html:584
-#: core/templates/tasks/dashboard.html:654
-#: core/templates/tasks/dashboard.html:724 dashboard_antiguo.txt:334
+#: core/templates/tasks/dashboard.html:148
+#: core/templates/tasks/dashboard.html:201
+#: core/templates/tasks/dashboard.html:254
+#: core/templates/tasks/dashboard.html:307 dashboard_antiguo.txt:334
 #: dashboard_antiguo.txt:374 dashboard_antiguo.txt:414
 #: dashboard_antiguo.txt:454
 msgid "Introduce un título para esta tarjeta..."
 msgstr "Enter a title for this card..."
 
-#: core/templates/tasks/dashboard.html:521
-#: core/templates/tasks/dashboard.html:591
-#: core/templates/tasks/dashboard.html:661
-#: core/templates/tasks/dashboard.html:731 dashboard_antiguo.txt:337
+#: core/templates/tasks/dashboard.html:151
+#: core/templates/tasks/dashboard.html:204
+#: core/templates/tasks/dashboard.html:257
+#: core/templates/tasks/dashboard.html:310 dashboard_antiguo.txt:337
 #: dashboard_antiguo.txt:377 dashboard_antiguo.txt:417
 #: dashboard_antiguo.txt:457
 msgid "Añadir tarea"
 msgstr "Add task"
 
-#: core/templates/tasks/dashboard.html:542
+#: core/templates/tasks/dashboard.html:168
 msgid "Importante - No Urgente"
 msgstr "Important - Not Urgent"
 
-#: core/templates/tasks/dashboard.html:545
+#: core/templates/tasks/dashboard.html:169
 msgid "Planificar • Metas a medio plazo"
 msgstr "Schedule • Medium-term goals"
 
-#: core/templates/tasks/dashboard.html:561
+#: core/templates/tasks/dashboard.html:184
 msgid "No hay tareas estratégicas"
 msgstr "No strategic tasks"
 
-#: core/templates/tasks/dashboard.html:562
+#: core/templates/tasks/dashboard.html:185
 msgid "Dedica tiempo a proyectar tus metas a largo plazo."
 msgstr "Spend time planning your long-term goals."
 
-#: core/templates/tasks/dashboard.html:569
+#: core/templates/tasks/dashboard.html:193
 msgid "Añadir tarea a Q2"
 msgstr "Add task to Q2"
 
-#: core/templates/tasks/dashboard.html:612
+#: core/templates/tasks/dashboard.html:221
 msgid "Urgente - No Importante"
 msgstr "Urgent - Not Important"
 
-#: core/templates/tasks/dashboard.html:615
+#: core/templates/tasks/dashboard.html:222
 msgid "Delegar • Interrupciones y tareas operativas"
 msgstr "Delegate • Interruptions and operational tasks"
 
-#: core/templates/tasks/dashboard.html:631
+#: core/templates/tasks/dashboard.html:237
 msgid "No hay tareas operativas"
 msgstr "No operational tasks"
 
-#: core/templates/tasks/dashboard.html:632
+#: core/templates/tasks/dashboard.html:238
 msgid "Libera tu agenda de interrupciones no esenciales."
 msgstr "Free your schedule from non-essential interruptions."
 
-#: core/templates/tasks/dashboard.html:639
+#: core/templates/tasks/dashboard.html:246
 msgid "Añadir tarea a Q3"
 msgstr "Add task to Q3"
 
-#: core/templates/tasks/dashboard.html:682
+#: core/templates/tasks/dashboard.html:274
 msgid "No Urgente - No Importante"
 msgstr "Not Urgent - Not Important"
 
-#: core/templates/tasks/dashboard.html:685
+#: core/templates/tasks/dashboard.html:275
 msgid "Eliminar • Distracciones e irrelevantes"
 msgstr "Don't Do • Distractions and irrelevant items"
 
-#: core/templates/tasks/dashboard.html:701
+#: core/templates/tasks/dashboard.html:290
 msgid "No hay tareas irrelevantes"
 msgstr "No irrelevant tasks"
 
-#: core/templates/tasks/dashboard.html:702
+#: core/templates/tasks/dashboard.html:291
 msgid "Mantén tu foco libre de ruido innecesario"
 msgstr "Keep your focus free from unnecessary noise"
 
-#: core/templates/tasks/dashboard.html:709
+#: core/templates/tasks/dashboard.html:299
 msgid "Añadir tarea a Q4"
 msgstr "Add task to Q4"
-
-#: core/templates/tasks/dashboard.html:753 dashboard_antiguo.txt:474
-msgid "Completadas"
-msgstr "Completed"
-
-#: core/templates/tasks/dashboard.html:763 dashboard_antiguo.txt:484
-msgid "Hoy"
-msgstr "Today"
-
-#: core/templates/tasks/dashboard.html:764 dashboard_antiguo.txt:485
-msgid "Esta semana"
-msgstr "This week"
-
-#: core/templates/tasks/dashboard.html:767
-#: core/templates/tasks/dashboard.html:951 dashboard_antiguo.txt:488
-msgid "Vaciar completadas"
-msgstr "Clear completed"
-
-#: core/templates/tasks/dashboard.html:810 dashboard_antiguo.txt:531
-msgid "No hay tareas completadas."
-msgstr "No completed tasks."
-
-#: core/templates/tasks/dashboard.html:830 dashboard_antiguo.txt:547
-msgid "Crear nuevo tablero"
-msgstr "Create new board"
-
-#: core/templates/tasks/dashboard.html:840
-msgid "Nombre del tablero..."
-msgstr "Board name..."
-
-#: core/templates/tasks/dashboard.html:932
-msgid "Le llegará una notificación inmediata para unirse al guardar."
-msgstr "An immediate notification to join will be sent upon saving."
-
-#: core/templates/tasks/dashboard.html:940 dashboard_antiguo.txt:575
-msgid "Guardar Tablero"
-msgstr "Save Board"
-
-#: core/templates/tasks/dashboard.html:952
-msgid "¿Deseas eliminar permanentemente las tareas completadas?"
-msgstr "Do you want to permanently delete completed tasks?"
-
-#: core/templates/tasks/dashboard.html:956 dashboard_antiguo.txt:597
-msgid "Eliminar definitivamente"
-msgstr "Delete permanently"
 
 #: dashboard_antiguo.txt:29
 msgid "Asignadas"
 msgstr "Assigned"
-
-#: dashboard_antiguo.txt:44 tasks/models.py:38
-msgid "Título de la tarea"
-msgstr "Task title"
 
 #: dashboard_antiguo.txt:52
 msgid "Urgente"
@@ -701,42 +1370,6 @@ msgstr "Apply"
 #: dashboard_antiguo.txt:193
 msgid "Crear recordatorio"
 msgstr "Create reminder"
-
-#: dashboard_antiguo.txt:200 tasks/models.py:25
-msgid "A la hora del vencimiento"
-msgstr "At time of due date"
-
-#: dashboard_antiguo.txt:201 tasks/models.py:26
-msgid "5 minutos antes"
-msgstr "5 minutes before"
-
-#: dashboard_antiguo.txt:202 tasks/models.py:27
-msgid "15 minutos antes"
-msgstr "15 minutes before"
-
-#: dashboard_antiguo.txt:203 tasks/models.py:28
-msgid "1 hora antes"
-msgstr "1 hour before"
-
-#: dashboard_antiguo.txt:204 tasks/models.py:29
-msgid "2 horas antes"
-msgstr "2 hours before"
-
-#: dashboard_antiguo.txt:205 tasks/models.py:30
-msgid "1 día antes"
-msgstr "1 day before"
-
-#: dashboard_antiguo.txt:206 tasks/models.py:31
-msgid "2 días antes"
-msgstr "2 days before"
-
-#: dashboard_antiguo.txt:207 tasks/models.py:32
-msgid "1 semana antes"
-msgstr "1 week before"
-
-#: dashboard_antiguo.txt:208 tasks/models.py:33
-msgid "2 semanas antes"
-msgstr "2 weeks before"
 
 #: dashboard_antiguo.txt:242
 msgid "Miembros"
@@ -891,58 +1524,83 @@ msgstr "Task"
 msgid "Tareas"
 msgstr "Tasks"
 
-#: users/forms/user_form.py:17
+#: users/forms/user_form.py:15
+msgid "El correo electrónico es obligatorio para crear la cuenta."
+msgstr "An email address is required to create an account."
+
+#: users/forms/user_form.py:16
+msgid "Introduce una dirección de correo electrónico válida."
+msgstr "Enter a valid email address."
+
+#: users/forms/user_form.py:30
 msgid "Ej. Ruben"
 msgstr "e.g. Ruben"
 
-#: users/forms/user_form.py:26
+#: users/forms/user_form.py:39
 msgid "Ej. García Pérez"
 msgstr "e.g. Smith"
 
-#: users/forms/user_form.py:39
+#: users/forms/user_form.py:44
+msgid "He leído y acepto los Términos y la Política de Privacidad"
+msgstr "I have read and accept the Terms and Privacy Policy"
+
+#: users/forms/user_form.py:46
+msgid ""
+"Debes aceptar el Aviso Legal y la Política de Privacidad para registrarte."
+msgstr "You must accept the Legal Notice and Privacy Policy to register."
+
+#: users/forms/user_form.py:65
 msgid "tu_usuario"
 msgstr "your_username"
 
-#: users/forms/user_form.py:40
-msgid "tu@email.com"
-msgstr "you@email.com"
-
-#: users/forms/user_form.py:41
+#: users/forms/user_form.py:67
 msgid "Crea una contraseña segura"
 msgstr "Create a strong password"
 
-#: users/forms/user_form.py:42
+#: users/forms/user_form.py:68
 msgid "Repite la contraseña"
 msgstr "Repeat password"
 
-#: users/forms/user_form.py:50
+#: users/forms/user_form.py:73 users/models.py:22
+msgid "Usuario"
+msgstr "Username"
+
+#: users/forms/user_form.py:76
 msgid "Confirmar contraseña"
 msgstr "Confirm password"
 
-#: users/models.py:11
+#: users/models.py:10
+msgid "dirección de correo electrónico"
+msgstr "email address"
+
+#: users/models.py:15
+msgid "Ya existe un usuario registrado con este correo electrónico."
+msgstr "A user is already registered with this email address."
+
+#: users/models.py:23
 msgid "Usuarios"
 msgstr "Users"
 
-#: users/views.py:41
+#: users/views.py:48
 msgid "Tu perfil se ha actualizado correctamente."
 msgstr "Your profile has been updated successfully."
 
-#: users/views.py:43
+#: users/views.py:50
 msgid "Por favor, rellena todos los campos obligatorios."
 msgstr "Please fill in all required fields."
 
-#: users/views.py:59
+#: users/views.py:65
 msgid "La contraseña actual no es correcta."
 msgstr "The current password is incorrect."
 
-#: users/views.py:61
+#: users/views.py:67
 msgid "Las nuevas contraseñas no coinciden."
 msgstr "The new passwords do not match."
 
-#: users/views.py:63
+#: users/views.py:69
 msgid "La nueva contraseña debe tener al menos 6 caracteres."
 msgstr "The new password must be at least 6 characters long."
 
-#: users/views.py:69
+#: users/views.py:75
 msgid "Tu contraseña ha sido actualizada con éxito."
 msgstr "Your password has been updated successfully."

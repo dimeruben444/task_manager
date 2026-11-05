@@ -3,6 +3,7 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
 from django.utils.translation import gettext_lazy as _
+from email_validator import validate_email, EmailNotValidError
 
 User = get_user_model()
 
@@ -89,6 +90,21 @@ class CustomUserCreationForm(UserCreationForm):
 
             # Limpiar textos de ayuda ruidosos por defecto de Django
             field.help_text = None
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        
+        # 1. Comprobar si el email ya existe en la base de datos
+        if User.objects.filter(email=email).exists():
+            raise forms.ValidationError("Este correo electrónico ya está registrado.")
+        
+        # 2. Validar sintaxis y existencia del dominio MX real
+        try:
+            # check_deliverability=True comprueba si el dominio (@gmail.com) tiene servidor de correo activo
+            valid = validate_email(email, check_deliverability=True)
+            return valid.email
+        except EmailNotValidError as e:
+            raise forms.ValidationError("El correo no es válido o el dominio no existe (ej. comprueba si escribiste bien @gmail.com).")        
 
     def save(self, commit=True):
         user = super().save(commit=False)

@@ -288,9 +288,7 @@ body.modal-open {
   scrollbar-width: none !important;
 }
 
-.modal-backdrop {
-  display: none !important;
-}
+
 
 .rating-box-container {
   border-color: #cbd5e1 !important;
@@ -350,7 +348,7 @@ html {
 .sidebar-boards {
   position: sticky;
   top: 78px;
-  height: calc(100vh - 100px);
+  height: 100vh;
   margin-top: 8px;
   border-radius: 16px;
   overflow-y: auto;

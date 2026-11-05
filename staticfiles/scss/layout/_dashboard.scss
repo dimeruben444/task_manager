@@ -42,6 +42,7 @@ body,
 
 .app-dashboard-layout {
   display: flex !important;
+  align-items: stretch !important;
   gap: 3rem !important;
   padding: 1.5rem !important;
   background-color: var(--bg-app) !important;
@@ -57,6 +58,11 @@ body,
   border-radius: 16px;
   border: 1px solid var(--border-default);
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
+
+  height: auto !important;         /* Permite que align-items: stretch mande sobre la altura */
+  align-self: stretch !important;  /* Garantiza estiramiento en la columna */
+  display: flex !important;
+  flex-direction: column !important;
 
   .board-chip {
     border-radius: 8px;
@@ -537,4 +543,212 @@ body {
 #quickDropdownDate + .dropdown-menu,
 .quick-date-dropdown-menu {
     z-index: 1055 !important;
+}
+
+.color-picker-group {
+  height: 42px;
+  background-color: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+
+  .color-swatch-item {
+    cursor: pointer;
+    margin: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    .swatch-circle {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: inline-block;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      border: 2px solid transparent;
+    }
+
+    /* Estado seleccionado con la clase btn-check de Bootstrap */
+    .btn-check:checked + .swatch-circle {
+      transform: scale(1.15);
+      border-color: #ffffff;
+      box-shadow: 0 0 0 2px #3b82f6, 0 2px 6px rgba(0, 0, 0, 0.15);
+    }
+
+    &:hover .swatch-circle {
+      transform: scale(1.1);
+    }
+  }
+}
+
+.custom-styled-input {
+  height: 42px;
+  background-color: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+  font-size: 0.88rem;
+
+  &:focus {
+    background-color: #ffffff !important;
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important;
+  }
+}
+
+/* ==========================================
+   LISTA PLANA DE MIEMBROS (SIN CONTENEDOR)
+   ========================================== */
+
+.custom-members-flat-list {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+
+  /* Scrollbar sutil solo si hay muchos miembros */
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1;
+    border-radius: var(--bs-border-radius-lg);
+  }
+}
+
+.member-row-item {
+  border-color: #e2e8f0 !important;
+  box-shadow: none !important; /* 👈 Quita cualquier sombra previa */
+  transition: border-color 0.15s ease;
+
+  &:hover {
+    border-color: #cbd5e1 !important;
+  }
+
+  .user-avatar-sm {
+    width: 28px;
+    height: 28px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    background: #0C6EFD;
+    letter-spacing: 0.5px;
+    margin-right: 0.5rem;
+  }
+
+  .badge-owner {
+    background-color: #eff6ff !important;
+    color: #2563eb !important;
+    border: 1px solid #bfdbfe !important;
+    font-size: 0.68rem !important;
+    font-weight: 600 !important;
+    padding: 0.35em 0.7em !important;
+    border-radius: 6px !important;
+  }
+
+  .custom-member-checkbox {
+    width: 1.1em;
+    height: 1.1em;
+    border-color: #cbd5e1;
+    cursor: pointer;
+
+    &:checked {
+      background-color: #2563eb;
+      border-color: #2563eb;
+    }
+
+    &:focus {
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+  }
+}
+
+/* ==========================================
+   COLOR PICKER RESISTENTE A NAVEGADORES MÓVILES
+   ========================================== */
+
+.color-swatch-box {
+  position: relative !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 30px !important;
+  height: 30px !important;
+  min-width: 30px !important;
+  min-height: 30px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  cursor: pointer !important;
+
+  .swatch-radio-hidden {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    opacity: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    cursor: pointer !important;
+    z-index: 10 !important;
+  }
+
+  .swatch-circle-paint {
+    width: 24px !important;
+    height: 24px !important;
+    min-width: 24px !important;
+    min-height: 24px !important;
+    border-radius: 50% !important;
+    display: block !important;
+    box-sizing: border-box !important;
+    transition: transform 0.15s ease, box-shadow 0.15s ease !important;
+    pointer-events: none !important;
+  }
+
+  /* Estado Seleccionado: dibuja el anillo blanco + azul al activar el input */
+  .swatch-radio-hidden:checked + .swatch-circle-paint {
+    transform: scale(1.18) !important;
+    box-shadow: 0 0 0 2px #ffffff, 0 0 0 4.5px #3b82f6, 0 2px 6px rgba(0, 0, 0, 0.25) !important;
+  }
+}
+
+/* RESALTE CHECKED PARA CUALQUIER NAVEGADOR Y MÓVIL */
+.board-color-input:checked + .board-color-dot {
+  transform: scale(1.2) !important;
+  box-shadow: 0 0 0 2px #ffffff, 0 0 0 4.5px #3b82f6, 0 2px 6px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* ==========================================
+   COLOR PICKER ACTIVE FIX (JS + CSS)
+   ========================================== */
+
+.board-color-dot {
+  width: 24px !important;
+  height: 24px !important;
+  border-radius: 50% !important;
+  display: block !important;
+  box-sizing: border-box !important;
+  transition: transform 0.15s ease, box-shadow 0.15s ease !important;
+  pointer-events: none !important;
+
+  /* Estado Activo mediante la clase is-active */
+  &.is-active {
+    transform: scale(1.22) !important;
+    box-shadow: 0 0 0 2px #ffffff, 0 0 0 4.5px #3b82f6, 0 2px 6px rgba(0, 0, 0, 0.3) !important;
+  }
+}
+
+/* ==========================================
+   COLOR PICKER ACTIVE FIX (JS + CSS)
+   ========================================== */
+
+.board-color-dot {
+  width: 24px !important;
+  height: 24px !important;
+  border-radius: 50% !important;
+  display: block !important;
+  box-sizing: border-box !important;
+  transition: transform 0.15s ease, box-shadow 0.15s ease !important;
+  pointer-events: none !important;
+
+  /* Estado Activo mediante la clase is-active */
+  &.is-active {
+    transform: scale(1.22) !important;
+    box-shadow: 0 0 0 2px #ffffff, 0 0 0 4.5px #3b82f6, 0 2px 6px rgba(0, 0, 0, 0.3) !important;
+  }
 }

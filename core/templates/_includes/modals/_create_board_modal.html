@@ -1,13 +1,13 @@
 {% load i18n %}
 
-<div class="modal fade" id="createBoardModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="false" style="z-index: 1060 !important;">
+<div class="modal fade" id="createBoardModal" tabindex="-1" aria-hidden="true" style="z-index: 1060 !important;">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content text-dark border-0 shadow-lg rounded-4">
             <form method="POST" action="{% url 'create_board' %}">
                 {% csrf_token %}
                 <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
                     <h5 class="modal-title fw-bold text-dark d-flex align-items-center gap-2">
-                        ➕ {% translate "Crear nuevo tablero" %}
+                        {% translate "Crear nuevo tablero" %}
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{% translate 'Cerrar' %}"></button>
                 </div>
@@ -19,22 +19,50 @@
                     </div>
 
                     <div class="row g-2 mb-3">
-                        <div class="col-md-5">
-                            <label class="form-label small fw-bold text-dark">{% translate "Color" %}</label>
-                            <select name="color" class="form-select rounded-3">
-                                <option value="#3B82F6" selected>🟦 {% translate "Azul" %}</option>
-                                <option value="#10B981">🟩 {% translate "Verde" %}</option>
-                                <option value="#EF4444">🟥 {% translate "Rojo" %}</option>
-                                <option value="#F59E0B">🟧 {% translate "Naranja" %}</option>
-                                <option value="#8B5CF6">🟪 {% translate "Púrpura" %}</option>
-                                <option value="#6B7280">⬜ {% translate "Gris" %}</option>
-                            </select>
-                        </div>
-                        <div class="col-md-7">
-                            <label class="form-label small fw-bold text-dark">{% translate "Descripción" %}</label>
-                            <input type="text" name="description" class="form-control rounded-3" placeholder="{% translate 'Opcional' %}">
-                        </div>
-                    </div>
+                                                        <!-- Selector de Color Visual -->
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold text-secondary mb-2">{% translate "Color del Tablero" %}</label>
+                                    <div class="color-picker-group d-flex align-items-center gap-2 p-1 bg-light rounded-3 border">
+                                        {% with current_color=b.color|default:"#3B82F6" %}
+                                        <label class="color-swatch-item flex-fill text-center">
+                                            <input type="radio" name="color" value="#3B82F6" {% if current_color == "#3B82F6" %}checked{% endif %} class="btn-check">
+                                            <span class="swatch-circle" style="background-color: #3B82F6;" title="{% translate 'Azul' %}"></span>
+                                        </label>
+
+                                        <label class="color-swatch-item flex-fill text-center">
+                                            <input type="radio" name="color" value="#10B981" {% if current_color == "#10B981" %}checked{% endif %} class="btn-check">
+                                            <span class="swatch-circle" style="background-color: #10B981;" title="{% translate 'Verde' %}"></span>
+                                        </label>
+
+                                        <label class="color-swatch-item flex-fill text-center">
+                                            <input type="radio" name="color" value="#EF4444" {% if current_color == "#EF4444" %}checked{% endif %} class="btn-check">
+                                            <span class="swatch-circle" style="background-color: #EF4444;" title="{% translate 'Rojo' %}"></span>
+                                        </label>
+
+                                        <label class="color-swatch-item flex-fill text-center">
+                                            <input type="radio" name="color" value="#F59E0B" {% if current_color == "#F59E0B" %}checked{% endif %} class="btn-check">
+                                            <span class="swatch-circle" style="background-color: #F59E0B;" title="{% translate 'Naranja' %}"></span>
+                                        </label>
+
+                                        <label class="color-swatch-item flex-fill text-center">
+                                            <input type="radio" name="color" value="#8B5CF6" {% if current_color == "#8B5CF6" %}checked{% endif %} class="btn-check">
+                                            <span class="swatch-circle" style="background-color: #8B5CF6;" title="{% translate 'Púrpura' %}"></span>
+                                        </label>
+
+                                        <label class="color-swatch-item flex-fill text-center">
+                                            <input type="radio" name="color" value="#6B7280" {% if current_color == "#6B7280" %}checked{% endif %} class="btn-check">
+                                            <span class="swatch-circle" style="background-color: #6B7280;" title="{% translate 'Gris' %}"></span>
+                                        </label>
+                                        {% endwith %}
+                                    </div>
+                                </div>
+
+                                <!-- Campo Descripción -->
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold text-secondary mb-2">{% translate "Descripción" %}</label>
+                                    <input type="text" name="description" value="{{ b.description|default:'' }}" class="form-control rounded-3 custom-styled-input" placeholder="{% translate 'Opcional' %}">
+                                </div>
+                            </div>
 
                     <hr class="my-3 text-muted opacity-25">
 

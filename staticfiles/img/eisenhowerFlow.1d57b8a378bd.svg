@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <defs>
+    <!-- GRADIENTE ORIGINAL: Violeta/Morado a Azul Celeste -->
+    <linearGradient id="eisenhowerFlowGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8B5CF6" />
+      <stop offset="45%" stop-color="#6366F1" />
+      <stop offset="100%" stop-color="#38BDF8" />
+    </linearGradient>
+  </defs>
+
+  <!-- PASTILLA CONTENEDORA AL LÍMITE (OCUPA TODO EL CANVAS 32x32) -->
+  <rect x="0" y="0" width="32" height="32" rx="7.5" fill="url(#eisenhowerFlowGrad)" />
+
+  <!-- RETÍCULA DE 4 BLOQUES (PROPORCIONES Y OPACIDADES DEL DISEÑO ORIGINAL) -->
+  <!-- Arriba Izquierda: Blanco Puro -->
+  <rect x="8.5" y="8.5" width="6.5" height="6.5" rx="1.8" fill="#FFFFFF" opacity="1" />
+  
+  <!-- Arriba Derecha: Blanco Traslúcido Suave -->
+  <rect x="17" y="8.5" width="6.5" height="6.5" rx="1.8" fill="#FFFFFF" opacity="0.65" />
+  
+  <!-- Abajo Izquierda: Blanco Traslúcido Medio -->
+  <rect x="8.5" y="17" width="6.5" height="6.5" rx="1.8" fill="#FFFFFF" opacity="0.8" />
+  
+  <!-- Abajo Derecha: Blanco Traslúcido Tenue -->
+  <rect x="17" y="17" width="6.5" height="6.5" rx="1.8" fill="#FFFFFF" opacity="0.5" />
+</svg>

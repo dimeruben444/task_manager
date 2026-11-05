@@ -1,0 +1,11 @@
+//Elementos adicionales de tareas e inputs
+
+// Estilos adicionales para formularios e inputs de tareas
+.task-inline-input {
+  background-color: transparent;
+  
+  &:focus {
+    outline: none;
+    box-shadow: none;
+  }
+}

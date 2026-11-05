@@ -9,28 +9,35 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
-import os
-from pathlib import Path
 
+import os
+import sys
+from pathlib import Path
+from dotenv import load_dotenv
+from django.utils.translation import gettext_lazy as _
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Cargar variables de entorno desde .env
+load_dotenv(os.path.join(BASE_DIR, '.env'))
+
+# Detectar si estamos ejecutando tests
+TESTING = any(arg in sys.argv for arg in ['test', 'pytest', 'coverage'])
 
 # Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-local-dev-key')
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY')
+# DEBUG controlado por entorno (por defecto True en desarrollo)
+# Forzar booleano limpio quitando espacios o comillas accidentales del .env
+DEBUG_ENV = os.getenv('DEBUG', 'True').strip().strip("'").strip('"')
+DEBUG = DEBUG_ENV.lower() in ('true', '1', 't')
 
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = ['.ngrok-free.dev', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['.ngrok-free.dev', '.ngrok-free.app', 'localhost', '127.0.0.1']
 
 CSRF_TRUSTED_ORIGINS = [
     'https://*.ngrok-free.dev',
+    'https://*.ngrok-free.app',
     'https://*.ngrok.io',
 ]
 
@@ -47,16 +54,15 @@ INSTALLED_APPS = [
 
     'sass_processor',
 
-    # Aplicacciones locales
+    # Aplicaciones locales
     'users',
     'boards',
     'tasks',
-
-
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # sirve estáticos con WhiteNoise
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -64,8 +70,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-
-    
 ]
 
 ROOT_URLCONF = 'core.urls'
@@ -82,9 +86,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
 
-                
-
-                #Context processor de notificaciones:
+                # Context processors de notificaciones locales
                 'boards.context_processors.notifications_context',
                 'boards.context_processors.frequent_collaborators_context',
             ],
@@ -96,8 +98,6 @@ WSGI_APPLICATION = 'core.wsgi.application'
 
 
 # Database
-# https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -107,8 +107,6 @@ DATABASES = {
 
 
 # Password validation
-# https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -126,15 +124,12 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 AUTHENTICATION_BACKENDS = [
-    'users.backends.EmailOrUsernameModelBackend',  # Tu backend personalizado en la app 'users'
-    'django.contrib.auth.backends.ModelBackend',   # El backend por defecto de Django
+    'users.backends.EmailOrUsernameModelBackend',  # Backend personalizado
+    'django.contrib.auth.backends.ModelBackend',   # Backend por defecto
 ]
 
 
 # Internationalization
-# https://docs.djangoproject.com/en/4.2/topics/i18n/
-from django.utils.translation import gettext_lazy as _
-
 LANGUAGE_CODE = 'es'
 
 TIME_ZONE = 'Europe/Madrid'
@@ -147,6 +142,7 @@ LANGUAGES = [
     ('es', _('Español')),
     ('en', _('English')),
 ]
+
 LOCALE_PATHS = [
     BASE_DIR / 'locale',
 ]
@@ -154,10 +150,9 @@ LOCALE_PATHS = [
 LANGUAGE_COOKIE_NAME = 'django_language'
 LANGUAGE_COOKIE_AGE = 365 * 24 * 60 * 60
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
+# Static files (CSS, JavaScript, Images)
+STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
@@ -165,61 +160,51 @@ STATICFILES_DIRS = [
 
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
+# Configuración dinámica para WhiteNoise según el entorno
+if not DEBUG:
+    # En producción: comprime y usa hashes en el manifiesto
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+else:
+    # En desarrollo local: sirve estáticos directos sin exigir manifest.json
+    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 
-# Ruta raíz de tus archivos estáticos
 STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-    'sass_processor.finders.CssFinder',  # 👈 Compilador automático de Sass
+    'sass_processor.finders.CssFinder',  # Compilador automático de Sass
 ]
 
 SASS_PROCESSOR_ROOT = BASE_DIR / 'static'
 
-# Default primary key field type
-# https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
-# sirve para que no utilize el ususario predeteminado del sistema sino la clase User de mi app users
+# Modelo de usuario personalizado
 AUTH_USER_MODEL = 'users.User'
 
-
 # Redirecciones de Autenticación
-LOGIN_URL = 'login'              # 👈 Redirige a /login/ en vez de /accounts/login/
-LOGIN_REDIRECT_URL = 'dashboard'  # Redirige tras iniciar sesión con éxito
-LOGOUT_REDIRECT_URL = 'login'     # Redirige tras cerrar sesión
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'dashboard'
+LOGOUT_REDIRECT_URL = 'login'
 
 
-
-
-
-import os
-from pathlib import Path
-from dotenv import load_dotenv
-
-load_dotenv(os.path.join(BASE_DIR, '.env'))
-
-# En entorno de desarrollo (para ver los correos en la consola del terminal):
-#EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-
-SECRET_KEY = os.getenv('SECRET_KEY')
-DEBUG = os.getenv('DEBUG', 'False') == 'True'
-
-# Configuración SMTP con Brevo
+# Configuración de Email (SendGrid / Brevo)
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.sendgrid.net'  # Servidor SMTP de Brevo
+EMAIL_HOST = 'smtp.sendgrid.net'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-
 EMAIL_HOST_USER = 'apikey'
 EMAIL_HOST_PASSWORD = os.getenv('SENDGRID_API_KEY')
 DEFAULT_FROM_EMAIL = 'EisenhowerFlow <eisenhowerflow@gmail.com>'
 SERVER_EMAIL = 'eisenhowerflow@gmail.com'
 
 
-import sys
-TESTING = any(arg in sys.argv for arg in ['test', 'pytest', 'coverage'])
+# ==========================================
+# CONFIGURACIÓN DE SEGURIDAD PARA PRODUCCIÓN
+# ==========================================
+# Limpieza estricta de la variable DEBUG para evitar falsos "False" por comillas o espacios en el .env
+_debug_raw = os.getenv('DEBUG', 'True').strip().strip("'").strip('"')
+DEBUG = _debug_raw.lower() in ('true', '1', 't', 'yes')
+
 # ==========================================
 # CONFIGURACIÓN DE SEGURIDAD PARA PRODUCCIÓN
 # ==========================================
@@ -234,5 +219,10 @@ if not DEBUG and not TESTING:
 
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 else:
-    # Garantizar que en desarrollo y en tests no redirija a HTTPS
+    # Garantizar que en desarrollo local y en tests nunca fuerce HTTPS ni invalide cookies
     SECURE_SSL_REDIRECT = False
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
+    SECURE_HSTS_SECONDS = 0
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+    SECURE_HSTS_PRELOAD = False
