@@ -377,11 +377,21 @@ def search_tasks_api(request):
     return JsonResponse({'results': results})
 
 from django.http import JsonResponse
+from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from .models import Notification  # Ajusta según el nombre de tu modelo de notificaciones
+from django.views.decorators.cache import never_cache
+from .models import Notification  # Ajusta según tu modelo
 
 @login_required
+@never_cache
 def unread_notifications_count(request):
     """Devuelve el número de notificaciones no leídas del usuario actual."""
     count = Notification.objects.filter(recipient=request.user, is_read=False).count()
     return JsonResponse({'unread_count': count})
+
+@login_required
+@never_cache
+def notifications_list_html(request):
+    """Devuelve la lista parcial en HTML de las notificaciones sin recargar la página."""
+    notifications = Notification.objects.filter(recipient=request.user).order_by('-created_at')[:10]
+    return render(request, 'partials/_notifications_list.html', {'notifications': notifications})

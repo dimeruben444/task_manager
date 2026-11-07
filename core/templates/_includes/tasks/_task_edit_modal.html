@@ -207,7 +207,8 @@
                                             <button type="button" class="btn btn-outline-danger btn-sm w-50 fw-bold rounded-lg" onclick="removeTaskDate('{{ task.id }}')">
                                                 {% translate "Quitar" %}
                                             </button>
-                                            <button type="button" class="btn btn-primary btn-sm w-50 fw-bold rounded-lg" onclick="saveTaskModal('{{ task.id }}', event)">
+                                            <!-- Actualizado onclick para guardar la fecha en el modal -->
+                                            <button type="button" class="btn btn-primary btn-sm w-50 fw-bold rounded-lg" onclick="saveModalTaskDate('{{ task.id }}')">
                                                 {% translate "Guardar" %}
                                             </button>
                                         </div>

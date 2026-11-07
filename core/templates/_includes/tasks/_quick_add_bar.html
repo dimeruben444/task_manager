@@ -376,3 +376,28 @@
         </div>
     </div>
 </div>
+
+<script>
+    // Configuración traducida para Urgencia e Importancia
+    const urgencyConfig = {
+        4: { text: "{% translate 'Crítica (4/4)' %}", color: '#dc2626' },
+        3: { text: "{% translate 'Alta (3/4)' %}", color: '#dc2626' },
+        2: { text: "{% translate 'Moderada (2/4)' %}", color: '#fbbf24' },
+        1: { text: "{% translate 'Baja (1/4)' %}", color: '#fbbf24' }
+    };
+
+    const importanceConfig = {
+        4: { text: "{% translate 'Crítica (4/4)' %}", color: '#6466F1' },
+        3: { text: "{% translate 'Alta (3/4)' %}", color: '#6466F1' },
+        2: { text: "{% translate 'Moderada (2/4)' %}", color: '#41c6f6' },
+        1: { text: "{% translate 'Baja (1/4)' %}", color: '#41c6f6' }
+    };
+
+    // Traducciones dinámicas para los destinos de los cuadrantes
+    const quadrantLabels = {
+        Q1: "{% translate 'Q1 (Hacer ahora)' %}",
+        Q2: "{% translate 'Q2 (Planificar)' %}",
+        Q3: "{% translate 'Q3 (Delegar)' %}",
+        Q4: "{% translate 'Q4 (Eliminar)' %}"
+    };
+</script>

@@ -1,0 +1,76 @@
+{% load i18n %}
+
+{% for notif in notifications_list %}
+    <div class="p-3 mb-2 rounded-3 border-start border-4 position-relative"
+        style="background: rgba(255, 255, 255, 0.10);
+            {% if notif.notification_type == 'invitation' %}border-left-color: #6466F1 !important;
+            {% elif notif.notification_type == 'task_assigned' %}border-left-color: #fbbf24 !important;
+            {% elif notif.notification_type == 'task_updated' %}border-left-color: #42C6F6 !important;
+            {% else %}border-left-color: #9ca3af !important;{% endif %}">
+        
+        {% if notif.notification_type != 'invitation' %}
+            <form method="POST" action="{% url 'delete_notification' notif.id %}" class="position-absolute top-0 end-0 mt-2 me-2">
+                {% csrf_token %}
+                <button type="submit" class="btn-close btn-close-white btn-sm p-1" style="font-size: 0.65rem;" title="{% translate 'Descartar notificación' %}"></button>
+            </form>
+        {% endif %}
+
+        <div class="d-flex align-items-center gap-2 mb-1 pe-3">
+            <span class="d-inline-flex align-items-center justify-content-center rounded-circle flex-shrink-0" 
+                style="width: 24px; height: 24px; font-size: 0.8rem;
+                {% if notif.notification_type == 'invitation' %}background-color: rgba(100, 102, 241, 0.2); color: #818cf8;
+                {% elif notif.notification_type == 'task_assigned' %}background-color: rgba(251, 191, 36, 0.2); color: #fbbf24;
+                {% elif notif.notification_type == 'task_updated' %}background-color: rgba(66, 198, 246, 0.2); color: #38bdf8;
+                {% else %}background-color: rgba(255, 255, 255, 0.1); color: #d1d5db;{% endif %}">
+                
+                {% if notif.notification_type == 'invitation' %}
+                    <i class="bi bi-kanban" style="transform: rotate(-90deg); display: inline-block;"></i>
+                {% elif notif.notification_type == 'task_assigned' %}
+                    <i class="bi bi-people-fill" style="font-size: 0.85rem;"></i>
+                {% elif notif.notification_type == 'task_updated' %}
+                    <i class="bi bi-card-text"></i>
+                {% elif notif.notification_type == 'mention' %}
+                    <i class="bi bi-chat-quote-fill"></i>
+                {% else %}
+                    <i class="bi bi-bell-fill"></i>
+                {% endif %}
+            </span>
+
+            <strong class="me-auto small text-white fw-bold" style="font-size: 0.85rem;">
+                {{ notif.actor.username }}
+            </strong>
+            
+            <small class="text-white-50" style="font-size: 0.72rem;">
+                {{ notif.created_at|timesince }}
+            </small>
+        </div>
+
+        <p class="mb-2 small text-white-50 fw-medium" style="line-height: 1.35; font-size: 0.82rem;">
+            {{ notif.verb }}
+        </p>
+
+        {% if notif.notification_type == 'invitation' and notif.invitation %}
+            <div class="d-flex gap-2 mt-2">
+                <a href="{% url 'accept_invitation' notif.invitation.id %}" class="btn btn-sm btn-success flex-fill py-1 rounded-3 fw-bold shadow-sm d-inline-flex align-items-center justify-content-center gap-1" style="font-size: 0.78rem;">
+                    <i class="bi bi-check-lg"></i> {% translate "Aceptar" %}
+                </a>
+                <a href="{% url 'reject_invitation' notif.invitation.id %}" class="btn btn-sm btn-outline-danger flex-fill py-1 rounded-3 fw-semibold d-inline-flex align-items-center justify-content-center gap-1" style="font-size: 0.78rem;">
+                    <i class="bi bi-x-lg"></i> {% translate "Rechazar" %}
+                </a>
+            </div>
+        {% elif notif.target_board %}
+            <a href="{% url 'dashboard_board' notif.target_board.id %}" class="btn btn-sm btn-outline-light w-100 mt-2 py-1 rounded-3 fw-semibold d-inline-flex align-items-center justify-content-center gap-1" style="font-size: 0.78rem;">
+                <i class="bi bi-kanban"></i> {% translate "Ver en el tablero" %}
+            </a>
+        {% elif notif.target_task %}
+            <a href="{% url 'dashboard' %}" class="btn btn-sm btn-outline-light w-100 mt-2 py-1 rounded-3 fw-semibold d-inline-flex align-items-center justify-content-center gap-1" style="font-size: 0.78rem;">
+                <i class="bi bi-grid-fill"></i> {% translate "Ver en General" %}
+            </a>
+        {% endif %}
+    </div>
+{% empty %}
+    <div class="text-center text-white-50 small py-4">
+        <i class="bi bi-bell-slash d-block fs-4 mb-1 text-white-50 opacity-50"></i>
+        {% translate "No tienes notificaciones pendientes." %}
+    </div>
+{% endfor %}

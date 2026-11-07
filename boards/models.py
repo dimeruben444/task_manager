@@ -40,6 +40,7 @@ class Board(models.Model):
     email_notifications_sent = models.BooleanField(_('Notificación enviada'),default=False)
 
     created_at = models.DateTimeField(_('Fecha de creación'), auto_now_add=True)
+    
 
     class Meta:
         verbose_name = _('Tablero')

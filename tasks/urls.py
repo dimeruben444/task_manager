@@ -24,4 +24,5 @@ urlpatterns = [
     path('tasks/search/', views.search_tasks_api, name='search_tasks_api'),
 
     path('api/unread-notifications-count/', views.unread_notifications_count, name='unread_notifications_count'),
+    path('api/notifications-list-html/', views.notifications_list_html, name='notifications_list_html'),
 ]

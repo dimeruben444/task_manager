@@ -1,6 +1,8 @@
 // static/js/task-modal.js
 
+// ==========================================
 // 1. DECLARACIÓN ÚNICA Y GLOBAL DE LA ANIMACIÓN DE SHAKE
+// ==========================================
 window.triggerDueDateShake = function(taskElement) {
     if (!taskElement) return;
 
@@ -20,7 +22,9 @@ window.triggerDueDateShake = function(taskElement) {
     }
 };
 
+// ==========================================
 // 2. FUNCIÓN DE SELECCIÓN DE CUADRANTE EN EL MODAL
+// ==========================================
 function selectQuadrant(quadrantCode, taskId, labelText) {
     let urgency = 4, importance = 4;
     let svgIcon = '';
@@ -51,22 +55,9 @@ function selectQuadrant(quadrantCode, taskId, labelText) {
     if (importanceRadio) importanceRadio.checked = true;
 }
 
-// 3. FUNCIONES AUXILIARES PARA EL DROPDOWN DE FECHAS EN MODALES
-function syncHiddenDueDate(taskId) {
-  const displayDate = document.getElementById(`displayDate${taskId}`);
-  const displayTime = document.getElementById(`displayTime${taskId}`);
-  const hiddenInput = document.getElementById(`hiddenDueDate${taskId}`);
-
-  if (hiddenInput && displayDate) {
-    if (displayDate.value.trim() !== "") {
-      const timeVal = displayTime && displayTime.value ? displayTime.value : "12:00";
-      hiddenInput.value = `${displayDate.value.trim()} ${timeVal}`;
-    } else {
-      hiddenInput.value = "";
-    }
-  }
-}
-
+// ==========================================
+// 3. FUNCIONES PARA EL DROPDOWN DE FECHAS (MODALES TAREAS EXISTENTES)
+// ==========================================
 function prepareDateDropdown(taskId) {
   const calendarContainer = document.getElementById(`inlineCalendar${taskId}`);
   const hiddenInput = document.getElementById(`hiddenDueDate${taskId}`);
@@ -75,7 +66,6 @@ function prepareDateDropdown(taskId) {
   const reminderCheck = document.getElementById(`reminder_enabled_${taskId}`);
   const reminderOffsetBox = document.getElementById(`reminderOffsetContainer_${taskId}`);
 
-  // Sincronizar visibilidad del desplegable offset según el estado del checkbox
   if (reminderCheck && reminderOffsetBox) {
     reminderOffsetBox.style.display = reminderCheck.checked ? 'block' : 'none';
   }
@@ -96,10 +86,9 @@ function prepareDateDropdown(taskId) {
       defaultDate: initialVal,
       dateFormat: "Y-m-d",
       onChange: function (selectedDates) {
-        if (selectedDates.length > 0) {
-          const dateStr = fp.formatDate(selectedDates[0], "Y-m-d");
-          if (displayDate) displayDate.value = dateStr;
-          syncHiddenDueDate(taskId);
+        if (selectedDates.length > 0 && displayDate) {
+          displayDate.value = fp.formatDate(selectedDates[0], "Y-m-d");
+          // NO guardamos automáticamente en hiddenInput
         }
       },
     });
@@ -107,24 +96,41 @@ function prepareDateDropdown(taskId) {
     if (displayDate) {
       displayDate.addEventListener("input", function () {
         if (this.value) fp.setDate(this.value, false);
-        syncHiddenDueDate(taskId);
-      });
-    }
-
-    if (displayTime) {
-      displayTime.addEventListener("change", function () {
-        if (displayDate && displayDate.value) {
-          syncHiddenDueDate(taskId);
-        }
       });
     }
   } else {
-    const fp = calendarContainer._flatpickr;
-    fp.setDate(initialVal, false);
+    calendarContainer._flatpickr.setDate(initialVal, false);
   }
 
+  // Si no había fecha previa, se muestra la sugerida en el input visual pero el hiddenInput sigue intacto
   if (!hasExistingDate && displayDate) {
     displayDate.value = tomorrowStr;
+  }
+}
+
+function saveModalTaskDate(taskId) {
+  const displayDate = document.getElementById(`displayDate${taskId}`);
+  const displayTime = document.getElementById(`displayTime${taskId}`);
+  const hiddenInput = document.getElementById(`hiddenDueDate${taskId}`);
+  const badgeDisplay = document.getElementById(`dateBadgeDisplay${taskId}`);
+
+  if (displayDate && displayDate.value.trim() !== "") {
+    const timeVal = displayTime && displayTime.value ? displayTime.value : "12:00";
+    hiddenInput.value = `${displayDate.value.trim()} ${timeVal}`;
+
+    const dateParts = displayDate.value.trim().split("-");
+    if (dateParts.length === 3 && badgeDisplay) {
+      badgeDisplay.textContent = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]} ${timeVal}`;
+    }
+  } else if (hiddenInput) {
+    hiddenInput.value = "";
+    if (badgeDisplay) badgeDisplay.textContent = "+";
+  }
+
+  const dropdownBtn = document.getElementById(`dropdownDate${taskId}`);
+  if (dropdownBtn && typeof bootstrap !== "undefined") {
+    const instance = bootstrap.Dropdown.getInstance(dropdownBtn);
+    if (instance) instance.hide();
   }
 }
 
@@ -147,31 +153,15 @@ function removeTaskDate(taskId) {
     const bsDropdown = bootstrap.Dropdown.getInstance(dropdownBtn);
     if (bsDropdown) bsDropdown.hide();
   }
-
-  saveTaskModal(taskId);
 }
 
-// 4. FUNCIONES AUXILIARES PARA EL DROPDOWN SUPERIOR RÁPIDO (CREAR TAREA)
-function syncQuickHiddenDueDate() {
-  const displayDate = document.getElementById("quickDisplayDate");
-  const displayTime = document.getElementById("quickDisplayTime");
-  const hiddenInput = document.getElementById("quickHiddenDueDate");
-
-  if (hiddenInput && displayDate) {
-    if (displayDate.value.trim() !== "") {
-      const timeVal = displayTime && displayTime.value ? displayTime.value : "12:00";
-      hiddenInput.value = `${displayDate.value.trim()} ${timeVal}`;
-    } else {
-      hiddenInput.value = "";
-    }
-  }
-}
-
+// ==========================================
+// 4. FUNCIONES PARA EL DROPDOWN DE FECHAS (QUICK ADD BAR)
+// ==========================================
 function prepareQuickDateDropdown() {
   const calendarContainer = document.getElementById("quickInlineCalendar");
   const hiddenInput = document.getElementById("quickHiddenDueDate");
   const displayDate = document.getElementById("quickDisplayDate");
-  const displayTime = document.getElementById("quickDisplayTime");
 
   if (!calendarContainer || typeof flatpickr === "undefined") return;
 
@@ -189,10 +179,9 @@ function prepareQuickDateDropdown() {
       defaultDate: initialVal,
       dateFormat: "Y-m-d",
       onChange: function (selectedDates) {
-        if (selectedDates.length > 0) {
-          const dateStr = fp.formatDate(selectedDates[0], "Y-m-d");
-          if (displayDate) displayDate.value = dateStr;
-          syncQuickHiddenDueDate();
+        if (selectedDates.length > 0 && displayDate) {
+          displayDate.value = fp.formatDate(selectedDates[0], "Y-m-d");
+          // NO guardamos automáticamente en quickHiddenDueDate
         }
       },
     });
@@ -200,20 +189,10 @@ function prepareQuickDateDropdown() {
     if (displayDate) {
       displayDate.addEventListener("input", function () {
         if (this.value) fp.setDate(this.value, false);
-        syncQuickHiddenDueDate();
-      });
-    }
-
-    if (displayTime) {
-      displayTime.addEventListener("change", function () {
-        if (displayDate && displayDate.value) {
-          syncQuickHiddenDueDate();
-        }
       });
     }
   } else {
-    const fp = calendarContainer._flatpickr;
-    fp.setDate(initialVal, false);
+    calendarContainer._flatpickr.setDate(initialVal, false);
   }
 
   if (!hasExistingDate && displayDate) {
@@ -223,21 +202,20 @@ function prepareQuickDateDropdown() {
 
 function saveQuickDate() {
   const displayDate = document.getElementById("quickDisplayDate");
+  const displayTime = document.getElementById("quickDisplayTime");
   const hiddenInput = document.getElementById("quickHiddenDueDate");
   const badgeDisplay = document.getElementById("quickDateBadgeDisplay");
 
-  if (displayDate && displayDate.value) {
-    syncQuickHiddenDueDate();
-  }
+  if (displayDate && displayDate.value.trim() !== "") {
+    const timeVal = displayTime && displayTime.value ? displayTime.value : "12:00";
+    hiddenInput.value = `${displayDate.value.trim()} ${timeVal}`;
 
-  if (hiddenInput && hiddenInput.value) {
-    const parts = hiddenInput.value.split(" ");
-    const dateParts = parts[0].split("-");
-    if (dateParts.length === 3) {
-      const timePart = parts[1] || "12:00";
-      if (badgeDisplay) badgeDisplay.textContent = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]} ${timePart}`;
+    const dateParts = displayDate.value.trim().split("-");
+    if (dateParts.length === 3 && badgeDisplay) {
+      badgeDisplay.textContent = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]} ${timeVal}`;
     }
-  } else {
+  } else if (hiddenInput) {
+    hiddenInput.value = "";
     if (badgeDisplay) badgeDisplay.textContent = "+";
   }
 
@@ -274,7 +252,9 @@ function clearQuickDate() {
   }
 }
 
-// 5. INICIALIZACIÓN DE MODALES Y DROPDOWNS
+// ==========================================
+// 5. INICIALIZACIÓN DE DROPDOWNS Y MODALES
+// ==========================================
 
 // A. Al abrir el modal principal de la tarea
 document.addEventListener("shown.bs.modal", function (event) {
@@ -299,34 +279,24 @@ document.addEventListener("shown.bs.modal", function (event) {
   }
 });
 
-// B. Al abrir desplegables de fecha (Modal y Creación Rápida)
+// B. Al desplazar el dropdown de fechas
 document.addEventListener("show.bs.dropdown", function (event) {
   const dropdownToggle = event.target;
   if (!dropdownToggle || !dropdownToggle.id) return;
 
-  // Formulario superior de creación rápida
   if (dropdownToggle.id === "quickDropdownDate") {
     prepareQuickDateDropdown();
-
-    const hiddenInput = document.getElementById("quickHiddenDueDate");
-    if (hiddenInput && hiddenInput.value.trim() === "") {
-      syncQuickHiddenDueDate();
-    }
   }
 
-  // Modales de tareas existentes
   if (dropdownToggle.id.startsWith("dropdownDate") && dropdownToggle.id !== "quickDropdownDate") {
     const taskId = dropdownToggle.id.replace("dropdownDate", "");
     prepareDateDropdown(taskId);
-
-    const hiddenInput = document.getElementById(`hiddenDueDate${taskId}`);
-    if (hiddenInput && hiddenInput.value.trim() === "") {
-      syncHiddenDueDate(taskId);
-    }
   }
 });
 
+// ==========================================
 // 6. GUARDAR TAREA CON ANIMACIÓN DE VIAJE (FLIP) Y SACUDIDA
+// ==========================================
 function saveTaskModal(taskId, event) {
 
     if (event) {
@@ -469,7 +439,9 @@ function saveTaskModal(taskId, event) {
     });
 }
 
+// ==========================================
 // 7. FUNCIÓN BORRAR TAREA DESDE EL MODAL
+// ==========================================
 function deleteTaskModal(taskId, deleteUrl) {
     if (!confirm('¿Seguro que quieres eliminar esta tarea?')) {
         return;
@@ -512,7 +484,9 @@ function deleteTaskModal(taskId, deleteUrl) {
     });
 }
 
-// SELECCIÓN DIRECTA DE TABLERO EN DESPLEGABLES
+// ==========================================
+// 8. OTRAS FUNCIONES AUXILIARES (TABLEROS Y MIEMBROS)
+// ==========================================
 function selectBoardOption(boardId, boardName, targetSuffix, boardColor) {
   const hiddenInput = document.getElementById(`hiddenBoardId${targetSuffix}`);
   if (hiddenInput) {
