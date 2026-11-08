@@ -713,42 +713,53 @@ body {
   box-shadow: 0 0 0 2px #ffffff, 0 0 0 4.5px #3b82f6, 0 2px 6px rgba(0, 0, 0, 0.3) !important;
 }
 
-/* ==========================================
-   COLOR PICKER ACTIVE FIX (JS + CSS)
-   ========================================== */
 
-.board-color-dot {
-  width: 24px !important;
-  height: 24px !important;
-  border-radius: 50% !important;
-  display: block !important;
-  box-sizing: border-box !important;
-  transition: transform 0.15s ease, box-shadow 0.15s ease !important;
-  pointer-events: none !important;
-
-  /* Estado Activo mediante la clase is-active */
-  &.is-active {
-    transform: scale(1.22) !important;
-    box-shadow: 0 0 0 2px #ffffff, 0 0 0 4.5px #3b82f6, 0 2px 6px rgba(0, 0, 0, 0.3) !important;
-  }
+/* Forzar que el fondo de Bootstrap oscurezca la pantalla sutilmente */
+.modal-backdrop {
+    background-color: #000000 !important;
+}
+.modal-backdrop.show {
+    opacity: 0.45 !important; /* Ajusta este valor entre 0.3 (más claro) y 0.6 (más oscuro) según prefieras */
 }
 
-/* ==========================================
-   COLOR PICKER ACTIVE FIX (JS + CSS)
-   ========================================== */
+/* Estilo unificado de cuadrantes (Landing + Dashboard) */
 
-.board-color-dot {
-  width: 24px !important;
-  height: 24px !important;
-  border-radius: 50% !important;
-  display: block !important;
-  box-sizing: border-box !important;
-  transition: transform 0.15s ease, box-shadow 0.15s ease !important;
-  pointer-events: none !important;
+.quadrant , .completed-panel{
+  background: #ffffff;
+  border-top: 4px solid #e2e8f0 !important;
+  border-radius: 16px;
+  border-left-width: 4px;
+  border-left-style: solid;
+  transition: box-shadow 0.2s ease;
 
-  /* Estado Activo mediante la clase is-active */
-  &.is-active {
-    transform: scale(1.22) !important;
-    box-shadow: 0 0 0 2px #ffffff, 0 0 0 4.5px #3b82f6, 0 2px 6px rgba(0, 0, 0, 0.3) !important;
+  /* Sombra sutil opcional al pasar el ratón */
+  &:hover {
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+  }
+
+  /* Q1 - Hacer ahora (Rojo) */
+
+  &.quadrant-q1 {
+    border-top-color: #ef4444 !important;
+  }
+
+
+  &.quadrant-q2 {
+    border-top-color: #3b82f6 !important;
+  }
+
+
+  &.quadrant-q3 {
+    border-top-color: #f59e0b !important;
+  }
+
+  /* Q4 - Eliminar (Gris Slate) */
+ 
+  &.quadrant-q4 {
+    border-top-color: #64748b !important;
+  }
+
+  &.completed-panel {
+    border-top-color: #12B981 !important;
   }
 }

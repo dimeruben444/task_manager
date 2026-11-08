@@ -1,20 +1,4 @@
-// dashboard.js
 
-// Configuración exacta para cada nivel numérico (1 al 4) en Urgencia
-const urgencyConfig = {
-    4: { text: 'Crítica (4/4)', color: '#dc2626' },   // Rojo para Crítica
-    3: { text: 'Alta (3/4)', color: '#dc2626' },      // Rojo para Alta
-    2: { text: 'Moderada (2/4)', color: '#fbbf24' },  // Morado para Moderada
-    1: { text: 'Baja (1/4)', color: '#fbbf24' }       // Amarillo para Baja
-};
-
-// Configuración exacta para cada nivel numérico (1 al 4) en Importancia
-const importanceConfig = {
-    4: { text: 'Crítica (4/4)', color: '#6466F1' },   // Morado para Crítica
-    3: { text: 'Alta (3/4)', color: '#6466F1' },      // Morado para Alta
-    2: { text: 'Moderada (2/4)', color: '#41c6f6' },  // Azul para Moderada
-    1: { text: 'Baja (1/4)', color: '#41c6f6' }       // Azul para Baja
-};
 
 function updateLabel(type, value) {
     // Seleccionamos estrictamente el sublabel (el span de texto superior)
@@ -37,6 +21,7 @@ function resetLabel(type) {
     const checked = form.querySelector(`input[name="${type}"]:checked`);
     updateLabel(type, checked ? checked.value : null);
 }
+
 
 // CÁLCULO DINÁMICO DEL DESTINO PREVISTO Y GESTIÓN DE ETIQUETAS
 function updateQuickTargetQuadrantDisplay() {
@@ -72,17 +57,18 @@ function updateQuickTargetQuadrantDisplay() {
     const isUrgent = urgencyVal >= 3;
     const isImportant = importanceVal >= 3;
 
+    // Lectura dinámica desde el diccionario quadrantLabels traducido por Django
     if (isUrgent && isImportant) {
-        targetEl.textContent = 'Q1 (Hacer ahora)';
+        targetEl.textContent = (typeof quadrantLabels !== 'undefined') ? quadrantLabels.Q1 : 'Q1 (Hacer ahora)';
         targetEl.className = 'fw-bold text-danger';
     } else if (!isUrgent && isImportant) {
-        targetEl.textContent = 'Q2 (Planificar)';
+        targetEl.textContent = (typeof quadrantLabels !== 'undefined') ? quadrantLabels.Q2 : 'Q2 (Planificar)';
         targetEl.className = 'fw-bold text-primary';
     } else if (isUrgent && !isImportant) {
-        targetEl.textContent = 'Q3 (Delegar)';
+        targetEl.textContent = (typeof quadrantLabels !== 'undefined') ? quadrantLabels.Q3 : 'Q3 (Delegar)';
         targetEl.className = 'fw-bold text-warning';
     } else {
-        targetEl.textContent = 'Q4 (Eliminar)';
+        targetEl.textContent = (typeof quadrantLabels !== 'undefined') ? quadrantLabels.Q4 : 'Q4 (Eliminar)';
         targetEl.className = 'fw-bold text-secondary';
     }
 }
@@ -1346,3 +1332,169 @@ function executeMobileEdit(taskId) {
         }
     }
 }
+
+
+// ==========================================
+// POLLING Y REFRESCO EN TIEMPO REAL DE NOTIFICACIONES
+// ==========================================
+
+let previousUnreadCount = 0;
+let isFirstNotificationPoll = true;
+let audioCtx = null;
+
+function getAudioContext() {
+    if (!audioCtx) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioContextClass) {
+            audioCtx = new AudioContextClass();
+        }
+    }
+    if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+    }
+    return audioCtx;
+}
+
+// Desbloquear motor de audio con el primer toque/clic
+document.addEventListener('click', function unlockAudio() {
+    getAudioContext();
+    document.removeEventListener('click', unlockAudio);
+}, { once: true });
+
+function playNotificationSound() {
+    try {
+        const ctx = getAudioContext();
+        if (!ctx) return;
+
+        const oscillator = ctx.createOscillator();
+        const gainNode = ctx.createGain();
+
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(880, ctx.currentTime);
+        gainNode.gain.setValueAtTime(0.08, ctx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+
+        oscillator.connect(gainNode);
+        gainNode.connect(ctx.destination);
+
+        oscillator.start();
+        oscillator.stop(ctx.currentTime + 0.15);
+    } catch (e) {
+        console.debug("Audio no disponible");
+    }
+}
+
+// Carga el HTML fresco de la lista de notificaciones desde el servidor
+function fetchNotificationsList() {
+    const bellBtn = document.getElementById('notificationsDropdown');
+    if (!bellBtn) return;
+
+    // Localiza específicamente el contenedor interno de la lista de notificaciones
+    const notificationsContainer = bellBtn.nextElementSibling ? bellBtn.nextElementSibling.querySelector('.notifications-list') : null;
+    if (!notificationsContainer) return;
+
+    const cacheBuster = new Date().getTime();
+
+    fetch(`/api/notifications-list-html/?_t=${cacheBuster}`, {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'text/html, application/json',
+            'Cache-Control': 'no-cache'
+        }
+    })
+    .then(res => res.ok ? res.text() : Promise.reject())
+    .then(htmlContent => {
+        notificationsContainer.innerHTML = htmlContent;
+    })
+    .catch(err => console.debug("No se pudo refrescar la lista de notificaciones"));
+}
+
+function pollUnreadNotifications() {
+    if (document.hidden) return;
+
+    const cacheBuster = new Date().getTime();
+
+    fetch(`/api/unread-notifications-count/?_t=${cacheBuster}`, {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json',
+            'Cache-Control': 'no-cache'
+        }
+    })
+    .then(res => res.ok ? res.json() : Promise.reject())
+    .then(data => {
+        const bellBtn = document.getElementById('notificationsDropdown');
+        if (!bellBtn) return;
+
+        let redDot = bellBtn.querySelector('.notification-red-dot');
+        const currentCount = data.unread_count || 0;
+
+        if (currentCount > 0) {
+            const displayValue = currentCount > 99 ? '99+' : currentCount;
+
+            if (!redDot) {
+                redDot = document.createElement('span');
+                redDot.className = 'notification-red-dot';
+                bellBtn.appendChild(redDot);
+            }
+            
+            // Actualizar número
+            redDot.textContent = displayValue;
+
+            if (!isFirstNotificationPoll && currentCount > previousUnreadCount) {
+                playNotificationSound();
+                if (bellBtn.classList.contains('show')) {
+                    fetchNotificationsList();
+                }
+            }
+        } else if (redDot) {
+            redDot.remove();
+        }
+
+        previousUnreadCount = currentCount;
+        isFirstNotificationPoll = false;
+    })
+    .catch(err => console.debug("Polling en pausa"));
+}
+
+// AL PINCHAR EN LA CAMPANA: Refresca el menú desplegable antes de mostrarlo
+document.addEventListener('DOMContentLoaded', function() {
+    const bellBtn = document.getElementById('notificationsDropdown');
+    if (bellBtn) {
+        bellBtn.addEventListener('show.bs.dropdown', function () {
+            fetchNotificationsList();
+        });
+    }
+});
+
+document.addEventListener('visibilitychange', function() {
+    if (!document.hidden) {
+        pollUnreadNotifications();
+    }
+});
+
+setInterval(pollUnreadNotifications, 8000);
+
+
+// Aislamiento completo del scroll dentro del desplegable de notificaciones
+document.addEventListener('wheel', function(e) {
+    const list = e.target.closest('.notifications-list') || e.target.closest('#notificationsDropdown + .dropdown-menu');
+    if (!list) return;
+
+    const targetList = list.classList.contains('notifications-list') ? list : list.querySelector('.notifications-list');
+    if (!targetList) return;
+
+    const scrollTop = targetList.scrollTop;
+    const scrollHeight = targetList.scrollHeight;
+    const height = targetList.clientHeight;
+    const delta = e.deltaY;
+
+    // Si la lista tiene contenido desplazable, forzar que la rueda solo mueva la lista
+    if (scrollHeight > height) {
+        targetList.scrollTop += delta;
+        e.preventDefault();
+        e.stopPropagation();
+    }
+}, { passive: false });
+
+

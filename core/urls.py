@@ -19,7 +19,7 @@ from django.urls import path, include
 from django.contrib.auth.views import LoginView, LogoutView
 from users.views import register_view
 from boards.views import search_users_api
-from .views import TermsView, PrivacyPolicyView, CookiesPolicyView
+from .views import TermsView, PrivacyPolicyView, CookiesPolicyView, landing_page_view
 from django.contrib.auth import views as auth_views
 from django.views.decorators.cache import never_cache
 
@@ -28,23 +28,25 @@ urlpatterns = [
 
     path('i18n/', include('django.conf.urls.i18n')),
     
-    # Rutas de apps
-    path('', include('tasks.urls')),
-    path('boards/', include('boards.urls')),
-    path('users/', include('users.urls')),
+    # 1. RUTA RAÍZ: La landing debe evaluarse primero
+    path('', landing_page_view, name='landing'),
 
-    # RUTAS DE AUTENTICACIÓN (Asegúrate de tener esta línea con name='logout')
-    path('logout/', LogoutView.as_view(next_page='login'), name='logout'),
+    # 2. RUTAS DE AUTENTICACIÓN
     path('login/', never_cache(auth_views.LoginView.as_view(
         template_name='registration/login.html',
         redirect_authenticated_user=True
     )), name='login'),
+    path('logout/', LogoutView.as_view(next_page='landing'), name='logout'),  # Redirige a landing al salir
     path('register/', register_view, name='register'),
 
-    path('api/search-users/', search_users_api, name='search_users_api'),
-    
+    # 3. RUTAS DE APPS (El dashboard de tasks debe tener su propio prefijo o ruta dentro de tasks.urls)
+    path('tasks/', include('tasks.urls')),  # O si prefieres 'dashboard/', include('tasks.urls')
+    path('boards/', include('boards.urls')),
+    path('users/', include('users.urls')),
 
-    #legal
+    path('api/search-users/', search_users_api, name='search_users_api'),
+
+    # 4. LEGAL
     path('terminos/', TermsView.as_view(), name='terms'),
     path('privacidad/', PrivacyPolicyView.as_view(), name='privacy_policy'),
     path('cookies/', CookiesPolicyView.as_view(), name='cookies_policy'),

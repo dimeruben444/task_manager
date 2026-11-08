@@ -1,0 +1,257 @@
+{% extends "base/base.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}
+    {% translate "EisenhowerFlow — Prioriza con claridad" %}
+{% endblock %}
+
+{% block content %}
+<div class="landing-page">
+    
+    <!-- HERO SECTION -->
+    <header class="hero py-5">
+        <div class="container py-lg-4">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-6">
+                    <span class="pill mb-4">
+                        <span class="dot bg-success"></span> 
+                        {% translate "Matriz de Eisenhower interactiva" %}
+                    </span>
+                    <h1 class="mb-4">
+                        {% translate "Domina tu caos." %}<br>
+                        <span class="accent">{% translate "Prioriza con claridad." %}</span>
+                    </h1>
+                    <p class="lead-ef mb-4">
+                        {% blocktranslate %}
+                        Valora cada tarea por <strong>urgencia</strong> e <strong>importancia</strong> y EisenhowerFlow la coloca sola en el cuadrante correcto: hacer, planificar, delegar o eliminar.
+                        {% endblocktranslate %}
+                    </p>
+                    
+                    <div class="d-flex flex-column flex-sm-row gap-3 mb-4">
+                        <a href="{% url 'register' %}" class="btn btn-ef text-nowrap d-inline-flex align-items-center justify-content-center gap-2">
+                            {% translate "Empieza gratis" %} <i class="bi bi-arrow-right"></i>
+                        </a>
+                        <a href="{% url 'login' %}" class="btn btn-ef-outline text-nowrap d-inline-flex align-items-center justify-content-center gap-2">
+                            {% translate "Iniciar sesión" %}
+                        </a>
+                    </div>
+                    
+                    <div class="d-flex flex-wrap gap-3 small text-secondary">
+                        <span><i class="bi bi-check-circle-fill check"></i> {% translate "Sin tarjeta de crédito" %}</span>
+                        <span><i class="bi bi-check-circle-fill check"></i> {% translate "Tableros ilimitados" %}</span>
+                        <span><i class="bi bi-star-fill text-warning"></i> {% translate "4.9/5 de 1.200 equipos" %}</span>
+                    </div>
+                </div>
+
+                <!-- MOCKUP INTERACTIVO CON TUS SVGS -->
+                <div class="col-lg-6">
+                    <div class="mock">
+                        <div class="mock-bar">
+                            <img src="{% static 'img/eisenhowerFlow.svg' %}" alt="Logo" style="height: 20px; width: auto;">
+                            <span class="text-white fw-bold small">Eisenhower<span style="color:var(--flow)">Flow</span></span>
+                            <div class="search ms-auto me-0"></div>
+                        </div>
+                        <div class="mock-body">
+                            <div class="mock-input">
+                                <span class="fw-semibold">{% translate "comprar comida tobi" %}</span>
+                                <span class="ms-auto text-secondary d-none d-sm-inline">{% translate "Urgencia" %}</span>
+                                <span class="stars text-warning">★★★<span class="text-muted opacity-25">★</span></span>
+                                <span class="text-secondary d-none d-sm-inline ms-2">{% translate "Importancia" %}</span>
+                                <span class="stars text-primary">★★<span class="text-muted opacity-25">★★</span></span>
+                                <span class="plus">+</span>
+                            </div>
+                            <div class="row g-2">
+                                <!-- Q1: Hacer -->
+                                <div class="col-6">
+                                    <div class="quad q1">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <div class="d-flex align-items-center gap-1">
+                                                <img src="{% static 'img/fire.svg' %}" alt="Q1" style="width: 14px; height: 14px;">
+                                                <small class="fw-bold">{% translate "Hacer ahora" %}</small>
+                                            </div>
+                                            <span class="count">2</span>
+                                        </div>
+                                        <div class="task">{% translate "Despliegue matriz en Render" %}<br><span class="date me-2">11 Nov</span> <span><i class="bi bi-card-text me-2" style="color: #5cbcf3 !important;"></i></span><i class="bi bi-people-fill me-2" style="color: #fbbf24 !important;"></i></div>
+                                        <div class="task">{% translate "Finalizar proyecto" %}<br> <span><i class="bi bi-card-text me-2" style="color: #5cbcf3 !important;"></i></span><i class="bi bi-people-fill me-2" style="color: #fbbf24 !important;"></i></div>
+                                    </div>
+                                </div>
+                                <!-- Q2: Planificar -->
+                                <div class="col-6">
+                                    <div class="quad q2">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <div class="d-flex align-items-center gap-1">
+                                                <img src="{% static 'img/calendar.svg' %}" alt="Q2" style="width: 14px; height: 14px;">
+                                                <small class="fw-bold">{% translate "Planificar" %}</small>
+                                            </div>
+                                            <span class="count">2</span>
+                                        </div>
+                                        <div class="task">{% translate "Hacer descripción web" %} <br><span><i class="bi bi-card-text me-2" style="color: #5cbcf3 !important;"></i></span></div>
+                                        <div class="task">{% translate "Planificar calendario" %}<br><span class="date">23 Dec</span> </div>
+                                    </div>
+                                </div>
+                                <!-- Q3: Delegar -->
+                                <div class="col-6">
+                                    <div class="quad q3">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <div class="d-flex align-items-center gap-1">
+                                                <img src="{% static 'img/group.svg' %}" alt="Q3" style="width: 14px; height: 14px;">
+                                                <small class="fw-bold">{% translate "Delegar" %}</small>
+                                            </div>
+                                            <span class="count">1</span>
+                                        </div>
+                                        <div class="task">{% translate "Hacer la compra" %} <br><i class="bi bi-people-fill me-2" style="color: #fbbf24 !important;"></i></div>
+                                    </div>
+                                </div>
+                                <!-- Q4: Eliminar -->
+                                <div class="col-6">
+                                    <div class="quad q4">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <div class="d-flex align-items-center gap-1">
+                                                <img src="{% static 'img/trash.svg' %}" alt="Q4" style="width: 14px; height: 14px;">
+                                                <small class="fw-bold">{% translate "Eliminar" %}</small>
+                                            </div>
+                                            <span class="count">0</span>
+                                        </div>
+                                        <div class="task text-center text-secondary fw-normal">
+                                            <i class="bi bi-check2 check"></i> {% translate "Sin ruido" %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- BANNER DE LOGOS -->
+    <section class="py-4 border-top border-bottom bg-white">
+        <div class="container text-center">
+            <p class="eyebrow mb-3">{% translate "Equipos que ya priorizan mejor" %}</p>
+            <div class="logos d-flex flex-wrap justify-content-center gap-4 gap-md-5">
+                <span>Northwind</span><span>Acme Co</span><span>Lumen</span><span>Kestrel</span><span>Orbital</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section id="features" class="py-5">
+        <div class="container py-lg-4">
+            <div class="text-center mx-auto mb-5" style="max-width: 640px;">
+                <p class="eyebrow">{% translate "Características" %}</p>
+                <h2 class="section-title">{% translate "Todo lo que necesitas para enfocarte en lo que importa" %}</h2>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="ef-card">
+                        <div class="icon-box bg-primary-subtle text-primary"><i class="bi bi-stars"></i></div>
+                        <h5 class="fw-bold">{% translate "Priorización Inteligente" %}</h5>
+                        <p class="text-secondary mb-3">{% translate "Puntúa urgencia e importancia con estrellas y el cuadrante previsto se calcula al instante." %}</p>
+                        <ul class="list-unstyled small mb-0">
+                            <li><i class="bi bi-check2 check me-1"></i> {% translate "Escala de 4 niveles" %}</li>
+                            <li><i class="bi bi-check2 check me-1"></i> {% translate "Fechas límite y notas" %}</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="ef-card">
+                        <div class="icon-box bg-success-subtle text-success"><i class="bi bi-check2-circle"></i></div>
+                        <h5 class="fw-bold">{% translate "Seguimiento de Completadas" %}</h5>
+                        <p class="text-secondary mb-3">{% translate "Un historial claro de lo que has cerrado y la distribución actual de tu carga de trabajo." %}</p>
+                        <ul class="list-unstyled small mb-0">
+                            <li><i class="bi bi-check2 check me-1"></i> {% translate "Panel de completadas" %}</li>
+                            <li><i class="bi bi-check2 check me-1"></i> {% translate "Métricas por tablero" %}</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="ef-card">
+                        <div class="icon-box bg-warning-subtle text-warning"><i class="bi bi-people"></i></div>
+                        <h5 class="fw-bold">{% translate "Colaboración en Equipo" %}</h5>
+                        <p class="text-secondary mb-3">{% translate "Tableros compartidos, asignación de tareas en tiempo real y vista general para cada miembro." %}</p>
+                        <ul class="list-unstyled small mb-0">
+                            <li><i class="bi bi-check2 check me-1"></i> {% translate "Tableros ilimitados" %}</li>
+                            <li><i class="bi bi-check2 check me-1"></i> {% translate "Asignación y notificaciones" %}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CÓMO FUNCIONA CON TUS CUADRANTES -->
+    <section id="how" class="py-5 bg-white border-top border-bottom">
+        <div class="container py-lg-4">
+            <div class="text-center mx-auto mb-5" style="max-width: 640px;">
+                <p class="eyebrow">{% translate "Cómo funciona" %}</p>
+                <h2 class="section-title">{% translate "Cuatro cuadrantes. Una decisión clara." %}</h2>
+            </div>
+            
+            <div class="row g-4">
+                <!-- Q1 -->
+                <div class="col-md-6">
+                    <div class="quad-lg border-top-danger">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <img src="{% static 'img/fire.svg' %}" alt="Q1" style="width: 22px; height: 22px;">
+                            <span class="tag bg-danger-subtle text-danger">{% translate "Q1 · Hacer ahora" %}</span>
+                        </div>
+                        <h5 class="fw-bold mt-2">{% translate "Urgente e importante" %}</h5>
+                        <p class="text-secondary mb-0">{% translate "Crisis y plazos clave. Actúa ahora sin rodeos." %}</p>
+                    </div>
+                </div>
+                <!-- Q2 -->
+                <div class="col-md-6">
+                    <div class="quad-lg border-top-primary">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <img src="{% static 'img/calendar.svg' %}" alt="Q2" style="width: 22px; height: 22px;">
+                            <span class="tag bg-primary-subtle text-primary">{% translate "Q2 · Planificar" %}</span>
+                        </div>
+                        <h5 class="fw-bold mt-2">{% translate "Importante, no urgente" %}</h5>
+                        <p class="text-secondary mb-0">{% translate "Metas a medio plazo. Agenda tiempo para lo que te hace avanzar." %}</p>
+                    </div>
+                </div>
+                <!-- Q3 -->
+                <div class="col-md-6">
+                    <div class="quad-lg border-top-warning">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <img src="{% static 'img/group.svg' %}" alt="Q3" style="width: 22px; height: 22px;">
+                            <span class="tag bg-warning-subtle text-warning-emphasis">{% translate "Q3 · Delegar" %}</span>
+                        </div>
+                        <h5 class="fw-bold mt-2">{% translate "Urgente, no importante" %}</h5>
+                        <p class="text-secondary mb-0">{% translate "Interrupciones y tareas operativas. Asígnalas a tu equipo." %}</p>
+                    </div>
+                </div>
+                <!-- Q4 -->
+                <div class="col-md-6">
+                    <div class="quad-lg border-top-secondary">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <img src="{% static 'img/trash.svg' %}" alt="Q4" style="width: 22px; height: 22px;">
+                            <span class="tag bg-secondary-subtle text-secondary">{% translate "Q4 · Eliminar" %}</span>
+                        </div>
+                        <h5 class="fw-bold mt-2">{% translate "No urgente, no importante" %}</h5>
+                        <p class="text-secondary mb-0">{% translate "Distracciones. Mantén tu foco libre de ruido innecesario." %}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CALL TO ACTION (CTA) -->
+    <section id="cta" class="py-5">
+        <div class="container py-lg-4">
+            <div class="cta p-4 p-md-5 text-center rounded-4">
+                <h2 class="section-title text-white mb-3">{% translate "Empieza a priorizar hoy" %}</h2>
+                <p class="mx-auto mb-4 text-white-50" style="max-width: 520px;">
+                    {% translate "Crea tu primer tablero en menos de un minuto. Gratis para siempre para uso personal." %}
+                </p>
+                <a href="{% url 'register' %}" class="btn btn-light btn-lg rounded-3 fw-bold fs-6 px-4">
+                    {% translate "Empieza gratis" %} <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+</div>
+{% endblock %}

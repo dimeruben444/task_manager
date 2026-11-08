@@ -9,6 +9,8 @@
   border-bottom: 1px solid $nav-border !important;
   height: 60px;
   width: 100%;
+  padding-left: 2rem !important;
+  padding-right: 2rem !important;
   position: sticky;
   top: 0;
   z-index: 1020;
@@ -97,6 +99,7 @@
   .navbar-user-wrapper {
     display: flex;
     align-items: center;
+    padding-right: 2rem ;
 
     .notification-btn {
       width: 40px;
@@ -616,3 +619,5 @@ html {
     border-color: rgba(255, 255, 255, 0.15) !important;
   }
 }
+
+

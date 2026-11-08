@@ -47,16 +47,12 @@
         <main class="flex-grow-1 p-0 bg-transparent overflow-auto">
             {% block content %}
             {% endblock %}
-
-            
         </main>
-
-        
 
     </div>
 
     <!-- FOOTER LEGAL -->
-        {% include "_includes/navigation/_footer.html" %}
+    {% include "_includes/navigation/_footer.html" %}
 
     <!-- MODAL DE AJUSTES DE USUARIO -->
     {% if user.is_authenticated %}
