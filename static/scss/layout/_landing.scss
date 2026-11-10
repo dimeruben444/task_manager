@@ -317,3 +317,31 @@
     }
   }
 }
+
+.app-dashboard-layout{
+    border-radius: 12rem;
+}
+
+.quad-lg:hover{
+    transform: translateY(-2px);
+    box-shadow: rgba(15, 23, 42, 0.18) 0px 10px 24px -12px;
+}
+
+.landing-page {
+  /* Dar esquinas redondeadas y bordes a los contenedores principales de la landing */
+  .hero,
+  section {
+    border-radius: 16px !important;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+  }
+
+  /* Las tarjetas internas mantienen su radio uniforme */
+  .ef-card,
+  .quad-lg,
+  .mock {
+    border-radius: 16px !important;
+  }
+}

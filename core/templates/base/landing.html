@@ -7,10 +7,10 @@
 {% endblock %}
 
 {% block content %}
-<div class="landing-page">
-    
+<div class="landing-page py-3">
+
     <!-- HERO SECTION -->
-    <header class="hero py-5">
+    <header class="hero py-5 mb-4 rounded-4 border bg-white shadow-sm">
         <div class="container py-lg-4">
             <div class="row align-items-center g-5">
                 <div class="col-lg-6">
@@ -27,7 +27,7 @@
                         Valora cada tarea por <strong>urgencia</strong> e <strong>importancia</strong> y EisenhowerFlow la coloca sola en el cuadrante correcto: hacer, planificar, delegar o eliminar.
                         {% endblocktranslate %}
                     </p>
-                    
+
                     <div class="d-flex flex-column flex-sm-row gap-3 mb-4">
                         <a href="{% url 'register' %}" class="btn btn-ef text-nowrap d-inline-flex align-items-center justify-content-center gap-2">
                             {% translate "Empieza gratis" %} <i class="bi bi-arrow-right"></i>
@@ -36,7 +36,7 @@
                             {% translate "Iniciar sesión" %}
                         </a>
                     </div>
-                    
+
                     <div class="d-flex flex-wrap gap-3 small text-secondary">
                         <span><i class="bi bi-check-circle-fill check"></i> {% translate "Sin tarjeta de crédito" %}</span>
                         <span><i class="bi bi-check-circle-fill check"></i> {% translate "Tableros ilimitados" %}</span>
@@ -44,17 +44,17 @@
                     </div>
                 </div>
 
-                <!-- MOCKUP INTERACTIVO CON TUS SVGS -->
+                <!-- MOCKUP INTERACTIVO -->
                 <div class="col-lg-6">
-                    <div class="mock">
+                    <div class="mock rounded-4">
                         <div class="mock-bar">
                             <img src="{% static 'img/eisenhowerFlow.svg' %}" alt="Logo" style="height: 20px; width: auto;">
                             <span class="text-white fw-bold small">Eisenhower<span style="color:var(--flow)">Flow</span></span>
                             <div class="search ms-auto me-0"></div>
                         </div>
                         <div class="mock-body">
-                            <div class="mock-input">
-                                <span class="fw-semibold">{% translate "comprar comida tobi" %}</span>
+                            <div class="mock-input rounded-3">
+                                <span class="fw-semibold">{% translate "Comprar medecina Tobi" %}</span>
                                 <span class="ms-auto text-secondary d-none d-sm-inline">{% translate "Urgencia" %}</span>
                                 <span class="stars text-warning">★★★<span class="text-muted opacity-25">★</span></span>
                                 <span class="text-secondary d-none d-sm-inline ms-2">{% translate "Importancia" %}</span>
@@ -64,7 +64,7 @@
                             <div class="row g-2">
                                 <!-- Q1: Hacer -->
                                 <div class="col-6">
-                                    <div class="quad q1">
+                                    <div class="quad q1 rounded-3">
                                         <div class="d-flex justify-content-between align-items-center mb-1">
                                             <div class="d-flex align-items-center gap-1">
                                                 <img src="{% static 'img/fire.svg' %}" alt="Q1" style="width: 14px; height: 14px;">
@@ -72,13 +72,13 @@
                                             </div>
                                             <span class="count">2</span>
                                         </div>
-                                        <div class="task">{% translate "Despliegue matriz en Render" %}<br><span class="date me-2">11 Nov</span> <span><i class="bi bi-card-text me-2" style="color: #5cbcf3 !important;"></i></span><i class="bi bi-people-fill me-2" style="color: #fbbf24 !important;"></i></div>
-                                        <div class="task">{% translate "Finalizar proyecto" %}<br> <span><i class="bi bi-card-text me-2" style="color: #5cbcf3 !important;"></i></span><i class="bi bi-people-fill me-2" style="color: #fbbf24 !important;"></i></div>
+                                        <div class="task rounded-2">{% translate "Despliegue matriz en Render" %}<br><span class="date me-2">11 Nov</span> <span><i class="bi bi-card-text me-2" style="color: #5cbcf3 !important;"></i></span><i class="bi bi-people-fill me-2" style="color: #fbbf24 !important;"></i></div>
+                                        <div class="task rounded-2">{% translate "Finalizar proyecto 2" %}<br> <span><i class="bi bi-card-text me-2" style="color: #5cbcf3 !important;"></i></span><i class="bi bi-people-fill me-2" style="color: #fbbf24 !important;"></i></div>
                                     </div>
                                 </div>
                                 <!-- Q2: Planificar -->
                                 <div class="col-6">
-                                    <div class="quad q2">
+                                    <div class="quad q2 rounded-3">
                                         <div class="d-flex justify-content-between align-items-center mb-1">
                                             <div class="d-flex align-items-center gap-1">
                                                 <img src="{% static 'img/calendar.svg' %}" alt="Q2" style="width: 14px; height: 14px;">
@@ -86,13 +86,13 @@
                                             </div>
                                             <span class="count">2</span>
                                         </div>
-                                        <div class="task">{% translate "Hacer descripción web" %} <br><span><i class="bi bi-card-text me-2" style="color: #5cbcf3 !important;"></i></span></div>
-                                        <div class="task">{% translate "Planificar calendario" %}<br><span class="date">23 Dec</span> </div>
+                                        <div class="task rounded-2">{% translate "Hacer descripción web" %} <br><span><i class="bi bi-card-text me-2" style="color: #5cbcf3 !important;"></i></span></div>
+                                        <div class="task rounded-2">{% translate "Planificar calendario" %}<br><span class="date">23 Dec</span> </div>
                                     </div>
                                 </div>
                                 <!-- Q3: Delegar -->
                                 <div class="col-6">
-                                    <div class="quad q3">
+                                    <div class="quad q3 rounded-3">
                                         <div class="d-flex justify-content-between align-items-center mb-1">
                                             <div class="d-flex align-items-center gap-1">
                                                 <img src="{% static 'img/group.svg' %}" alt="Q3" style="width: 14px; height: 14px;">
@@ -100,12 +100,12 @@
                                             </div>
                                             <span class="count">1</span>
                                         </div>
-                                        <div class="task">{% translate "Hacer la compra" %} <br><i class="bi bi-people-fill me-2" style="color: #fbbf24 !important;"></i></div>
+                                        <div class="task rounded-2">{% translate "Hacer la compra" %} <br><i class="bi bi-people-fill me-2" style="color: #fbbf24 !important;"></i></div>
                                     </div>
                                 </div>
                                 <!-- Q4: Eliminar -->
                                 <div class="col-6">
-                                    <div class="quad q4">
+                                    <div class="quad q4 rounded-3">
                                         <div class="d-flex justify-content-between align-items-center mb-1">
                                             <div class="d-flex align-items-center gap-1">
                                                 <img src="{% static 'img/trash.svg' %}" alt="Q4" style="width: 14px; height: 14px;">
@@ -113,7 +113,7 @@
                                             </div>
                                             <span class="count">0</span>
                                         </div>
-                                        <div class="task text-center text-secondary fw-normal">
+                                        <div class="task rounded-2 text-center text-secondary fw-normal">
                                             <i class="bi bi-check2 check"></i> {% translate "Sin ruido" %}
                                         </div>
                                     </div>
@@ -127,7 +127,7 @@
     </header>
 
     <!-- BANNER DE LOGOS -->
-    <section class="py-4 border-top border-bottom bg-white">
+    <section class="py-4 my-4 border rounded-4 bg-white shadow-sm">
         <div class="container text-center">
             <p class="eyebrow mb-3">{% translate "Equipos que ya priorizan mejor" %}</p>
             <div class="logos d-flex flex-wrap justify-content-center gap-4 gap-md-5">
@@ -137,7 +137,7 @@
     </section>
 
     <!-- FEATURES -->
-    <section id="features" class="py-5">
+    <section id="features" class="py-5 my-4 border rounded-4 bg-white shadow-sm">
         <div class="container py-lg-4">
             <div class="text-center mx-auto mb-5" style="max-width: 640px;">
                 <p class="eyebrow">{% translate "Características" %}</p>
@@ -145,8 +145,8 @@
             </div>
             <div class="row g-4">
                 <div class="col-md-4">
-                    <div class="ef-card">
-                        <div class="icon-box bg-primary-subtle text-primary"><i class="bi bi-stars"></i></div>
+                    <div class="ef-card rounded-4">
+                        <div class="icon-box bg-primary-subtle text-primary rounded-3"><i class="bi bi-stars"></i></div>
                         <h5 class="fw-bold">{% translate "Priorización Inteligente" %}</h5>
                         <p class="text-secondary mb-3">{% translate "Puntúa urgencia e importancia con estrellas y el cuadrante previsto se calcula al instante." %}</p>
                         <ul class="list-unstyled small mb-0">
@@ -156,8 +156,8 @@
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="ef-card">
-                        <div class="icon-box bg-success-subtle text-success"><i class="bi bi-check2-circle"></i></div>
+                    <div class="ef-card rounded-4">
+                        <div class="icon-box bg-success-subtle text-success rounded-3"><i class="bi bi-check2-circle"></i></div>
                         <h5 class="fw-bold">{% translate "Seguimiento de Completadas" %}</h5>
                         <p class="text-secondary mb-3">{% translate "Un historial claro de lo que has cerrado y la distribución actual de tu carga de trabajo." %}</p>
                         <ul class="list-unstyled small mb-0">
@@ -167,8 +167,8 @@
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="ef-card">
-                        <div class="icon-box bg-warning-subtle text-warning"><i class="bi bi-people"></i></div>
+                    <div class="ef-card rounded-4">
+                        <div class="icon-box bg-warning-subtle text-warning rounded-3"><i class="bi bi-people"></i></div>
                         <h5 class="fw-bold">{% translate "Colaboración en Equipo" %}</h5>
                         <p class="text-secondary mb-3">{% translate "Tableros compartidos, asignación de tareas en tiempo real y vista general para cada miembro." %}</p>
                         <ul class="list-unstyled small mb-0">
@@ -181,21 +181,22 @@
         </div>
     </section>
 
-    <!-- CÓMO FUNCIONA CON TUS CUADRANTES -->
-    <section id="how" class="py-5 bg-white border-top border-bottom">
+    <!-- CÓMO FUNCIONA / CÓMO SE USA -->
+    <section id="how" class="py-5 my-4 border rounded-4 bg-white shadow-sm">
         <div class="container py-lg-4">
             <div class="text-center mx-auto mb-5" style="max-width: 640px;">
                 <p class="eyebrow">{% translate "Cómo funciona" %}</p>
                 <h2 class="section-title">{% translate "Cuatro cuadrantes. Una decisión clara." %}</h2>
             </div>
-            
-            <div class="row g-4">
+
+            <!-- BLOQUE DE LOS 4 CUADRANTES -->
+            <div class="row g-4 mb-5 pb-5">
                 <!-- Q1 -->
                 <div class="col-md-6">
-                    <div class="quad-lg border-top-danger">
+                    <div class="quad-lg border-top-danger rounded-4">
                         <div class="d-flex align-items-center gap-2 mb-2">
                             <img src="{% static 'img/fire.svg' %}" alt="Q1" style="width: 22px; height: 22px;">
-                            <span class="tag bg-danger-subtle text-danger">{% translate "Q1 · Hacer ahora" %}</span>
+                            <span class="tag bg-danger-subtle text-danger rounded-2">{% translate "Q1 · Hacer ahora" %}</span>
                         </div>
                         <h5 class="fw-bold mt-2">{% translate "Urgente e importante" %}</h5>
                         <p class="text-secondary mb-0">{% translate "Crisis y plazos clave. Actúa ahora sin rodeos." %}</p>
@@ -203,10 +204,10 @@
                 </div>
                 <!-- Q2 -->
                 <div class="col-md-6">
-                    <div class="quad-lg border-top-primary">
+                    <div class="quad-lg border-top-primary rounded-4">
                         <div class="d-flex align-items-center gap-2 mb-2">
                             <img src="{% static 'img/calendar.svg' %}" alt="Q2" style="width: 22px; height: 22px;">
-                            <span class="tag bg-primary-subtle text-primary">{% translate "Q2 · Planificar" %}</span>
+                            <span class="tag bg-primary-subtle text-primary rounded-2">{% translate "Q2 · Planificar" %}</span>
                         </div>
                         <h5 class="fw-bold mt-2">{% translate "Importante, no urgente" %}</h5>
                         <p class="text-secondary mb-0">{% translate "Metas a medio plazo. Agenda tiempo para lo que te hace avanzar." %}</p>
@@ -214,10 +215,10 @@
                 </div>
                 <!-- Q3 -->
                 <div class="col-md-6">
-                    <div class="quad-lg border-top-warning">
+                    <div class="quad-lg border-top-warning rounded-4">
                         <div class="d-flex align-items-center gap-2 mb-2">
                             <img src="{% static 'img/group.svg' %}" alt="Q3" style="width: 22px; height: 22px;">
-                            <span class="tag bg-warning-subtle text-warning-emphasis">{% translate "Q3 · Delegar" %}</span>
+                            <span class="tag bg-warning-subtle text-warning-emphasis rounded-2">{% translate "Q3 · Delegar" %}</span>
                         </div>
                         <h5 class="fw-bold mt-2">{% translate "Urgente, no importante" %}</h5>
                         <p class="text-secondary mb-0">{% translate "Interrupciones y tareas operativas. Asígnalas a tu equipo." %}</p>
@@ -225,23 +226,116 @@
                 </div>
                 <!-- Q4 -->
                 <div class="col-md-6">
-                    <div class="quad-lg border-top-secondary">
+                    <div class="quad-lg border-top-secondary rounded-4">
                         <div class="d-flex align-items-center gap-2 mb-2">
                             <img src="{% static 'img/trash.svg' %}" alt="Q4" style="width: 22px; height: 22px;">
-                            <span class="tag bg-secondary-subtle text-secondary">{% translate "Q4 · Eliminar" %}</span>
+                            <span class="tag bg-secondary-subtle text-secondary rounded-2">{% translate "Q4 · Eliminar" %}</span>
                         </div>
                         <h5 class="fw-bold mt-2">{% translate "No urgente, no importante" %}</h5>
                         <p class="text-secondary mb-0">{% translate "Distracciones. Mantén tu foco libre de ruido innecesario." %}</p>
                     </div>
                 </div>
             </div>
+
+            <!-- APARTADO 1: TABLEROS PERSONALIZADOS Y TABLERO GENERAL (TEXTO IZQUIERDA / FOTO DERECHA) -->
+            <div class="row align-items-center g-5 mb-5 pb-5 pt-3 border-top flex-lg-row-reverse">
+                <div class="col-lg-5">
+                    <div class="p-3 bg-light border rounded-4 shadow-sm text-center">
+                        <img src="{% static 'img/tableros.png' %}" alt="Tableros personalizados" class="img-fluid rounded-3" style="max-height: 440px; width: auto;">
+                    </div>
+                </div>
+                <div class="col-lg-7">
+                    <div class="pe-lg-3">
+                        <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2 mb-3 fw-semibold">
+                            <i class="bi bi-kanban me-1"></i> {% translate "Organización total" %}
+                        </span>
+                        <h3 class="fw-bold mb-3">{% translate "Crea tableros personalizados para cada ámbito de tu vida" %}</h3>
+                        <p class="text-secondary lead-ef mb-3">
+                            {% translate "Separa tus proyectos de trabajo, tareas del hogar o metas personales en tableros independientes. Todo tu flujo de trabajo se condensa de manera inteligente en el Tablero General para que mantengas la visión global sin perder detalle." %}
+                        </p>
+                        <div class="row g-3 mt-2">
+                            <div class="col-sm-6">
+                                <div class="p-3 border rounded-3 bg-light-subtle">
+                                    <h6 class="fw-bold mb-1"><i class="bi bi-folder-check text-primary me-2"></i>{% translate "Tableros por proyecto" %}</h6>
+                                    <small class="text-secondary">{% translate "Organiza trabajo, hogar y proyectos personales en espacios aislados." %}</small>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="p-3 border rounded-3 bg-light-subtle">
+                                    <h6 class="fw-bold mb-1"><i class="bi bi-grid-1x2 text-primary me-2"></i>{% translate "Tablero General condensado" %}</h6>
+                                    <small class="text-secondary">{% translate "Visualiza todas tus tareas urgentes e importantes en una única matriz." %}</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- APARTADO 2: DRAG AND DROP -->
+            <div class="row align-items-center g-5 mb-5 pb-5 pt-3 border-top flex-row-reverse">
+                <div class="col-lg-6">
+                    <div class="pe-lg-3">
+                        <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2 mb-3 fw-semibold">
+                            <i class="bi bi-arrows-move me-1"></i> {% translate "Gestión fluida" %}
+                        </span>
+                        <h3 class="fw-bold mb-3">{% translate "Reorganiza tus tareas arrastrandolas al cuadrante que quieras" %}</h3>
+                        <p class="text-secondary lead-ef mb-3">
+                            {% translate "Cambiar la prioridad de una tarea es tan sencillo como moverla entre cuadrantes. El sistema recalcula y guarda el nuevo estado de forma instantánea." %}
+                        </p>
+                        <ul class="list-unstyled text-secondary">
+                            <li class="mb-2"><i class="bi bi-check-circle-fill check me-2"></i>{% translate "Movimiento fluido e intuitivo en tiempo real" %}</li>
+                            <li class="mb-2"><i class="bi bi-check-circle-fill check me-2"></i>{% translate "Cambio automático de nivel de urgencia e importancia" %}</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="p-2 bg-light border rounded-4 shadow-sm overflow-hidden">
+                        <img src="{% static 'img/drag-drop.png' %}" alt="Arrastrar y soltar tareas" class="img-fluid rounded-3 w-100 object-fit-cover">
+                    </div>
+                </div>
+            </div>
+
+            <!-- APARTADO 3: DISPONIBILIDAD MÓVIL Y TABLET -->
+            <div class="row align-items-center g-5 pb-5 pt-3 border-top">
+                <div class="col-lg-6">
+                    <div class="pe-lg-3">
+                        <span class="badge bg-warning-subtle text-warning-emphasis rounded-pill px-3 py-2 mb-3 fw-semibold">
+                            <i class="bi bi-phone me-1"></i> {% translate "Acceso multiplataforma" %}
+                        </span>
+                        <h3 class="fw-bold mb-3">{% translate "No hace falta que estés en el ordenador" %}</h3>
+                        <p class="text-secondary lead-ef mb-3">
+                            {% translate "Lleva tu matriz de Eisenhower siempre contigo. Nuestra interfaz responsiva se adapta perfectamente a tu móvil o tablet para que puedas consultar, añadir y priorizar tareas desde cualquier lugar." %}
+                        </p>
+                        <div class="d-flex gap-3 align-items-center mt-3">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="bi bi-phone fs-4 text-primary"></i>
+                                <span class="fw-medium">{% translate "Smartphone" %}</span>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="bi bi-tablet-landscape fs-4 text-primary"></i>
+                                <span class="fw-medium">{% translate "Tablet" %}</span>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="bi bi-laptop fs-4 text-primary"></i>
+                                <span class="fw-medium">{% translate "Escritorio" %}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="p-2 text-center">
+                        <img src="{% static 'img/mockup-smartphone.png' %}" alt="Disponible en móvil y tablet" class="img-fluid rounded-3" style="max-height: 420px; width: auto;">
+                    </div>
+                </div>
+            </div>
+
         </div>
     </section>
 
     <!-- CALL TO ACTION (CTA) -->
-    <section id="cta" class="py-5">
+    <section id="cta" class="py-5 my-4">
         <div class="container py-lg-4">
-            <div class="cta p-4 p-md-5 text-center rounded-4">
+            <div class="cta p-4 p-md-5 text-center rounded-4 shadow-sm">
                 <h2 class="section-title text-white mb-3">{% translate "Empieza a priorizar hoy" %}</h2>
                 <p class="mx-auto mb-4 text-white-50" style="max-width: 520px;">
                     {% translate "Crea tu primer tablero en menos de un minuto. Gratis para siempre para uso personal." %}
