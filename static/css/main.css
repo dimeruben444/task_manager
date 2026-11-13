@@ -1754,6 +1754,18 @@ body {
   border-top-color: #12B981 !important;
 }
 
+@media (max-width: 576px) {
+  /* Elimina el margen lateral de las filas que contienen los cuadrantes */
+  .matrix-container-wrapper .row {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+  /* Elimina el padding horizontal de las columnas de Bootstrap en los cuadrantes */
+  .matrix-container-wrapper .col-md-6 {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+}
 /* ==========================================================================
    AJUSTE VERTICAL PARA FORMULARIOS EN TARJETAS (.card)
    ========================================================================== */
@@ -2059,51 +2071,68 @@ body {
   border: 1px solid #334155;
 }
 
-/* FORZADO DE VISIBILIDAD DE ENLACES EN LANDING NAVBAR */
+/* ========================================== */
+/* VISIBILIDAD DE ENLACES DE LA LANDING       */
+/* ========================================== */
 .app-navbar {
-  /* Evita que elementos flotantes tapen la barra central */
   position: relative !important;
   z-index: 1030 !important;
 }
-.app-navbar .landing-nav-wrapper {
-  display: flex !important;
-  flex-direction: row !important;
-  align-items: center !important;
-  gap: 1.5rem !important;
-  min-width: max-content !important; /* Evita que el contenedor colapse a ancho 0 */
-  opacity: 1 !important;
-  visibility: visible !important;
-}
-.app-navbar .landing-nav-link {
-  color: #e2e8f0 !important; /* Blanco/Gris claro de alto contraste */
-  font-weight: 600 !important;
-  font-size: 0.95rem !important;
-  white-space: nowrap !important;
-  display: inline-block !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-}
-.app-navbar .landing-nav-link:hover {
-  color: #60a5fa !important; /* Azul brillante al pasar el ratón */
-}
-
 .app-navbar a.text-decoration-none {
   color: inherit !important;
 }
 
-/* Color permanente para enlaces de la landing en la navbar */
-.app-navbar .landing-nav-link,
-.app-navbar a.landing-nav-link {
-  color: #cbd5e1 !important; /* Gris claro de alto contraste visible sin hacer hover */
-  font-weight: 500 !important;
-  font-size: 0.95rem !important;
-}
-.app-navbar .landing-nav-link:hover, .app-navbar .landing-nav-link:focus,
-.app-navbar a.landing-nav-link:hover,
-.app-navbar a.landing-nav-link:focus {
-  color: #60a5fa !important; /* Azul brillante solo al hacer hover */
+/* Por defecto en móvil: OCULTO TOTALMENTE */
+.landing-nav-wrapper {
+  display: none !important;
 }
 
+/* Solo a partir de pantallas de escritorio (992px en adelante): VISIBLE */
+@media (min-width: 992px) {
+  .app-navbar .landing-nav-wrapper {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 1.5rem !important;
+    min-width: max-content !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+  .app-navbar .landing-nav-link,
+  .app-navbar a.landing-nav-link {
+    color: #cbd5e1 !important;
+    font-weight: 500 !important;
+    font-size: 0.95rem !important;
+    white-space: nowrap !important;
+    display: inline-block !important;
+  }
+  .app-navbar .landing-nav-link:hover, .app-navbar .landing-nav-link:focus,
+  .app-navbar a.landing-nav-link:hover,
+  .app-navbar a.landing-nav-link:focus {
+    color: #60a5fa !important;
+  }
+}
+@media (min-width: 768px) {
+  .app-navbar .landing-nav-wrapper {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 1.2rem !important;
+    min-width: max-content !important;
+  }
+  .app-navbar .landing-nav-link,
+  .app-navbar a.landing-nav-link {
+    color: #cbd5e1 !important;
+    font-weight: 500 !important;
+    font-size: 0.9rem !important;
+    white-space: nowrap !important;
+  }
+  .app-navbar .landing-nav-link:hover, .app-navbar .landing-nav-link:focus,
+  .app-navbar a.landing-nav-link:hover,
+  .app-navbar a.landing-nav-link:focus {
+    color: #60a5fa !important;
+  }
+}
 .app-dashboard-layout {
   border-radius: 12rem;
 }
@@ -2131,6 +2160,18 @@ body {
 .landing-page .quad-lg,
 .landing-page .mock {
   border-radius: 16px !important;
+}
+
+.app-navbar {
+  background-color: #0f172a !important;
+  border-bottom: 1px solid #334155 !important;
+  height: 60px;
+  width: 100%;
+  padding-left: 0 !important; /* Dejamos que el .container controle el espacio lateral */
+  padding-right: 0 !important; /* Dejamos que el .container controle el espacio lateral */
+  position: sticky;
+  top: 0;
+  z-index: 1020;
 }
 
 html {

@@ -2,12 +2,13 @@
 {% load i18n %}
 
 <nav class="app-navbar">
-    <div class="nav-fluid d-flex justify-content-between align-items-center h-100">
+    <!-- Contenedor fluido con padding adaptativo para que respire en todas las pantallas -->
+    <div class="nav-fluid d-flex justify-content-between align-items-center h-100 px-3 px-md-4 px-lg-5 w-100">
         
-        <!-- 1. BLOQUE IZQUIERDA: HAMBURGUESA + LOGO -->
-        <div class="d-flex align-items-center gap-2">
+        <!-- 1. BLOQUE IZQUIERDA: HAMBURGUESA + LOGO FIJOS A LA IZQUIERDA -->
+        <div class="d-flex align-items-center gap-2 flex-shrink-0">
             {% if user.is_authenticated %}
-                <button class="btn btn-link text-white p-1 border-0 d-layout-mobile shadow-none text-decoration-none" 
+                <button class="btn btn-link text-white p-1 border-0 shadow-none text-decoration-none me-1 d-lg-none" 
                         type="button" 
                         data-bs-toggle="offcanvas" 
                         data-bs-target="#offcanvasBoards" 
@@ -17,29 +18,33 @@
                 </button>
             {% endif %}
 
-            <div class="navbar-brand-wrapper d-none d-lg-flex align-items-center gap-2">
+            <!-- Logo principal (visible en tablets y escritorio) -->
+            <div class="navbar-brand-wrapper d-none d-md-flex align-items-center gap-2">
                 <a href="{% if user.is_authenticated %}{% url 'dashboard' %}{% else %}{% url 'landing' %}{% endif %}" class="text-decoration-none d-flex align-items-center gap-2">
                     <img src="{% static 'img/eisenhowerFlow.svg' %}" alt="Logo" style="height: 30px; width: auto;">
                     <h1 class="brand-title m-0 fs-5">
                         <span class="brand-name-mobile">Eisen</span><span class="brand-name-desktop">Eisenhower</span><span class="brand-accent">Flow</span>
                     </h1>
                 </a>
-                <span class="badge-workspace align-self-center">Workspace</span>
+                {% if user.is_authenticated %}
+                    <span class="badge-workspace align-self-center">Workspace</span>
+                {% endif %}
             </div>
-        </div>
 
-        <!-- 2. BLOQUE CENTRO: LOGO MÓVIL / BUSCADOR (AUTENTICADO) / ENLACES LANDING (NO AUTENTICADO) -->
-        <div class="d-flex align-items-center justify-content-center flex-grow-1 mx-2 overflow-visible">
-            <a href="{% if user.is_authenticated %}{% url 'dashboard' %}{% else %}{% url 'landing' %}{% endif %}" class="text-decoration-none d-flex d-lg-none align-items-center gap-2">
+            <!-- Logo para móviles estrechos -->
+            <a href="{% if user.is_authenticated %}{% url 'dashboard' %}{% else %}{% url 'landing' %}{% endif %}" class="text-decoration-none d-flex d-md-none align-items-center gap-2">
                 <img src="{% static 'img/eisenhowerFlow.svg' %}" alt="Logo" style="height: 28px; width: auto;">
                 <h1 class="brand-title m-0 fs-5">
                     <span class="brand-name-mobile">Eisen</span><span class="brand-name-desktop">Eisenhower</span><span class="brand-accent">Flow</span>
                 </h1>
             </a>
+        </div>
 
+        <!-- 2. BLOQUE CENTRO: ENLACES DE LA LANDING (CENTRADOS) / BUSCADOR (SI LOGUEADO) -->
+        <div class="d-flex align-items-center justify-content-center flex-grow-1 mx-2 overflow-visible">
             {% if user.is_authenticated %}
                 {% if request.resolver_match.url_name != 'login' and request.resolver_match.url_name != 'register' %}
-                    <div id="globalTaskSearchWrapper" class="navbar-search-wrapper position-relative d-none d-lg-block mx-3 w-100" style="max-width: 420px;">
+                    <div id="globalTaskSearchWrapper" class="navbar-search-wrapper position-relative d-none d-lg-block mx-3 w-100" style="max-width: 440px;">
                         <div class="position-relative">
                             <i class="bi bi-search search-icon"></i>
                             <input type="text" 
@@ -54,23 +59,23 @@
                     </div>
                 {% endif %}
             {% else %}
-                <!-- ENLACES DE NAVEGACIÓN SUAVE PARA LA LANDING -->
-                <div class="d-flex align-items-center justify-content-center gap-3 gap-lg-4 landing-nav-wrapper">
-                    <a href="#features" class="nav-link landing-nav-link text-decoration-none">
+                <!-- ENLACES DE NAVEGACIÓN DE LA LANDING: Visibles en tablets y PC (d-none d-md-flex) -->
+                <div class="d-none d-md-flex align-items-center justify-content-center gap-4 landing-nav-wrapper">
+                    <a href="#features" class="nav-link landing-nav-link text-decoration-none text-white">
                         {% translate "Características" %}
                     </a>
-                    <a href="#how" class="nav-link landing-nav-link text-decoration-none">
+                    <a href="#how" class="nav-link landing-nav-link text-decoration-none text-white">
                         {% translate "Cómo funciona" %}
                     </a>
-                    <a href="#cta" class="nav-link landing-nav-link text-decoration-none">
+                    <a href="#cta" class="nav-link landing-nav-link text-decoration-none text-white">
                         {% translate "Pricing" %}
                     </a>
                 </div>
             {% endif %}
-        </div>>
+        </div>
 
-        <!-- 3. BLOQUE DERECHA: NOTIFICACIONES Y USUARIO / BOTONES ACCESO -->
-        <div class="navbar-user-wrapper d-flex align-items-center gap-1 gap-md-2 gap-sm-2 flex-shrink-0">
+        <!-- 3. BLOQUE DERECHA: NOTIFICACIONES / USUARIO / BOTONES ACCESO -->
+        <div class="navbar-user-wrapper d-flex align-items-center gap-1 gap-md-2 flex-shrink-0">
             {% if user.is_authenticated %}
                 
                 {% if request.resolver_match.url_name != 'login' and request.resolver_match.url_name != 'register' %}
@@ -285,11 +290,12 @@
                     </div>
                 </div>
             {% else %}
+                <!-- BOTONES DE ACCESO -->
                 <div class="d-flex gap-2">
-                    <a href="{% url 'login' %}" class="btn btn-outline-light btn-sm">
+                    <a href="{% url 'login' %}" class="btn btn-outline-light btn-sm px-3">
                         {% translate "Iniciar sesión" %}
                     </a>
-                    <a href="{% url 'register' %}" class="btn btn-primary btn-sm fw-bold">
+                    <a href="{% url 'register' %}" class="btn btn-primary btn-sm fw-bold px-3">
                         {% translate "Registrarse" %}
                     </a>
                 </div>

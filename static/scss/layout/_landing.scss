@@ -270,50 +270,74 @@
 }
 
 
-/* FORZADO DE VISIBILIDAD DE ENLACES EN LANDING NAVBAR */
+/* ========================================== */
+/* VISIBILIDAD DE ENLACES DE LA LANDING       */
+/* ========================================== */
+
 .app-navbar {
-  /* Evita que elementos flotantes tapen la barra central */
   position: relative !important;
   z-index: 1030 !important;
 
-  .landing-nav-wrapper {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    gap: 1.5rem !important;
-    min-width: max-content !important; /* Evita que el contenedor colapse a ancho 0 */
-    opacity: 1 !important;
-    visibility: visible !important;
+  a.text-decoration-none {
+    color: inherit !important;
   }
+}
 
-  .landing-nav-link {
-    color: #e2e8f0 !important; /* Blanco/Gris claro de alto contraste */
-    font-weight: 600 !important;
-    font-size: 0.95rem !important;
-    white-space: nowrap !important;
-    display: inline-block !important;
-    opacity: 1 !important;
-    visibility: visible !important;
+/* Por defecto en móvil: OCULTO TOTALMENTE */
+.landing-nav-wrapper {
+  display: none !important;
+}
 
-    &:hover {
-      color: #60a5fa !important; /* Azul brillante al pasar el ratón */
+/* Solo a partir de pantallas de escritorio (992px en adelante): VISIBLE */
+@media (min-width: 992px) {
+  .app-navbar {
+    .landing-nav-wrapper {
+      display: flex !important;
+      flex-direction: row !important;
+      align-items: center !important;
+      gap: 1.5rem !important;
+      min-width: max-content !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+    }
+
+    .landing-nav-link,
+    a.landing-nav-link {
+      color: #cbd5e1 !important;
+      font-weight: 500 !important;
+      font-size: 0.95rem !important;
+      white-space: nowrap !important;
+      display: inline-block !important;
+
+      &:hover,
+      &:focus {
+        color: #60a5fa !important;
+      }
     }
   }
 }
-.app-navbar a.text-decoration-none {
-  color: inherit !important;
-}
-/* Color permanente para enlaces de la landing en la navbar */
-.app-navbar {
-  .landing-nav-link,
-  a.landing-nav-link {
-    color: #cbd5e1 !important; /* Gris claro de alto contraste visible sin hacer hover */
-    font-weight: 500 !important;
-    font-size: 0.95rem !important;
 
-    &:hover,
-    &:focus {
-      color: #60a5fa !important; /* Azul brillante solo al hacer hover */
+@media (min-width: 768px) {
+  .app-navbar {
+    .landing-nav-wrapper {
+      display: flex !important;
+      flex-direction: row !important;
+      align-items: center !important;
+      gap: 1.2rem !important;
+      min-width: max-content !important;
+    }
+
+    .landing-nav-link,
+    a.landing-nav-link {
+      color: #cbd5e1 !important;
+      font-weight: 500 !important;
+      font-size: 0.9rem !important;
+      white-space: nowrap !important;
+
+      &:hover,
+      &:focus {
+        color: #60a5fa !important;
+      }
     }
   }
 }
@@ -344,4 +368,17 @@
   .mock {
     border-radius: 16px !important;
   }
+}
+
+
+.app-navbar {
+  background-color: $nav-bg !important;
+  border-bottom: 1px solid $nav-border !important;
+  height: 60px;
+  width: 100%;
+  padding-left: 0 !important;   /* Dejamos que el .container controle el espacio lateral */
+  padding-right: 0 !important;  /* Dejamos que el .container controle el espacio lateral */
+  position: sticky;
+  top: 0;
+  z-index: 1020;
 }

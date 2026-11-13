@@ -26,6 +26,7 @@
                     <input type="checkbox" 
                         class="task-completion-check" 
                         data-task-id="{{ task.id }}"
+                        data-url="{% url 'toggle_task' task.id %}"
                         {% if task.is_completed %}checked{% endif %}>
                     <span class="checkmark"></span>
                 </label>

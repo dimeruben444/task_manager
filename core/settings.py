@@ -35,6 +35,9 @@ DEBUG = DEBUG_ENV.lower() in ('true', '1', 't')
 
 ALLOWED_HOSTS = ['.ngrok-free.dev', '.ngrok-free.app', 'localhost', '127.0.0.1']
 
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 CSRF_TRUSTED_ORIGINS = [
     'https://*.ngrok-free.dev',
     'https://*.ngrok-free.app',
@@ -208,21 +211,32 @@ DEBUG = _debug_raw.lower() in ('true', '1', 't', 'yes')
 # ==========================================
 # CONFIGURACIÓN DE SEGURIDAD PARA PRODUCCIÓN
 # ==========================================
-if not DEBUG and not TESTING:
-    SECURE_SSL_REDIRECT = True
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
+#if not DEBUG and not TESTING:
+#    SECURE_SSL_REDIRECT = True
+#    SESSION_COOKIE_SECURE = True
+#    CSRF_COOKIE_SECURE = True
+#
+#    SECURE_HSTS_SECONDS = 31536000
+#    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+#    SECURE_HSTS_PRELOAD = True
+#
+#    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+#else:
+#    # Garantizar que en desarrollo local y en tests nunca fuerce HTTPS ni invalide cookies
+#    SECURE_SSL_REDIRECT = False
+#    SESSION_COOKIE_SECURE = False
+#    CSRF_COOKIE_SECURE = False
+#    SECURE_HSTS_SECONDS = 0
+#    SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+#    SECURE_HSTS_PRELOAD = False
 
-    SECURE_HSTS_SECONDS = 31536000
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-    SECURE_HSTS_PRELOAD = True
 
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-else:
-    # Garantizar que en desarrollo local y en tests nunca fuerce HTTPS ni invalide cookies
-    SECURE_SSL_REDIRECT = False
-    SESSION_COOKIE_SECURE = False
-    CSRF_COOKIE_SECURE = False
-    SECURE_HSTS_SECONDS = 0
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = False
-    SECURE_HSTS_PRELOAD = False
+SECURE_SSL_REDIRECT = False
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False
+
+SECURE_HSTS_SECONDS = 0
+SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+SECURE_HSTS_PRELOAD = False
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')

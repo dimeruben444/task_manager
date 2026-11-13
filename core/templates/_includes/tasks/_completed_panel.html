@@ -1,26 +1,10 @@
 {% load i18n %}
 
 <div class="completed-panel-wrapper w-100">
-    <div class="d-lg-none mb-3">
-        <button class="btn btn-white border shadow-sm w-100 py-2.5 px-3 rounded-3 d-flex align-items-center justify-content-between text-dark fw-bold" 
-                type="button" 
-                data-bs-toggle="collapse" 
-                data-bs-target="#collapseCompletedTablet" 
-                aria-expanded="false"
-                aria-label="{% translate 'Ver tareas completadas' %}">
-            <div class="d-flex align-items-center gap-2">
-                <span class="rounded-circle bg-success-subtle text-success p-1 d-inline-flex align-items-center justify-content-center" style="width: 24px; height: 24px;">
-                    <i class="bi bi-check-lg fw-bold"></i>
-                </span>
-                <span>{% translate "Ver tareas completadas" %}</span>
-            </div>
-            <span class="badge bg-primary text-white rounded-pill" id="completed-count-mobile" title="{% translate 'Total de tareas completadas' %}">
-                {{ completed_tasks|length }}
-            </span>
-        </button>
-    </div>
+    <!-- Se elimina el bloque div.d-lg-none que contenía el botón desplegable -->
 
-    <div class="collapse d-lg-block" id="collapseCompletedTablet">
+    <!-- Se eliminan las clases "collapse d-lg-block" para que esté siempre visible -->
+    <div id="collapseCompletedTablet">
         <div class="completed-panel p-3 h-100 d-flex flex-column bg-white border rounded-4 shadow-sm">
             <div class="d-flex align-items-center justify-content-between pb-3 border-bottom mb-2">
                 <div class="d-flex align-items-center gap-2">

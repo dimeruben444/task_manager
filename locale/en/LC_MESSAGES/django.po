@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: EisenhowerFlow 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-04 18:27+0100\n"
+"POT-Creation-Date: 2026-11-13 12:26+0100\n"
 "PO-Revision-Date: 2026-11-04 18:35+0100\n"
 "Last-Translator: EisenhowerFlow <dev@eisenhowerflow.local>\n"
 "Language-Team: English <en@li.org>\n"
@@ -21,43 +21,37 @@ msgid "Compartir con miembros"
 msgstr "Share with members"
 
 #: boards/models.py:11
-#: core/templates/_includes/modals/_create_board_modal.html:25
-#: core/templates/_includes/modals/_edit_board_modal.html:27
+#: core/templates/_includes/modals/_create_board_modal.html:29
 #: dashboard_antiguo.txt:559
 msgid "Azul"
 msgstr "Blue"
 
 #: boards/models.py:12
-#: core/templates/_includes/modals/_create_board_modal.html:26
-#: core/templates/_includes/modals/_edit_board_modal.html:28
+#: core/templates/_includes/modals/_create_board_modal.html:34
 #: dashboard_antiguo.txt:560
 msgid "Verde"
 msgstr "Green"
 
 #: boards/models.py:13
-#: core/templates/_includes/modals/_create_board_modal.html:27
-#: core/templates/_includes/modals/_edit_board_modal.html:29
+#: core/templates/_includes/modals/_create_board_modal.html:39
 #: dashboard_antiguo.txt:561
 msgid "Rojo"
 msgstr "Red"
 
 #: boards/models.py:14
-#: core/templates/_includes/modals/_create_board_modal.html:28
-#: core/templates/_includes/modals/_edit_board_modal.html:30
+#: core/templates/_includes/modals/_create_board_modal.html:44
 #: dashboard_antiguo.txt:562
 msgid "Naranja"
 msgstr "Orange"
 
 #: boards/models.py:15
-#: core/templates/_includes/modals/_create_board_modal.html:29
-#: core/templates/_includes/modals/_edit_board_modal.html:31
+#: core/templates/_includes/modals/_create_board_modal.html:49
 #: dashboard_antiguo.txt:563
 msgid "Púrpura"
 msgstr "Purple"
 
 #: boards/models.py:16
-#: core/templates/_includes/modals/_create_board_modal.html:30
-#: core/templates/_includes/modals/_edit_board_modal.html:32
+#: core/templates/_includes/modals/_create_board_modal.html:54
 #: dashboard_antiguo.txt:564
 msgid "Gris"
 msgstr "Gray"
@@ -67,17 +61,15 @@ msgid "Título"
 msgstr "Title"
 
 #: boards/models.py:20
-#: core/templates/_includes/modals/_create_board_modal.html:34
-#: core/templates/_includes/modals/_edit_board_modal.html:36
+#: core/templates/_includes/modals/_create_board_modal.html:62
+#: core/templates/_includes/modals/_edit_board_modal.html:78
 #: core/templates/_includes/tasks/_quick_add_bar.html:350
-#: core/templates/_includes/tasks/_task_edit_modal.html:363
+#: core/templates/_includes/tasks/_task_edit_modal.html:364
 #: dashboard_antiguo.txt:278
 msgid "Descripción"
 msgstr "Description"
 
 #: boards/models.py:21
-#: core/templates/_includes/modals/_create_board_modal.html:23
-#: core/templates/_includes/modals/_edit_board_modal.html:25
 msgid "Color"
 msgstr "Color"
 
@@ -86,7 +78,7 @@ msgid "¿Tablero general?"
 msgstr "General board?"
 
 #: boards/models.py:29
-#: core/templates/_includes/modals/_edit_board_modal.html:130
+#: core/templates/_includes/modals/_edit_board_modal.html:178
 msgid "Propietario"
 msgstr "Owner"
 
@@ -106,45 +98,45 @@ msgstr "Notification sent"
 msgid "Fecha de creación"
 msgstr "Creation date"
 
-#: boards/models.py:45 core/templates/_includes/tasks/_quick_add_bar.html:115
-#: core/templates/_includes/tasks/_task_edit_modal.html:226
-#: core/templates/_includes/tasks/_task_edit_modal.html:258
+#: boards/models.py:46 core/templates/_includes/tasks/_quick_add_bar.html:115
+#: core/templates/_includes/tasks/_task_edit_modal.html:227
+#: core/templates/_includes/tasks/_task_edit_modal.html:259
 #: dashboard_antiguo.txt:126 tasks/models.py:96
 msgid "Tablero"
 msgstr "Board"
 
-#: boards/models.py:46
+#: boards/models.py:47
 #: core/templates/_includes/navigation/_offcanvas_boards.html:6
 #: core/templates/_includes/navigation/_sidebar.html:5
 msgid "Tableros"
 msgstr "Boards"
 
-#: boards/models.py:58
+#: boards/models.py:59
 #: core/templates/_includes/navigation/_offcanvas_boards.html:21
 #: core/templates/_includes/navigation/_sidebar.html:18
 #: core/templates/_includes/tasks/_quick_add_bar.html:138
-#: core/templates/_includes/tasks/_task_edit_modal.html:282
-#: core/templates/_includes/tasks/_task_edit_modal.html:306
-#: core/templates/_includes/tasks/_task_edit_modal.html:392
+#: core/templates/_includes/tasks/_task_edit_modal.html:283
+#: core/templates/_includes/tasks/_task_edit_modal.html:307
+#: core/templates/_includes/tasks/_task_edit_modal.html:393
 #: core/templates/tasks/dashboard.html:6 core/templates/tasks/dashboard.html:42
 #: dashboard_antiguo.txt:7 dashboard_antiguo.txt:17 dashboard_antiguo.txt:128
 msgid "General"
 msgstr "General"
 
-#: boards/models.py:58
+#: boards/models.py:59
 msgid "Personalizado"
 msgstr "Custom"
 
-#: core/settings.py:147
+#: core/settings.py:145
 msgid "Español"
 msgstr "Spanish"
 
-#: core/settings.py:148
+#: core/settings.py:146
 msgid "English"
 msgstr "English"
 
 #: core/templates/_includes/modals/_clear_completed_modal.html:6
-#: core/templates/_includes/tasks/_completed_panel.html:45
+#: core/templates/_includes/tasks/_completed_panel.html:29
 #: dashboard_antiguo.txt:488
 msgid "Vaciar completadas"
 msgstr "Clear completed"
@@ -179,83 +171,88 @@ msgstr "Board name"
 msgid "Nombre del tablero..."
 msgstr "Board name..."
 
-#: core/templates/_includes/modals/_create_board_modal.html:35
-#: core/templates/_includes/modals/_edit_board_modal.html:37
+#: core/templates/_includes/modals/_create_board_modal.html:24
+#: core/templates/_includes/modals/_edit_board_modal.html:26
+msgid "Color del Tablero"
+msgstr "Board color"
+
+#: core/templates/_includes/modals/_create_board_modal.html:63
+#: core/templates/_includes/modals/_edit_board_modal.html:79
 msgid "Opcional"
 msgstr "Optional"
 
-#: core/templates/_includes/modals/_create_board_modal.html:43
-#: core/templates/_includes/modals/_edit_board_modal.html:45
+#: core/templates/_includes/modals/_create_board_modal.html:71
+#: core/templates/_includes/modals/_edit_board_modal.html:87
 msgid "Invitar a un nuevo miembro"
 msgstr "Invite a new member"
 
-#: core/templates/_includes/modals/_create_board_modal.html:53
-#: core/templates/_includes/modals/_edit_board_modal.html:55
+#: core/templates/_includes/modals/_create_board_modal.html:81
+#: core/templates/_includes/modals/_edit_board_modal.html:97
 msgid "Escribe usuario, email o nombre..."
 msgstr "Type username, email or name..."
 
-#: core/templates/_includes/modals/_create_board_modal.html:91
-#: core/templates/_includes/modals/_edit_board_modal.html:93
+#: core/templates/_includes/modals/_create_board_modal.html:119
+#: core/templates/_includes/modals/_edit_board_modal.html:135
 msgid "No se encontró ningún usuario registrado."
 msgstr "No registered user found."
 
-#: core/templates/_includes/modals/_create_board_modal.html:97
-#: core/templates/_includes/modals/_edit_board_modal.html:99
+#: core/templates/_includes/modals/_create_board_modal.html:125
+#: core/templates/_includes/modals/_edit_board_modal.html:141
 msgid "Se enviará una invitación para participar en el tablero a:"
 msgstr "An invitation to participate in the board will be sent to:"
 
-#: core/templates/_includes/modals/_create_board_modal.html:105
+#: core/templates/_includes/modals/_create_board_modal.html:133
 msgid "Le llegará una notificación inmediata para unirse al guardar."
 msgstr "An immediate notification to join will be sent upon saving."
 
-#: core/templates/_includes/modals/_create_board_modal.html:111
-#: core/templates/_includes/modals/_edit_board_modal.html:171
+#: core/templates/_includes/modals/_create_board_modal.html:139
+#: core/templates/_includes/modals/_edit_board_modal.html:230
 #: core/templates/_includes/modals/_user_settings_modal.html:108
 #: core/templates/_includes/modals/_user_settings_modal.html:134
 #: core/templates/_includes/modals/_user_settings_modal.html:248
-#: core/templates/_includes/tasks/_task_edit_modal.html:523
+#: core/templates/_includes/tasks/_task_edit_modal.html:524
 #: dashboard_antiguo.txt:574 dashboard_antiguo.txt:593
 msgid "Cancelar"
 msgstr "Cancel"
 
-#: core/templates/_includes/modals/_create_board_modal.html:112
+#: core/templates/_includes/modals/_create_board_modal.html:140
 #: dashboard_antiguo.txt:575
 msgid "Guardar Tablero"
 msgstr "Save Board"
 
 #: core/templates/_includes/modals/_edit_board_modal.html:12
-msgid "Ajustes del Tablero"
+msgid "Ajustes de Tablero"
 msgstr "Board Settings"
 
-#: core/templates/_includes/modals/_edit_board_modal.html:108
+#: core/templates/_includes/modals/_edit_board_modal.html:150
 msgid "Le llegará una notificación inmediata para unirse."
 msgstr "An immediate notification will be sent to join."
 
-#: core/templates/_includes/modals/_edit_board_modal.html:113
+#: core/templates/_includes/modals/_edit_board_modal.html:155
 msgid "Enviar Invitación"
 msgstr "Send Invitation"
 
-#: core/templates/_includes/modals/_edit_board_modal.html:119
+#: core/templates/_includes/modals/_edit_board_modal.html:161
 msgid "Miembros actuales"
 msgstr "Current members"
 
-#: core/templates/_includes/modals/_edit_board_modal.html:145
+#: core/templates/_includes/modals/_edit_board_modal.html:202
 msgid "Desmarca para quitar miembro"
 msgstr "Uncheck to remove member"
 
-#: core/templates/_includes/modals/_edit_board_modal.html:151
+#: core/templates/_includes/modals/_edit_board_modal.html:208
 msgid "Sin miembros colaboradores adicionales."
 msgstr "No additional collaborating members."
 
-#: core/templates/_includes/modals/_edit_board_modal.html:163
+#: core/templates/_includes/modals/_edit_board_modal.html:222
 msgid "¿Seguro que quieres eliminar el tablero"
 msgstr "Are you sure you want to delete the board"
 
-#: core/templates/_includes/modals/_edit_board_modal.html:164
+#: core/templates/_includes/modals/_edit_board_modal.html:223
 msgid "Eliminar Tablero"
 msgstr "Delete Board"
 
-#: core/templates/_includes/modals/_edit_board_modal.html:172
+#: core/templates/_includes/modals/_edit_board_modal.html:231
 msgid "Guardar Cambios"
 msgstr "Save Changes"
 
@@ -285,18 +282,18 @@ msgid "Nombre de usuario"
 msgstr "Username"
 
 #: core/templates/_includes/modals/_user_settings_modal.html:93
-#: core/templates/legal/cookies.html:23 users/forms/user_form.py:25
+#: core/templates/legal/cookies.html:23 users/forms/user_form.py:26
 msgid "Nombre"
 msgstr "First Name"
 
 #: core/templates/_includes/modals/_user_settings_modal.html:97
-#: users/forms/user_form.py:34
+#: users/forms/user_form.py:35
 msgid "Apellidos"
 msgstr "Last Name"
 
 #: core/templates/_includes/modals/_user_settings_modal.html:103
 #: core/templates/registration/password_reset_form.html:21
-#: users/forms/user_form.py:12 users/forms/user_form.py:74
+#: users/forms/user_form.py:13 users/forms/user_form.py:75
 msgid "Correo electrónico"
 msgstr "Email address"
 
@@ -392,7 +389,8 @@ msgid "Más información en nuestra Política de Cookies"
 msgstr "More information in our Cookie Policy"
 
 #: core/templates/_includes/navigation/_cookie_banner.html:13
-#: core/templates/_includes/navigation/_navbar.html:179
+#: core/templates/_includes/navigation/_navbar.html:198
+#: core/templates/partials/_notifications_list.html:55
 msgid "Aceptar"
 msgstr "Accept"
 
@@ -411,24 +409,38 @@ msgstr "Legal Notice"
 msgid "Cookies"
 msgstr "Cookies"
 
-#: core/templates/_includes/navigation/_navbar.html:15
+#: core/templates/_includes/navigation/_navbar.html:16
 msgid "Ver tableros"
 msgstr "View boards"
 
-#: core/templates/_includes/navigation/_navbar.html:47
-#: core/templates/_includes/navigation/_navbar.html:81
+#: core/templates/_includes/navigation/_navbar.html:53
+#: core/templates/_includes/navigation/_navbar.html:100
 msgid "Buscar tareas..."
 msgstr "Search tasks..."
 
-#: core/templates/_includes/navigation/_navbar.html:70
+#: core/templates/_includes/navigation/_navbar.html:65
+#: core/templates/base/landing.html:143
+msgid "Características"
+msgstr "Features"
+
+#: core/templates/_includes/navigation/_navbar.html:68
+#: core/templates/base/landing.html:188
+msgid "Cómo funciona"
+msgstr "How it works"
+
+#: core/templates/_includes/navigation/_navbar.html:71
+msgid "Pricing"
+msgstr "Pricing"
+
+#: core/templates/_includes/navigation/_navbar.html:89
 msgid "Buscar tareas"
 msgstr "Search tasks"
 
-#: core/templates/_includes/navigation/_navbar.html:112
+#: core/templates/_includes/navigation/_navbar.html:131
 msgid "NOTIFICACIONES"
 msgstr "NOTIFICATIONS"
 
-#: core/templates/_includes/navigation/_navbar.html:116
+#: core/templates/_includes/navigation/_navbar.html:135
 #, python-format
 msgid ""
 "\n"
@@ -447,46 +459,51 @@ msgstr[1] ""
 "                                        %(counter)s new\n"
 "                                    "
 
-#: core/templates/_includes/navigation/_navbar.html:138
+#: core/templates/_includes/navigation/_navbar.html:157
+#: core/templates/partials/_notifications_list.html:14
 msgid "Descartar notificación"
 msgstr "Dismiss notification"
 
-#: core/templates/_includes/navigation/_navbar.html:182
+#: core/templates/_includes/navigation/_navbar.html:201
+#: core/templates/partials/_notifications_list.html:58
 msgid "Rechazar"
 msgstr "Decline"
 
-#: core/templates/_includes/navigation/_navbar.html:187
+#: core/templates/_includes/navigation/_navbar.html:206
+#: core/templates/partials/_notifications_list.html:63
 msgid "Ver en el tablero"
 msgstr "View on board"
 
-#: core/templates/_includes/navigation/_navbar.html:191
+#: core/templates/_includes/navigation/_navbar.html:210
+#: core/templates/partials/_notifications_list.html:67
 msgid "Ver en General"
 msgstr "View in General"
 
-#: core/templates/_includes/navigation/_navbar.html:198
+#: core/templates/_includes/navigation/_navbar.html:217
+#: core/templates/partials/_notifications_list.html:74
 msgid "No tienes notificaciones pendientes."
 msgstr "You have no pending notifications."
 
-#: core/templates/_includes/navigation/_navbar.html:232
+#: core/templates/_includes/navigation/_navbar.html:251
 msgid "CUENTA"
 msgstr "ACCOUNT"
 
-#: core/templates/_includes/navigation/_navbar.html:261
+#: core/templates/_includes/navigation/_navbar.html:280
 msgid "Ajustes de cuenta"
 msgstr "Account settings"
 
-#: core/templates/_includes/navigation/_navbar.html:268
+#: core/templates/_includes/navigation/_navbar.html:287
 msgid "Cerrar sesión"
 msgstr "Log out"
 
-#: core/templates/_includes/navigation/_navbar.html:276
-#: core/templates/registration/login.html:5
+#: core/templates/_includes/navigation/_navbar.html:296
+#: core/templates/base/landing.html:36 core/templates/registration/login.html:5
 #: core/templates/registration/login.html:53
 #: core/templates/registration/password_reset_complete.html:18
 msgid "Iniciar sesión"
 msgstr "Log in"
 
-#: core/templates/_includes/navigation/_navbar.html:279
+#: core/templates/_includes/navigation/_navbar.html:299
 #: core/templates/registration/register.html:86
 msgid "Registrarse"
 msgstr "Sign up"
@@ -539,63 +556,60 @@ msgstr[1] ""
 "                            "
 
 #: core/templates/_includes/navigation/_sidebar.html:128
+#: core/templates/base/landing.html:85
 msgid "Planificar"
 msgstr "Schedule"
 
 #: core/templates/_includes/navigation/_sidebar.html:142
+#: core/templates/base/landing.html:99
 msgid "Delegar"
 msgstr "Delegate"
 
 #: core/templates/_includes/navigation/_sidebar.html:156
-#: core/templates/_includes/tasks/_completed_panel.html:82
+#: core/templates/_includes/tasks/_completed_panel.html:66
+#: core/templates/base/landing.html:112
 msgid "Eliminar"
 msgstr "Delete"
 
-#: core/templates/_includes/tasks/_completed_panel.html:10
 #: core/templates/_includes/tasks/_completed_panel.html:15
-msgid "Ver tareas completadas"
-msgstr "View completed tasks"
-
-#: core/templates/_includes/tasks/_completed_panel.html:17
-#: core/templates/_includes/tasks/_completed_panel.html:33
-msgid "Total de tareas completadas"
-msgstr "Total completed tasks"
-
-#: core/templates/_includes/tasks/_completed_panel.html:31
 #: dashboard_antiguo.txt:474
 msgid "Completadas"
 msgstr "Completed"
 
-#: core/templates/_includes/tasks/_completed_panel.html:40
+#: core/templates/_includes/tasks/_completed_panel.html:17
+msgid "Total de tareas completadas"
+msgstr "Total completed tasks"
+
+#: core/templates/_includes/tasks/_completed_panel.html:24
 #: core/templates/tasks/dashboard.html:73 dashboard_antiguo.txt:23
 #: dashboard_antiguo.txt:483
 msgid "Todas"
 msgstr "All"
 
-#: core/templates/_includes/tasks/_completed_panel.html:41
+#: core/templates/_includes/tasks/_completed_panel.html:25
 #: dashboard_antiguo.txt:484
 msgid "Hoy"
 msgstr "Today"
 
-#: core/templates/_includes/tasks/_completed_panel.html:42
+#: core/templates/_includes/tasks/_completed_panel.html:26
 #: dashboard_antiguo.txt:485
 msgid "Esta semana"
 msgstr "This week"
 
-#: core/templates/_includes/tasks/_completed_panel.html:80
+#: core/templates/_includes/tasks/_completed_panel.html:64
 msgid "¿Eliminar esta tarea definitivamente?"
 msgstr "Delete this task permanently?"
 
-#: core/templates/_includes/tasks/_completed_panel.html:89
+#: core/templates/_includes/tasks/_completed_panel.html:73
 #: dashboard_antiguo.txt:531
 msgid "No hay tareas completadas."
 msgstr "No completed tasks."
 
-#: core/templates/_includes/tasks/_mobile_action_modal.html:42
+#: core/templates/_includes/tasks/_mobile_action_modal.html:43
 msgid "Completar"
 msgstr "Complete"
 
-#: core/templates/_includes/tasks/_mobile_action_modal.html:50
+#: core/templates/_includes/tasks/_mobile_action_modal.html:51
 msgid "Editar"
 msgstr "Edit"
 
@@ -625,7 +639,7 @@ msgid "Opciones avanzadas (Tablero, fecha límite, notas...)"
 msgstr "Advanced options (Board, due date, notes...)"
 
 #: core/templates/_includes/tasks/_quick_add_bar.html:145
-#: core/templates/_includes/tasks/_task_edit_modal.html:289
+#: core/templates/_includes/tasks/_task_edit_modal.html:290
 #: dashboard_antiguo.txt:133
 msgid "Seleccionar Tablero"
 msgstr "Select Board"
@@ -715,36 +729,72 @@ msgid "Quitar"
 msgstr "Remove"
 
 #: core/templates/_includes/tasks/_quick_add_bar.html:260
-#: core/templates/_includes/tasks/_task_edit_modal.html:211
-#: core/templates/_includes/tasks/_task_edit_modal.html:526
+#: core/templates/_includes/tasks/_task_edit_modal.html:212
+#: core/templates/_includes/tasks/_task_edit_modal.html:527
 #: dashboard_antiguo.txt:214
 msgid "Guardar"
 msgstr "Save"
 
 #: core/templates/_includes/tasks/_quick_add_bar.html:277
-#: core/templates/_includes/tasks/_task_edit_modal.html:402
+#: core/templates/_includes/tasks/_task_edit_modal.html:403
 #: dashboard_antiguo.txt:235
 msgid "Asignada a"
 msgstr "Assigned to"
 
 #: core/templates/_includes/tasks/_quick_add_bar.html:287
-#: core/templates/_includes/tasks/_task_edit_modal.html:423
+#: core/templates/_includes/tasks/_task_edit_modal.html:424
 msgid "Asignar personas"
 msgstr "Assign people"
 
 #: core/templates/_includes/tasks/_quick_add_bar.html:296
-#: core/templates/_includes/tasks/_task_edit_modal.html:432
+#: core/templates/_includes/tasks/_task_edit_modal.html:433
 msgid "Buscar persona o email..."
 msgstr "Search person or email..."
 
 #: core/templates/_includes/tasks/_quick_add_bar.html:365
-#: core/templates/_includes/tasks/_task_edit_modal.html:370
+#: core/templates/_includes/tasks/_task_edit_modal.html:371
 msgid "Escribe una descripción más detallada..."
 msgstr "Write a more detailed description..."
 
 #: core/templates/_includes/tasks/_quick_add_bar.html:368
 msgid "caracteres"
 msgstr "characters"
+
+#: core/templates/_includes/tasks/_quick_add_bar.html:383
+#: core/templates/_includes/tasks/_quick_add_bar.html:390
+msgid "Crítica (4/4)"
+msgstr "Critical (4/4)"
+
+#: core/templates/_includes/tasks/_quick_add_bar.html:384
+#: core/templates/_includes/tasks/_quick_add_bar.html:391
+msgid "Alta (3/4)"
+msgstr "High (3/4)"
+
+#: core/templates/_includes/tasks/_quick_add_bar.html:385
+#: core/templates/_includes/tasks/_quick_add_bar.html:392
+msgid "Moderada (2/4)"
+msgstr "Moderate (2/4)"
+
+#: core/templates/_includes/tasks/_quick_add_bar.html:386
+#: core/templates/_includes/tasks/_quick_add_bar.html:393
+msgid "Baja (1/4)"
+msgstr "Low (1/4)"
+
+#: core/templates/_includes/tasks/_quick_add_bar.html:398
+msgid "Q1 (Hacer ahora)"
+msgstr "Q1 (Do now)"
+
+#: core/templates/_includes/tasks/_quick_add_bar.html:399
+msgid "Q2 (Planificar)"
+msgstr "Q2 (Schedule)"
+
+#: core/templates/_includes/tasks/_quick_add_bar.html:400
+msgid "Q3 (Delegar)"
+msgstr "Q3 (Delegate)"
+
+#: core/templates/_includes/tasks/_quick_add_bar.html:401
+msgid "Q4 (Eliminar)"
+msgstr "Q4 (Delete)"
 
 #: core/templates/_includes/tasks/_reminder_email.html:7
 msgid "Recordatorio de Tarea"
@@ -797,19 +847,19 @@ msgstr ""
 "This is an automated message generated by your app to help you keep your "
 "tasks up to date."
 
-#: core/templates/_includes/tasks/_task_card.html:65
+#: core/templates/_includes/tasks/_task_card.html:66
 msgid "Tiene descripción"
 msgstr "Has description"
 
-#: core/templates/_includes/tasks/_task_card.html:73
+#: core/templates/_includes/tasks/_task_card.html:74
 msgid "Tarea compartida / asignada"
 msgstr "Shared / assigned task"
 
-#: core/templates/_includes/tasks/_task_card.html:86
+#: core/templates/_includes/tasks/_task_card.html:87
 msgid "Asignado a:"
 msgstr "Assigned to:"
 
-#: core/templates/_includes/tasks/_task_card.html:93
+#: core/templates/_includes/tasks/_task_card.html:94
 msgid "Total de asignados:"
 msgstr "Total assignees:"
 
@@ -846,29 +896,353 @@ msgid "Título de la tarea"
 msgstr "Task title"
 
 #: core/templates/_includes/tasks/_task_edit_modal.html:92
+#: core/templates/base/landing.html:58
 msgid "Urgencia"
 msgstr "Urgency"
 
+#: core/templates/_includes/tasks/_task_edit_modal.html:97
+msgid "Muy Urgente"
+msgstr "Very Urgent"
+
+#: core/templates/_includes/tasks/_task_edit_modal.html:100
+#: dashboard_antiguo.txt:52
+msgid "Urgente"
+msgstr "Urgent"
+
+#: core/templates/_includes/tasks/_task_edit_modal.html:103
+#: core/templates/_includes/tasks/_task_edit_modal.html:124
+msgid "Moderado"
+msgstr "Moderate"
+
+#: core/templates/_includes/tasks/_task_edit_modal.html:106
+#: core/templates/_includes/tasks/_task_edit_modal.html:127
+msgid "Baja"
+msgstr "Low"
+
 #: core/templates/_includes/tasks/_task_edit_modal.html:113
+#: core/templates/base/landing.html:60
 msgid "Importancia"
 msgstr "Importance"
 
-#: core/templates/_includes/tasks/_task_edit_modal.html:391
+#: core/templates/_includes/tasks/_task_edit_modal.html:118
+msgid "Muy Importante"
+msgstr "Very Important"
+
+#: core/templates/_includes/tasks/_task_edit_modal.html:121
+#: dashboard_antiguo.txt:75
+msgid "Importante"
+msgstr "Important"
+
+#: core/templates/_includes/tasks/_task_edit_modal.html:392
 msgid "ha añadido esta tarjeta a"
 msgstr "added this card to"
 
-#: core/templates/_includes/tasks/_task_edit_modal.html:509
-#: core/templates/_includes/tasks/_task_edit_modal.html:517
+#: core/templates/_includes/tasks/_task_edit_modal.html:510
+#: core/templates/_includes/tasks/_task_edit_modal.html:518
 msgid "Eliminar Tarea"
 msgstr "Delete Task"
 
-#: core/templates/_includes/tasks/_task_edit_modal.html:516
+#: core/templates/_includes/tasks/_task_edit_modal.html:517
 msgid "Solo el creador o el propietario del tablero pueden eliminar esta tarea"
 msgstr "Only the creator or board owner can delete this task"
 
 #: core/templates/base/base.html:9
 msgid "EisenhowerFlow"
 msgstr "EisenhowerFlow"
+
+#: core/templates/base/landing.html:6
+msgid "EisenhowerFlow — Prioriza con claridad"
+msgstr "EisenhowerFlow — Prioritize with clarity"
+
+#: core/templates/base/landing.html:19
+msgid "Matriz de Eisenhower interactiva"
+msgstr "Interactive Eisenhower Matrix"
+
+#: core/templates/base/landing.html:22
+msgid "Domina tu caos."
+msgstr "Master your chaos."
+
+#: core/templates/base/landing.html:23
+msgid "Prioriza con claridad."
+msgstr "Prioritize with clarity."
+
+#: core/templates/base/landing.html:26
+msgid ""
+"\n"
+"                        Valora cada tarea por <strong>urgencia</strong> e "
+"<strong>importancia</strong> y EisenhowerFlow la coloca sola en el cuadrante "
+"correcto: hacer, planificar, delegar o eliminar.\n"
+"                        "
+msgstr ""
+"\n"
+"                        Rate each task by <strong>urgency</strong> and "
+"<strong>importance</strong> and EisenhowerFlow automatically places it in the "
+"correct quadrant: do, schedule, delegate, or delete.\n"
+"                        "
+
+#: core/templates/base/landing.html:33 core/templates/base/landing.html:344
+msgid "Empieza gratis"
+msgstr "Get started for free"
+
+#: core/templates/base/landing.html:41
+msgid "Sin tarjeta de crédito"
+msgstr "No credit card required"
+
+#: core/templates/base/landing.html:42 core/templates/base/landing.html:175
+msgid "Tableros ilimitados"
+msgstr "Unlimited boards"
+
+#: core/templates/base/landing.html:43
+msgid "4.9/5 de 1.200 equipos"
+msgstr "4.9/5 from 1,200 teams"
+
+#: core/templates/base/landing.html:57
+msgid "Comprar medecina Tobi"
+msgstr "Buy medicine for Tobi"
+
+#: core/templates/base/landing.html:71
+msgid "Hacer ahora"
+msgstr "Do now"
+
+#: core/templates/base/landing.html:75
+msgid "Despliegue matriz en Render"
+msgstr "Deploy matrix on Render"
+
+#: core/templates/base/landing.html:76
+msgid "Finalizar proyecto 2"
+msgstr "Finish project 2"
+
+#: core/templates/base/landing.html:89
+msgid "Planificar calendario"
+msgstr "Plan calendar"
+
+#: core/templates/base/landing.html:90
+msgid "Hacer descripción web"
+msgstr "Write web description"
+
+#: core/templates/base/landing.html:103
+msgid "Hacer la compra"
+msgstr "Grocery shopping"
+
+#: core/templates/base/landing.html:117 core/templates/tasks/dashboard.html:290
+msgid "No hay tareas irrelevantes"
+msgstr "No irrelevant tasks"
+
+#: core/templates/base/landing.html:132
+msgid "Equipos que ya priorizan mejor"
+msgstr "Teams already prioritizing better"
+
+#: core/templates/base/landing.html:144
+msgid "Todo lo que necesitas para enfocarte en lo que importa"
+msgstr "Everything you need to focus on what matters"
+
+#: core/templates/base/landing.html:150
+msgid "Priorización Inteligente"
+msgstr "Smart Prioritization"
+
+#: core/templates/base/landing.html:151
+msgid ""
+"Puntúa urgencia e importancia con estrellas y el cuadrante previsto se "
+"calcula al instante."
+msgstr ""
+"Rate urgency and importance with stars and the intended quadrant is "
+"calculated instantly."
+
+#: core/templates/base/landing.html:153
+msgid "Escala de 4 niveles"
+msgstr "4-level scale"
+
+#: core/templates/base/landing.html:154
+msgid "Fechas límite y notas"
+msgstr "Due dates and notes"
+
+#: core/templates/base/landing.html:161
+msgid "Seguimiento de Completadas"
+msgstr "Completed Tasks Tracking"
+
+#: core/templates/base/landing.html:162
+msgid ""
+"Un historial claro de lo que has cerrado y la distribución actual de tu "
+"carga de trabajo."
+msgstr ""
+"A clear history of what you've closed and your current workload "
+"distribution."
+
+#: core/templates/base/landing.html:164
+msgid "Panel de completadas"
+msgstr "Completed tasks panel"
+
+#: core/templates/base/landing.html:165
+msgid "Métricas por tablero"
+msgstr "Metrics per board"
+
+#: core/templates/base/landing.html:172
+msgid "Colaboración en Equipo"
+msgstr "Team Collaboration"
+
+#: core/templates/base/landing.html:173
+msgid ""
+"Tableros compartidos, asignación de tareas en tiempo real y vista general "
+"para cada miembro."
+msgstr ""
+"Shared boards, real-time task assignment, and overview for each member."
+
+#: core/templates/base/landing.html:176
+msgid "Asignación y notificaciones"
+msgstr "Assignment and notifications"
+
+#: core/templates/base/landing.html:189
+msgid "Cuatro cuadrantes. Una decisión clara."
+msgstr "Four quadrants. One clear decision."
+
+#: core/templates/base/landing.html:199
+msgid "Q1 · Hacer ahora"
+msgstr "Q1 · Do now"
+
+#: core/templates/base/landing.html:201
+msgid "Urgente e importante"
+msgstr "Urgent & Important"
+
+#: core/templates/base/landing.html:202
+msgid "Crisis y plazos clave. Actúa ahora sin rodeos."
+msgstr "Crises and key deadlines. Take action right away."
+
+#: core/templates/base/landing.html:210
+msgid "Q2 · Planificar"
+msgstr "Q2 · Schedule"
+
+#: core/templates/base/landing.html:212
+msgid "Importante, no urgente"
+msgstr "Important, not urgent"
+
+#: core/templates/base/landing.html:213
+msgid "Metas a medio plazo. Agenda tiempo para lo que te hace avanzar."
+msgstr "Medium-term goals. Schedule time for what moves you forward."
+
+#: core/templates/base/landing.html:221
+msgid "Q3 · Delegar"
+msgstr "Q3 · Delegate"
+
+#: core/templates/base/landing.html:223
+msgid "Urgente, no importante"
+msgstr "Urgent, not important"
+
+#: core/templates/base/landing.html:224
+msgid "Interrupciones y tareas operativas. Asígnalas a tu equipo."
+msgstr "Interruptions and operational tasks. Assign them to your team."
+
+#: core/templates/base/landing.html:232
+msgid "Q4 · Eliminar"
+msgstr "Q4 · Delete"
+
+#: core/templates/base/landing.html:234
+msgid "No urgente, no importante"
+msgstr "Not urgent, not important"
+
+#: core/templates/base/landing.html:235
+msgid "Distracciones. Mantén tu foco libre de ruido innecesario."
+msgstr "Distractions. Keep your focus free from unnecessary noise."
+
+#: core/templates/base/landing.html:250
+msgid "Organización total"
+msgstr "Total Organization"
+
+#: core/templates/base/landing.html:252
+msgid "Crea tableros personalizados para cada ámbito de tu vida"
+msgstr "Create custom boards for every area of your life"
+
+#: core/templates/base/landing.html:254
+msgid ""
+"Separa tus proyectos de trabajo, tareas del hogar o metas personales en "
+"tableros independientes. Todo tu flujo de trabajo se condensa de manera "
+"inteligente en el Tablero General para que mantengas la visión global sin "
+"perder detalle."
+msgstr ""
+"Separate your work projects, household chores, or personal goals into "
+"independent boards. Your entire workflow intelligently condenses into the "
+"General Board so you maintain a global overview without missing a detail."
+
+#: core/templates/base/landing.html:259
+msgid "Tableros por proyecto"
+msgstr "Project-based boards"
+
+#: core/templates/base/landing.html:260
+msgid "Organiza trabajo, hogar y proyectos personales en espacios aislados."
+msgstr "Organize work, home, and personal projects in isolated spaces."
+
+#: core/templates/base/landing.html:265
+msgid "Tablero General condensado"
+msgstr "Condensed General Board"
+
+#: core/templates/base/landing.html:266
+msgid "Visualiza todas tus tareas urgentes e importantes en una única matriz."
+msgstr "View all your urgent and important tasks in a single matrix."
+
+#: core/templates/base/landing.html:279
+msgid "Gestión fluida"
+msgstr "Fluid Management"
+
+#: core/templates/base/landing.html:281
+msgid "Reorganiza tus tareas arrastrandolas al cuadrante que quieras"
+msgstr "Reorganize your tasks by dragging them to the quadrant you want"
+
+#: core/templates/base/landing.html:283
+msgid ""
+"Cambiar la prioridad de una tarea es tan sencillo como moverla entre "
+"cuadrantes. El sistema recalcula y guarda el nuevo estado de forma "
+"instantánea."
+msgstr ""
+"Changing a task's priority is as simple as moving it between quadrants. The "
+"system recalculates and saves the new state instantly."
+
+#: core/templates/base/landing.html:286
+msgid "Movimiento fluido e intuitivo en tiempo real"
+msgstr "Smooth and intuitive real-time movement"
+
+#: core/templates/base/landing.html:287
+msgid "Cambio automático de nivel de urgencia e importancia"
+msgstr "Automatic change of urgency and importance levels"
+
+#: core/templates/base/landing.html:303
+msgid "Acceso multiplataforma"
+msgstr "Cross-platform access"
+
+#: core/templates/base/landing.html:305
+msgid "No hace falta que estés en el ordenador"
+msgstr "No need to be at your computer"
+
+#: core/templates/base/landing.html:307
+msgid ""
+"Lleva tu matriz de Eisenhower siempre contigo. Nuestra interfaz responsiva "
+"se adapta perfectamente a tu móvil o tablet para que puedas consultar, "
+"añadir y priorizar tareas desde cualquier lugar."
+msgstr ""
+"Take your Eisenhower Matrix with you wherever you go. Our responsive "
+"interface adapts perfectly to your phone or tablet so you can check, add, "
+"and prioritize tasks from anywhere."
+
+#: core/templates/base/landing.html:312
+msgid "Smartphone"
+msgstr "Smartphone"
+
+#: core/templates/base/landing.html:316
+msgid "Tablet"
+msgstr "Tablet"
+
+#: core/templates/base/landing.html:320
+msgid "Escritorio"
+msgstr "Desktop"
+
+#: core/templates/base/landing.html:339
+msgid "Empieza a priorizar hoy"
+msgstr "Start prioritizing today"
+
+#: core/templates/base/landing.html:341
+msgid ""
+"Crea tu primer tablero en menos de un minuto. Gratis para siempre para uso "
+"personal."
+msgstr ""
+"Create your first board in under a minute. Free forever for personal use."
 
 #: core/templates/legal/cookies.html:4 core/templates/legal/cookies.html:9
 msgid "Política de Cookies"
@@ -1075,7 +1449,7 @@ msgstr "Username or Email address"
 msgid "Tu usuario o correo"
 msgstr "Your username or email"
 
-#: core/templates/registration/login.html:44 users/forms/user_form.py:75
+#: core/templates/registration/login.html:44 users/forms/user_form.py:76
 msgid "Contraseña"
 msgstr "Password"
 
@@ -1196,7 +1570,7 @@ msgid "Introduce tu email y te enviaremos un enlace para restablecerla."
 msgstr "Enter your email and we will send you a link to reset it."
 
 #: core/templates/registration/password_reset_form.html:24
-#: users/forms/user_form.py:20 users/forms/user_form.py:66
+#: users/forms/user_form.py:21 users/forms/user_form.py:67
 msgid "tu@email.com"
 msgstr "you@email.com"
 
@@ -1339,10 +1713,6 @@ msgstr "Not Urgent - Not Important"
 msgid "Eliminar • Distracciones e irrelevantes"
 msgstr "Don't Do • Distractions and irrelevant items"
 
-#: core/templates/tasks/dashboard.html:290
-msgid "No hay tareas irrelevantes"
-msgstr "No irrelevant tasks"
-
 #: core/templates/tasks/dashboard.html:291
 msgid "Mantén tu foco libre de ruido innecesario"
 msgstr "Keep your focus free from unnecessary noise"
@@ -1354,14 +1724,6 @@ msgstr "Add task to Q4"
 #: dashboard_antiguo.txt:29
 msgid "Asignadas"
 msgstr "Assigned"
-
-#: dashboard_antiguo.txt:52
-msgid "Urgente"
-msgstr "Urgent"
-
-#: dashboard_antiguo.txt:75
-msgid "Importante"
-msgstr "Important"
 
 #: dashboard_antiguo.txt:143
 msgid "Aplicar"
@@ -1524,48 +1886,48 @@ msgstr "Task"
 msgid "Tareas"
 msgstr "Tasks"
 
-#: users/forms/user_form.py:15
+#: users/forms/user_form.py:16
 msgid "El correo electrónico es obligatorio para crear la cuenta."
 msgstr "An email address is required to create an account."
 
-#: users/forms/user_form.py:16
+#: users/forms/user_form.py:17
 msgid "Introduce una dirección de correo electrónico válida."
 msgstr "Enter a valid email address."
 
-#: users/forms/user_form.py:30
+#: users/forms/user_form.py:31
 msgid "Ej. Ruben"
 msgstr "e.g. Ruben"
 
-#: users/forms/user_form.py:39
+#: users/forms/user_form.py:40
 msgid "Ej. García Pérez"
 msgstr "e.g. Smith"
 
-#: users/forms/user_form.py:44
+#: users/forms/user_form.py:45
 msgid "He leído y acepto los Términos y la Política de Privacidad"
 msgstr "I have read and accept the Terms and Privacy Policy"
 
-#: users/forms/user_form.py:46
+#: users/forms/user_form.py:47
 msgid ""
 "Debes aceptar el Aviso Legal y la Política de Privacidad para registrarte."
 msgstr "You must accept the Legal Notice and Privacy Policy to register."
 
-#: users/forms/user_form.py:65
+#: users/forms/user_form.py:66
 msgid "tu_usuario"
 msgstr "your_username"
 
-#: users/forms/user_form.py:67
+#: users/forms/user_form.py:68
 msgid "Crea una contraseña segura"
 msgstr "Create a strong password"
 
-#: users/forms/user_form.py:68
+#: users/forms/user_form.py:69
 msgid "Repite la contraseña"
 msgstr "Repeat password"
 
-#: users/forms/user_form.py:73 users/models.py:22
+#: users/forms/user_form.py:74 users/models.py:22
 msgid "Usuario"
 msgstr "Username"
 
-#: users/forms/user_form.py:76
+#: users/forms/user_form.py:77
 msgid "Confirmar contraseña"
 msgstr "Confirm password"
 

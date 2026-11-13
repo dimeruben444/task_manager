@@ -763,3 +763,17 @@ body {
     border-top-color: #12B981 !important;
   }
 }
+
+@media (max-width: 576px) {
+  /* Elimina el margen lateral de las filas que contienen los cuadrantes */
+  .matrix-container-wrapper .row {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  /* Elimina el padding horizontal de las columnas de Bootstrap en los cuadrantes */
+  .matrix-container-wrapper .col-md-6 {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+}
