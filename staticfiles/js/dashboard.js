@@ -239,10 +239,14 @@ function getCookie(name) {
     return cookieValue;
 }
 
+
 function sendToggleRequest(taskId, isCompleted, checkbox) {
     const csrftoken = getCookie('csrftoken');
+    
+    // Priorizamos la URL exacta inyectada por Django (data-url), si existe
+    const targetUrl = (checkbox && checkbox.dataset.url) ? checkbox.dataset.url : `/tasks/task/${taskId}/toggle/`;
 
-    fetch(`/task/${taskId}/toggle/`, {
+    fetch(targetUrl, {
         method: 'POST',
         headers: {
             'X-CSRFToken': csrftoken,
@@ -252,14 +256,28 @@ function sendToggleRequest(taskId, isCompleted, checkbox) {
         body: JSON.stringify({ 'is_completed': isCompleted })
     })
     .then(response => {
-        if (!response.ok) throw new Error('Error en el servidor');
+        if (!response.ok) {
+            // Respaldo secundario por compatibilidad
+            return fetch(`/task/${taskId}/toggle/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({ 'is_completed': isCompleted })
+            }).then(altRes => {
+                if (!altRes.ok) throw new Error('Error en el servidor');
+                return altRes.json();
+            });
+        }
         return response.json();
     })
     .then(data => {
         if (data.status === 'success' || data.is_completed !== undefined) {
-            const card = checkbox.closest('.task-card, .completed-task-item');
+            const card = checkbox ? checkbox.closest('.task-card, .completed-task-item') : null;
 
-            // 1. SI MARCAMOS COMO COMPLETADA (CON ANIMACIÓN DE VUELO / DESVANECIMIENTO)
+            // 1. SI MARCAMOS COMO COMPLETADA
             if (isCompleted && card) {
                 const targetContainer = document.getElementById('completed-tasks-container');
                 if (targetContainer) {
@@ -273,12 +291,10 @@ function sendToggleRequest(taskId, isCompleted, checkbox) {
                     const urgency = card.dataset.urgency || "4";
                     const importance = card.dataset.importance || "4";
 
-                    // Extraer atributos de metadatos para preservarlos
                     const dueDate = card.dataset.dueDate || "";
                     const hasDescription = card.dataset.hasDescription || "false";
                     const isShared = card.dataset.isShared || "false";
 
-                    // Medir posición inicial de la tarjeta en la matriz
                     const startRect = card.getBoundingClientRect();
 
                     const completedItem = document.createElement('div');
@@ -307,7 +323,7 @@ function sendToggleRequest(taskId, isCompleted, checkbox) {
                             </span>
                         </div>
 
-                        <form method="POST" action="/task/${taskId}/delete/" class="d-inline m-0 flex-shrink-0" onsubmit="return confirm('¿Eliminar esta tarea definitivamente?');">
+                        <form method="POST" action="/tasks/task/${taskId}/delete/" class="d-inline m-0 flex-shrink-0" onsubmit="return confirm('¿Eliminar esta tarea definitivamente?');">
                             <input type="hidden" name="csrfmiddlewaretoken" value="${csrftoken}">
                             <button type="submit" class="btn btn-link text-danger p-0 border-0 opacity-50 hover-opacity-100" title="Eliminar">
                                 <i class="bi bi-x-lg" style="font-size: 0.85rem;"></i>
@@ -315,30 +331,24 @@ function sendToggleRequest(taskId, isCompleted, checkbox) {
                         </form>
                     `;
 
-                    // Insertar la nueva tarjeta en el panel de completadas
                     targetContainer.prepend(completedItem);
 
-                    // Medir posición final y calcular delta para la animación FLIP
                     const endRect = completedItem.getBoundingClientRect();
                     const deltaX = startRect.left - endRect.left;
                     const deltaY = startRect.top - endRect.top;
 
-                    // Aplicar posición inicial desplazada en la tarjeta destino
                     completedItem.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(0.98)`;
                     completedItem.style.transition = 'none';
 
-                    // Animar la tarjeta original desvaneciéndola
                     card.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
                     card.style.opacity = '0';
                     card.style.transform = 'scale(0.9)';
 
-                    // Animar el elemento de completadas hacia su sitio definitivo
                     requestAnimationFrame(() => {
                         completedItem.style.transition = 'transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s ease';
                         completedItem.style.transform = 'translate(0, 0) scale(1)';
                     });
 
-                    // Eliminar la tarjeta antigua tras completar la transición de desvanecimiento
                     setTimeout(() => {
                         card.remove();
                     }, 250);
@@ -351,7 +361,7 @@ function sendToggleRequest(taskId, isCompleted, checkbox) {
                     updateMatrixAndSidebarCounts();
                 }
             } 
-            // 2. SI DESMARCAMOS (DESCOMPLETAR) CON ANIMACIÓN DE VUELO
+            // 2. SI DESMARCAMOS (DESCOMPLETAR)
             else if (!isCompleted && card) {
                 let targetQuadrantCode = data.quadrant; 
                 
@@ -395,7 +405,7 @@ function sendToggleRequest(taskId, isCompleted, checkbox) {
                         if (hasDescription) {
                             descBadge = `
                                 <span class="badge text-secondary px-1.5 py-0.5 rounded-md" title="Tiene descripción" style="font-size: 0.98rem;">
-                                    <i class="bi bi-card-text" style="color: #5cbcf3; !important"></i> 
+                                    <i class="bi bi-card-text" style="color: #5cbcf3 !important;"></i> 
                                 </span>`;
                         }
 
@@ -489,15 +499,17 @@ function sendToggleRequest(taskId, isCompleted, checkbox) {
                 }
                 updateMatrixAndSidebarCounts();
             }
-        } else {
+        } else if (checkbox) {
             checkbox.checked = !isCompleted;
         }
     })
     .catch(error => {
         console.error('Error al actualizar la tarea:', error);
-        checkbox.checked = !isCompleted;
+        if (checkbox) checkbox.checked = !isCompleted;
     });
 }
+
+
 
 function initQuickQuadrantListeners() {
     // Lógica para inicializar los selectores de urgencia/importancia si es necesario

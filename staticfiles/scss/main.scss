@@ -25,3 +25,48 @@ html {
 :root {
   color-scheme: light;
 }
+
+/* ==========================================================================
+   TIPOGRAFÍAS GLOBALES: Roboto Mono (Títulos) + Cabin (Cuerpo / UI)
+   ========================================================================== */
+
+/* 1. Importar ambas fuentes desde Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Cabin:ital,wght@0,400..700;1,400..700&family=Roboto+Mono:wght@500;600;700&display=swap');
+
+/* 2. Definición de variables CSS en el root */
+:root {
+  --font-heading: 'Roboto Mono', monospace;
+  --font-body: 'Cabin', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+  /* Bootstrap 5 override variable */
+  --bs-body-font-family: var(--font-body);
+}
+
+/* 3. Aplicar Cabin al cuerpo general y a la interfaz */
+body, 
+p, 
+span, 
+input, 
+button, 
+select, 
+textarea, 
+.lead-ef, 
+.nav-link, 
+.btn, 
+.task {
+  font-family: var(--font-body) !important;
+}
+
+/* 4. Aplicar Roboto Mono a todos los títulos, marcas y encabezados */
+h1, h2, h3, h4, h5, h6,
+.section-title,
+.brand-title,
+.eyebrow,
+.shortcut-badge,
+.tag,
+.badge,
+.quadrant-header-title,
+.count {
+  font-family: var(--font-heading) !important;
+  letter-spacing: -0.02em;
+}
