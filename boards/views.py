@@ -27,169 +27,137 @@ User = get_user_model()
 
 @login_required
 def dashboard_view(request, board_id=None):
-
-    # Mantenimiento para el despliegue Limpia tareas completadas hace más de 30 días del usuario 
-    limite = timezone.now() - timedelta(days=30)
-    Task.objects.filter(
-        created_by=request.user, 
-        is_completed=True, 
-        updated_at__lte=limite
-    ).delete()
-
-    # 1. Tableros propios del usuario
-    user_boards = Board.objects.filter(owner=request.user).order_by('-is_default', 'id')
-    default_board = user_boards.filter(is_default=True).first()
-
-    # 2. Tableros compartidos
-    shared_boards = Board.objects.filter(members=request.user).distinct()
-
-    # 3. Consulta unificada con ordenación garantizada (Personales 0, Compartidos 1)
-    all_boards = Board.objects.filter(
-        Q(owner=request.user) | Q(members=request.user)
-    ).annotate(
-        members_count=Count('members'),
-        is_shared=Case(
-            # Si NO es el propietario OR el tablero TIENE miembros -> Considerar COMPARTIDO (1)
-            When(Q(members_count__gt=0) | ~Q(owner=request.user), then=Value(1)),
-            # Si es el propietario Y NO tiene miembros -> Considerar PERSONAL (0)
-            default=Value(0),
-            output_field=IntegerField(),
+    # 1. Tableros unificados con conteo y miembros precargados en 1 sola consulta
+    all_boards = list(
+        Board.objects.filter(Q(owner=request.user) | Q(members=request.user))
+        .select_related('owner')
+        .prefetch_related('members')
+        .annotate(
+            members_count=Count('members', distinct=True),
+            is_shared=Case(
+                When(Q(members_count__gt=0) | ~Q(owner=request.user), then=Value(1)),
+                default=Value(0),
+                output_field=IntegerField(),
+            )
         )
-    ).order_by('is_shared', '-is_default', 'created_at').distinct()
+        .order_by('is_shared', '-is_default', 'created_at')
+        .distinct()
+    )
+
+    user_boards = [b for b in all_boards if b.owner_id == request.user.id]
+    default_board = next((b for b in user_boards if b.is_default), None)
+    shared_boards = [b for b in all_boards if b.owner_id != request.user.id]
 
     current_board = None
 
     if board_id:
-        current_board = Board.objects.filter(
-            Q(id=board_id) & (Q(owner=request.user) | Q(members=request.user))
-        ).distinct().first()
-
-        # Si el tablero no existe o el usuario ha dejado de ser miembro/propietario
+        current_board = next((b for b in all_boards if b.id == board_id), None)
         if not current_board:
             messages.warning(request, "Ya no tienes acceso a este tablero o ha sido eliminado.")
             return redirect('dashboard')
 
         base_tasks = Task.objects.filter(board=current_board)
     else:
-        # En la raíz (/), muestra tareas de tableros propios O asignadas al usuario O de tableros compartidos
         base_tasks = Task.objects.filter(
             Q(board__owner=request.user) | Q(board__members=request.user) | Q(assigned_to=request.user)
         ).distinct()
 
         task_filter = request.GET.get('filter', 'all')
-        
         if task_filter == 'mine':
-            # 👤 Mis tareas: 
-            # 1. Tareas asignadas explícitamente al usuario actual (en cualquier tablero)
-            # 2. O tareas creadas por él EN TABLEROS PRIVADOS/PERSONALES (sin más miembros) donde no esté asignado a otra persona
             base_tasks = base_tasks.filter(
                 Q(assigned_to=request.user) |
                 (
-                    Q(created_by=request.user) & 
+                    Q(created_by=request.user) &
                     (Q(board__isnull=True) | Q(board__members__isnull=True)) &
                     (Q(assigned_to__isnull=True) | Q(assigned_to=request.user))
                 )
             ).distinct()
-
         elif task_filter == 'shared':
-            # 🤝 Compartidas / Equipo: Tareas en tableros con miembros o asignadas
             base_tasks = base_tasks.filter(
                 Q(assigned_to=request.user) |
                 Q(board__members=request.user) |
                 (Q(board__owner=request.user) & Q(board__members__isnull=False))
             ).distinct()
-        # Si es 'all', muestra todas las tareas accesibles
-
-    has_shared_tasks = base_tasks.filter(~Q(created_by=request.user)).exists()
 
     if request.method == 'POST':
         form = TaskForm(request.POST, user=request.user, current_board=current_board)
         if form.is_valid():
             task = form.save(commit=False)
             task.created_by = request.user
-            
-            # Validar y asignar el tablero (soporta tableros propios y compartidos como miembro)
+
             selected_board = form.cleaned_data.get('board')
             if selected_board:
-                is_owner = selected_board.owner == request.user
-                is_member = selected_board.members.filter(id=request.user.id).exists()
-                
-                if is_owner or is_member:
-                    task.board = selected_board
-                else:
-                    task.board = current_board or default_board
+                is_owner = selected_board.owner_id == request.user.id
+                is_member = any(m.id == request.user.id for m in selected_board.members.all())
+                task.board = selected_board if (is_owner or is_member) else (current_board or default_board)
             else:
                 task.board = current_board or default_board
-                
-            task.save()
 
+            task.save()
             assigned_users = form.cleaned_data.get('assigned_to')
             if assigned_users:
                 task.assigned_to.set(assigned_users)
 
             return redirect('dashboard_board', board_id=board_id) if board_id else redirect('dashboard')
-        else:
-            print("❌ ERRORES DEL FORMULARIO:", form.errors)
-    else: 
+    else:
         form = TaskForm(user=request.user, current_board=current_board)
 
-    # === EXTRACCIÓN DE IDs ÚNICOS (ELIMINA DUPLICADOS DE JOIN M2M) ===
+    # === CARGA ÚNICA DE TAREAS CON RELACIONES PRECARGADAS ===
     active_task_ids = list(base_tasks.filter(is_completed=False).values_list('id', flat=True).distinct())
     completed_task_ids = list(base_tasks.filter(is_completed=True).values_list('id', flat=True).distinct())
 
-    active_tasks = Task.objects.filter(id__in=active_task_ids).order_by('created_at')
-    completed_tasks = Task.objects.filter(id__in=completed_task_ids).order_by('-updated_at')[:15]
-    # =================================================================
-
-    # Clasificación en listas para las columnas del tablero
-    q1_list = list(active_tasks.filter(urgency__gte=3, importance__gte=3))
-    q2_list = list(active_tasks.filter(urgency__lt=3, importance__gte=3))
-    q3_list = list(active_tasks.filter(urgency__gte=3, importance__lt=3))
-    q4_list = list(active_tasks.filter(urgency__lt=3, importance__lt=3))
-
-    
-    # FILTRADO DE MIEMBROS PARA ASIGNACIÓN DE TAREAS
-   
-    # Obtiene usuarios con los que has compartido tablero o tareas alguna vez
-    collaborator_ids = set(
-        User.objects.filter(
-            Q(shared_boards__owner=request.user) |        # Miembros de mis tableros
-            Q(boards__members=request.user) |             # Dueños de tableros donde soy miembro
-            Q(assigned_tasks__created_by=request.user) |  # Personas a las que les he creado/asignado tareas
-            Q(created_tasks__assigned_to=request.user)    # Personas que me han asignado tareas a mí
-        ).values_list('id', flat=True)
+    active_tasks = list(
+        Task.objects.filter(id__in=active_task_ids)
+        .select_related('board', 'created_by')
+        .prefetch_related('assigned_to', 'board__members')
+        .order_by('created_at')
+    )
+    completed_tasks = list(
+        Task.objects.filter(id__in=completed_task_ids)
+        .select_related('board', 'created_by')
+        .prefetch_related('assigned_to')
+        .order_by('-updated_at')[:15]
     )
 
-    # Añadimos al propio usuario activo
-    collaborator_ids.add(request.user.id)
+    # Clasificación en memoria (0 consultas extra a Supabase)
+    q1_list = [t for t in active_tasks if (t.urgency or 0) >= 3 and (t.importance or 0) >= 3]
+    q2_list = [t for t in active_tasks if (t.urgency or 0) < 3 and (t.importance or 0) >= 3]
+    q3_list = [t for t in active_tasks if (t.urgency or 0) >= 3 and (t.importance or 0) < 3]
+    q4_list = [t for t in active_tasks if (t.urgency or 0) < 3 and (t.importance or 0) < 3]
 
-    # Cargar los objetos User de la red de contactos
-    board_members = User.objects.filter(id__in=collaborator_ids).distinct()
+    has_shared_tasks = any(t.created_by_id != request.user.id for t in active_tasks) or any(
+        t.created_by_id != request.user.id for t in completed_tasks
+    )
+
+    # Red de colaboradores sin queries extra
+    collaborator_ids = set(
+        User.objects.filter(
+            Q(shared_boards__owner=request.user) |
+            Q(boards__members=request.user) |
+            Q(assigned_tasks__created_by=request.user) |
+            Q(created_tasks__assigned_to=request.user)
+        ).values_list('id', flat=True)
+    )
+    collaborator_ids.add(request.user.id)
+    board_members = list(User.objects.filter(id__in=collaborator_ids).distinct())
 
     context = {
         'form': form,
         'board_form': BoardForm(),
-        'boards': all_boards,          # Lista unificada y ordenada (Personales -> Compartidos)
-        'user_boards': user_boards,    # Mapeo retrocompatible para tableros propios
-        'shared_boards': shared_boards,# Mapeo retrocompatible para tableros compartidos
-        
-        # 🚀 Filtro de miembros aplicado manteniendo compatibilidad con ambos nombres
+        'boards': all_boards,
+        'user_boards': user_boards,
+        'shared_boards': shared_boards,
         'board_members': board_members,
-        'users': board_members,        
-        
+        'users': board_members,
         'current_board': current_board,
         'default_board': default_board,
         'has_shared_tasks': has_shared_tasks,
-        'has_shared_boards': any(b.members.exists() or b.owner != request.user for b in all_boards if not b.is_default),
-        
-        # Listas de tareas activas por cuadrante
+        'has_shared_boards': any(b.is_shared == 1 for b in all_boards if not b.is_default),
         'q1_tasks': q1_list,
         'q2_tasks': q2_list,
         'q3_tasks': q3_list,
         'q4_tasks': q4_list,
         'completed_tasks': completed_tasks,
-
-        # Conteos numéricos para el bloque "DISTRIBUCIÓN ACTUAL" del sidebar
         'q1_count': len(q1_list),
         'q2_count': len(q2_list),
         'q3_count': len(q3_list),
@@ -197,6 +165,7 @@ def dashboard_view(request, board_id=None):
     }
 
     return render(request, 'tasks/dashboard.html', context)
+
 
 class BoardCreateView(LoginRequiredMixin, CreateView):
     model = Board

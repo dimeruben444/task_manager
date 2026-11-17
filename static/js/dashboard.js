@@ -1,5 +1,3 @@
-
-
 function updateLabel(type, value) {
     // Seleccionamos estrictamente el sublabel (el span de texto superior)
     const labelEl = document.getElementById(type === 'urgency' ? 'urgencyLabelQuick' : 'importanceLabelQuick');
@@ -611,7 +609,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 formData.append('importance', importance);
 
                 try {
-                    const response = await fetch(`/task/${taskId}/edit/`, {
+                    const response = await fetch(`/tasks/task/${taskId}/edit/`, {
                         method: 'POST',
                         headers: {
                             'X-Requested-With': 'XMLHttpRequest',
@@ -812,6 +810,7 @@ document.addEventListener('click', function (e) {
         dropdown.style.display = 'none';
     }
 });
+
 function clearGlobalSearch() {
     const searchInput = document.getElementById('globalTaskSearchInput');
     const dropdown = document.getElementById('searchDropdownResults');
@@ -857,7 +856,6 @@ document.addEventListener('keydown', function(e) {
 });
 
 // Oculta o muestra el letrero "No hay tareas..." en cada cuadrante dinámicamente
-
 function checkEmptyQuadrants() {
     ['Q1', 'Q2', 'Q3', 'Q4'].forEach(quadCode => {
         const container = document.querySelector(`.quadrant-container[data-quadrant="${quadCode}"]`);
@@ -869,7 +867,7 @@ function checkEmptyQuadrants() {
 
         if (emptyMsg) {
             if (realTasks.length > 0) {
-                // Si hay tarjetas realmentes en el DOM, forzamos ocultar
+                // Si hay tarjetas reales en el DOM, forzamos ocultar
                 emptyMsg.classList.add('d-none');
                 emptyMsg.style.setProperty('display', 'none', 'important');
             } else {
@@ -886,7 +884,7 @@ document.addEventListener('DOMContentLoaded', function () {
     checkEmptyQuadrants();
 });
 
-//actualiza tanto el número de cada cuadrante
+// Actualiza tanto el número de cada cuadrante
 function updateMatrixAndSidebarCounts() {
     // Verificación e invisibilidad inmediata del letrero "No hay tareas"
     checkEmptyQuadrants();
@@ -913,7 +911,7 @@ function updateMatrixAndSidebarCounts() {
 }
 
 
-//scroll ajustado para que se vean los tableros
+// Scroll ajustado para que se vean los tableros
 let isAnimating = false;
 
 window.addEventListener('wheel', function(e) {
@@ -943,38 +941,6 @@ window.addEventListener('wheel', function(e) {
     }
 }, { passive: false });
 
-// Gestión de envíos de invitación desde los modals de tablero en el sidebar
-// Envía las invitaciones acumuladas haciendo submit del formulario principal del tablero
-function sendBoardInvite(boardId) {
-    const users = selectedUsersMap[boardId] || [];
-    const feedbackEl = document.getElementById(`invite-feedback-${boardId}`);
-
-    if (users.length === 0) {
-        if (feedbackEl) {
-            feedbackEl.className = "text-danger fw-bold";
-            feedbackEl.textContent = "Selecciona al menos una persona de la lista primero.";
-        }
-        return;
-    }
-
-    // Buscar el formulario principal del modal
-    const inputEl = document.getElementById(`invite-input-${boardId}`);
-    const form = inputEl ? inputEl.closest('form') : null;
-
-    if (form) {
-        // Asegurar que renderSelectedUsers ha volcado los datos al input oculto antes de enviar
-        renderSelectedUsers(boardId);
-        
-        if (feedbackEl) {
-            feedbackEl.className = "text-success fw-bold";
-            feedbackEl.textContent = `Enviando invitación a ${users.length} persona(s)...`;
-        }
-        
-        form.submit();
-    } else {
-        console.error("No se encontró el formulario para el tablero:", boardId);
-    }
-}
 
 // ==========================================
 // BUSCADOR EN VIVO DE INVITADOS PARA TABLEROS (MÚLTIPLES SELECCIONES)
@@ -1207,43 +1173,6 @@ function sendBoardInvite(boardId) {
 }
 
 
-// ==========================================
-// POLLING DE NOTIFICACIONES EN TIEMPO REAL
-// ==========================================
-function pollUnreadNotifications() {
-    // Si la pestaña no está activa o visible, pausar peticiones
-    if (document.hidden) return;
-
-    fetch('/api/unread-notifications-count/', {
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest',
-            'Accept': 'application/json'
-        }
-    })
-    .then(res => res.ok ? res.json() : Promise.reject())
-    .then(data => {
-        const bellBtn = document.getElementById('notificationsDropdown');
-        if (!bellBtn) return;
-
-        let redDot = bellBtn.querySelector('.notification-red-dot');
-
-        if (data.unread_count > 0) {
-            if (!redDot) {
-                const dot = document.createElement('span');
-                dot.className = 'notification-red-dot';
-                bellBtn.appendChild(dot);
-            }
-        } else if (redDot) {
-            redDot.remove();
-        }
-    })
-    .catch(err => console.debug("Polling pausado o sin conexión"));
-}
-
-// Comprobar notificaciones no leídas cada 12 segundos
-setInterval(pollUnreadNotifications, 12000);
-
-
 // =======================================================
 // CONTROLADOR TÁCTIL Y MENÚ DE ACCIONES (MÓVIL / TABLET)
 // =======================================================
@@ -1407,7 +1336,7 @@ function fetchNotificationsList() {
 
     const cacheBuster = new Date().getTime();
 
-    fetch(`/api/notifications-list-html/?_t=${cacheBuster}`, {
+    fetch(`/tasks/api/notifications-list-html/?_t=${cacheBuster}`, {
         headers: {
             'X-Requested-With': 'XMLHttpRequest',
             'Accept': 'text/html, application/json',
@@ -1426,7 +1355,7 @@ function pollUnreadNotifications() {
 
     const cacheBuster = new Date().getTime();
 
-    fetch(`/api/unread-notifications-count/?_t=${cacheBuster}`, {
+    fetch(`/tasks/api/unread-notifications-count/?_t=${cacheBuster}`, {
         headers: {
             'X-Requested-With': 'XMLHttpRequest',
             'Accept': 'application/json',
@@ -1485,7 +1414,7 @@ document.addEventListener('visibilitychange', function() {
     }
 });
 
-setInterval(pollUnreadNotifications, 8000);
+setInterval(pollUnreadNotifications, 30000);
 
 
 // Aislamiento completo del scroll dentro del desplegable de notificaciones
@@ -1496,7 +1425,6 @@ document.addEventListener('wheel', function(e) {
     const targetList = list.classList.contains('notifications-list') ? list : list.querySelector('.notifications-list');
     if (!targetList) return;
 
-    const scrollTop = targetList.scrollTop;
     const scrollHeight = targetList.scrollHeight;
     const height = targetList.clientHeight;
     const delta = e.deltaY;
@@ -1508,5 +1436,3 @@ document.addEventListener('wheel', function(e) {
         e.stopPropagation();
     }
 }, { passive: false });
-
-
