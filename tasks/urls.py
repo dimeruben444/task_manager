@@ -30,4 +30,6 @@ urlpatterns = [
     # Rutas de API Notificaciones
     path('api/unread-notifications-count/', views.unread_notifications_count, name='unread_notifications_count'),
     path('api/notifications-list-html/', views.notifications_list_html, name='notifications_list_html'),
+
+    path('cron/send-reminders/', views.trigger_email_reminders, name='trigger_email_reminders'),
 ]

@@ -19,6 +19,14 @@ import json
 
 from django.template.loader import render_to_string
 
+
+import io
+from django.views.decorators.http import require_GET
+from django.core.management import call_command
+from django.http import JsonResponse, HttpResponseForbidden
+from django.conf import settings
+
+
 # Valores predeterminados de urgencia e importancia al mover a cada cuadrante activo
 QUADRANT_DEFAULTS = {
     'Q1': {'urgency': 4, 'importance': 4},  # Hacer ahora (Urgente e Importante)
@@ -395,3 +403,20 @@ def notifications_list_html(request):
     """Devuelve la lista parcial en HTML de las notificaciones sin recargar la página."""
     notifications = Notification.objects.filter(recipient=request.user).order_by('-created_at')[:10]
     return render(request, 'partials/_notifications_list.html', {'notifications': notifications})
+
+
+@require_GET
+def trigger_email_reminders(request):
+    token = request.GET.get('token', '')
+    expected_token = getattr(settings, 'CRON_SECRET_TOKEN', None)
+
+    if not expected_token or token != expected_token:
+        return HttpResponseForbidden("Acceso denegado: token inválido.")
+
+    output = io.StringIO()
+    call_command('send_reminders', stdout=output)
+
+    return JsonResponse({
+        'status': 'ok',
+        'log': output.getvalue().strip()
+    })
