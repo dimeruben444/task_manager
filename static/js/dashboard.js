@@ -1345,12 +1345,22 @@ function playNotificationSound() {
     }
 }
 
+
 function fetchNotificationsList() {
     const bellBtn = document.getElementById('notificationsDropdown');
     if (!bellBtn) return;
 
-    const dropdownWrapper = bellBtn.closest('.dropdown');
-    const notificationsContainer = dropdownWrapper ? dropdownWrapper.querySelector('.notifications-list') : null;
+    // Buscar el menú desplegable asociado por aria-labelledby o hermano inmediato
+    const dropdownMenu = document.querySelector('[aria-labelledby="notificationsDropdown"]') 
+        || (bellBtn.parentElement ? bellBtn.parentElement.querySelector('.dropdown-menu') : null);
+    
+    if (!dropdownMenu) return;
+
+    // Buscar el contenedor interior (después del <hr>) o .notifications-list
+    const hrEl = dropdownMenu.querySelector('hr');
+    const notificationsContainer = dropdownMenu.querySelector('.notifications-list') 
+        || (hrEl ? hrEl.nextElementSibling : null);
+
     if (!notificationsContainer) return;
 
     const cacheBuster = new Date().getTime();
@@ -1358,7 +1368,7 @@ function fetchNotificationsList() {
     fetch(`/tasks/api/notifications-list-html/?_t=${cacheBuster}`, {
         headers: {
             'X-Requested-With': 'XMLHttpRequest',
-            'Accept': 'text/html, application/json',
+            'Accept': 'text/html',
             'Cache-Control': 'no-cache'
         }
     })
@@ -1370,6 +1380,8 @@ function fetchNotificationsList() {
     })
     .catch(err => console.error("Error refrescando notificaciones:", err));
 }
+
+
 
 function pollUnreadNotifications() {
     if (document.hidden) return;
