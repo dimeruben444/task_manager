@@ -425,7 +425,8 @@ def notifications_list_html(request):
     """Devuelve la lista parcial en HTML de las notificaciones sin recargar la página."""
     from boards.models import Notification
     notifications = (
-        Notification.objects.filter(recipient=request.user)
+        Notification.objects.filter(recipient=request.user, is_read=False)
+        .exclude(notification_type='invitation', invitation__status__in=['accepted', 'rejected'])
         .select_related('actor', 'target_board', 'target_task', 'invitation')
         .order_by('-created_at')[:10]
     )
@@ -433,6 +434,7 @@ def notifications_list_html(request):
         'notifications': notifications,
         'notifications_list': notifications,
     })
+
 
 @require_GET
 def trigger_email_reminders(request):
