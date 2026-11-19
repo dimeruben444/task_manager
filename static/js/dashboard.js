@@ -627,7 +627,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             const newCard = tempDiv.firstElementChild;
                             itemEl.replaceWith(newCard);
 
-                            // Si la tarea vence en <= 2 días y el servidor la devolvió a Q1/Q3
+                            // Si la fecha límite (<= 2 días) impide moverla fuera de Q1/Q3
                             if (data.quadrant && data.quadrant !== targetQuadrant) {
                                 const realContainer = document.querySelector(`.quadrant-container[data-quadrant="${data.quadrant}"]`);
                                 if (realContainer) {
@@ -642,7 +642,6 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                         updateMatrixAndSidebarCounts();
                     } else {
-                        // Si fallara en servidor, devolvemos la tarjeta a su columna original
                         const inlineWrapper = sourceContainer.querySelector('.add-task-inline-wrapper');
                         if (inlineWrapper) sourceContainer.insertBefore(itemEl, inlineWrapper);
                         else sourceContainer.appendChild(itemEl);

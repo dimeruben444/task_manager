@@ -294,7 +294,7 @@ def update_task_position(request):
     try:
         data = json.loads(request.body)
         task_id = data.get('task_id')
-        target_quadrant = data.get('target_quadrant')  # 'Q1', 'Q2', 'Q3', 'Q4' o 'DONE'
+        target_quadrant = data.get('target_quadrant')
 
         if not task_id or not target_quadrant:
             return JsonResponse({'status': 'error', 'message': 'Parámetros incompletos'}, status=400)
@@ -314,34 +314,24 @@ def update_task_position(request):
         if target_quadrant == 'DONE':
             task.is_completed = True
             task.quadrant = 'DONE'
-
         elif target_quadrant in QUADRANT_DEFAULTS:
             task.is_completed = False
             defaults = QUADRANT_DEFAULTS[target_quadrant]
             urgency = defaults['urgency']
             importance = defaults['importance']
 
-            # Mantener la misma regla de negocio si vence en <= 2 días
+            # Comprobar si la fecha límite fuerza urgencia (<= 2 días)
             if task.due_date:
-                today = timezone.now().date()
-                due_date = task.due_date.date() if hasattr(task.due_date, 'date') else task.due_date
-                if (due_date - today).days <= 2 and urgency <= 2:
-                    urgency = 3
+                time_left = task.due_date - timezone.now()
+                if time_left <= timedelta(days=2) and urgency <= 2:
+                    urgency = 4
                     date_blocked = True
 
             task.urgency = urgency
             task.importance = importance
-
-            if urgency >= 3 and importance >= 3:
-                task.quadrant = 'Q1'
-            elif urgency <= 2 and importance >= 3:
-                task.quadrant = 'Q2'
-            elif urgency >= 3 and importance <= 2:
-                task.quadrant = 'Q3'
-            else:
-                task.quadrant = 'Q4'
+            task.quadrant = task.calculate_quadrant()
         else:
-            return JsonResponse({'status': 'error', 'message': f'Cuadrante no válido: {target_quadrant}'}, status=400)
+            return JsonResponse({'status': 'error', 'message': 'Cuadrante no válido'}, status=400)
 
         task.save(update_fields=['is_completed', 'quadrant', 'urgency', 'importance', 'updated_at'])
 
