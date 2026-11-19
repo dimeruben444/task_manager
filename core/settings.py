@@ -221,9 +221,10 @@ LOGOUT_REDIRECT_URL = 'login'
 
 
 # Configuración de Email (SendGrid / Brevo)
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND = 'core.email_backend.SendGridWebAPIBackend'
 EMAIL_HOST = 'smtp.sendgrid.net'
 EMAIL_PORT = 587
+EMAIL_TIMEOUT = 10
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'apikey'
 EMAIL_HOST_PASSWORD = os.getenv('SENDGRID_API_KEY')
