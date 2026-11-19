@@ -418,6 +418,7 @@ def unread_notifications_count(request):
     count = Notification.objects.filter(recipient=request.user, is_read=False).count()
     return JsonResponse({'unread_count': count})
 
+
 @login_required
 @never_cache
 def notifications_list_html(request):
@@ -428,7 +429,10 @@ def notifications_list_html(request):
         .select_related('actor', 'target_board', 'target_task', 'invitation')
         .order_by('-created_at')[:10]
     )
-    return render(request, 'partials/_notifications_list.html', {'notifications': notifications})
+    return render(request, 'partials/_notifications_list.html', {
+        'notifications': notifications,
+        'notifications_list': notifications,
+    })
 
 @require_GET
 def trigger_email_reminders(request):

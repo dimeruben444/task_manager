@@ -1367,8 +1367,8 @@ function fetchNotificationsList() {
     const bellBtn = document.getElementById('notificationsDropdown');
     if (!bellBtn) return;
 
-    const dropdownMenu = bellBtn.nextElementSibling;
-    const notificationsContainer = dropdownMenu ? dropdownMenu.querySelector('.notifications-list') : null;
+    const dropdownWrapper = bellBtn.closest('.dropdown');
+    const notificationsContainer = dropdownWrapper ? dropdownWrapper.querySelector('.notifications-list') : null;
     if (!notificationsContainer) return;
 
     const cacheBuster = new Date().getTime();
@@ -1376,15 +1376,17 @@ function fetchNotificationsList() {
     fetch(`/tasks/api/notifications-list-html/?_t=${cacheBuster}`, {
         headers: {
             'X-Requested-With': 'XMLHttpRequest',
-            'Accept': 'text/html, application/json',
+            'Accept': 'text/html',
             'Cache-Control': 'no-cache'
         }
     })
-    .then(res => res.ok ? res.text() : Promise.reject())
+    .then(res => res.ok ? res.text() : Promise.reject(res.status))
     .then(htmlContent => {
-        notificationsContainer.innerHTML = htmlContent;
+        if (htmlContent && htmlContent.trim() !== '') {
+            notificationsContainer.innerHTML = htmlContent;
+        }
     })
-    .catch(err => console.debug("No se pudo refrescar la lista de notificaciones"));
+    .catch(err => console.error("Error refrescando notificaciones:", err));
 }
 
 function pollUnreadNotifications() {
