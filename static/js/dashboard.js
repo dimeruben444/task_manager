@@ -1438,7 +1438,7 @@ document.addEventListener('visibilitychange', function() {
     }
 });
 
-setInterval(pollUnreadNotifications, 30000);
+setInterval(pollUnreadNotifications, 10000);
 
 
 // Aislamiento completo del scroll dentro del desplegable de notificaciones
