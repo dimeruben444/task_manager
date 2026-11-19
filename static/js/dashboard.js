@@ -1297,30 +1297,12 @@ function executeMobileEdit(taskId) {
     }
 }
 
-
 // ==========================================
 // POLLING Y REFRESCO EN TIEMPO REAL DE NOTIFICACIONES
 // ==========================================
 
-let previousUnreadCount = 0;
-let isFirstNotificationPoll = true;
+let previousUnreadCount = null;
 let audioCtx = null;
-
-document.addEventListener('DOMContentLoaded', function() {
-    const bellBtn = document.getElementById('notificationsDropdown');
-    if (bellBtn) {
-        const initialDot = bellBtn.querySelector('.notification-red-dot');
-        if (initialDot) {
-            previousUnreadCount = parseInt(initialDot.textContent, 10) || 1;
-            isFirstNotificationPoll = false;
-        }
-        bellBtn.addEventListener('show.bs.dropdown', function () {
-            fetchNotificationsList();
-        });
-    }
-    // Primera comprobación a los 4 segundos de cargar
-    setTimeout(pollUnreadNotifications, 4000);
-});
 
 function getAudioContext() {
     if (!audioCtx) {
@@ -1376,7 +1358,7 @@ function fetchNotificationsList() {
     fetch(`/tasks/api/notifications-list-html/?_t=${cacheBuster}`, {
         headers: {
             'X-Requested-With': 'XMLHttpRequest',
-            'Accept': 'text/html',
+            'Accept': 'text/html, application/json',
             'Cache-Control': 'no-cache'
         }
     })
@@ -1409,6 +1391,12 @@ function pollUnreadNotifications() {
         let redDot = bellBtn.querySelector('.notification-red-dot');
         const currentCount = data.unread_count || 0;
 
+        // Inicializar contador base leyendo el DOM en la primera ejecución
+        if (previousUnreadCount === null) {
+            const initialDot = bellBtn.querySelector('.notification-red-dot');
+            previousUnreadCount = initialDot ? (parseInt(initialDot.textContent, 10) || 1) : 0;
+        }
+
         if (currentCount > 0) {
             const displayValue = currentCount > 99 ? '99+' : currentCount;
 
@@ -1417,10 +1405,10 @@ function pollUnreadNotifications() {
                 redDot.className = 'notification-red-dot';
                 bellBtn.appendChild(redDot);
             }
-            
             redDot.textContent = displayValue;
 
-            if ((!isFirstNotificationPoll && currentCount > previousUnreadCount) || (isFirstNotificationPoll && currentCount > 0)) {
+            // Si subió el contador respecto a la comprobación anterior, sonamos y precargamos el HTML
+            if (currentCount > previousUnreadCount) {
                 playNotificationSound();
                 fetchNotificationsList();
             }
@@ -1429,10 +1417,16 @@ function pollUnreadNotifications() {
         }
 
         previousUnreadCount = currentCount;
-        isFirstNotificationPoll = false;
     })
     .catch(err => console.debug("Polling en pausa"));
 }
+
+// Delegación global de clic sobre la campana (garantiza disparo aunque se pinche en el SVG)
+document.addEventListener('click', function (e) {
+    if (e.target.closest('#notificationsDropdown')) {
+        fetchNotificationsList();
+    }
+});
 
 document.addEventListener('visibilitychange', function() {
     if (!document.hidden) {
