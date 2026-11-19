@@ -276,9 +276,9 @@ class BoardUpdateView(LoginRequiredMixin, UpdateView):
                 if target_user and target_user not in board.members.all() and target_user != board.owner:
                     invitation, created = BoardInvitation.objects.get_or_create(
                         board=board,
-                        sender=request.user,
                         receiver=target_user,
-                        defaults={'status': 'pending'}
+                        status='pending',
+                        defaults={'sender': request.user}
                     )
 
                     if created:

@@ -1306,6 +1306,22 @@ let previousUnreadCount = 0;
 let isFirstNotificationPoll = true;
 let audioCtx = null;
 
+document.addEventListener('DOMContentLoaded', function() {
+    const bellBtn = document.getElementById('notificationsDropdown');
+    if (bellBtn) {
+        const initialDot = bellBtn.querySelector('.notification-red-dot');
+        if (initialDot) {
+            previousUnreadCount = parseInt(initialDot.textContent, 10) || 1;
+            isFirstNotificationPoll = false;
+        }
+        bellBtn.addEventListener('show.bs.dropdown', function () {
+            fetchNotificationsList();
+        });
+    }
+    // Primera comprobación a los 4 segundos de cargar
+    setTimeout(pollUnreadNotifications, 4000);
+});
+
 function getAudioContext() {
     if (!audioCtx) {
         const AudioContextClass = window.AudioContext || window.webkitAudioContext;
@@ -1319,7 +1335,6 @@ function getAudioContext() {
     return audioCtx;
 }
 
-// Desbloquear motor de audio con el primer toque/clic
 document.addEventListener('click', function unlockAudio() {
     getAudioContext();
     document.removeEventListener('click', unlockAudio);
@@ -1348,13 +1363,12 @@ function playNotificationSound() {
     }
 }
 
-// Carga el HTML fresco de la lista de notificaciones desde el servidor
 function fetchNotificationsList() {
     const bellBtn = document.getElementById('notificationsDropdown');
     if (!bellBtn) return;
 
-    // Localiza específicamente el contenedor interno de la lista de notificaciones
-    const notificationsContainer = bellBtn.nextElementSibling ? bellBtn.nextElementSibling.querySelector('.notifications-list') : null;
+    const dropdownMenu = bellBtn.nextElementSibling;
+    const notificationsContainer = dropdownMenu ? dropdownMenu.querySelector('.notifications-list') : null;
     if (!notificationsContainer) return;
 
     const cacheBuster = new Date().getTime();
@@ -1402,14 +1416,11 @@ function pollUnreadNotifications() {
                 bellBtn.appendChild(redDot);
             }
             
-            // Actualizar número
             redDot.textContent = displayValue;
 
-            if (!isFirstNotificationPoll && currentCount > previousUnreadCount) {
+            if ((!isFirstNotificationPoll && currentCount > previousUnreadCount) || (isFirstNotificationPoll && currentCount > 0)) {
                 playNotificationSound();
-                if (bellBtn.classList.contains('show')) {
-                    fetchNotificationsList();
-                }
+                fetchNotificationsList();
             }
         } else if (redDot) {
             redDot.remove();
@@ -1420,16 +1431,6 @@ function pollUnreadNotifications() {
     })
     .catch(err => console.debug("Polling en pausa"));
 }
-
-// AL PINCHAR EN LA CAMPANA: Refresca el menú desplegable antes de mostrarlo
-document.addEventListener('DOMContentLoaded', function() {
-    const bellBtn = document.getElementById('notificationsDropdown');
-    if (bellBtn) {
-        bellBtn.addEventListener('show.bs.dropdown', function () {
-            fetchNotificationsList();
-        });
-    }
-});
 
 document.addEventListener('visibilitychange', function() {
     if (!document.hidden) {
