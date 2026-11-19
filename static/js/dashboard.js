@@ -604,37 +604,61 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 updateMatrixAndSidebarCounts();
 
-                const formData = new FormData();
-                formData.append('urgency', urgency);
-                formData.append('importance', importance);
-
                 try {
-                    const response = await fetch(`/tasks/task/${taskId}/edit/`, {
+                    const response = await fetch('/tasks/move/', {
                         method: 'POST',
                         headers: {
+                            'Content-Type': 'application/json',
                             'X-Requested-With': 'XMLHttpRequest',
                             'X-CSRFToken': getCookie('csrftoken')
                         },
-                        body: formData
+                        body: JSON.stringify({
+                            task_id: taskId,
+                            target_quadrant: targetQuadrant
+                        })
                     });
 
-                    if (response.ok) {
-                        const data = await response.json().catch(() => ({ status: 'success' }));
-                        
-                        if (data && data.card_html) {
+                    const data = await response.json().catch(() => null);
+
+                    if (response.ok && data && data.status === 'success') {
+                        if (data.card_html) {
                             const tempDiv = document.createElement('div');
                             tempDiv.innerHTML = data.card_html.trim();
                             const newCard = tempDiv.firstElementChild;
                             itemEl.replaceWith(newCard);
+
+                            // Si la tarea vence en <= 2 días y el servidor la devolvió a Q1/Q3
+                            if (data.quadrant && data.quadrant !== targetQuadrant) {
+                                const realContainer = document.querySelector(`.quadrant-container[data-quadrant="${data.quadrant}"]`);
+                                if (realContainer) {
+                                    const inlineWrapper = realContainer.querySelector('.add-task-inline-wrapper');
+                                    if (inlineWrapper) realContainer.insertBefore(newCard, inlineWrapper);
+                                    else realContainer.appendChild(newCard);
+                                }
+                                if (data.date_restriction_applied && typeof window.triggerDueDateShake === 'function') {
+                                    window.triggerDueDateShake(newCard);
+                                }
+                            }
                         }
+                        updateMatrixAndSidebarCounts();
+                    } else {
+                        // Si fallara en servidor, devolvemos la tarjeta a su columna original
+                        const inlineWrapper = sourceContainer.querySelector('.add-task-inline-wrapper');
+                        if (inlineWrapper) sourceContainer.insertBefore(itemEl, inlineWrapper);
+                        else sourceContainer.appendChild(itemEl);
                         updateMatrixAndSidebarCounts();
                     }
                 } catch (err) {
-                    console.error('Error en la petición AJAX:', err);
+                    console.error('Error al mover la tarea:', err);
+                    const inlineWrapper = sourceContainer.querySelector('.add-task-inline-wrapper');
+                    if (inlineWrapper) sourceContainer.insertBefore(itemEl, inlineWrapper);
+                    else sourceContainer.appendChild(itemEl);
+                    updateMatrixAndSidebarCounts();
                 } finally {
                     isProcessingMove = false;
                 }
             }
+
         });
 
         // Guardar referencia en el contenedor para actualizaciones dinámicas

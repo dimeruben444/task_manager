@@ -286,6 +286,7 @@ def quick_create_task(request):
 
 
 # 5. Mover tarea mediante Drag & Drop (SortableJS)
+
 @login_required
 @csrf_protect
 @require_POST
@@ -302,10 +303,13 @@ def update_task_position(request):
             Task.objects.filter(
                 Q(created_by=request.user) |
                 Q(assigned_to=request.user) |
-                Q(board__owner=request.user)
+                Q(board__owner=request.user) |
+                Q(board__members=request.user)
             ).distinct(),
             pk=task_id
         )
+
+        date_blocked = False
 
         if target_quadrant == 'DONE':
             task.is_completed = True
@@ -313,21 +317,47 @@ def update_task_position(request):
 
         elif target_quadrant in QUADRANT_DEFAULTS:
             task.is_completed = False
-            task.quadrant = target_quadrant
             defaults = QUADRANT_DEFAULTS[target_quadrant]
-            task.urgency = defaults['urgency']
-            task.importance = defaults['importance']
+            urgency = defaults['urgency']
+            importance = defaults['importance']
 
+            # Mantener la misma regla de negocio si vence en <= 2 días
+            if task.due_date:
+                today = timezone.now().date()
+                due_date = task.due_date.date() if hasattr(task.due_date, 'date') else task.due_date
+                if (due_date - today).days <= 2 and urgency <= 2:
+                    urgency = 3
+                    date_blocked = True
+
+            task.urgency = urgency
+            task.importance = importance
+
+            if urgency >= 3 and importance >= 3:
+                task.quadrant = 'Q1'
+            elif urgency <= 2 and importance >= 3:
+                task.quadrant = 'Q2'
+            elif urgency >= 3 and importance <= 2:
+                task.quadrant = 'Q3'
+            else:
+                task.quadrant = 'Q4'
         else:
             return JsonResponse({'status': 'error', 'message': f'Cuadrante no válido: {target_quadrant}'}, status=400)
 
-        task.save()
+        task.save(update_fields=['is_completed', 'quadrant', 'urgency', 'importance', 'updated_at'])
+
+        card_html = render_to_string(
+            '_includes/tasks/_task_card.html',
+            {'task': task, 'request': request},
+            request=request
+        )
 
         return JsonResponse({
             'status': 'success',
             'task_id': task.id,
             'quadrant': task.quadrant,
-            'is_completed': task.is_completed
+            'is_completed': task.is_completed,
+            'card_html': card_html,
+            'date_restriction_applied': date_blocked
         })
 
     except json.JSONDecodeError:
