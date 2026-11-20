@@ -253,8 +253,5 @@ else:
     SECURE_HSTS_PRELOAD = False
 
 
-SITE_URL = os.getenv(
-    'SITE_URL',
-    'https://eisenhowerflow.onrender.com' if not DEBUG else 'http://127.0.0.1:8000'
-)
+SITE_URL = os.getenv('SITE_URL', 'http://127.0.0.1:8000')
 CRON_SECRET_TOKEN = os.getenv('CRON_SECRET_TOKEN')
