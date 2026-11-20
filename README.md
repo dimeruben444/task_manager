@@ -8,11 +8,12 @@ Aplicación web de gestión de tareas y productividad basada en la matriz de Eis
 
 ## Características principales
 
-- **Matriz de Eisenhower interactiva:** Clasificación visual en cuatro cuadrantes (*Hacer*, *Planificar*, *Delegar* y *Eliminar*) con actualización dinámica mediante peticiones asíncronas.
-- **Tableros colaborativos:** Creación de múltiples espacios de trabajo con sistema de invitaciones, gestión de permisos y panel de notificaciones en tiempo real.
+- **Matriz de Eisenhower interactiva:** Clasificación visual en cuatro cuadrantes (*Hacer*, *Planificar*, *Delegar* y *Eliminar*) con actualización dinámica mediante peticiones asíncronas y soporte *drag-and-drop*.
+- **Tableros colaborativos:** Creación de múltiples espacios de trabajo (`boards`) con sistema de invitaciones, gestión de miembros y panel de notificaciones en tiempo real.
 - **Sistema de recordatorios y correo transaccional:** Envío automatizado de avisos de vencimiento y recuperación de contraseñas a través de un backend personalizado integrado con la API HTTP v3 de SendGrid (`core/email_backend.py`).
-- **Internacionalización (i18n):** Soporte completo para español e inglés tanto en la interfaz web como en las plantillas de correo electrónico.
-- **Autenticación y perfiles de usuario:** Registro, inicio de sesión, recuperación de contraseña y configuración de cuenta.
+- **Internacionalización (i18n):** Soporte completo para español e inglés (`locale/`) tanto en la interfaz web como en las plantillas de correo electrónico.
+- **Autenticación y perfiles de usuario:** Registro, inicio de sesión personalizado, recuperación de contraseña y gestión de cuenta.
+- **Suite de pruebas:** Cobertura de tests unitarios y de integración por aplicación, junto con pruebas End-to-End en `e2e/`.
 
 ---
 
@@ -29,13 +30,28 @@ Aplicación web de gestión de tareas y productividad basada en la matriz de Eis
 ## Estructura del proyecto
 
 ```text
-task_manager/
-├── core/                   # Configuración principal, settings, backend de email y plantillas base
-│   ├── email_backend.py    # Integración con SendGrid API v3
+taskmanager/
+├── boards/                 # Gestión de tableros colaborativos, invitaciones y notificaciones
+├── core/                   # Configuración global, backend de email y plantillas base
+│   ├── email_backend.py    # Integración con SendGrid Web API v3
 │   ├── settings.py         # Configuración de entornos, seguridad e i18n
 │   └── templates/          # Plantillas globales, registro y correos HTML
-├── tasks/                  # Lógica de tableros, cuadrantes, tareas, invitaciones y notificaciones
-├── users/                  # Gestión de usuarios, autenticación y perfiles
-├── static/                 # Recursos estáticos (CSS compilado, JS, SVG/PNG)
+├── tasks/                  # Lógica de tareas, cuadrantes, formularios y comandos de recordatorio
+│   └── management/commands/# Comando send_reminders para envío programado
+├── users/                  # Autenticación personalizada, modelos de usuario y señales
+├── e2e/                    # Pruebas End-to-End (autenticación, dashboard y modales)
+├── locale/                 # Archivos de traducción (en / es)
+├── static/                 # Recursos estáticos (SCSS, CSS compilado, JS e imágenes)
 ├── manage.py
-└── requirements.txt
+├── Procfile
+├── requirements.txt
+├── run_auto_reminders.py
+└── runtime.txt
+```
+
+
+---
+
+## Autoría y derechos
+
+Desarrollado por **Rubén López Pérez**. Todos los derechos reservados.
